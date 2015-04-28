@@ -28,12 +28,11 @@ abstract class GamePlayer {
 
 object OneQuestionBaseline extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
-    println(state.payload)
     if (state.payload == null) state.payload = (0, state.graph.nodes.size)
     val i = state.payload.asInstanceOf[(Int,Int)]
     if (i._1 < i._2) {
       state.payload = (i._1+1,i._2)
-      MakeHumanObservation(state.graph.nodes(i._1))
+      MakeHumanObservation(state.oldToNew(state.originalGraph.nodes(i._1)))
     }
     else TurnInGuess()
   }
@@ -49,6 +48,8 @@ case class GameState(graph : Graph,
                      lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
+  var originalGraph : Graph = graph
+  var oldToNew : Map[GraphNode,GraphNode] = graph.nodes.map(n => (n,n)).toMap
 
   val assumedHumanCost = 1.0
   val assumedHumanDelay = 1.0
@@ -68,6 +69,8 @@ case class GameState(graph : Graph,
     val clonePair = graph.clone()
     val nextState : GameState = GameState(clonePair._1, cost + assumedHumanCost, delay + assumedHumanDelay, getHumanObservation, addHumanObservation, lossFunction)
     nextState.payload = payload
+    nextState.originalGraph = originalGraph
+    nextState.oldToNew = oldToNew.map(pair => (pair._1, clonePair._2(pair._2)))
     addHumanObservation(nextState.graph, clonePair._2(node), obs)
     nextState
   }

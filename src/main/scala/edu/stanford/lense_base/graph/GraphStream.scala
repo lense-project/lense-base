@@ -119,10 +119,10 @@ case class Graph(stream : GraphStream) {
         MaximizeByBPLoopy.infer(variables, stream.model)
     }
 
-    variables.map{
+    variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
         nodeVar.node -> sumMax.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].value1.category
-    }.toMap.asInstanceOf[Map[GraphNode, String]]
+    }.toMap
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
@@ -167,7 +167,7 @@ case class Graph(stream : GraphStream) {
         new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
     }
 
-    variables.map{
+    variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
         // Create node -> [value,score] pair for map
         nodeVar.node -> {
@@ -176,7 +176,7 @@ case class Graph(stream : GraphStream) {
             nodeVar.node.nodeType.valueDomain.category(scoreIndexPair._2) -> scoreIndexPair._1
           }).toMap
         }
-    }.toMap.asInstanceOf[Map[GraphNode, Map[String,Double]]]
+    }.toMap
   }
 
   def allVariablesForFactorie(): Seq[NodeVariable] = {

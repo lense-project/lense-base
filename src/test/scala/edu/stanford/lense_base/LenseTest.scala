@@ -24,4 +24,7 @@ object LenseTest extends App {
   val secondGameState = firstGameState.takeRealMove(MakeHumanObservation(n))
   println(secondGameState.graph)
   println(secondGameState.graph.marginalEstimate())
+  val thirdGameState = secondGameState.takeRealMove(MakeHumanObservation(secondGameState.graph.nodes(0)))
+  println(thirdGameState.graph)
+  println(thirdGameState.graph.marginalEstimate())
 }

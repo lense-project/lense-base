@@ -43,6 +43,7 @@ class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExa
 class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes) {
   val graphStream : GraphStream = new GraphStream()
   val nodeType = graphStream.makeNodeType(classes)
+  val factorType = graphStream.makeFactorType(List(nodeType,nodeType))
   // This keeps state for learning, etc
   val lense : Lense = new Lense(graphStream, OneQuestionBaseline)
 
@@ -51,7 +52,6 @@ class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes)
 
     var index = 0
     for (pair <- tokenPOSPairs) {
-      // TODO: fill in features here
       val features : Map[String, Double] = Map()
       graph.makeNode(nodeType, features, payload = index)
       index += 1

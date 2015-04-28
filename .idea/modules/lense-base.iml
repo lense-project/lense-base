@@ -19,8 +19,17 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.4" level="project" />
-    <orderEntry type="library" name="factorie_2.11-1.1" level="project" />
-    <orderEntry type="library" name="factorie_2.11-1.1-sources" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.4:jar" level="project" />
+    <orderEntry type="module-library">
+      <library name="SBT: unmanaged-jars">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="scala-sdk-2.11.4" level="application" />
   </component>
 </module>
