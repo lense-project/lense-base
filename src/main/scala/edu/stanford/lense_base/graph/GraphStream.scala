@@ -74,15 +74,23 @@ case class Graph(stream : GraphStream) {
   val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
   val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
 
-  override def clone() : Graph = {
+  override def clone() : (Graph, Map[GraphNode, GraphNode]) = {
     val g = stream.newGraph()
-    for (node <- nodes) {
-      g.makeNode(node.nodeType, node.features, node.observedValue, node.payload)
-    }
+
+    // Double check for corruption
     for (factor <- factors) {
-      g.makeFactor(factor.factorType, factor.nodes, factor.features)
+      for (node <- factor.nodes) {
+        if (!nodes.contains(node)) throw new IllegalStateException("Corrupt state, contain nodes we're not supposed to")
+      }
     }
-    g
+
+    val oldToNew : Map[GraphNode, GraphNode] = nodes.map{node => {
+      (node, g.makeNode(node.nodeType, node.features, node.observedValue, node.payload))
+    }}.toMap
+    for (factor <- factors) {
+      g.makeFactor(factor.factorType, factor.nodes.map(oldToNew(_)), factor.features)
+    }
+    (g, oldToNew)
   }
 
   def makeNode(nodeType : NodeType, features : Map[String,Double] = null, observedValue: String = null, payload : Any = null) : GraphNode = {
@@ -90,6 +98,9 @@ case class Graph(stream : GraphStream) {
   }
 
   def makeFactor(factorType : FactorType, nodes : Iterable[GraphNode], features : Map[String,Double] = null, payload : Any = null) : GraphFactor = {
+    for (node <- nodes) {
+      if (!this.nodes.contains(node)) throw new IllegalStateException()
+    }
     GraphFactor(this, factorType, nodes, features, payload)
   }
 

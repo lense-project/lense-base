@@ -63,11 +63,17 @@ case class GameState(graph : Graph,
     lossFunction(bestGuesses, cost, delay)
   }
 
-  def takeRealMove(obs : MakeHumanObservation) : GameState = {
-    val nextState : GameState = GameState(graph.clone(), cost + assumedHumanCost, delay + assumedHumanDelay, getHumanObservation, addHumanObservation, lossFunction)
+  // Gets a GameState that corresponds to seeing observation "obs" on node "node"
+  private def getNextStateForNodeObservation(node : GraphNode, obs : String) : GameState = {
+    val clonePair = graph.clone()
+    val nextState : GameState = GameState(clonePair._1, cost + assumedHumanCost, delay + assumedHumanDelay, getHumanObservation, addHumanObservation, lossFunction)
     nextState.payload = payload
-    addHumanObservation(nextState.graph, obs.node, getHumanObservation(obs.node))
+    addHumanObservation(nextState.graph, clonePair._2(node), obs)
     nextState
+  }
+
+  def takeRealMove(obs : MakeHumanObservation) : GameState = {
+    getNextStateForNodeObservation(obs.node, getHumanObservation(obs.node))
   }
 
   def getNextStates(move : GameMove) : List[(Double,GameState)] = {
@@ -75,10 +81,7 @@ case class GameState(graph : Graph,
     move match {
       case obs : MakeHumanObservation => {
         obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          val nextState : GameState = GameState(graph.clone(), cost + assumedHumanCost, delay + assumedHumanDelay, getHumanObservation, addHumanObservation, lossFunction)
-          nextState.payload = payload
-          addHumanObservation(nextState.graph, obs.node, randomHumanResponse)
-          (marginals(obs.node)(randomHumanResponse),nextState)
+          (marginals(obs.node)(randomHumanResponse),getNextStateForNodeObservation(obs.node, randomHumanResponse))
         })
       }.toList
       case _ : TurnInGuess => List()
