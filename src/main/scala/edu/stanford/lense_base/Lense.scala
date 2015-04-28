@@ -13,8 +13,16 @@ import scala.collection.mutable
 class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
   val defaultEpsilon = 0.3
 
+  val pastGuesses = mutable.ListBuffer[Graph]()
+  val pastQueryStructure = mutable.ListBuffer[Graph]()
+
   def predict(graph : Graph, askHuman : GraphNode => String, lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
+
+    if (pastGuesses.size > 0) {
+      stream.learn(pastGuesses)
+      println(stream.withDomainList)
+    }
 
     // Keep playing until the game player tells us to stop
 
@@ -22,17 +30,32 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
       val optimalMove = gamePlayer.getOptimalMove(gameState)
       optimalMove match {
         case _ : TurnInGuess =>
-          return gameState.graph.mapEstimate()
+          val mapEstimate = gameState.graph.mapEstimate()
+
+          // Store the original request graph, with our guessed labels, in our pastGuesses stream
+          gameState.originalGraph.nodes.foreach(n => {
+            n.observedValue = mapEstimate(gameState.oldToNew(n))
+          })
+          pastGuesses += gameState.originalGraph
+          // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
+          pastQueryStructure += gameState.graph
+
+          return mapEstimate
         case obs : MakeHumanObservation =>
           gameState = gameState.takeRealMove(obs)
       }
     }
 
-    // Stupid one-vote no-learning baseline
-    // Code will never reach here
-    graph.nodes.map(n => {
-      (n, askHuman(n))
-    }).toMap
+    // Code will never reach here, because the only way to exit while() loop is to TurnInGuess
+    throw new IllegalStateException("Code should never reach this point")
+  }
+
+  def learnHoldingPastGuessesConstant() = {
+    stream.learn(pastGuesses)
+    // Reset human weights to default, because regularizer will have messed with them
+    for (humanObservationTypePair <- humanObservationTypesCache.values) {
+      humanObservationTypePair._2.weights = getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues)
+    }
   }
 
   // create initial BIAS weights guess, as a log scale normalized factor, using defaultEpsilon for error probability

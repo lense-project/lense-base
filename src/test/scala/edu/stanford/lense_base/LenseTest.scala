@@ -1,7 +1,7 @@
 package edu.stanford.lense_base
 
 import edu.stanford.lense_base.gameplaying.{MakeHumanObservation, GameState, OneQuestionBaseline}
-import edu.stanford.lense_base.graph.{GraphNode, NodeType, GraphStream}
+import edu.stanford.lense_base.graph.{Graph, GraphNode, NodeType, GraphStream}
 
 /**
  * Created by keenon on 4/27/15.
@@ -26,5 +26,22 @@ object LenseTest extends App {
   println(secondGameState.graph.marginalEstimate())
   val thirdGameState = secondGameState.takeRealMove(MakeHumanObservation(secondGameState.graph.nodes(0)))
   println(thirdGameState.graph)
+  println(thirdGameState.graph.marginalEstimate())
+
+  firstGameState.graph.nodes(0).observedValue = "false"
+
+  println("learning")
+  println("pre-learning weights")
+  println(graphStream.withDomainList)
+  println("peforming GD")
+  lense.pastGuesses += firstGameState.graph
+  lense.learnHoldingPastGuessesConstant()
+  println("post-learning weights")
+  println(graphStream.withDomainList)
+
+  firstGameState.graph.nodes(0).observedValue = null
+
+  println(firstGameState.graph.marginalEstimate())
+  println(secondGameState.graph.marginalEstimate())
   println(thirdGameState.graph.marginalEstimate())
 }

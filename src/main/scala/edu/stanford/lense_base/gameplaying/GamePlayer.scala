@@ -19,8 +19,8 @@ case class MakeHumanObservation(node : GraphNode) extends GameMove
 abstract class GamePlayer {
   def getOptimalMove(state : GameState) : GameMove
 
-  def getAllLegalMoves(graph : Graph) : List[GameMove] = {
-    List(TurnInGuess()) ++ graph.nodes.filter(_.observedValue != null).map(n => MakeHumanObservation(n)).toList
+  def getAllLegalMoves(state : GameState) : List[GameMove] = {
+    List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).map(n => MakeHumanObservation(state.oldToNew(n))).toList
   }
 }
 
