@@ -38,6 +38,25 @@ object OneQuestionBaseline extends GamePlayer {
   }
 }
 
+// This game player calculates loss if we turn in the solution now, and expected loss if we turn in after each possible query we
+// could make, and takes the best possible
+
+object LookaheadOneHeuristic extends GamePlayer {
+  override def getOptimalMove(state: GameState): GameMove = {
+    getAllLegalMoves(state).map(m => {
+      val nextStates = state.getNextStates(m)
+      // get loss now
+      val moveLoss =
+        if (nextStates.size == 0) state.loss
+        else {
+          // get expected loss at next state
+          nextStates.map(p => p._1 * p._2.loss).sum
+        }
+      (moveLoss, m)
+    }).maxBy(_._1)._2
+  }
+}
+
 // This is the current state of the "game"
 
 case class GameState(graph : Graph,

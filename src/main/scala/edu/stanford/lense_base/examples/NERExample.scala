@@ -1,7 +1,7 @@
 package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.Lense
-import edu.stanford.lense_base.gameplaying.OneQuestionBaseline
+import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer, OneQuestionBaseline}
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
 
 import scala.collection.mutable
@@ -40,12 +40,12 @@ class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExa
   }
 }
 
-class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes) {
+class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) extends NERExample(classes) {
   val graphStream : GraphStream = new GraphStream()
   val nodeType = graphStream.makeNodeType(classes)
   val factorType = graphStream.makeFactorType(List(nodeType,nodeType))
   // This keeps state for learning, etc
-  val lense : Lense = new Lense(graphStream, OneQuestionBaseline)
+  val lense : Lense = new Lense(graphStream, gamePlayer)
 
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
     val graph = graphStream.newGraph()
@@ -60,13 +60,12 @@ class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes)
 
     val assignments : Map[GraphNode, String] = lense.predict(graph,
       askHuman,
-      (mostLikelyAssignments : List[(GraphNode, String, Double)], cost : Double, time : Double) => {
-        0.0
-      })
+      lossFunction)
 
     assignments.toList.sortBy(_._1.payload.asInstanceOf[Int]).map(_._2)
   }
 }
+
 
 object NERExample extends App {
   def loadNER : List[List[(String,String,String)]] = {
@@ -127,5 +126,14 @@ object NERExample extends App {
 
   println(testSystem(new SingleQueryBaseline(classes), data, 0.3))
   println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.3))
-  println(testSystem(new LenseSingletonsBaseline(classes), data, 0.3))
+
+  def lossFunction(mostLikelyGuesses : List[(GraphNode,String,Double)], cost : Double, time : Double) : Double = {
+    val expectedErrors = mostLikelyGuesses.map(1.0 - _._3).sum
+    expectedErrors + cost
+  }
+
+  println("One Question Baseline, with only BIAS feature")
+  println(testSystem(new LenseFramework(classes, OneQuestionBaseline, lossFunction), data, 0.3))
+  println("Basic Lost Function LookaheadOneHeuristic")
+  println(testSystem(new LenseFramework(classes, LookaheadOneHeuristic, lossFunction), data, 0.3))
 }
