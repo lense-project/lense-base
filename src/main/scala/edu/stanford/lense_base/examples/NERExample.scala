@@ -52,7 +52,16 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
 
     var index = 0
     for (pair <- tokenPOSPairs) {
-      val features : Map[String, Double] = Map()
+      val token = pair._1
+      val pos = pair._2
+      val capitalized = pair._1.charAt(0).isUpper
+
+      val features : Map[String, Double] = Map(
+        "TOKEN:"+token -> 1.0,
+        "POS:"+pos -> 1.0,
+        "CAPITALIZED:"+capitalized -> 1.0
+      )
+
       graph.makeNode(nodeType, features, payload = index)
       index += 1
     }
@@ -97,7 +106,7 @@ object NERExample extends App {
     var correct : Double = 0
     var incorrect : Double = 0
     var numQueries : Int = 0
-    var confusionMatrix : mutable.HashMap[(String,String), Int] = mutable.HashMap()
+    val confusionMatrix : mutable.HashMap[(String,String), Int] = mutable.HashMap()
 
     for (sentence <- data) {
       val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)),

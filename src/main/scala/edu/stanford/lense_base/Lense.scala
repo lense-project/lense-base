@@ -20,7 +20,10 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
 
     if (pastGuesses.size > 0) {
+      println("Learning...")
       learnHoldingPastGuessesConstant()
+      println("Finished Learning:")
+      println(stream.withDomainList)
     }
 
     // Keep playing until the game player tells us to stop
@@ -50,7 +53,13 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
   }
 
   def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = {
-    stream.learn(pastGuesses, regularization)
+    try {
+      stream.learn(pastGuesses, regularization)
+    }
+    catch {
+      case e : Throwable =>
+        e.printStackTrace()
+    }
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

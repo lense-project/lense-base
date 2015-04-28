@@ -378,13 +378,17 @@ class GraphStream {
   // This will learn just Weight() values from the fully observed values in the graphs
 
   private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
+
+    model.weightsTensorCache.clear()
+    model.dotFamilyCache.clear()
+
     graphs.foreach(graph => graph.nodes.foreach(node => {
       node.variable.includeHardConstantFactors = false
       if (node.observedValue != null) {
         node.variable.set(node.nodeType.valueDomain.index(node.observedValue))(null)
       }
     }))
-    val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
+    val trainer = new OnlineTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
     val likelihoodExamples = graphs.map(graph => new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain))
     trainer.trainFromExamples(likelihoodExamples)
   }
@@ -413,7 +417,6 @@ class GraphStream {
           case factorType : FactorType =>
             // Size the tensor
             val tensor = factorType.neighborTypes.size match {
-                // TODO: This will take forever to write and will totally suck
               case 1 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                 val numFeatures = factorType.featureDomain.length
@@ -502,7 +505,7 @@ class GraphStream {
                   FeatureVectorVariable[String]] {
                   val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
                   // Initialize the vector
-                  limitedDiscreteValues1 = new SparseBinaryTensor1(factorType.neighborTypes(0).domain.dimensionSize)
+                  limitedDiscreteValues1 = new SparseBinaryTensor1(factorType.neighborTypes(0).valueDomain.dimensionSize)
                   // Set all entries to "true"
                   for (i <- 0 to limitedDiscreteValues1.size-1) limitedDiscreteValues1.+=(i, 1.0)
                 })
@@ -512,7 +515,7 @@ class GraphStream {
                   FeatureVectorVariable[String]] {
                   val weights = getWeightTensorFor(elemType).asInstanceOf[Weights3]
                   // Initialize the vector
-                  limitedDiscreteValues12 = new SparseBinaryTensor2(factorType.neighborTypes(0).domain.dimensionSize, factorType.neighborTypes(1).domain.dimensionSize)
+                  limitedDiscreteValues12 = new SparseBinaryTensor2(factorType.neighborTypes(0).valueDomain.dimensionSize, factorType.neighborTypes(1).valueDomain.dimensionSize)
                   // Set all entries to "true"
                   for (i <- 0 to limitedDiscreteValues12.size-1) limitedDiscreteValues12.+=(i, 1.0)
                 })
@@ -589,12 +592,24 @@ class GraphStream {
       }
       for (node <- graph.nodes) {
         if (node.features != null) for (featureWeightPair <- node.features) {
+          val oldSize = node.nodeType.featureDomain.length
           node.nodeType.featureDomain.index(featureWeightPair._1)
+          // Clear cached elements if we change the feature domain size
+          if (node.nodeType.featureDomain.length > oldSize) {
+            dotFamilyCache.remove(node.nodeType)
+            weightsTensorCache.remove(node.nodeType)
+          }
         }
       }
       for (factor <- graph.factors) {
         if (factor.features != null) for (featureWeightPair <- factor.features) {
+          val oldSize = factor.factorType.featureDomain.length
           factor.factorType.featureDomain.index(featureWeightPair._1)
+          // Clear cached elements if we change the feature domain size
+          if (factor.factorType.featureDomain.length > oldSize) {
+            dotFamilyCache.remove(factor.factorType)
+            weightsTensorCache.remove(factor.factorType)
+          }
         }
       }
     }
