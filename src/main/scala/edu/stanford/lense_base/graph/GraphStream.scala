@@ -107,6 +107,7 @@ case class Graph(stream : GraphStream) {
   def mapEstimate(): Map[GraphNode, String] = {
     val variables = allVariablesForFactorie()
     if (variables.size == 0) return Map()
+    variables.foreach(_.includeHardConstantFactors = true)
 
     // Do exact inference via trees if possible.
     val sumMax = try {
@@ -121,13 +122,19 @@ case class Graph(stream : GraphStream) {
 
     variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
-        nodeVar.node -> sumMax.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].value1.category
+        nodeVar.node -> (sumMax.getMarginal(nodeVar).get match {
+          case dm : DiscreteMarginal1[NodeVariable] => dm.value1.category
+          case sm : MAPSummary#SingletonMarginal =>
+            sm.setToMaximize(null)
+            nodeVar.categoryValue
+        })
     }.toMap
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
     val variables = allVariablesForFactorie()
     if (variables.size == 0) return Map()
+    variables.foreach(_.includeHardConstantFactors = true)
 
     /*
     val factors = model.factors(variables)
@@ -179,6 +186,10 @@ case class Graph(stream : GraphStream) {
     }.toMap
   }
 
+  def unobservedVariablesForFactorie(): Seq[NodeVariable] = {
+    nodes.filter(_.observedValue == null).map(_.variable)
+  }
+
   def allVariablesForFactorie(): Seq[NodeVariable] = {
     nodes.map(_.variable)
   }
@@ -197,7 +208,7 @@ case class NodeType(stream : GraphStream, possibleValues : Set[String], var weig
   override def hashCode : Int = possibleValues.hashCode()
 }
 
-case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null, isConstant : Boolean = false) extends WithDomain(stream) with CaseClassEq {
+case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
   if (neighborTypes.size < 1 || neighborTypes.size > 3)
     throw new UnsupportedOperationException("FactorType doesn't support neighbor lists smaller than 1, or larger "+
       "than 3, due to underlying design decisions in FACTORIE making larger factor support a total pain in the ass.")
@@ -209,6 +220,11 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
 // The model expects a list of these to be passed in.
 
 case class NodeVariable(node : GraphNode, graph : Graph) extends CategoricalVariable[String] {
+
+  // TODO: Keeping this state here will lead to race conditions, unfortunately, but it seems there is no way to pass
+  // the variable through
+  var includeHardConstantFactors = false
+
   override def domain = node.nodeType.valueDomain
 }
 
@@ -223,8 +239,8 @@ class GraphStream {
     NodeType(this, possibleValues, weights)
   }
 
-  def makeFactorType(neighborTypes : List[NodeType], weights : Map[List[String],Map[String,Double]] = null, isConstant : Boolean = false) : FactorType = {
-    FactorType(this, neighborTypes, weights, isConstant)
+  def makeFactorType(neighborTypes : List[NodeType], weights : Map[List[String],Map[String,Double]] = null) : FactorType = {
+    FactorType(this, neighborTypes, weights)
   }
 
   def newGraph() : Graph = Graph(this)
@@ -369,6 +385,7 @@ class GraphStream {
 
   private def learnFullyObserved(graphs : Iterable[Graph]): Unit = {
     graphs.foreach(graph => graph.nodes.foreach(node => {
+      node.variable.includeHardConstantFactors = false
       if (node.observedValue != null) {
         node.variable.set(node.nodeType.valueDomain.index(node.observedValue))(null)
       }
@@ -417,15 +434,7 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                if (factorType.isConstant) {
-                  weightsTensorCache.put(elemType, new TensorVar{
-                    override type Value = DenseTensor2
-                    override def value: Value = factorTensor
-                  })
-                }
-                else {
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                }
+                weightsTensorCache.put(elemType, Weights(factorTensor))
               case 2 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                 val numNode2Values = factorType.neighborTypes(1).valueDomain.length
@@ -442,15 +451,7 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                if (factorType.isConstant) {
-                  weightsTensorCache.put(elemType, new TensorVar{
-                    override type Value = DenseTensor3
-                    override def value: Value = factorTensor
-                  })
-                }
-                else {
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                }
+                weightsTensorCache.put(elemType, Weights(factorTensor))
               case 3 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                 val numNode2Values = factorType.neighborTypes(1).valueDomain.length
@@ -469,15 +470,7 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                if (factorType.isConstant) {
-                  weightsTensorCache.put(elemType, new TensorVar{
-                    override type Value = DenseTensor4
-                    override def value: Value = factorTensor
-                  })
-                }
-                else {
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                }
+                weightsTensorCache.put(elemType, Weights(factorTensor))
               case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
             }
 
@@ -614,7 +607,7 @@ class GraphStream {
 
     val nodeFactorCache : mutable.Map[NodeVariable, Factor] = mutable.Map()
     def getNodeFactor(nodeVar : NodeVariable) : Factor = {
-      if (nodeVar.node.observedValue != null) {
+      if (nodeVar.node.observedValue != null && nodeVar.includeHardConstantFactors) {
         nodeFactorCache.put(nodeVar, getConstantFactor(nodeVar.node))
       }
       else {
