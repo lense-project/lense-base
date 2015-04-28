@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.Lense
+import edu.stanford.lense_base.gameplaying.OneQuestionBaseline
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
 
 import scala.collection.mutable
@@ -43,7 +44,7 @@ class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes)
   val graphStream : GraphStream = new GraphStream()
   val nodeType = graphStream.makeNodeType(classes)
   // This keeps state for learning, etc
-  val lense : Lense = new Lense(graphStream)
+  val lense : Lense = new Lense(graphStream, OneQuestionBaseline)
 
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
     val graph = graphStream.newGraph()
@@ -120,7 +121,7 @@ object NERExample extends App {
     (correct / (correct + incorrect), numQueries)
   }
 
-  val data = loadNER
+  val data = loadNER.take(100)
   println(data(1))
   val classes = data.flatMap(_.map(_._3)).distinct.toSet
 
