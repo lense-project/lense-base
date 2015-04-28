@@ -105,7 +105,7 @@ case class Graph(stream : GraphStream) {
   }
 
   def mapEstimate(): Map[GraphNode, String] = {
-    val variables = allUnobservedVariablesForFactorie()
+    val variables = allVariablesForFactorie()
     if (variables.size == 0) return Map()
 
     // Do exact inference via trees if possible.
@@ -126,7 +126,7 @@ case class Graph(stream : GraphStream) {
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
-    val variables = allUnobservedVariablesForFactorie()
+    val variables = allVariablesForFactorie()
     if (variables.size == 0) return Map()
 
     /*
@@ -177,10 +177,6 @@ case class Graph(stream : GraphStream) {
           }).toMap
         }
     }.toMap.asInstanceOf[Map[GraphNode, Map[String,Double]]]
-  }
-
-  def allUnobservedVariablesForFactorie(): Seq[NodeVariable] = {
-    nodes.filter(_.observedValue == null).map(_.variable)
   }
 
   def allVariablesForFactorie(): Seq[NodeVariable] = {
@@ -594,15 +590,28 @@ class GraphStream {
 
     val nodeFactorCache : mutable.Map[NodeVariable, Factor] = mutable.Map()
     def getNodeFactor(nodeVar : NodeVariable) : Factor = {
-      //if (!nodeFactorCache.contains(nodeVar)) {
+      if (nodeVar.node.observedValue != null) {
+        nodeFactorCache.put(nodeVar, getConstantFactor(nodeVar.node))
+      }
+      else {
         val featureVariable = getFeatureVariableFor(nodeVar.node)
         val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType)
           // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
           // cruft is necessary here
           .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
         nodeFactorCache.put(nodeVar, family.Factor(nodeVar, featureVariable))
-      //}
+      }
       nodeFactorCache(nodeVar)
+    }
+
+    def getConstantFactor(node : GraphNode) : Factor1[NodeVariable] = {
+      val idx = node.nodeType.valueDomain.index(node.observedValue)
+      val hardWeights = new DenseTensor1(node.nodeType.valueDomain.dimensionSize)
+      for (i <- 0 to hardWeights.size-1) if (i != idx) hardWeights.+=(i, Double.NegativeInfinity)
+
+      new DotFactorWithStatistics1[NodeVariable](node.variable) {
+        override val weights: Tensor = hardWeights
+      }
     }
 
     val factorCache : mutable.Map[GraphFactor, Factor] = mutable.Map()
