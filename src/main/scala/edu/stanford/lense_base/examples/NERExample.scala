@@ -97,9 +97,12 @@ object NERExample extends App {
     var correct : Double = 0
     var incorrect : Double = 0
     var numQueries : Int = 0
+    var confusionMatrix : mutable.HashMap[(String,String), Int] = mutable.HashMap()
 
     for (sentence <- data) {
-      val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)), (i : Int) => {
+      val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)),
+      // This is our "query human" function
+      (i : Int) => {
         numQueries += 1
         // With probability epsilon we choose at random
         if (random.nextDouble() < epsilon) {
@@ -114,13 +117,17 @@ object NERExample extends App {
       for (i <- 0 to sentence.size - 1) {
         if (sentence(i)._3 == predictedTags(i)) correct += 1
         else incorrect += 1
+
+        val key = (sentence(i)._3, predictedTags(i))
+        confusionMatrix.put(key, confusionMatrix.getOrElse(key, 0) + 1)
       }
     }
 
+    println(confusionMatrix)
     (correct / (correct + incorrect), numQueries)
   }
 
-  val data = loadNER.take(100)
+  val data = loadNER.filter(_.size < 15).take(100)
   println(data(1))
   val classes = data.flatMap(_.map(_._3)).distinct.toSet
 
@@ -128,7 +135,11 @@ object NERExample extends App {
   println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.3))
 
   def lossFunction(mostLikelyGuesses : List[(GraphNode,String,Double)], cost : Double, time : Double) : Double = {
-    val expectedErrors = mostLikelyGuesses.map(1.0 - _._3).sum
+    val expectedErrors = mostLikelyGuesses.map{
+      // we much prefer to not tag 0s
+      case (_,"0",p) => (1.0 - p)*5.0
+      case t => 1.0 - t._3
+    }.sum
     expectedErrors + cost
   }
 

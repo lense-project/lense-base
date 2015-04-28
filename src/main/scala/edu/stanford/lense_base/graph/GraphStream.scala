@@ -117,7 +117,7 @@ case class Graph(stream : GraphStream) {
     catch {
       case _ : Throwable =>
         // run loopy bp
-        MaximizeByBPLoopy.infer(variables, stream.model)
+        MaximizeByBPLoopyTreewise.infer(variables, stream.model)
     }
 
     variables.filter(_.node.observedValue == null).map{
@@ -136,30 +136,6 @@ case class Graph(stream : GraphStream) {
     if (variables.size == 0) return Map()
     variables.foreach(_.includeHardConstantFactors = true)
 
-    /*
-    val factors = model.factors(variables)
-
-    variables(0).set(1)(null)
-    variables(1).set(0)(null)
-    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-    variables(0).set(0)(null)
-    variables(1).set(0)(null)
-    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-    variables(0).set(0)(null)
-    variables(1).set(1)(null)
-    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-    variables(0).set(1)(null)
-    variables(1).set(1)(null)
-    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-    */
-
-    // val sumMarginal = LoopyBPSummary(variables, BPSumProductRing, model)
-    // BP.inferLoopy(sumMarginal)
-
     // Do exact inference via trees if possible.
     val sumMarginal = try {
       InferByBPTree.infer(variables, stream.model)
@@ -167,11 +143,18 @@ case class Graph(stream : GraphStream) {
     // If that fails, perform gibbs sampling
     catch {
       case _ : Throwable =>
-        val r = new scala.util.Random(42)
+        /*
+
+        It seems the Factorie Gibbs Sampler is very slow, creating tons of unnecessary objects to perform sampling.
+        So we don't use it.
+
+        // val r = new scala.util.Random(42)
         // randomly initialize to valid values
-        for (variable <- variables) variable.set(r.nextInt(variable.domain.size))(null)
+        // for (variable <- variables) variable.set(r.nextInt(variable.domain.size))(null)
         // run gibbs sampler
-        new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
+        // new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
+        */
+        InferByBPLoopyTreewise.infer(variables, stream.model)
     }
 
     variables.filter(_.node.observedValue == null).map{

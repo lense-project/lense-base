@@ -43,7 +43,8 @@ object OneQuestionBaseline extends GamePlayer {
 
 object LookaheadOneHeuristic extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
-    getAllLegalMoves(state).map(m => {
+    println("Getting optimal move")
+    val optimal = getAllLegalMoves(state).map(m => {
       val nextStates = state.getNextStates(m)
       // get loss now
       val moveLoss =
@@ -53,7 +54,9 @@ object LookaheadOneHeuristic extends GamePlayer {
           nextStates.map(p => p._1 * p._2.loss).sum
         }
       (moveLoss, m)
-    }).maxBy(_._1)._2
+    }).minBy(_._1)
+    println(optimal)
+    optimal._2
   }
 }
 
