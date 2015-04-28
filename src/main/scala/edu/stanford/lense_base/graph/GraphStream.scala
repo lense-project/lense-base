@@ -197,7 +197,7 @@ case class NodeType(stream : GraphStream, possibleValues : Set[String], var weig
   override def hashCode : Int = possibleValues.hashCode()
 }
 
-case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
+case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null, isConstant : Boolean = false) extends WithDomain(stream) with CaseClassEq {
   if (neighborTypes.size < 1 || neighborTypes.size > 3)
     throw new UnsupportedOperationException("FactorType doesn't support neighbor lists smaller than 1, or larger "+
       "than 3, due to underlying design decisions in FACTORIE making larger factor support a total pain in the ass.")
@@ -223,8 +223,8 @@ class GraphStream {
     NodeType(this, possibleValues, weights)
   }
 
-  def makeFactorType(neighborTypes : List[NodeType], weights : Map[List[String],Map[String,Double]] = null) : FactorType = {
-    FactorType(this, neighborTypes, weights)
+  def makeFactorType(neighborTypes : List[NodeType], weights : Map[List[String],Map[String,Double]] = null, isConstant : Boolean = false) : FactorType = {
+    FactorType(this, neighborTypes, weights, isConstant)
   }
 
   def newGraph() : Graph = Graph(this)
@@ -263,7 +263,7 @@ class GraphStream {
             // we need the weight values for each possible assignment
             val tensor2 = tensor.asInstanceOf[Tensor2]
             val keyValue : ListBuffer[(String, Map[String,Double])] = ListBuffer()
-            nodeType.possibleValues.map(value => {
+            nodeType.possibleValues.foreach(value => {
               val valueIndex = nodeType.valueDomain.index(value)
               for (val1 <- nodeType.possibleValues) {
                 val index1 = nodeType.valueDomain.index(val1)
@@ -395,13 +395,13 @@ class GraphStream {
     // for this factor. These are going to be treated as **constant** during inference. They will be **variable** during
     // learning.
 
-    val weightsTensorCache : mutable.Map[WithDomain, Weights] = mutable.Map()
-    def getWeightTensorFor(elemType : WithDomain) : Weights = {
+    val weightsTensorCache : mutable.Map[WithDomain, TensorVar] = mutable.Map()
+    def getWeightTensorFor(elemType : WithDomain) : TensorVar = {
       if (!weightsTensorCache.contains(elemType)) {
         elemType match {
           case factorType : FactorType =>
             // Size the tensor
-            factorType.neighborTypes.size match {
+            val tensor = factorType.neighborTypes.size match {
                 // TODO: This will take forever to write and will totally suck
               case 1 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
@@ -417,7 +417,15 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
+                if (factorType.isConstant) {
+                  weightsTensorCache.put(elemType, new TensorVar{
+                    override type Value = DenseTensor2
+                    override def value: Value = factorTensor
+                  })
+                }
+                else {
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                }
               case 2 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                 val numNode2Values = factorType.neighborTypes(1).valueDomain.length
@@ -434,7 +442,15 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
+                if (factorType.isConstant) {
+                  weightsTensorCache.put(elemType, new TensorVar{
+                    override type Value = DenseTensor3
+                    override def value: Value = factorTensor
+                  })
+                }
+                else {
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                }
               case 3 =>
                 val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                 val numNode2Values = factorType.neighborTypes(1).valueDomain.length
@@ -453,7 +469,15 @@ class GraphStream {
                     factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
                   }
                 }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
+                if (factorType.isConstant) {
+                  weightsTensorCache.put(elemType, new TensorVar{
+                    override type Value = DenseTensor4
+                    override def value: Value = factorTensor
+                  })
+                }
+                else {
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                }
               case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
             }
 

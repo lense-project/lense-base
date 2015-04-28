@@ -106,3 +106,59 @@ object EpsilonLearn extends App {
   println(epsilonFactorType.weights)
   println(nodeType.weights)
 }
+
+object EpsilonLearnWithConstantBias extends App {
+
+  ///////////////////////////////////////
+  // An experiment to learn the value epsilon from random switchings
+  ///////////////////////////////////////
+
+  // Generate a set of booleans, that are either flipped or not
+
+  val r : Random = new Random(42)
+  val epsilon = r.nextFloat()
+  val pairs = (0 to 1000).map(i => r.nextBoolean()).map(b => {
+    // Keep the same
+    if (r.nextFloat() > epsilon) {
+      (b, b)
+    }
+    // Flip
+    else {
+      (b, !b)
+    }
+  }).toList
+
+  // Proceed with actually using the API
+
+  val learnEpsilonExperiment = new GraphStream()
+
+  // Create the weight-sharing types
+
+  val nodeType = learnEpsilonExperiment.makeNodeType(Set("true", "false"))
+  val epsilonFactorType = learnEpsilonExperiment.makeFactorType(List(nodeType, nodeType))
+  val constantBiasFactorType = learnEpsilonExperiment.makeFactorType(List(nodeType),
+    weights = Map(List("true") -> Map("BIAS" -> 1.0),
+                  List("false") -> Map("BIAS" -> -1.0)),
+    isConstant = true)
+
+  // Create the graphs, one for each pair
+
+  val graphs = pairs.map(p => {
+    val g = learnEpsilonExperiment.newGraph()
+    // This creates Node and Factor objects which automatically add themselves to the outer Graph
+    val headNode = g.makeNode(nodeType, observedValue = p._1.toString)
+    val tailNode = g.makeNode(nodeType, observedValue = p._2.toString)
+    val f = g.makeFactor(epsilonFactorType, List(headNode, tailNode))
+    val k = g.makeFactor(constantBiasFactorType, List(tailNode))
+    g
+  })
+
+  val marg = graphs.toList(0).marginalEstimate()
+
+  // Learn the factor weights for those connected to observed variables
+
+  learnEpsilonExperiment.learn(graphs)
+  println(epsilonFactorType.weights)
+  println(constantBiasFactorType.weights)
+  println(nodeType.weights)
+}
