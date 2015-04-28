@@ -105,7 +105,7 @@ case class Graph(stream : GraphStream) {
   }
 
   def mapEstimate(): Map[GraphNode, String] = {
-    val variables = allVariablesForFactorie()
+    val variables = allUnobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
 
     // Do exact inference via trees if possible.
@@ -126,7 +126,7 @@ case class Graph(stream : GraphStream) {
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
-    val variables = allVariablesForFactorie()
+    val variables = allUnobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
 
     /*
@@ -179,10 +179,12 @@ case class Graph(stream : GraphStream) {
     }.toMap.asInstanceOf[Map[GraphNode, Map[String,Double]]]
   }
 
+  def allUnobservedVariablesForFactorie(): Seq[NodeVariable] = {
+    nodes.filter(_.observedValue == null).map(_.variable)
+  }
+
   def allVariablesForFactorie(): Seq[NodeVariable] = {
-    nodes.map(n => {
-      n.variable
-    })
+    nodes.map(_.variable)
   }
 }
 
