@@ -28,7 +28,7 @@ object LenseTest extends App {
   println(thirdGameState.graph)
   println(thirdGameState.graph.marginalEstimate())
 
-  firstGameState.graph.nodes(0).observedValue = "false"
+  firstGameState.graph.nodes(0).observedValue = "true"
 
   println("learning")
   println("pre-learning weights")
@@ -42,6 +42,8 @@ object LenseTest extends App {
   firstGameState.graph.nodes(0).observedValue = null
 
   println(firstGameState.graph.marginalEstimate())
+  println(secondGameState.graph.factors.size)
+  println(secondGameState.graph.factors)
   println(secondGameState.graph.marginalEstimate())
   println(thirdGameState.graph.marginalEstimate())
 }

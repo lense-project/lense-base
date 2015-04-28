@@ -206,6 +206,12 @@ case class NodeType(stream : GraphStream, possibleValues : Set[String], var weig
   valueDomain.indexAll(possibleValues)
 
   override def hashCode : Int = possibleValues.hashCode()
+
+  def setWeights(newWeights : Map[String,Map[String,Double]]) = {
+    weights = newWeights
+    stream.model.weightsTensorCache.remove(this)
+    stream.model.dotFamilyCache.remove(this)
+  }
 }
 
 case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
@@ -214,6 +220,12 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
       "than 3, due to underlying design decisions in FACTORIE making larger factor support a total pain in the ass.")
 
   override def hashCode : Int = neighborTypes.hashCode()
+
+  def setWeights(newWeights : Map[List[String],Map[String,Double]]) = {
+    weights = newWeights
+    stream.model.weightsTensorCache.remove(this)
+    stream.model.dotFamilyCache.remove(this)
+  }
 }
 
 // This holds the Multi-class decision variable component of a given node.
@@ -249,7 +261,7 @@ class GraphStream {
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
-  def learn(graphs : Iterable[Graph], regularization: Double = 0.5) = {
+  def learn(graphs : Iterable[Graph], regularization: Double = 1.0) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs)
