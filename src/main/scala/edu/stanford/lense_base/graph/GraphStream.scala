@@ -20,179 +20,194 @@ import scala.util.Random
  * hard to learn, and some things (like attaching features to a hyper-arc) have awkward structure)
  */
 
+// GraphVarWithDomain is an easy way to refer to both Node and Factor (declared in Graph), since both will need to be
+// represented in the FACTORIE graph partially by a node which holds the feature values.
+
+abstract class GraphVarWithDomain(initDomainType : WithDomain) {
+  def domainType = initDomainType
+}
+
+case class GraphNode(graph : Graph,
+                      nodeType: NodeType,
+                      var features: Map[String, Double] = null,
+                      observedValue: String = null,
+                      payload: Any = null) extends GraphVarWithDomain(nodeType) with CaseClassEq {
+
+  val id: Int = graph.nodes.size
+  graph.nodes += this
+
+  val variable = NodeVariable(this, graph)
+
+  if (features == null) features = Map("BIAS" -> 1.0)
+  else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
+
+  override def hashCode() : Int = nodeType.hashCode() + id.hashCode()
+}
+
+case class GraphFactor(graph : Graph,
+                        factorType: FactorType,
+                  nodes: Iterable[GraphNode],
+                  var features: Map[String, Double] = null,
+                  payload: Any = null) extends GraphVarWithDomain(factorType) with CaseClassEq {
+
+  // A type check verification at initialization
+  // to prevent initialization with mismatched nodes and factorType
+  val nodeList : List[GraphNode] = nodes.toList
+  if (nodeList.size != factorType.neighborTypes.size) throw new IllegalArgumentException("Wrong number of neighbors"
+  +" for this factorType. The factorType expects neighbors of type (and in order) "+factorType.neighborTypes+", and"
+  +" you gave nodes with type "+nodes.map(_.nodeType).toString)
+  for (i <- 0 to nodeList.size-1) {
+    if (nodeList(i).nodeType != factorType.neighborTypes(i)) throw new IllegalArgumentException("Created a Factor "
+    +"with the wrong neighbor type at (atleast, but we haven't checked higher indices yet) neighbor #"+i+", where "+
+    "the node type is "+nodeList(i).nodeType+" and expected type is "+factorType.neighborTypes(i))
+  }
+
+  graph.factors += this
+
+  if (features == null) features = Map("BIAS" -> 1.0)
+  else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
+
+  override def hashCode() : Int = factorType.hashCode() + nodes.hashCode()
+}
+
+case class Graph(stream : GraphStream) {
+  val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
+  val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
+
+  def makeNode(nodeType : NodeType, features : Map[String,Double] = null, observedValue: String = null, payload : Any = null) : GraphNode = {
+    GraphNode(this, nodeType, features, observedValue, payload)
+  }
+
+  def makeFactor(factorType : FactorType, nodes : Iterable[GraphNode], features : Map[String,Double] = null, payload : Any = null) : GraphFactor = {
+    GraphFactor(this, factorType, nodes, features, payload)
+  }
+
+  def mapEstimate(): Map[GraphNode, String] = {
+    val variables = allVariablesForFactorie()
+    if (variables.size == 0) return Map()
+
+    // Do exact inference via trees if possible.
+    val sumMax = try {
+      MaximizeByBPTree.infer(variables, stream.model)
+    }
+    // If that fails, perform loopy maximization
+    catch {
+      case _ : Throwable =>
+        // run loopy bp
+        MaximizeByBPLoopy.infer(variables, stream.model)
+    }
+
+    variables.map{
+      case nodeVar : NodeVariable =>
+        nodeVar.node -> sumMax.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].value1.category
+    }.toMap.asInstanceOf[Map[GraphNode, String]]
+  }
+
+  def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
+    val variables = allVariablesForFactorie()
+    if (variables.size == 0) return Map()
+
+    /*
+    val factors = model.factors(variables)
+
+    variables(0).set(1)(null)
+    variables(1).set(0)(null)
+    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
+    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
+    variables(0).set(0)(null)
+    variables(1).set(0)(null)
+    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
+    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
+    variables(0).set(0)(null)
+    variables(1).set(1)(null)
+    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
+    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
+    variables(0).set(1)(null)
+    variables(1).set(1)(null)
+    println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
+    println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
+    */
+
+    // val sumMarginal = LoopyBPSummary(variables, BPSumProductRing, model)
+    // BP.inferLoopy(sumMarginal)
+
+    // Do exact inference via trees if possible.
+    val sumMarginal = try {
+      InferByBPTree.infer(variables, stream.model)
+    }
+    // If that fails, perform gibbs sampling
+    catch {
+      case _ : Throwable =>
+        val r = new scala.util.Random(42)
+        // randomly initialize to valid values
+        for (variable <- variables) variable.set(r.nextInt(variable.domain.size))(null)
+        // run gibbs sampler
+        new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
+    }
+
+    variables.map{
+      case nodeVar : NodeVariable =>
+        // Create node -> [value,score] pair for map
+        nodeVar.node -> {
+          val props : Array[Double] = sumMarginal.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].proportions.toArray
+          props.zipWithIndex.map(scoreIndexPair => {
+            nodeVar.node.nodeType.valueDomain.category(scoreIndexPair._2) -> scoreIndexPair._1
+          }).toMap
+        }
+    }.toMap.asInstanceOf[Map[GraphNode, Map[String,Double]]]
+  }
+
+  def allVariablesForFactorie(): Seq[NodeVariable] = {
+    nodes.map(n => {
+      n.variable
+    })
+  }
+}
+
+abstract class WithDomain(stream : GraphStream) {
+  val featureDomain = new CategoricalDomain[String]
+  val domain = new CategoricalVectorDomain[String] { override def dimensionDomain = featureDomain }
+  stream.withDomainList += this
+}
+
+case class NodeType(stream : GraphStream, possibleValues : Set[String], var weights : Map[String,Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
+  val valueDomain = new CategoricalDomain[String]
+  valueDomain.indexAll(possibleValues)
+
+  override def hashCode : Int = possibleValues.hashCode()
+}
+
+case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
+  if (neighborTypes.size < 1 || neighborTypes.size > 3)
+    throw new UnsupportedOperationException("FactorType doesn't support neighbor lists smaller than 1, or larger "+
+      "than 3, due to underlying design decisions in FACTORIE making larger factor support a total pain in the ass.")
+
+  override def hashCode : Int = neighborTypes.hashCode()
+}
+
+// This holds the Multi-class decision variable component of a given node.
+// The model expects a list of these to be passed in.
+
+case class NodeVariable(node : GraphNode, graph : Graph) extends CategoricalVariable[String] {
+  override def domain = node.nodeType.valueDomain
+}
+
 class GraphStream {
 
   // NodeType and FactorType are a way to share weights across different nodes.
   // They are assumed to have the same domain (mapping from feature string to int), and they share weights globally.
 
   val withDomainList = mutable.MutableList[WithDomain]()
-  abstract class WithDomain() {
-    val featureDomain = new CategoricalDomain[String]
-    val domain = new CategoricalVectorDomain[String] { override def dimensionDomain = featureDomain }
-    withDomainList += this
-  }
-  case class NodeType(possibleValues : Set[String], var weights : Map[String,Map[String,Double]] = null) extends WithDomain with CaseClassEq {
-    val valueDomain = new CategoricalDomain[String]
-    valueDomain.indexAll(possibleValues)
-
-    override def hashCode : Int = possibleValues.hashCode()
-  }
 
   def makeNodeType(possibleValues : Set[String], weights : Map[String,Map[String,Double]] = null) : NodeType = {
-    NodeType(possibleValues, weights)
+    NodeType(this, possibleValues, weights)
   }
 
-  case class FactorType(neighborTypes : List[NodeType], var weights : Map[List[String],Map[String,Double]] = null) extends WithDomain with CaseClassEq {
-    if (neighborTypes.size < 1 || neighborTypes.size > 3)
-      throw new UnsupportedOperationException("FactorType doesn't support neighbor lists smaller than 1, or larger "+
-        "than 3, due to underlying design decisions in FACTORIE making larger factor support a total pain in the ass.")
-
-    override def hashCode : Int = neighborTypes.hashCode()
-  }
-
-  def makeFactorType(size : Int) : FactorType = {
-    makeFactorType(for (i <- List.range(0, size)) yield defaultNodeType)
-  }
-  def makeFactorType(size : Int, weights : Map[List[String],Map[String,Double]]) : FactorType = {
-    makeFactorType(for (i <- List.range(0, size)) yield defaultNodeType, weights)
-  }
   def makeFactorType(neighborTypes : List[NodeType], weights : Map[List[String],Map[String,Double]] = null) : FactorType = {
-    FactorType(neighborTypes, weights)
+    FactorType(this, neighborTypes, weights)
   }
 
-  // VarWithDomain is an easy way to refer to both Node and Factor (declared in Graph), since both will need to be
-  // represented in the FACTORIE graph partially by a node which holds the feature values.
-
-  abstract class VarWithDomain(initDomainType : WithDomain) {
-    def domainType = initDomainType
-  }
-
-  lazy private val defaultNodeType = NodeType(Set("true", "false"))
-
-  class Graph {
-    val nodes: mutable.MutableList[Node] = new mutable.MutableList[Node]()
-    val factors: mutable.MutableList[Factor] = new mutable.MutableList[Factor]()
-
-    case class Node(nodeType: NodeType = defaultNodeType,
-                    var features: Map[String, Double] = null,
-                    observedValue: String = null,
-                    payload: Any = null,
-                    id: Int = nodes.size) extends VarWithDomain(nodeType) with CaseClassEq {
-      Graph.this.nodes += this
-      val variable = NodeVariable(this, Graph.this)
-
-      if (features == null) features = Map("BIAS" -> 1.0)
-      else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
-
-      override def hashCode() : Int = nodeType.hashCode() + id.hashCode()
-    }
-
-    case class Factor(factorType: FactorType,
-                      nodes: Iterable[Node],
-                      var features: Map[String, Double] = null,
-                      payload: Any = null) extends VarWithDomain(factorType) with CaseClassEq {
-
-      // A type check verification at initialization
-      // to prevent initialization with mismatched nodes and factorType
-      val nodeList : List[Node] = nodes.toList
-      if (nodeList.size != factorType.neighborTypes.size) throw new IllegalArgumentException("Wrong number of neighbors"
-      +" for this factorType. The factorType expects neighbors of type (and in order) "+factorType.neighborTypes+", and"
-      +" you gave nodes with type "+(nodes.map(_.nodeType).toString))
-      for (i <- 0 to nodeList.size-1) {
-        if (nodeList(i).nodeType != factorType.neighborTypes(i)) throw new IllegalArgumentException("Created a Factor "
-        +"with the wrong neighbor type at (atleast, but we haven't checked higher indices yet) neighbor #"+i+", where "+
-        "the node type is "+nodeList(i).nodeType+" and expected type is "+factorType.neighborTypes(i))
-      }
-
-      Graph.this.factors += this
-
-      if (features == null) features = Map("BIAS" -> 1.0)
-      else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
-
-      override def hashCode() : Int = factorType.hashCode() + nodes.hashCode()
-    }
-
-    def mapEstimate(): Map[Node, String] = {
-      val variables = allVariablesForFactorie()
-      if (variables.size == 0) return Map()
-
-      // Do exact inference via trees if possible.
-      val sumMax = try {
-        MaximizeByBPTree.infer(variables, model)
-      }
-      // If that fails, perform loopy maximization
-      catch {
-        case _ : Throwable =>
-          // run loopy bp
-          MaximizeByBPLoopy.infer(variables, model)
-      }
-
-      variables.map{
-        case nodeVar : NodeVariable =>
-          nodeVar.node -> sumMax.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].value1.category
-      }.toMap.asInstanceOf[Map[Node, String]]
-    }
-
-    def marginalEstimate(): Map[Node, Map[String,Double]] = {
-      val variables = allVariablesForFactorie()
-      if (variables.size == 0) return Map()
-
-      /*
-      val factors = model.factors(variables)
-
-      variables(0).set(1)(null)
-      variables(1).set(0)(null)
-      println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-      println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-      variables(0).set(0)(null)
-      variables(1).set(0)(null)
-      println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-      println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-      variables(0).set(0)(null)
-      variables(1).set(1)(null)
-      println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-      println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-      variables(0).set(1)(null)
-      variables(1).set(1)(null)
-      println(variables(0)+","+variables(1)+":"+factors.toList(2).currentScore)
-      println("Assignment stats: "+factors.toList(2).assignmentStatistics(TargetAssignment))
-      */
-
-      // val sumMarginal = LoopyBPSummary(variables, BPSumProductRing, model)
-      // BP.inferLoopy(sumMarginal)
-
-      // Do exact inference via trees if possible.
-      val sumMarginal = try {
-        InferByBPTree.infer(variables, model)
-      }
-      // If that fails, perform gibbs sampling
-      catch {
-        case _ : Throwable =>
-          val r = new scala.util.Random(42)
-          // randomly initialize to valid values
-          for (variable <- variables) variable.set(r.nextInt(variable.domain.size))(null)
-          // run gibbs sampler
-          new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, model)
-      }
-
-      variables.map{
-        case nodeVar : NodeVariable =>
-          // Create node -> [value,score] pair for map
-          nodeVar.node -> {
-            val props : Array[Double] = sumMarginal.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].proportions.toArray
-            props.zipWithIndex.map(scoreIndexPair => {
-              nodeVar.node.nodeType.valueDomain.category(scoreIndexPair._2) -> scoreIndexPair._1
-            }).toMap
-          }
-      }.toMap.asInstanceOf[Map[Node, Map[String,Double]]]
-    }
-
-    def allVariablesForFactorie(): Seq[NodeVariable] = {
-      nodes.map(n => {
-        n.variable
-      })
-    }
-  }
+  def newGraph() : Graph = Graph(this)
 
   // learns the appropriate bits, which means any weight factors, and EM if there are any
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
@@ -344,13 +359,6 @@ class GraphStream {
   }
 
 
-  // This holds the Multi-class decision variable component of a given node.
-  // The model expects a list of these to be passed in.
-
-  case class NodeVariable(node : Graph#Node, graph : Graph) extends CategoricalVariable[String] {
-    override def domain = node.nodeType.valueDomain
-  }
-
   def getIndexCautious(domain : CategoricalDomain[String], value : String, nameForError : String) : Int = {
     val oldSize = domain.size
     val index = domain.index(value)
@@ -497,17 +505,17 @@ class GraphStream {
     // This can take both Node and Factor objects, and return a variable representing the feature values for the
     // object. This will always be a **constant**, so should never be passed into the model as part of the list of factors.
 
-    val featureVariableCache = mutable.Map[VarWithDomain, FeatureVariable]()
+    val featureVariableCache = mutable.Map[GraphVarWithDomain, FeatureVariable]()
 
-    case class FeatureVariable(variable : VarWithDomain) extends FeatureVectorVariable[String] {
+    case class FeatureVariable(variable : GraphVarWithDomain) extends FeatureVectorVariable[String] {
       override def domain: CategoricalVectorDomain[String] = variable.domainType.domain
     }
-    def getFeatureVariableFor(variable : VarWithDomain) : FeatureVariable = {
+    def getFeatureVariableFor(variable : GraphVarWithDomain) : FeatureVariable = {
       if (!featureVariableCache.contains(variable)) {
         val features = FeatureVariable(variable)
 
         variable match {
-          case factor: Graph#Factor =>
+          case factor: GraphFactor =>
             factor.nodeList.size match {
               case 1 =>
               case 2 =>
@@ -518,7 +526,7 @@ class GraphStream {
               case 3 =>
               case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
             }
-          case node: Graph#Node =>
+          case node: GraphNode =>
             if (node.features != null) for (featureWeightPair <- node.features) {
               val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
               features.update(featureIndex, featureWeightPair._2)(null)
@@ -573,8 +581,8 @@ class GraphStream {
       nodeFactorCache(nodeVar)
     }
 
-    val factorCache : mutable.Map[Graph#Factor, Factor] = mutable.Map()
-    def getFactor(factor : Graph#Factor) : Factor = {
+    val factorCache : mutable.Map[GraphFactor, Factor] = mutable.Map()
+    def getFactor(factor : GraphFactor) : Factor = {
       //if (!factorCache.contains(factor)) {
         val featureVariable = getFeatureVariableFor(factor)
         factorCache.put(factor, factor.nodeList.size match {
@@ -622,7 +630,7 @@ class GraphStream {
           result += getNodeFactor(nodeVar)
       }
 
-      def isMutableNode(n : Graph#Node) : Boolean = {
+      def isMutableNode(n : GraphNode) : Boolean = {
         mutableList.contains(n.variable)
       }
 

@@ -1,8 +1,9 @@
 package edu.stanford.lense_base.examples
 
-import edu.stanford.lense_base.graph.GraphStream
-import edu.stanford.lense_base.task.{Task, TaskStream}
+import edu.stanford.lense_base.Lense
+import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
 
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -11,13 +12,51 @@ import scala.io.Source
  *
  * Using hybrid crowd-ML to do accurate, cheap, fast NER
  */
-class NERExample(classes : Set[String]) {
+abstract class NERExample(classes : Set[String]) {
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String]
+}
 
+class SingleQueryBaseline(classes : Set[String]) extends NERExample(classes) {
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
-    // For now, super hack to test that human simulation is working
     (0 to tokenPOSPairs.size-1).map(simulateAskingHuman).toList
   }
+}
 
+class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExample(classes) {
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
+    (0 to tokenPOSPairs.size-1).map(i => {
+      val map : mutable.HashMap[String,Int] = mutable.HashMap()
+      for (cl <- classes) map.put(cl, 0)
+      for (j <- 0 to numQueries) {
+        val response = simulateAskingHuman(i)
+        map.put(response, map(response)+1)
+      }
+
+      var largestClass = ""
+      for (cl <- classes) if (map.getOrElse(largestClass, 0) < map(cl)) largestClass = cl
+      largestClass
+    }).toList
+  }
+}
+
+class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes) {
+  val graphStream : GraphStream = new GraphStream()
+  val nodeType = graphStream.makeNodeType(classes)
+
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
+    val graph = graphStream.newGraph()
+
+    for (pair <- tokenPOSPairs) {
+      // TODO: fill in features here
+      val features : Map[String, Double] = Map()
+      val index = tokenPOSPairs.indexOf(pair)
+      graph.makeNode(nodeType, features, payload = index)
+    }
+    def askHuman(node : GraphNode): String = simulateAskingHuman(node.payload.asInstanceOf[Int])
+
+    val assignments : Map[GraphNode, String] = Lense.predict(graph, askHuman)
+    assignments.toList.sortBy(_._1.payload.asInstanceOf[Int]).map(_._2)
+  }
 }
 
 object NERExample extends App {
@@ -43,17 +82,17 @@ object NERExample extends App {
     loadedData.toList
   }
 
-  def testSystem(data : List[List[(String,String,String)]], epsilon : Double) : Double = {
+  def testSystem(ner : NERExample, data : List[List[(String,String,String)]], epsilon : Double) : (Double,Int) = {
     val classes = data.flatMap(_.map(_._3)).distinct.toList
     val random = new util.Random(42)
 
-    val ner = new NERExample(classes.toSet)
-
     var correct : Double = 0
     var incorrect : Double = 0
+    var numQueries : Int = 0
 
     for (sentence <- data) {
       val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)), (i : Int) => {
+        numQueries += 1
         // With probability epsilon we choose at random
         if (random.nextDouble() < epsilon) {
           classes(random.nextInt(classes.size))
@@ -70,11 +109,14 @@ object NERExample extends App {
       }
     }
 
-    correct / (correct + incorrect)
+    (correct / (correct + incorrect), numQueries)
   }
 
   val data = loadNER
   println(data(1))
+  val classes = data.flatMap(_.map(_._3)).distinct.toSet
 
-  println(testSystem(data, 0.1))
+  println(testSystem(new SingleQueryBaseline(classes), data, 0.2))
+  println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.2))
+  println(testSystem(new LenseSingletonsBaseline(classes), data, 0.2))
 }

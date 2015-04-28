@@ -25,19 +25,20 @@ object BasicMap extends App {
 
   // Create the graph
 
-  val g = new simpleMapTest.Graph()
+  val g = simpleMapTest.newGraph()
   // This creates Node and Factor objects which automatically add themselves to the outer Graph
-  val shouldBeFalse = g.Node(nodeType, features = Map("feat1" -> 0.5, "feat2" -> 1.0))
-  val shouldBeTrue = g.Node(nodeType, features = Map("feat1" -> 1.0, "feat2" -> 0.5))
+  val shouldBeFalse = g.makeNode(nodeType, features = Map("feat1" -> 0.5, "feat2" -> 1.0))
+  val shouldBeTrue = g.makeNode(nodeType, features = Map("feat1" -> 1.0, "feat2" -> 0.5))
 
-  val map : Map[g.Node, String] = g.mapEstimate()
+  val map : Map[GraphNode, String] = g.mapEstimate()
   println("should be false MAP value: "+map(shouldBeFalse))
   println("should be true MAP value: "+map(shouldBeTrue))
 }
 
 object BasicMarginal extends App {
   val basicMarginalExperiment = new GraphStream()
-  val epsilonFactorType = basicMarginalExperiment.makeFactorType(2, weights =
+  val nodeType = basicMarginalExperiment.makeNodeType(Set("true","false"))
+  val epsilonFactorType = basicMarginalExperiment.makeFactorType(List(nodeType, nodeType), weights =
     Map(
       List("false","true") -> Map("feat1" -> -1.0),
       List("true","false") -> Map("feat1" -> 1.0)
@@ -46,11 +47,11 @@ object BasicMarginal extends App {
 
   // Create the graph
 
-  val g = new basicMarginalExperiment.Graph()
+  val g = basicMarginalExperiment.newGraph()
   // This creates Node and Factor objects which automatically add themselves to the outer Graph
-  val headNode = g.Node()
-  val tailNode = g.Node()
-  g.Factor(epsilonFactorType, List(headNode, tailNode), features = Map("feat1" -> 1.0))
+  val headNode = g.makeNode(nodeType)
+  val tailNode = g.makeNode(nodeType)
+  g.makeFactor(epsilonFactorType, List(headNode, tailNode), features = Map("feat1" -> 1.0))
 
   println(g.marginalEstimate())
   println(g.mapEstimate())
@@ -89,12 +90,12 @@ object EpsilonLearn extends App {
   // Create the graphs, one for each pair
 
   val graphs = pairs.map(p => {
-    new learnEpsilonExperiment.Graph {
-      // This creates Node and Factor objects which automatically add themselves to the outer Graph
-      val headNode = Node(nodeType, observedValue = p._1.toString)
-      val tailNode = Node(nodeType, observedValue = p._2.toString)
-      val f = Factor(epsilonFactorType, List(headNode, tailNode))
-    }
+    val g = learnEpsilonExperiment.newGraph()
+    // This creates Node and Factor objects which automatically add themselves to the outer Graph
+    val headNode = g.makeNode(nodeType, observedValue = p._1.toString)
+    val tailNode = g.makeNode(nodeType, observedValue = p._2.toString)
+    val f = g.makeFactor(epsilonFactorType, List(headNode, tailNode))
+    g
   })
 
   val marg = graphs.toList(0).marginalEstimate()
