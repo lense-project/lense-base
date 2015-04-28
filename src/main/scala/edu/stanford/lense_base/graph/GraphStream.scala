@@ -74,6 +74,17 @@ case class Graph(stream : GraphStream) {
   val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
   val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
 
+  override def clone() : Graph = {
+    val g = stream.newGraph()
+    for (node <- nodes) {
+      g.makeNode(node.nodeType, node.features, node.observedValue, node.payload)
+    }
+    for (factor <- factors) {
+      g.makeFactor(factor.factorType, factor.nodes, factor.features)
+    }
+    g
+  }
+
   def makeNode(nodeType : NodeType, features : Map[String,Double] = null, observedValue: String = null, payload : Any = null) : GraphNode = {
     GraphNode(this, nodeType, features, observedValue, payload)
   }

@@ -42,19 +42,27 @@ class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExa
 class LenseSingletonsBaseline(classes : Set[String]) extends NERExample(classes) {
   val graphStream : GraphStream = new GraphStream()
   val nodeType = graphStream.makeNodeType(classes)
+  // This keeps state for learning, etc
+  val lense : Lense = new Lense(graphStream)
 
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
     val graph = graphStream.newGraph()
 
+    var index = 0
     for (pair <- tokenPOSPairs) {
       // TODO: fill in features here
       val features : Map[String, Double] = Map()
-      val index = tokenPOSPairs.indexOf(pair)
       graph.makeNode(nodeType, features, payload = index)
+      index += 1
     }
     def askHuman(node : GraphNode): String = simulateAskingHuman(node.payload.asInstanceOf[Int])
 
-    val assignments : Map[GraphNode, String] = Lense.predict(graph, askHuman)
+    val assignments : Map[GraphNode, String] = lense.predict(graph,
+      askHuman,
+      (mostLikelyAssignments : List[(GraphNode, String, Double)], cost : Double, time : Double) => {
+        0.0
+      })
+
     assignments.toList.sortBy(_._1.payload.asInstanceOf[Int]).map(_._2)
   }
 }
@@ -116,7 +124,7 @@ object NERExample extends App {
   println(data(1))
   val classes = data.flatMap(_.map(_._3)).distinct.toSet
 
-  println(testSystem(new SingleQueryBaseline(classes), data, 0.2))
-  println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.2))
-  println(testSystem(new LenseSingletonsBaseline(classes), data, 0.2))
+  println(testSystem(new SingleQueryBaseline(classes), data, 0.3))
+  println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.3))
+  println(testSystem(new LenseSingletonsBaseline(classes), data, 0.3))
 }
