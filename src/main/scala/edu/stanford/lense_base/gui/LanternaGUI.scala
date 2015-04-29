@@ -9,6 +9,10 @@ import com.googlecode.lanterna.terminal.Terminal
  * This should be a simple display for in-progress LENSE computations, showing how likelihood guesses, costs, delays,
  * etc are progressing
  */
-class StatusGUI {
-  val terminal : Terminal = TerminalFacade.createTerminal()
+class LanternaGUI {
+  val terminal : Terminal = {
+    val t = TerminalFacade.createTerminal()
+    t.enterPrivateMode()
+    t
+  }
 }

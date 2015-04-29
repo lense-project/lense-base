@@ -1,6 +1,6 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.gameplaying.{MakeHumanObservation, TurnInGuess, GameState, GamePlayer}
+import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
 
 import scala.collection.mutable
@@ -16,6 +16,8 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
 
+  val pastGameTrajectories = mutable.ListBuffer[List[(GameState,GameMove)]]()
+
   def predict(graph : Graph, askHuman : GraphNode => String, lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
 
@@ -23,24 +25,35 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
       println("Learning...")
       learnHoldingPastGuessesConstant()
       println("Finished Learning:")
-      println(stream.withDomainList)
     }
 
     // Keep playing until the game player tells us to stop
 
+    val gameTrajectory = mutable.ListBuffer[(GameState,GameMove)]()
     while (true) {
       val optimalMove = gamePlayer.getOptimalMove(gameState)
+
+      // Add this move to our recorded trajectory
+      gameTrajectory += ((gameState, optimalMove))
+
       optimalMove match {
         case _ : TurnInGuess =>
           val mapEstimate = gameState.graph.mapEstimate()
 
           // Store the original request graph, with our guessed labels, in our pastGuesses stream
+          // Learning from this should be convex, so provide at least a good initialization for later values
           gameState.originalGraph.nodes.foreach(n => {
             n.observedValue = mapEstimate(gameState.oldToNew(n))
           })
           pastGuesses += gameState.originalGraph
+
           // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
+          // Learning from this will require learning with unobserved variables, so will be subject to local optima
           pastQueryStructure += gameState.graph
+
+          // Store the game trajectory for debugging and analysis
+          pastGameTrajectories += gameTrajectory.clone().toList
+          gameTrajectory.clear()
 
           return mapEstimate
         case obs : MakeHumanObservation =>

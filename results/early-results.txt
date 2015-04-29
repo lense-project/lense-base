@@ -1,5 +1,6 @@
 With simple NER Example, at this commit:
 
+Simulated Human Error Rate: 30% -> on error choose tag uniformly at random
 Data: 100 sentences. From CoNLL dataset, filtered for len < 15 for processing speed
 
 -------
