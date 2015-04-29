@@ -379,8 +379,14 @@ class GraphStream {
 
   private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
 
-    model.weightsTensorCache.clear()
-    model.dotFamilyCache.clear()
+    // Need to clear all the weights beforehand, because for some reason if we don't then
+    // they simultaneously update and effect the updates (bc they change E[x])
+
+    for (w <- model.weightsTensorCache) {
+      w._2.value.*=(0.0)
+    }
+
+    // println(model.parameters.toSeq)
 
     graphs.foreach(graph => graph.nodes.foreach(node => {
       node.variable.includeHardConstantFactors = false
@@ -388,6 +394,7 @@ class GraphStream {
         node.variable.set(node.nodeType.valueDomain.index(node.observedValue))(null)
       }
     }))
+
     val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
     val likelihoodExamples = graphs.map(graph => new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain))
     trainer.trainFromExamples(likelihoodExamples)
@@ -410,8 +417,8 @@ class GraphStream {
     // for this factor. These are going to be treated as **constant** during inference. They will be **variable** during
     // learning.
 
-    val weightsTensorCache : mutable.Map[WithDomain, TensorVar] = mutable.Map()
-    def getWeightTensorFor(elemType : WithDomain) : TensorVar = {
+    val weightsTensorCache : mutable.Map[WithDomain, Weights] = mutable.Map()
+    def getWeightTensorFor(elemType : WithDomain) : Weights = {
       if (!weightsTensorCache.contains(elemType)) {
         elemType match {
           case factorType : FactorType =>

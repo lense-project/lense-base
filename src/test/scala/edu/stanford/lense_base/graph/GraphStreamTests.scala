@@ -105,6 +105,7 @@ object EpsilonLearn extends App {
   // TODO: it seems that this is the problem
   while (true) {
     learnEpsilonExperiment.learn(graphs)
+    println(epsilonFactorType.weights)
   }
 
   println(epsilonFactorType.weights)
