@@ -4,7 +4,7 @@
 		module="lense-base_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150428105734"
+		publication="20150429133229"
 	>
 		<description>
 		lense-base
@@ -32,5 +32,6 @@
 	<dependencies>
 		<dependency org="org.scala-lang" name="scala-compiler" rev="2.11.4" conf="scala-tool->default,optional(default)"/>
 		<dependency org="org.scala-lang" name="scala-library" rev="2.11.4" conf="scala-tool->default,optional(default);compile->default(compile)"/>
+		<dependency org="com.googlecode.lanterna" name="lanterna" rev="2.1.8" conf="compile->default(compile)"/>
 	</dependencies>
 </ivy-module>

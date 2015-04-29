@@ -1,0 +1,15 @@
+With simple NER Example, at this commit:
+
+Data: 100 sentences from CoNLL dataset, filtered for len < 15 for processing speed
+
+One question baseline:
+Map((I-MISC,I-ORG) -> 1, (I-ORG,I-ORG) -> 20, (I-PER,I-ORG) -> 1, (I-PER,O) -> 3, (I-MISC,O) -> 5, (O,I-LOC) -> 54, (O,I-PER) -> 42, (I-ORG,I-LOC) -> 1, (I-PER,I-PER) -> 27, (I-MISC,I-MISC) -> 32, (I-ORG,I-PER) -> 3, (I-PER,I-LOC) -> 4, (I-LOC,O) -> 4, (O,I-MISC) -> 47, (I-PER,I-MISC) -> 3, (I-LOC,I-ORG) -> 2, (O,O) -> 636, (I-LOC,I-PER) -> 1, (I-ORG,I-MISC) -> 3, (I-LOC,I-LOC) -> 33, (I-LOC,I-MISC) -> 6, (I-MISC,I-PER) -> 3, (O,I-ORG) -> 41, (I-ORG,O) -> 1)
+(0.7687564234326825,973)
+
+3 question baseline, max-vote:
+Map((I-MISC,I-ORG) -> 2, (I-ORG,I-ORG) -> 28, (I-PER,I-ORG) -> 1, (I-MISC,O) -> 1, (O,I-LOC) -> 15, (O,I-PER) -> 18, (I-MISC,I-MISC) -> 38, (I-PER,I-PER) -> 36, (O,I-MISC) -> 17, (I-LOC,I-ORG) -> 1, (I-PER,I-MISC) -> 1, (I-LOC,I-PER) -> 1, (O,O) -> 741, (I-LOC,I-LOC) -> 43, (I-LOC,I-MISC) -> 1, (O,I-ORG) -> 29)
+(0.9105858170606372,3892)
+
+Simple, non-CRF with basic features, Token, POS and Capitalization
+Map((I-MISC,I-ORG) -> 2, (I-ORG,I-ORG) -> 25, (I-PER,O) -> 4, (I-MISC,O) -> 4, (O,I-LOC) -> 13, (O,I-PER) -> 9, (I-ORG,I-LOC) -> 1, (I-MISC,I-MISC) -> 35, (I-PER,I-PER) -> 32, (I-PER,I-LOC) -> 1, (O,I-MISC) -> 6, (I-LOC,O) -> 8, (I-PER,I-MISC) -> 1, (I-LOC,I-PER) -> 1, (O,O) -> 784, (I-LOC,I-LOC) -> 37, (O,I-ORG) -> 8, (I-ORG,O) -> 2)
+(0.9383350462487153,1953)
