@@ -57,12 +57,12 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
       val capitalized = pair._1.charAt(0).isUpper
 
       val features : Map[String, Double] = Map(
-        // "TOKEN:"+token -> 1.0,
-        // "POS:"+pos -> 1.0,
+        "TOKEN:"+token -> 1.0,
+        "POS:"+pos -> 1.0,
         "CAPITALIZED:"+capitalized -> 1.0
       )
 
-      graph.makeNode(nodeType, features, payload = index)
+      graph.makeNode(nodeType, features, payload = index, toString = index+":"+token)
       index += 1
     }
     def askHuman(node : GraphNode): String = simulateAskingHuman(node.payload.asInstanceOf[Int])
@@ -145,7 +145,7 @@ object NERExample extends App {
 
   def lossFunction(mostLikelyGuesses : List[(GraphNode,String,Double)], cost : Double, time : Double) : Double = {
     val expectedErrors = mostLikelyGuesses.map{
-      // we much prefer to not tag 0s
+      // we much prefer to not tag 0s incorrectly
       case (_,"0",p) => (1.0 - p)*5.0
       case t => 1.0 - t._3
     }.sum

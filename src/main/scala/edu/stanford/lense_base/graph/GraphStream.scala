@@ -31,7 +31,8 @@ case class GraphNode(graph : Graph,
                       nodeType: NodeType,
                       var features: Map[String, Double] = null,
                       var observedValue: String = null,
-                      payload: Any = null) extends GraphVarWithDomain(nodeType) with CaseClassEq {
+                      payload: Any = null,
+                      stringName : String = null) extends GraphVarWithDomain(nodeType) with CaseClassEq {
 
   val id: Int = graph.nodes.size
   graph.nodes += this
@@ -42,13 +43,16 @@ case class GraphNode(graph : Graph,
   else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
 
   override def hashCode() : Int = nodeType.hashCode() + id.hashCode()
+
+  override def toString : String = if (stringName != null) "GraphNode("+stringName+")" else super.toString
 }
 
 case class GraphFactor(graph : Graph,
                         factorType: FactorType,
-                  nodes: Iterable[GraphNode],
-                  var features: Map[String, Double] = null,
-                  payload: Any = null) extends GraphVarWithDomain(factorType) with CaseClassEq {
+                        nodes: Iterable[GraphNode],
+                        var features: Map[String, Double] = null,
+                        payload: Any = null,
+                        stringName : String = null) extends GraphVarWithDomain(factorType) with CaseClassEq {
 
   // A type check verification at initialization
   // to prevent initialization with mismatched nodes and factorType
@@ -68,6 +72,8 @@ case class GraphFactor(graph : Graph,
   else if (!features.contains("BIAS")) features = features ++ Map("BIAS" -> 1.0)
 
   override def hashCode() : Int = factorType.hashCode() + nodes.hashCode()
+
+  override def toString : String = if (stringName != null) "GraphFactor("+stringName+")" else super.toString
 }
 
 case class Graph(stream : GraphStream) {
@@ -93,15 +99,15 @@ case class Graph(stream : GraphStream) {
     (g, oldToNew)
   }
 
-  def makeNode(nodeType : NodeType, features : Map[String,Double] = null, observedValue: String = null, payload : Any = null) : GraphNode = {
-    GraphNode(this, nodeType, features, observedValue, payload)
+  def makeNode(nodeType : NodeType, features : Map[String,Double] = null, observedValue: String = null, payload : Any = null, toString : String = null) : GraphNode = {
+    GraphNode(this, nodeType, features, observedValue, payload, toString)
   }
 
-  def makeFactor(factorType : FactorType, nodes : Iterable[GraphNode], features : Map[String,Double] = null, payload : Any = null) : GraphFactor = {
+  def makeFactor(factorType : FactorType, nodes : Iterable[GraphNode], features : Map[String,Double] = null, payload : Any = null, toString : String = null) : GraphFactor = {
     for (node <- nodes) {
       if (!this.nodes.contains(node)) throw new IllegalStateException()
     }
-    GraphFactor(this, factorType, nodes, features, payload)
+    GraphFactor(this, factorType, nodes, features, payload, toString)
   }
 
   def mapEstimate(): Map[GraphNode, String] = {

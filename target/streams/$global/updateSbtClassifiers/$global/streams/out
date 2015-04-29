@@ -611,9 +611,9 @@
 [debug] 	[NOT REQUIRED] org.scala-sbt#test-agent;0.13.5!test-agent.jar
 [debug] 	[NOT REQUIRED] org.scala-sbt#test-interface;1.0!test-interface.jar
 [debug] 	[NOT REQUIRED] org.scala-sbt#apply-macro;0.13.5!apply-macro.jar
-[debug] :: resolution report :: resolve 397ms :: artifacts dl 14ms
+[debug] :: resolution report :: resolve 883ms :: artifacts dl 31ms
 [debug] 	report for default#lense-base$sbt_2.11;1.0 default produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sbt_2.11-default.xml
-[debug] 	resolve done (397ms resolve - 14ms download)
+[debug] 	resolve done (883ms resolve - 31ms download)
 [debug] Using inline dependencies specified in Scala.
 [debug] :: resolving dependencies :: default#lense-base$sources_2.11;1.0
 [debug] 	confs: [default]
@@ -955,6 +955,6 @@
 [debug] 	[NOT REQUIRED] org.scala-sbt#precompiled-2_8_2;0.13.5!precompiled-2_8_2.jar(src)
 [debug] 	[NOT REQUIRED] org.scala-sbt#precompiled-2_9_2;0.13.5!precompiled-2_9_2.jar(src)
 [debug] 	[NOT REQUIRED] org.scala-sbt#precompiled-2_9_3;0.13.5!precompiled-2_9_3.jar(src)
-[debug] :: resolution report :: resolve 99ms :: artifacts dl 23ms
+[debug] :: resolution report :: resolve 311ms :: artifacts dl 17ms
 [debug] 	report for default#lense-base$sources_2.11;1.0 default produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_2.11-default.xml
-[debug] 	resolve done (99ms resolve - 23ms download)
+[debug] 	resolve done (311ms resolve - 17ms download)
