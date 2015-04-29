@@ -106,3 +106,12 @@ object EpsilonLearn extends App {
   println(epsilonFactorType.weights)
   println(nodeType.weights)
 }
+
+object SparseLearn extends App {
+  val s = new GraphStream()
+
+  val t = s.makeNodeType(Set("true","false"))
+  val f = s.makeFactorType(List(t,t))
+
+
+}

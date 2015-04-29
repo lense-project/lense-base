@@ -53,13 +53,7 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
   }
 
   def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = {
-    try {
-      stream.learn(pastGuesses, regularization)
-    }
-    catch {
-      case e : Throwable =>
-        e.printStackTrace()
-    }
+    stream.learn(pastGuesses, regularization)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

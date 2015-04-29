@@ -388,7 +388,7 @@ class GraphStream {
         node.variable.set(node.nodeType.valueDomain.index(node.observedValue))(null)
       }
     }))
-    val trainer = new OnlineTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
+    val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
     val likelihoodExamples = graphs.map(graph => new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain))
     trainer.trainFromExamples(likelihoodExamples)
   }

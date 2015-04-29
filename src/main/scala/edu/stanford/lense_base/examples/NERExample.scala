@@ -57,8 +57,8 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
       val capitalized = pair._1.charAt(0).isUpper
 
       val features : Map[String, Double] = Map(
-        "TOKEN:"+token -> 1.0,
-        "POS:"+pos -> 1.0,
+        // "TOKEN:"+token -> 1.0,
+        // "POS:"+pos -> 1.0,
         "CAPITALIZED:"+capitalized -> 1.0
       )
 
