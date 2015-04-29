@@ -102,7 +102,11 @@ object EpsilonLearn extends App {
 
   // Learn the factor weights for those connected to observed variables
 
-  learnEpsilonExperiment.learn(graphs)
+  // TODO: it seems that this is the problem
+  while (true) {
+    learnEpsilonExperiment.learn(graphs)
+  }
+
   println(epsilonFactorType.weights)
   println(nodeType.weights)
 }

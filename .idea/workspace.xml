@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" afterPath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -59,8 +56,8 @@
       <file leaf-file-name="GraphStreamTests.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.024350649" vertical-offset="465" max-vertical-offset="1845">
-              <caret line="32" column="51" selection-start-line="32" selection-start-column="51" selection-end-line="32" selection-end-column="51" />
+            <state vertical-scroll-proportion="0.77922076" vertical-offset="1080" max-vertical-offset="1905">
+              <caret line="104" column="44" selection-start-line="104" selection-start-column="44" selection-end-line="104" selection-end-column="44" />
               <folding />
             </state>
           </provider>
@@ -766,7 +763,8 @@
     <MESSAGE value="Basic one question baseline + bias learning beats no learning baseline by 6 points." />
     <MESSAGE value="Got baselines running, one move lookahead game player is put together" />
     <MESSAGE value="Numeric stability issues with Factorie and very large sparse sets of weights." />
-    <option name="LAST_COMMIT_MESSAGE" value="Numeric stability issues with Factorie and very large sparse sets of weights." />
+    <MESSAGE value="Making le changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Making le changes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1048,8 +1046,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.024350649" vertical-offset="465" max-vertical-offset="1845">
-          <caret line="32" column="51" selection-start-line="32" selection-start-column="51" selection-end-line="32" selection-end-column="51" />
+        <state vertical-scroll-proportion="0.77922076" vertical-offset="1080" max-vertical-offset="1905">
+          <caret line="104" column="44" selection-start-line="104" selection-start-column="44" selection-end-line="104" selection-end-column="44" />
           <folding />
         </state>
       </provider>
