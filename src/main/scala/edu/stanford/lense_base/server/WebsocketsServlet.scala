@@ -10,6 +10,7 @@ import org.scalatra.json.{JValueResult, JacksonJsonSupport}
 import org.scalatra.scalate.ScalateSupport
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
  * Created by keenon on 4/30/15.
@@ -28,8 +29,11 @@ class WebsocketsServlet extends ScalatraServlet
           send("Hello world! I'm from AJAX land")
         case Disconnected(disconnector, Some(error)) =>
         case Error(Some(error)) =>
-        case TextMessage(text) => send("ECHO: " + text)
-        case JsonMessage(json) => broadcast(json)
+        case TextMessage(text) =>
+          send("ECHO: " + text)
+        case JsonMessage(json) =>
+          send("received json")
+          // broadcast(json)
       }
     }
   }

@@ -5,15 +5,24 @@ $(function () {
     var socket = $.atmosphere;
 
     // We are now ready to cut the request
-    var request = { url: 'http://127.0.0.1:8080/chat',
-        contentType : "application/json",
-        transport : 'websocket'};
+    var request = {
+        url: '/chat',
+        contentType : 'application/text',
+        transport : 'websocket',
+        fallbackTransport: 'long-polling'
+    };
 
     request.onOpen = function(response) {
-        content.html($('<p>', { text: 'Atmosphere connected using ' + response.transport }));
+        console.log("on open: ")
+        console.log(response)
+
+        content.html($('<p>', { text: 'connected using ' + response.transport }));
     };
 
     request.onMessage = function (response) {
+        console.log("on message: ")
+        console.log(response)
+
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
@@ -25,10 +34,15 @@ $(function () {
     };
 
     request.onClose = function(response) {
+        console.log("closed connection: ")
+        console.log(response)
         logged = false;
-    }
+    };
 
     request.onError = function(response) {
+        console.log("on error: ")
+        console.log(response)
+
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
             + 'socket or the server is down' }));
     };
