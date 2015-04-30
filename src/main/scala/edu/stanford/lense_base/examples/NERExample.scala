@@ -3,6 +3,7 @@ package edu.stanford.lense_base.examples
 import edu.stanford.lense_base.Lense
 import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer, OneQuestionBaseline}
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
+import edu.stanford.lense_base.gui.Java2DGUI
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -46,6 +47,9 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
   val factorType = graphStream.makeFactorType(List(nodeType,nodeType))
   // This keeps state for learning, etc
   val lense : Lense = new Lense(graphStream, gamePlayer)
+
+  // creates a GUI to use
+  println(new Java2DGUI(lense))
 
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
     val graph = graphStream.newGraph()

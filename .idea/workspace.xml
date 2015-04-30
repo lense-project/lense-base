@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/StatusGUI.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/LanternaGUI.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/results/early-results.txt" afterPath="$PROJECT_DIR$/results/early-results.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/Java2DGUI.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -43,13 +42,25 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LanternaGUI.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="LanternaGUI.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/LanternaGUI.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.42713568" vertical-offset="0" max-vertical-offset="597">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
+              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
               <folding>
                 <element signature="e#37#82#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Java2DGUI.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/Java2DGUI.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="121" max-vertical-offset="855">
+              <caret line="30" column="9" selection-start-line="30" selection-start-column="9" selection-end-line="30" selection-end-column="9" />
+              <folding>
+                <element signature="e#37#63#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -103,8 +114,8 @@
       <file leaf-file-name="Lense.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1635">
-              <caret line="18" column="47" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1635">
+              <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
               <folding>
                 <element signature="e#33#77#0" expanded="true" />
               </folding>
@@ -112,21 +123,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="early-results.txt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/results/early-results.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-              <caret line="17" column="177" selection-start-line="17" selection-start-column="177" selection-end-line="17" selection-end-column="177" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NERExample.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NERExample.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1458" max-vertical-offset="2370">
-              <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
+            <state vertical-scroll-proportion="0.78031635" vertical-offset="936" max-vertical-offset="2415">
+              <caret line="99" column="6" selection-start-line="99" selection-start-column="6" selection-end-line="99" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -155,18 +156,19 @@
         <option value="$PROJECT_DIR$/build.sbt" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/StatusGUI.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
         <option value="$PROJECT_DIR$/results/early-results.txt" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/LanternaGUI.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/Java2DGUI.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
-    <option name="y" value="-4" />
+    <option name="y" value="24" />
     <option name="width" value="1855" />
-    <option name="height" value="1084" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -404,22 +406,6 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="EpsilonLearnWithConstantBias" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.EpsilonLearnWithConstantBias" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="lense-base" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="LenseTest" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.LenseTest" />
       <option name="VM_PARAMETERS" />
@@ -461,6 +447,22 @@
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Java2DGUI" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.gui.Java2DGUI" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="lense-base" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -626,17 +628,17 @@
     <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.BasicMarginal" />
       <item index="1" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
-      <item index="2" class="java.lang.String" itemvalue="Application.EpsilonLearnWithConstantBias" />
-      <item index="3" class="java.lang.String" itemvalue="Application.LenseTest" />
-      <item index="4" class="java.lang.String" itemvalue="Application.NERExample" />
+      <item index="2" class="java.lang.String" itemvalue="Application.LenseTest" />
+      <item index="3" class="java.lang.String" itemvalue="Application.NERExample" />
+      <item index="4" class="java.lang.String" itemvalue="Application.Java2DGUI" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Application.NERExample" />
-        <item index="1" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
-        <item index="2" class="java.lang.String" itemvalue="Application.LenseTest" />
-        <item index="3" class="java.lang.String" itemvalue="Application.BasicMarginal" />
-        <item index="4" class="java.lang.String" itemvalue="Application.EpsilonLearnWithConstantBias" />
+        <item index="1" class="java.lang.String" itemvalue="Application.Java2DGUI" />
+        <item index="2" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
+        <item index="3" class="java.lang.String" itemvalue="Application.LenseTest" />
+        <item index="4" class="java.lang.String" itemvalue="Application.BasicMarginal" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
@@ -682,7 +684,7 @@
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="ToolWindowManager">
-    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <frame x="65" y="24" width="1855" height="1056" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -694,7 +696,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.346875" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35729614" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23935877" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -745,7 +747,8 @@
     <MESSAGE value="Minor aesthetic updates to GraphStream, now need to go make a GUI or something for watching game players in real time." />
     <MESSAGE value="Early Results!! Beating baselines. Fuck yeah!!" />
     <MESSAGE value="Reformatting results page for clarity and email-ability" />
-    <option name="LAST_COMMIT_MESSAGE" value="Reformatting results page for clarity and email-ability" />
+    <MESSAGE value="Adding a history of game trajectories to the Lense object, started the Lanterna GUI to review them." />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding a history of game trajectories to the Lense object, started the Lanterna GUI to review them." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1053,14 +1056,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1458" max-vertical-offset="2370">
-          <caret line="149" column="25" selection-start-line="149" selection-start-column="25" selection-end-line="149" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="723" max-vertical-offset="1860">
@@ -1071,29 +1066,47 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/results/early-results.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-          <caret line="17" column="177" selection-start-line="17" selection-start-column="177" selection-end-line="17" selection-end-column="177" />
+        <state vertical-scroll-proportion="0.4586331" vertical-offset="0" max-vertical-offset="556">
+          <caret line="17" column="37" selection-start-line="17" selection-start-column="37" selection-end-line="17" selection-end-column="37" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/LanternaGUI.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
+          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding>
+            <element signature="e#37#82#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/Java2DGUI.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="121" max-vertical-offset="855">
+          <caret line="30" column="9" selection-start-line="30" selection-start-column="9" selection-end-line="30" selection-end-column="9" />
+          <folding>
+            <element signature="e#37#63#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1635">
-          <caret line="18" column="47" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="47" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="15" max-vertical-offset="1635">
+          <caret line="19" column="0" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
           <folding>
             <element signature="e#33#77#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gui/LanternaGUI.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.42713568" vertical-offset="0" max-vertical-offset="597">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding>
-            <element signature="e#37#82#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.78031635" vertical-offset="936" max-vertical-offset="2415">
+          <caret line="99" column="6" selection-start-line="99" selection-start-column="6" selection-end-line="99" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
