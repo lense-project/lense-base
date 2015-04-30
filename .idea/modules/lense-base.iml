@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module external.linked.project.id="lense-base" external.linked.project.path="$MODULE_DIR$/../.." external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="web" name="Web">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/../../src/main/webapp/WEB-INF/web.xml" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/../../webapp" relative="/" />
+        </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/../../src/main/java" />
+          <root url="file://$MODULE_DIR$/../../src/main/scala" />
+          <root url="file://$MODULE_DIR$/../../target/scala-2.11/src_managed/main" />
+          <root url="file://$MODULE_DIR$/../../src/main/resources" />
+          <root url="file://$MODULE_DIR$/../../target/scala-2.11/resource_managed/main" />
+        </sourceRoots>
+      </configuration>
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../target/scala-2.11/classes" />
     <output-test url="file://$MODULE_DIR$/../../target/scala-2.11/test-classes" />
@@ -29,12 +48,89 @@
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.4" level="project" />
     <orderEntry type="library" name="SBT: com.googlecode.lanterna:lanterna:2.1.8" level="project" />
+    <orderEntry type="library" name="SBT: javax.servlet:javax.servlet-api:3.1.0" level="project" />
+    <orderEntry type="library" name="SBT: com.googlecode.juniversalchardet:juniversalchardet:1.0.3" level="project" />
+    <orderEntry type="library" name="SBT: eu.medsea.mimeutil:mime-util:2.1.3" level="project" />
+    <orderEntry type="library" name="SBT: joda-time:joda-time:2.7" level="project" />
+    <orderEntry type="library" name="SBT: org.clapper:grizzled-slf4j_2.11:1.0.2" level="project" />
+    <orderEntry type="library" name="SBT: org.joda:joda-convert:1.7" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.11.6" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-parser-combinators_2.11:1.0.3" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang.modules:scala-xml_2.11:1.0.3" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra:scalatra-common_2.11:2.4.0.RC1" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra:scalatra_2.11:2.4.0.RC1" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra.rl:rl_2.11:0.4.10" level="project" />
+    <orderEntry type="library" name="SBT: org.slf4j:slf4j-api:1.7.10" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-compiler:2.11.0" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-reflect:2.11.0" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra:scalatra-scalate_2.11:2.4.0.RC1" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra.scalate:scalate-core_2.11:1.7.1" level="project" />
+    <orderEntry type="library" name="SBT: org.scalatra.scalate:scalate-util_2.11:1.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="SBT: ch.qos.logback:logback-classic:1.1.2" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="SBT: ch.qos.logback:logback-core:1.1.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: commons-codec:commons-codec:1.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: commons-logging:commons-logging:1.1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: junit:junit:4.11" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.apache.commons:commons-lang3:3.3.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.apache.httpcomponents:httpclient:4.3.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.apache.httpcomponents:httpcore:4.3.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.apache.httpcomponents:httpmime:4.3.6" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-http:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-io:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-security:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-server:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-servlet:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-util:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-webapp:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.eclipse.jetty:jetty-xml:9.2.10.v20150310" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.mockito:mockito-all:1.10.19" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.mockito:mockito-core:1.9.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.objenesis:objenesis:1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm:4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm-analysis:4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm-tree:4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm-util:4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.parboiled:parboiled-core:1.1.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.parboiled:parboiled-java:1.1.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.pegdown:pegdown:1.2.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-lang:scala-compiler:2.11.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-lang:scala-reflect:2.11.5" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scala-sbt:test-interface:1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalacheck:scalacheck_2.11:1.12.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalatra:scalatra-specs2_2.11:2.4.0.RC1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalatra:scalatra-test_2.11:2.4.0.RC1" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalaz:scalaz-concurrent_2.11:7.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalaz:scalaz-core_2.11:7.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalaz:scalaz-effect_2.11:7.1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.scalaz.stream:scalaz-stream_2.11:0.5a" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.specs2:classycle:1.4.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.specs2:specs2_2.11:2.4.17" level="project" />
+    <orderEntry type="library" scope="TEST" name="SBT: org.typelevel:scodec-bits_2.11:1.0.2" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.aggregate:jetty-all-server:8.1.16.v20140903" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.activation:1.1.0.v201105071233" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.annotation:1.1.0.v201108011116" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.mail.glassfish:1.4.1.v201005082020" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.security.auth.message:1.0.0.v201108011116" level="project" />
+    <orderEntry type="library" name="SBT: org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.11.4" level="application" />
   </component>
 </module>

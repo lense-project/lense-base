@@ -11,6 +11,8 @@ import scala.concurrent._
 import scala.io.Source
 import scala.util.Random
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
  * Created by keenon on 4/27/15.
  *

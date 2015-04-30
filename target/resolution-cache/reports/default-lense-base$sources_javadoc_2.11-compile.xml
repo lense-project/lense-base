@@ -7,40 +7,427 @@
 		revision="1.0"
 		conf="compile"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150429133230"/>
+		date="20150430144602"/>
 	<dependencies>
-		<module organisation="com.googlecode.lanterna" name="lanterna">
-			<revision name="2.1.8" status="release" pubdate="20140609062657" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/lanterna/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="1">
-				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/lgpl-3.0.txt"/>
-				<metadata-artifact status="no" details="" size="3108" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/ivy-2.1.8.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.pom"/>
-				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.1.8" rev-constraint-default="2.1.8" rev-constraint-dynamic="2.1.8" callerrev="1.0"/>
+		<module organisation="org.scalatra" name="scalatra-scalate_2.11">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191642" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="18">
+				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
+				<metadata-artifact status="no" details="" size="2862" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-scalate_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra-scalate_2.11/2.4.0.RC1/scalatra-scalate_2.11-2.4.0.RC1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="1.0"/>
 				<artifacts>
-					<artifact name="lanterna" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="737703" time="618" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/docs/lanterna-2.1.8-javadoc.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8-javadoc.jar"/>
+					<artifact name="scalatra-scalate_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="432569" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-scalate_2.11/docs/scalatra-scalate_2.11-2.4.0.RC1-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-scalate_2.11/2.4.0.RC1/scalatra-scalate_2.11-2.4.0.RC1-javadoc.jar"/>
 					</artifact>
-					<artifact name="lanterna" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="159165" time="390" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/srcs/lanterna-2.1.8-sources.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8-sources.jar"/>
+					<artifact name="scalatra-scalate_2.11" type="jar" ext="jar" status="no" details="" size="53426" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-scalate_2.11/jars/scalatra-scalate_2.11-2.4.0.RC1.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-scalate_2.11/2.4.0.RC1/scalatra-scalate_2.11-2.4.0.RC1.jar"/>
 					</artifact>
-					<artifact name="lanterna" type="jar" ext="jar" status="no" details="" size="237320" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/jars/lanterna-2.1.8.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.jar"/>
+					<artifact name="scalatra-scalate_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="7685" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-scalate_2.11/srcs/scalatra-scalate_2.11-2.4.0.RC1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-scalate_2.11/2.4.0.RC1/scalatra-scalate_2.11-2.4.0.RC1-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra.scalate" name="scalate-core_2.11">
+			<revision name="1.7.1" status="release" pubdate="20150315191912" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="19">
+				<metadata-artifact status="no" details="" size="10971" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-core_2.11/ivy-1.7.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-core_2.11/1.7.1/scalate-core_2.11-1.7.1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.7.1" rev-constraint-default="1.7.1" rev-constraint-dynamic="1.7.1" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scalate-core_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="170651" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-core_2.11/srcs/scalate-core_2.11-1.7.1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-core_2.11/1.7.1/scalate-core_2.11-1.7.1-sources.jar"/>
+					</artifact>
+					<artifact name="scalate-core_2.11" type="jar" ext="jar" status="no" details="" size="1968230" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-core_2.11/jars/scalate-core_2.11-1.7.1.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-core_2.11/1.7.1/scalate-core_2.11-1.7.1.jar"/>
+					</artifact>
+					<artifact name="scalate-core_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="1398717" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-core_2.11/docs/scalate-core_2.11-1.7.1-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-core_2.11/1.7.1/scalate-core_2.11-1.7.1-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-compiler">
+			<revision name="2.11.0" status="release" pubdate="20140416021405" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="21">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="3131" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-compiler/ivy-2.11.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.0/scala-compiler-2.11.0.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.11.0" rev-constraint-default="2.11.0" rev-constraint-dynamic="2.11.0" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scala-compiler" type="jar" ext="jar" status="no" details="" size="13655547" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-compiler/jars/scala-compiler-2.11.0.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.0/scala-compiler-2.11.0.jar"/>
+					</artifact>
+					<artifact name="scala-compiler" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="2077837" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-compiler/srcs/scala-compiler-2.11.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.0/scala-compiler-2.11.0-sources.jar"/>
+					</artifact>
+					<artifact name="scala-compiler" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="8696006" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-compiler/docs/scala-compiler-2.11.0-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.0/scala-compiler-2.11.0-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang" name="scala-reflect">
+			<revision name="2.11.0" status="release" pubdate="20140416021350" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.0/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="22">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2825" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-reflect/ivy-2.11.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.0/scala-reflect-2.11.0.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.11.0" rev-constraint-default="2.11.0" rev-constraint-dynamic="2.11.0" callerrev="1.0" extra-info.apiURL="http://www.scala-lang.org/api/2.11.0/"/>
+				<artifacts>
+					<artifact name="scala-reflect" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="554963" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-reflect/srcs/scala-reflect-2.11.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.0/scala-reflect-2.11.0-sources.jar"/>
+					</artifact>
+					<artifact name="scala-reflect" type="jar" ext="jar" status="no" details="" size="4422519" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-reflect/jars/scala-reflect-2.11.0.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.0/scala-reflect-2.11.0.jar"/>
+					</artifact>
+					<artifact name="scala-reflect" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="3318132" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-reflect/docs/scala-reflect-2.11.0-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.0/scala-reflect-2.11.0-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra.scalate" name="scalate-util_2.11">
+			<revision name="1.7.1" status="release" pubdate="20150315191852" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="20">
+				<metadata-artifact status="no" details="" size="10292" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-util_2.11/ivy-1.7.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-util_2.11/1.7.1/scalate-util_2.11-1.7.1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.7.1" rev-constraint-default="1.7.1" rev-constraint-dynamic="1.7.1" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scalate-util_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="521054" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-util_2.11/docs/scalate-util_2.11-1.7.1-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-util_2.11/1.7.1/scalate-util_2.11-1.7.1-javadoc.jar"/>
+					</artifact>
+					<artifact name="scalate-util_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="33774" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-util_2.11/srcs/scalate-util_2.11-1.7.1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-util_2.11/1.7.1/scalate-util_2.11-1.7.1-sources.jar"/>
+					</artifact>
+					<artifact name="scalate-util_2.11" type="jar" ext="jar" status="no" details="" size="303890" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-util_2.11/jars/scalate-util_2.11-1.7.1.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-util_2.11/1.7.1/scalate-util_2.11-1.7.1.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra" name="scalatra_2.11">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191608" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="7">
+				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
+				<metadata-artifact status="no" details="" size="4891" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra_2.11/2.4.0.RC1/scalatra_2.11-2.4.0.RC1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scalatra_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="1557102" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra_2.11/docs/scalatra_2.11-2.4.0.RC1-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra_2.11/2.4.0.RC1/scalatra_2.11-2.4.0.RC1-javadoc.jar"/>
+					</artifact>
+					<artifact name="scalatra_2.11" type="jar" ext="jar" status="no" details="" size="1248485" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra_2.11/jars/scalatra_2.11-2.4.0.RC1.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra_2.11/2.4.0.RC1/scalatra_2.11-2.4.0.RC1.jar"/>
+					</artifact>
+					<artifact name="scalatra_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="82908" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra_2.11/srcs/scalatra_2.11-2.4.0.RC1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra_2.11/2.4.0.RC1/scalatra_2.11-2.4.0.RC1-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang.modules" name="scala-xml_2.11">
+			<revision name="1.0.3" status="release" pubdate="20141204121814" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="17">
+				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="3011" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.0.3" rev-constraint-default="1.0.3" rev-constraint-dynamic="1.0.3" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scala-xml_2.11" type="jar" ext="jar" status="no" details="" size="647893" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/jars/scala-xml_2.11-1.0.3.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3.jar"/>
+					</artifact>
+					<artifact name="scala-xml_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="1225501" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/docs/scala-xml_2.11-1.0.3-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3-javadoc.jar"/>
+					</artifact>
+					<artifact name="scala-xml_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="109174" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/srcs/scala-xml_2.11-1.0.3-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scala-lang.modules" name="scala-parser-combinators_2.11">
+			<revision name="1.0.3" status="release" pubdate="20141214162104" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="16">
+				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
+				<metadata-artifact status="no" details="" size="2803" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.0.3" rev-constraint-default="1.0.3" rev-constraint-dynamic="1.0.3" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scala-parser-combinators_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="693395" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/docs/scala-parser-combinators_2.11-1.0.3-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3-javadoc.jar"/>
+					</artifact>
+					<artifact name="scala-parser-combinators_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="42156" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/srcs/scala-parser-combinators_2.11-1.0.3-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3-sources.jar"/>
+					</artifact>
+					<artifact name="scala-parser-combinators_2.11" type="jar" ext="jar" status="no" details="" size="415523" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/jars/scala-parser-combinators_2.11-1.0.3.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.joda" name="joda-convert">
+			<revision name="1.7" status="release" pubdate="20140804073718" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-convert/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="15">
+				<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="6126" time="0" location="/home/keenon/.ivy2/cache/org.joda/joda-convert/ivy-1.7.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/joda/joda-convert/1.7/joda-convert-1.7.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.7" rev-constraint-default="1.7" rev-constraint-dynamic="1.7" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="joda-convert" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="100976" time="0" location="/home/keenon/.ivy2/cache/org.joda/joda-convert/docs/joda-convert-1.7-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/joda/joda-convert/1.7/joda-convert-1.7-javadoc.jar"/>
+					</artifact>
+					<artifact name="joda-convert" type="jar" ext="jar" status="no" details="" size="102981" time="0" location="/home/keenon/.ivy2/cache/org.joda/joda-convert/jars/joda-convert-1.7.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/joda/joda-convert/1.7/joda-convert-1.7.jar"/>
+					</artifact>
+					<artifact name="joda-convert" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="40304" time="0" location="/home/keenon/.ivy2/cache/org.joda/joda-convert/srcs/joda-convert-1.7-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/joda/joda-convert/1.7/joda-convert-1.7-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="joda-time" name="joda-time">
+			<revision name="2.7" status="release" pubdate="20150111165125" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-time/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="14">
+				<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
+				<metadata-artifact status="no" details="" size="6460" time="0" location="/home/keenon/.ivy2/cache/joda-time/joda-time/ivy-2.7.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/joda-time/joda-time/2.7/joda-time-2.7.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.7" rev-constraint-default="2.7" rev-constraint-dynamic="2.7" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="joda-time" type="jar" ext="jar" status="no" details="" size="589289" time="0" location="/home/keenon/.ivy2/cache/joda-time/joda-time/jars/joda-time-2.7.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/joda-time/joda-time/2.7/joda-time-2.7.jar"/>
+					</artifact>
+					<artifact name="joda-time" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="753961" time="0" location="/home/keenon/.ivy2/cache/joda-time/joda-time/srcs/joda-time-2.7-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/joda-time/joda-time/2.7/joda-time-2.7-sources.jar"/>
+					</artifact>
+					<artifact name="joda-time" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="1309080" time="0" location="/home/keenon/.ivy2/cache/joda-time/joda-time/docs/joda-time-2.7-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/joda-time/joda-time/2.7/joda-time-2.7-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.googlecode.juniversalchardet" name="juniversalchardet">
+			<revision name="1.0.3" status="release" pubdate="20110919103824" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://juniversalchardet.googlecode.com/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="13">
+				<license name="Mozilla Public License 1.1 (MPL 1.1)" url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
+				<metadata-artifact status="no" details="" size="2590" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.juniversalchardet/juniversalchardet/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/googlecode/juniversalchardet/juniversalchardet/1.0.3/juniversalchardet-1.0.3.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.0.3" rev-constraint-default="1.0.3" rev-constraint-dynamic="1.0.3" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="juniversalchardet" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="336512" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.juniversalchardet/juniversalchardet/docs/juniversalchardet-1.0.3-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/juniversalchardet/juniversalchardet/1.0.3/juniversalchardet-1.0.3-javadoc.jar"/>
+					</artifact>
+					<artifact name="juniversalchardet" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="220482" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.juniversalchardet/juniversalchardet/srcs/juniversalchardet-1.0.3-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/juniversalchardet/juniversalchardet/1.0.3/juniversalchardet-1.0.3-sources.jar"/>
+					</artifact>
+					<artifact name="juniversalchardet" type="jar" ext="jar" status="no" details="" size="220813" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.juniversalchardet/juniversalchardet/jars/juniversalchardet-1.0.3.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/com/googlecode/juniversalchardet/juniversalchardet/1.0.3/juniversalchardet-1.0.3.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra.rl" name="rl_2.11">
+			<revision name="0.4.10" status="release" pubdate="20140421152834" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://backchat.io" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="12">
+				<license name="MIT" url="http://github.com/mojolly/rl/raw/HEAD/LICENSE"/>
+				<metadata-artifact status="no" details="" size="2742" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.rl/rl_2.11/ivy-0.4.10.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/rl/rl_2.11/0.4.10/rl_2.11-0.4.10.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="0.4.10" rev-constraint-default="0.4.10" rev-constraint-dynamic="0.4.10" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="rl_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="10006" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.rl/rl_2.11/srcs/rl_2.11-0.4.10-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/rl/rl_2.11/0.4.10/rl_2.11-0.4.10-sources.jar"/>
+					</artifact>
+					<artifact name="rl_2.11" type="jar" ext="jar" status="no" details="" size="225603" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.rl/rl_2.11/jars/rl_2.11-0.4.10.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/rl/rl_2.11/0.4.10/rl_2.11-0.4.10.jar"/>
+					</artifact>
+					<artifact name="rl_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="507567" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.rl/rl_2.11/docs/rl_2.11-0.4.10-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/rl/rl_2.11/0.4.10/rl_2.11-0.4.10-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.clapper" name="grizzled-slf4j_2.11">
+			<revision name="1.0.2" status="release" pubdate="20140427072710" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/bmc/grizzled-slf4j/#readme" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="11">
+				<license name="BSD" url="http://software.clapper.org/grizzled-slf4j/license.html"/>
+				<metadata-artifact status="no" details="" size="2856" time="0" location="/home/keenon/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/ivy-1.0.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/clapper/grizzled-slf4j_2.11/1.0.2/grizzled-slf4j_2.11-1.0.2.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.0.2" rev-constraint-default="1.0.2" rev-constraint-dynamic="1.0.2" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="grizzled-slf4j_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="2881" time="0" location="/home/keenon/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/srcs/grizzled-slf4j_2.11-1.0.2-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/clapper/grizzled-slf4j_2.11/1.0.2/grizzled-slf4j_2.11-1.0.2-sources.jar"/>
+					</artifact>
+					<artifact name="grizzled-slf4j_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="357998" time="0" location="/home/keenon/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/docs/grizzled-slf4j_2.11-1.0.2-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/clapper/grizzled-slf4j_2.11/1.0.2/grizzled-slf4j_2.11-1.0.2-javadoc.jar"/>
+					</artifact>
+					<artifact name="grizzled-slf4j_2.11" type="jar" ext="jar" status="no" details="" size="6427" time="0" location="/home/keenon/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/jars/grizzled-slf4j_2.11-1.0.2.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/clapper/grizzled-slf4j_2.11/1.0.2/grizzled-slf4j_2.11-1.0.2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.slf4j" name="slf4j-api">
+			<revision name="1.7.10" status="release" pubdate="20150106121107" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.slf4j.org" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="10">
+				<metadata-artifact status="no" details="" size="4667" time="0" location="/home/keenon/.ivy2/cache/org.slf4j/slf4j-api/ivy-1.7.10.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.7.10" rev-constraint-default="1.7.10" rev-constraint-dynamic="1.7.10" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="slf4j-api" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="50644" time="0" location="/home/keenon/.ivy2/cache/org.slf4j/slf4j-api/srcs/slf4j-api-1.7.10-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10-sources.jar"/>
+					</artifact>
+					<artifact name="slf4j-api" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="211222" time="0" location="/home/keenon/.ivy2/cache/org.slf4j/slf4j-api/docs/slf4j-api-1.7.10-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10-javadoc.jar"/>
+					</artifact>
+					<artifact name="slf4j-api" type="jar" ext="jar" status="no" details="" size="32119" time="0" location="/home/keenon/.ivy2/cache/org.slf4j/slf4j-api/jars/slf4j-api-1.7.10.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra" name="scalatra-common_2.11">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191525" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="9">
+				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
+				<metadata-artifact status="no" details="" size="2664" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-common_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra-common_2.11/2.4.0.RC1/scalatra-common_2.11-2.4.0.RC1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="scalatra-common_2.11" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="3343" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-common_2.11/srcs/scalatra-common_2.11-2.4.0.RC1-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-common_2.11/2.4.0.RC1/scalatra-common_2.11-2.4.0.RC1-sources.jar"/>
+					</artifact>
+					<artifact name="scalatra-common_2.11" type="jar" ext="jar" status="no" details="" size="23001" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-common_2.11/jars/scalatra-common_2.11-2.4.0.RC1.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-common_2.11/2.4.0.RC1/scalatra-common_2.11-2.4.0.RC1.jar"/>
+					</artifact>
+					<artifact name="scalatra-common_2.11" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="377109" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-common_2.11/docs/scalatra-common_2.11-2.4.0.RC1-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scalatra/scalatra-common_2.11/2.4.0.RC1/scalatra-common_2.11-2.4.0.RC1-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="javax.servlet" name="javax.servlet-api">
+			<revision name="3.1.0" status="release" pubdate="20130425165239" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://servlet-spec.java.net" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="23">
+				<license name="CDDL + GPLv2 with classpath exception" url="https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html"/>
+				<metadata-artifact status="no" details="" size="4150" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/ivy-3.1.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="3.1.0" rev-constraint-default="3.1.0" rev-constraint-dynamic="3.1.0" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.servlet-api" type="jar" ext="jar" status="no" details="" size="95806" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/jars/javax.servlet-api-3.1.0.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar"/>
+					</artifact>
+					<artifact name="javax.servlet-api" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="223386" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/srcs/javax.servlet-api-3.1.0-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0-sources.jar"/>
+					</artifact>
+					<artifact name="javax.servlet-api" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="584540" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/docs/javax.servlet-api-3.1.0-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0-javadoc.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-library">
-			<revision name="2.11.4" status="release" pubdate="20141023083451" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.4/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="0">
+			<revision name="2.11.6" status="release" pubdate="20150225170105" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.6/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="8">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
-				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.4.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4.pom"/>
-				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0" extra-info.apiURL="http://www.scala-lang.org/api/2.11.4/"/>
+				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.6.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.6/scala-library-2.11.6.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="1.0" extra-info.apiURL="http://www.scala-lang.org/api/2.11.6/"/>
 				<artifacts>
-					<artifact name="scala-library" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="902333" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4-sources.jar"/>
+					<artifact name="scala-library" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="906435" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.6-sources.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.6/scala-library-2.11.6-sources.jar"/>
 					</artifact>
-					<artifact name="scala-library" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="20392906" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/docs/scala-library-2.11.4-javadoc.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4-javadoc.jar"/>
+					<artifact name="scala-library" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="22813840" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/docs/scala-library-2.11.6-javadoc.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.6/scala-library-2.11.6-javadoc.jar"/>
 					</artifact>
-					<artifact name="scala-library" type="jar" ext="jar" status="no" details="" size="5536783" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.4.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4.jar"/>
+					<artifact name="scala-library" type="jar" ext="jar" status="no" details="" size="5564007" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/jars/scala-library-2.11.6.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.6/scala-library-2.11.6.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.aggregate" name="jetty-all-server">
+			<revision name="8.1.16.v20140903" status="release" pubdate="20140903112917" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="1">
+				<metadata-artifact status="no" details="" size="12174" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/ivy-8.1.16.v20140903.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="8.1.16.v20140903" rev-constraint-default="8.1.16.v20140903" rev-constraint-dynamic="8.1.16.v20140903" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="jetty-all-server" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="1224456" time="467" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/srcs/jetty-all-server-8.1.16.v20140903-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903-sources.jar"/>
+					</artifact>
+					<artifact name="jetty-all-server" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="4619646" time="758" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/docs/jetty-all-server-8.1.16.v20140903-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903-javadoc.jar"/>
+					</artifact>
+					<artifact name="jetty-all-server" type="jar" ext="jar" status="no" details="" size="1882609" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/jars/jetty-all-server-8.1.16.v20140903.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.orbit" name="javax.annotation">
+			<revision name="1.1.0.v201108011116" status="release" pubdate="20111207120246" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="6">
+				<metadata-artifact status="no" details="" size="3034" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/ivy-1.1.0.v201108011116.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.1.0.v201108011116" rev-constraint-default="1.1.0.v201108011116" rev-constraint-dynamic="1.1.0.v201108011116" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.annotation" type="jar" ext="jar" status="successful" details="" size="26455" time="360" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/jars/javax.annotation-1.1.0.v201108011116.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116.jar"/>
+					</artifact>
+					<artifact name="javax.annotation" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="93948" time="342" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/docs/javax.annotation-1.1.0.v201108011116-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116-javadoc.jar"/>
+					</artifact>
+					<artifact name="javax.annotation" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="44068" time="321" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/srcs/javax.annotation-1.1.0.v201108011116-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.orbit" name="javax.mail.glassfish">
+			<revision name="1.4.1.v201005082020" status="release" pubdate="20120120142330" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="4">
+				<metadata-artifact status="no" details="" size="3241" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/ivy-1.4.1.v201005082020.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.4.1.v201005082020" rev-constraint-default="1.4.1.v201005082020" rev-constraint-dynamic="1.4.1.v201005082020" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.mail.glassfish" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="689366" time="428" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/srcs/javax.mail.glassfish-1.4.1.v201005082020-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020-sources.jar"/>
+					</artifact>
+					<artifact name="javax.mail.glassfish" type="jar" ext="jar" status="successful" details="" size="490811" time="335" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/jars/javax.mail.glassfish-1.4.1.v201005082020.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020.jar"/>
+					</artifact>
+					<artifact name="javax.mail.glassfish" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="1417628" time="395" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/docs/javax.mail.glassfish-1.4.1.v201005082020-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.orbit" name="javax.activation">
+			<revision name="1.1.0.v201105071233" status="release" pubdate="20120120142254" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="5">
+				<metadata-artifact status="no" details="" size="3034" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/ivy-1.1.0.v201105071233.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.1.0.v201105071233" rev-constraint-default="1.1.0.v201105071233" rev-constraint-dynamic="1.1.0.v201105071233" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.activation" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="104677" time="343" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/docs/javax.activation-1.1.0.v201105071233-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233-javadoc.jar"/>
+					</artifact>
+					<artifact name="javax.activation" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="43293" time="346" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/srcs/javax.activation-1.1.0.v201105071233-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233-sources.jar"/>
+					</artifact>
+					<artifact name="javax.activation" type="jar" ext="jar" status="successful" details="" size="54434" time="317" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/jars/javax.activation-1.1.0.v201105071233.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.orbit" name="javax.security.auth.message">
+			<revision name="1.0.0.v201108011116" status="release" pubdate="20120124152127" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="3">
+				<metadata-artifact status="no" details="" size="3056" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/ivy-1.0.0.v201108011116.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="1.0.0.v201108011116" rev-constraint-default="1.0.0.v201108011116" rev-constraint-dynamic="1.0.0.v201108011116" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.security.auth.message" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="40028" time="319" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/srcs/javax.security.auth.message-1.0.0.v201108011116-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116-sources.jar"/>
+					</artifact>
+					<artifact name="javax.security.auth.message" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="196313" time="329" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/docs/javax.security.auth.message-1.0.0.v201108011116-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116-javadoc.jar"/>
+					</artifact>
+					<artifact name="javax.security.auth.message" type="jar" ext="jar" status="successful" details="" size="40621" time="322" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/jars/javax.security.auth.message-1.0.0.v201108011116.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty.orbit" name="javax.servlet">
+			<revision name="3.0.0.v201112011016" status="release" pubdate="20111207114915" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="2">
+				<metadata-artifact status="no" details="" size="3028" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/ivy-3.0.0.v201112011016.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="3.0.0.v201112011016" rev-constraint-default="3.0.0.v201112011016" rev-constraint-dynamic="3.0.0.v201112011016" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.servlet" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="528733" time="362" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/docs/javax.servlet-3.0.0.v201112011016-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016-javadoc.jar"/>
+					</artifact>
+					<artifact name="javax.servlet" type="jar" ext="jar" status="successful" details="" size="200387" time="325" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/jars/javax.servlet-3.0.0.v201112011016.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.jar"/>
+					</artifact>
+					<artifact name="javax.servlet" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="329333" time="334" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/srcs/javax.servlet-3.0.0.v201112011016-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016-sources.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.googlecode.lanterna" name="lanterna">
+			<revision name="2.1.8" status="release" pubdate="20140609062657" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/lanterna/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="0">
+				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/lgpl-3.0.txt"/>
+				<metadata-artifact status="no" details="" size="3108" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/ivy-2.1.8.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile" rev="2.1.8" rev-constraint-default="2.1.8" rev-constraint-dynamic="2.1.8" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="lanterna" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="737703" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/docs/lanterna-2.1.8-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8-javadoc.jar"/>
+					</artifact>
+					<artifact name="lanterna" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="159165" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/srcs/lanterna-2.1.8-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8-sources.jar"/>
+					</artifact>
+					<artifact name="lanterna" type="jar" ext="jar" status="no" details="" size="237320" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/jars/lanterna-2.1.8.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>

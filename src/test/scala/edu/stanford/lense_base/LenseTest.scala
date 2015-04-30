@@ -3,6 +3,10 @@ package edu.stanford.lense_base
 import edu.stanford.lense_base.gameplaying.{MakeHumanObservation, GameState, OneQuestionBaseline}
 import edu.stanford.lense_base.graph.{Graph, GraphNode, NodeType, GraphStream}
 
+import scala.concurrent.Future
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
  * Created by keenon on 4/27/15.
  */
@@ -13,7 +17,7 @@ object LenseTest extends App {
   val g = graphStream.newGraph()
   val n = g.makeNode(t)
 
-  def askHuman(n : GraphNode) : String = "true"
+  def askHuman(n : GraphNode) : Future[String] = Future { "true" }
   def lossFunction(maxGuesses : List[(GraphNode, String, Double)], cost : Double, delay : Double) : Double = 1.0
 
   val lense = new Lense(graphStream, OneQuestionBaseline)

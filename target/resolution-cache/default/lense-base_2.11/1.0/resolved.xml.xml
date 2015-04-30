@@ -4,7 +4,7 @@
 		module="lense-base_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150429133229"
+		publication="20150430144556"
 	>
 		<description>
 		lense-base
@@ -33,5 +33,11 @@
 		<dependency org="org.scala-lang" name="scala-compiler" rev="2.11.4" conf="scala-tool->default,optional(default)"/>
 		<dependency org="org.scala-lang" name="scala-library" rev="2.11.4" conf="scala-tool->default,optional(default);compile->default(compile)"/>
 		<dependency org="com.googlecode.lanterna" name="lanterna" rev="2.1.8" conf="compile->default(compile)"/>
+		<dependency org="org.eclipse.jetty.aggregate" name="jetty-all-server" rev="8.1.16.v20140903" conf="compile->default(compile)"/>
+		<dependency org="org.scalatra" name="scalatra_2.11" rev="2.4.0.RC1" conf="compile->default(compile)"/>
+		<dependency org="org.scalatra" name="scalatra-scalate_2.11" rev="2.4.0.RC1" conf="compile->default(compile)"/>
+		<dependency org="org.scalatra" name="scalatra-specs2_2.11" rev="2.4.0.RC1" conf="test->default(compile)"/>
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2" conf="runtime->default(compile)"/>
+		<dependency org="javax.servlet" name="javax.servlet-api" rev="3.1.0" conf="compile->default(compile)"/>
 	</dependencies>
 </ivy-module>
