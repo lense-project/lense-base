@@ -28,8 +28,8 @@ class Java2DGUI(lense : Lense) {
       doDrawing(g)
     }
 
-    lense.
-    repaint()
+    // lense.
+    // repaint()
   }
 
   class MainFrame extends JFrame {

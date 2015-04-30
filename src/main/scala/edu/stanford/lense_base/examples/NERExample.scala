@@ -7,7 +7,9 @@ import edu.stanford.lense_base.gui.Java2DGUI
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.concurrent._
 import scala.io.Source
+import scala.util.Random
 
 /**
  * Created by keenon on 4/27/15.
@@ -49,7 +51,7 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
   val lense : Lense = new Lense(graphStream, gamePlayer)
 
   // creates a GUI to use
-  println(new Java2DGUI(lense))
+  // println(new Java2DGUI(lense))
 
   def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
     val graph = graphStream.newGraph()
@@ -69,7 +71,10 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
       graph.makeNode(nodeType, features, payload = index, toString = index+":"+token)
       index += 1
     }
-    def askHuman(node : GraphNode): String = simulateAskingHuman(node.payload.asInstanceOf[Int])
+
+    // We wrap this in a "Future" even though there's really no need to here, because in the general case
+    // we want web-requests to have the option to function somewhat asynchronously
+    def askHuman(node : GraphNode): Future[String] = Future { simulateAskingHuman(node.payload.asInstanceOf[Int]) }
 
     val assignments : Map[GraphNode, String] = lense.predict(graph,
       askHuman,
@@ -105,7 +110,7 @@ object NERExample extends App {
 
   def testSystem(ner : NERExample, data : List[List[(String,String,String)]], epsilon : Double) : (Double,Int) = {
     val classes = data.flatMap(_.map(_._3)).distinct.toList
-    val random = new util.Random(42)
+    val random = new Random(42)
 
     var correct : Double = 0
     var incorrect : Double = 0

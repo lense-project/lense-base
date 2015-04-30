@@ -2,6 +2,9 @@ package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph._
 
+import scala.concurrent.Future
+import scala.util.Try
+
 /**
  * Created by keenon on 4/27/15.
  *
@@ -68,7 +71,7 @@ object LookaheadOneHeuristic extends GamePlayer {
 case class GameState(graph : Graph,
                      cost : Double,
                      delay : Double,
-                     getHumanObservation : (GraphNode) => String,
+                     getHumanObservation : GraphNode => Future[String],
                      addHumanObservation : (Graph, GraphNode, String) => Unit,
                      lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) {
   // A quick and dirty way for game players to store arbitrary extra state
@@ -101,7 +104,15 @@ case class GameState(graph : Graph,
   }
 
   def takeRealMove(obs : MakeHumanObservation) : GameState = {
-    getNextStateForNodeObservation(obs.node, getHumanObservation(obs.node))
+    val humanObs : Future[String] = getHumanObservation(obs.node)
+    humanObs.value match {
+      case s : Some[Try[String]] =>
+        if (s.get.isSuccess)
+          getNextStateForNodeObservation(obs.node, s.get.get)
+        else
+          this
+      case _ => this
+    }
   }
 
   def getNextStates(move : GameMove) : List[(Double,GameState)] = {
