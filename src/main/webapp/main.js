@@ -26,21 +26,33 @@ $(function () {
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
-            console.log(json);
             if (json.type === "multiclass") {
                 // We need to create a multiclass question here
-                console.log("Handling a multiclass query");
+                content.html(json.html+"<br>");
+
+                for (var choiceID in json.choices) {
+                    var choice = json.choices[choiceID];
+                    var b = $('<button/>', {class: 'choice'});
+                    b.html(choice);
+                    content.append(b);
+
+                    // I hate Javascript so much. I just can't even describe it.
+                    b.click((function(closureChoice) {
+                        return function() {
+                            console.log("Choosing "+closureChoice);
+                            subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
+                            content.html("Congratulations! You've finished everything. Waiting for next question from the server...");
+                        }
+                    })(choice));
+                }
             }
         } catch (e) {
             console.log('This doesn\'t look like a valid JSON: ', message);
         }
-
-        content.html($('<p>', { text: message }))
     };
 
     request.onClose = function(response) {
         console.log("closed connection: "+response)
-        logged = false;
     };
 
     request.onError = function(response) {
@@ -51,9 +63,4 @@ $(function () {
     };
 
     var subSocket = socket.subscribe(request);
-
-    window.setInterval(
-        function() {
-            subSocket.push(jQuery.stringifyJSON({ keep-alive: 1000 }));
-        }, 1000);
 });

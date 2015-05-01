@@ -76,6 +76,10 @@
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -167,6 +171,5 @@
     <orderEntry type="library" name="SBT: com.fasterxml.jackson.core:jackson-core:2.3.5" level="project" />
     <orderEntry type="library" name="SBT: com.fasterxml.jackson.core:jackson-databind:2.3.5" level="project" />
     <orderEntry type="library" name="SBT: org.json4s:json4s-jackson_2.11:3.3.0.RC1" level="project" />
-    <orderEntry type="library" name="scala-sdk-2.11.4" level="application" />
   </component>
 </module>

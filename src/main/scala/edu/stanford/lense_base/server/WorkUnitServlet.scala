@@ -2,6 +2,7 @@ package edu.stanford.lense_base.server
 
 import java.util.Date
 
+import org.atmosphere.interceptor.IdleResourceInterceptor
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.jackson.Json
@@ -47,9 +48,11 @@ object WorkUnitServlet extends ScalatraServlet
 
   // Just for testing
 
+  val runStupidTest = false
+
   for (i <- 0 to 3) {
     addWorkUnit(new MulticlassQuestion(
-      "<p>Question #"+i+"</p>",
+      "<p>Do you like green eggs and ham? #"+i+"/3</p>",
       List("ham", "eggs", "neither"),
       Promise[String]()
     ).asInstanceOf[WorkUnit[Any]])
@@ -60,30 +63,34 @@ abstract class WorkUnit[T](resultFuture : Promise[T]) {
   def getOutboundMessage : JValue
   def handleReplyMessage(m : JValue) : Boolean
 }
-case class MulticlassQuestion(questionHTML : String, answers : List[String], resultFuture : Promise[String]) extends WorkUnit[String](resultFuture) {
+
+case class MulticlassQuestion(questionHTML : String, choices : List[String], resultFuture : Promise[String]) extends WorkUnit[String](resultFuture) {
   override def getOutboundMessage: JValue = {
     new JObject(List(
       "type" -> new JString("multiclass"),
       "html" -> new JString(questionHTML),
-      "answers" -> new JArray(answers.map(ans => new JString(ans)))
+      "choices" -> new JArray(choices.map(choice => new JString(choice)))
     ))
   }
 
   override def handleReplyMessage(m: JValue): Boolean = {
+    println("Received: "+m)
 
     // If for whatever reason we can't handle this, don't pretend that we did
 
     try {
-      m.asInstanceOf[Map[String,JString]]("Answer").values
+      m.asInstanceOf[JObject].values("answer").asInstanceOf[String]
     }
     catch {
-      case _ : Throwable => return false
+      case e : Throwable =>
+        e.printStackTrace()
+        return false
     }
 
     // If we can handle it, then do
 
     resultFuture.complete(Try {
-      m.asInstanceOf[Map[String,JString]]("Answer").values
+      m.asInstanceOf[JObject].values("answer").asInstanceOf[String]
     })
 
     true
@@ -118,6 +125,7 @@ class HCUClient extends AtmosphereClient {
   }
 
   def returnCurrentWorkUnfinished() = {
+    println("Attempting to return current unfinished work, if any")
     if (currentWork != null) {
       WorkUnitServlet.workQueue.synchronized {
         println("Returning work unit " + currentWork)
@@ -131,11 +139,13 @@ class HCUClient extends AtmosphereClient {
     case Connected =>
       WorkUnitServlet.workerPool += this
 
-    case Disconnected(disconnector, Some(error)) =>
+    case Disconnected(disconnector, errorOption) =>
+      println("Got disconnected")
       returnCurrentWorkUnfinished()
       WorkUnitServlet.workerPool -= this
 
     case Error(Some(error)) =>
+      println("Got error")
       returnCurrentWorkUnfinished()
       WorkUnitServlet.workerPool -= this
 
@@ -166,5 +176,8 @@ class HCUClient extends AtmosphereClient {
           }
         }
       }
+
+    case uncaught =>
+      println("Something made it through the match expressions: "+uncaught)
   }
 }
