@@ -4,7 +4,7 @@ import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
 
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.{Promise, Future}
 
 /**
  * Created by keenon on 4/27/15.
@@ -19,7 +19,7 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
 
   val pastGameTrajectories = mutable.ListBuffer[List[(GameState,GameMove)]]()
 
-  def predict(graph : Graph, askHuman : GraphNode => Future[String], lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
+  def predict(graph : Graph, askHuman : GraphNode => Promise[String], lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
 
     if (pastGuesses.size > 0) {

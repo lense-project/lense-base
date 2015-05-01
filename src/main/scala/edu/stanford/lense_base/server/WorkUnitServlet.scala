@@ -130,6 +130,7 @@ class HCUClient extends AtmosphereClient {
       WorkUnitServlet.workQueue.synchronized {
         println("Returning work unit " + currentWork)
         WorkUnitServlet.workQueue.enqueue(currentWork)
+        WorkUnitServlet.workQueue.notifyAll()
       }
       currentWork = null
     }

@@ -9,7 +9,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent._
 import scala.io.Source
-import scala.util.Random
+import scala.util.{Try, Random}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -76,7 +76,11 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
 
     // We wrap this in a "Future" even though there's really no need to here, because in the general case
     // we want web-requests to have the option to function somewhat asynchronously
-    def askHuman(node : GraphNode): Future[String] = Future { simulateAskingHuman(node.payload.asInstanceOf[Int]) }
+    def askHuman(node : GraphNode): Promise[String] = {
+      val p = Promise[String]()
+      p.complete(Try { simulateAskingHuman(node.payload.asInstanceOf[Int]) })
+      p
+    }
 
     val assignments : Map[GraphNode, String] = lense.predict(graph,
       askHuman,

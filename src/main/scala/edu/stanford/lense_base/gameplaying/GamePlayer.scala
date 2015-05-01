@@ -2,7 +2,8 @@ package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph._
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Promise, Future}
+import scala.concurrent.duration._
 import scala.util.Try
 
 /**
@@ -71,7 +72,7 @@ object LookaheadOneHeuristic extends GamePlayer {
 case class GameState(graph : Graph,
                      cost : Double,
                      delay : Double,
-                     getHumanObservation : GraphNode => Future[String],
+                     getHumanObservation : GraphNode => Promise[String],
                      addHumanObservation : (Graph, GraphNode, String) => Unit,
                      lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) {
   // A quick and dirty way for game players to store arbitrary extra state
@@ -104,14 +105,15 @@ case class GameState(graph : Graph,
   }
 
   def takeRealMove(obs : MakeHumanObservation) : GameState = {
-    val humanObs : Future[String] = getHumanObservation(obs.node)
-    humanObs.value match {
-      case s : Some[Try[String]] =>
-        if (s.get.isSuccess)
-          getNextStateForNodeObservation(obs.node, s.get.get)
-        else
-          this
-      case _ => this
+    try {
+      val s: String = Await.result(getHumanObservation(obs.node).future, 0 nanos)
+      getNextStateForNodeObservation(obs.node, s)
+    }
+    catch {
+      // Future has failed for some reason...
+      case _ : Throwable =>
+        // So just return the current state
+        GameState.this
     }
   }
 
