@@ -101,4 +101,18 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
     graph.makeFactor(humanTypes._2, List(node, humanObservationNode))
   }
 
+  /**
+   * THIS IS IMPORTANT:
+   *
+   * This lets you pass extra training data into the Lense instance, so that it starts out with a better prior than just
+   * plain old uniform.
+   *
+   * @param labels
+   */
+  def addTrainingData(labels : List[Graph]) : Unit = {
+    pastGuesses ++= labels
+    println("Doing initial learning...")
+    learnHoldingPastGuessesConstant()
+    println("Finished")
+  }
 }

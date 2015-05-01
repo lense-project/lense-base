@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.Lense
 import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer, OneQuestionBaseline}
-import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
+import edu.stanford.lense_base.graph.{Graph, GraphNode, GraphStream}
 import edu.stanford.lense_base.gui.Java2DGUI
 import edu.stanford.lense_base.server.{MulticlassQuestion, WorkUnitServlet}
 
@@ -48,24 +48,42 @@ class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExa
   }
 }
 
-class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) extends NERExample(classes) {
+class LenseFrameworkForNER(classes : Set[String],
+                           gamePlayer : GamePlayer,
+                           lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double,
+                           trainingData : List[List[(String,String,String)]] = null) extends NERExample(classes) {
   val graphStream : GraphStream = new GraphStream()
   val nodeType = graphStream.makeNodeType(classes)
   val factorType = graphStream.makeFactorType(List(nodeType,nodeType))
   // This keeps state for learning, etc
   val lense : Lense = new Lense(graphStream, gamePlayer)
 
-  // creates a GUI to use
-  // println(new Java2DGUI(lense))
+  if (trainingData != null) {
+    println("Training with initial batch of data")
+    lense.addTrainingData(trainingData.map(toGraph))
+  }
 
-  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String] = {
+  def toGraph(tokenPOSPairs : List[Any]) : Graph = {
     val graph = graphStream.newGraph()
 
     var index = 0
-    for (pair <- tokenPOSPairs) {
-      val token = pair._1
-      val pos = pair._2
-      val capitalized = pair._1.charAt(0).isUpper
+    for (tuple <- tokenPOSPairs) {
+      val token = tuple match {
+        case pair : (String,String) => pair._1
+        case triple : (String,String,String) => triple._1
+      }
+      val pos = tuple match {
+        case pair : (String,String) => pair._2
+        case triple : (String,String,String) => triple._2
+      }
+
+      // This lets us optionally include an observed value, for initializing with training data
+      val observed = tuple match {
+        case pair : (String,String) => null
+        case triple : (String,String,String) => triple._3
+      }
+
+      val capitalized = token.charAt(0).isUpper
 
       val features : Map[String, Double] = Map(
         "TOKEN:"+token -> 1.0,
@@ -73,9 +91,18 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
         "CAPITALIZED:"+capitalized -> 1.0
       )
 
-      graph.makeNode(nodeType, features, payload = index, toString = index+":"+token)
+      graph.makeNode(nodeType, features, payload = index, toString = index+":"+token, observedValue = observed)
       index += 1
     }
+
+    graph
+  }
+
+  // creates a GUI to use
+  // println(new Java2DGUI(lense))
+
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String] = {
+    val graph = toGraph(tokenPOSPairs)
 
     // We wrap this in a "Future" even though there's really no need to here, because in the general case
     // we want web-requests to have the option to function somewhat asynchronously
@@ -115,7 +142,10 @@ object NERExample extends App {
     loadedData.toList
   }
 
-  def testSystem(ner : NERExample, data : List[List[(String,String,String)]], epsilon : Double = 0.3, askRealHuman : ((List[String], Int, List[String]) => Promise[String]) = null) : (Double,Int) = {
+  def testSystem(ner : NERExample,
+                 data : List[List[(String,String,String)]],
+                 epsilon : Double = 0.3,
+                 askRealHuman : ((List[String], Int, List[String]) => Promise[String]) = null) : (Double,Int) = {
     val classes = data.flatMap(_.map(_._3)).distinct.toList
     val random = new Random(42)
 
@@ -180,14 +210,18 @@ object NERExample extends App {
   }
 
   println("One Question Baseline, with only BIAS feature")
-  println(testSystem(new LenseFramework(classes, OneQuestionBaseline, lossFunction), data, 0.3))
+  println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction), data, 0.3))
   println("Basic Lost Function LookaheadOneHeuristic")
-  println(testSystem(new LenseFramework(classes, LookaheadOneHeuristic, lossFunction), data, 0.3))
+  println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction), data, 0.3))
 
   def testWithRealHumans() = {
     println("****\n****\n****\nRunning a real NER test!")
 
+    val allData = loadNER
+
     val data = loadNER.filter(_.size < 15).take(100)
+    val trainSet = allData.filter(d => !data.contains(d)).take(10)
+
     println(data(1))
     val classes = data.flatMap(_.map(_._3)).distinct.toSet
     println("Classes: "+classes)
@@ -215,6 +249,6 @@ object NERExample extends App {
       p
     }
 
-    println(testSystem(new LenseFramework(classes, LookaheadOneHeuristic, lossFunction), data, 0.3, askRealHuman))
+    println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction, trainingData = trainSet), data, 0.3, askRealHuman))
   }
 }
