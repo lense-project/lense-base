@@ -273,7 +273,8 @@ class GraphStream {
             case nodeType: NodeType =>
               if (tensor.dimensions.length != 2) throw new IllegalStateException("Can't have weights for a node unary " +
                 "factor that aren't nodeValues x nodeFeatures, which means dim=2. Instead got dim=" + tensor.dimensions.length)
-              if (tensor.dimensions(0) != nodeType.possibleValues.size) throw new IllegalStateException()
+              if (tensor.dimensions(0) != nodeType.possibleValues.size) throw new IllegalStateException("Have a set of possibleValues that"+
+              " doesn't match the value domain: "+nodeType.valueDomain.categories+", "+nodeType.possibleValues)
               if (tensor.dimensions(1) != nodeType.featureDomain.size) throw new IllegalStateException()
               // we need the weight values for each possible assignment
               val tensor2 = tensor.asInstanceOf[Tensor2]
@@ -612,6 +613,9 @@ class GraphStream {
             dotFamilyCache.remove(node.nodeType)
             weightsTensorCache.remove(node.nodeType)
           }
+        }
+        if (node.observedValue != null) {
+          node.nodeType.valueDomain.index(node.observedValue)
         }
       }
       for (factor <- graph.factors) {

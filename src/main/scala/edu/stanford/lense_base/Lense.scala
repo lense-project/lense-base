@@ -24,7 +24,7 @@ class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
 
     if (pastGuesses.size > 0) {
       println("Learning...")
-      learnHoldingPastGuessesConstant()
+      learnHoldingPastGuessesConstant(1.0)
       println("Finished Learning:")
     }
 

@@ -1,6 +1,6 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.examples.{NERExample, LenseFramework}
+import edu.stanford.lense_base.examples.{NERExample, LenseFrameworkForNER}
 import edu.stanford.lense_base.gameplaying.LookaheadOneHeuristic
 
 /**
