@@ -6,7 +6,7 @@ $(function () {
 
     // We are now ready to cut the request
     var request = {
-        url: '/chat',
+        url: '/work-socket',
         contentType : 'application/text',
         transport : 'websocket',
         fallbackTransport: 'long-polling'
@@ -26,6 +26,11 @@ $(function () {
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
+            console.log(json);
+            if (json.type === "multiclass") {
+                // We need to create a multiclass question here
+                console.log("Handling a multiclass query");
+            }
         } catch (e) {
             console.log('This doesn\'t look like a valid JSON: ', message);
         }

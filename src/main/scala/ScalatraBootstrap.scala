@@ -1,12 +1,14 @@
 import javax.servlet.ServletContext
 
-import edu.stanford.lense_base.server.{WebsocketsServlet, ScalatraTest}
+import edu.stanford.lense_base.server.WorkUnitServlet
+import org.atmosphere.cpr.ApplicationConfig
 import org.scalatra.LifeCycle
 import org.scalatra.servlet.RichServletContext
 
 class ScalatraBootstrap extends LifeCycle {
   override def init(context : ServletContext) {
     // Mount servlets.
-    context.mount(new WebsocketsServlet, "/*")
+    context.setInitParameter(ApplicationConfig.SCAN_CLASSPATH, "false")
+    context.mount(WorkUnitServlet, "/*")
   }
 }
