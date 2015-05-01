@@ -52,5 +52,8 @@ $(function () {
 
     var subSocket = socket.subscribe(request);
 
-    // subSocket.push(jQuery.stringifyJSON({ author: author, message: msg }));
+    window.setInterval(
+        function() {
+            subSocket.push(jQuery.stringifyJSON({ keep-alive: 1000 }));
+        }, 1000);
 });

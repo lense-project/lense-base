@@ -158,7 +158,13 @@ class HCUClient extends AtmosphereClient {
       // This probably means we should be checking for work, so do that
 
       else {
-        checkForWork()
+        val map = m.content.asInstanceOf[JObject].obj.toMap
+        if (map.contains("status")) {
+          val status = map.apply("status").values.asInstanceOf[String]
+          if (status == "ready") {
+            checkForWork()
+          }
+        }
       }
   }
 }
