@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: com.googlecode.lanterna:lanterna:2.1.8:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.googlecode.lanterna/lanterna/jars/lanterna-2.1.8.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.googlecode.lanterna/lanterna/docs/lanterna-2.1.8-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/com.googlecode.lanterna/lanterna/srcs/lanterna-2.1.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
