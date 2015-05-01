@@ -23,3 +23,6 @@ libraryDependencies += "org.scalatra" %% "scalatra-specs2" % "2.4.0.RC1" % "test
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2" % "runtime"
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0"
+
+// This seems to be necessary for specs2
+resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
