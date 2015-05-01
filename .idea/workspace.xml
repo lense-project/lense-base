@@ -2,36 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WebsocketsServlet.scala" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" afterPath="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sbt_2.11-default.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sbt_2.11-default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_2.11-default.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_2.11-default.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile-internal.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile-internal.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-docs.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-docs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-optional.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-optional.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-plugin.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-plugin.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-pom.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-provided.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-provided.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime-internal.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime-internal.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-scala-tool.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-scala-tool.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-sources.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-sources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test-internal.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test-internal.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/highlighting.xml" afterPath="$PROJECT_DIR$/.idea/highlighting.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/lense-base.iml" afterPath="$PROJECT_DIR$/.idea/modules/lense-base.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/main.js" afterPath="$PROJECT_DIR$/src/main/webapp/main.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/$global/updateClassifiers/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/$global/updateClassifiers/$global/streams/out" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/streams/$global/updateSbtClassifiers/$global/streams/out" afterPath="$PROJECT_DIR$/target/streams/$global/updateSbtClassifiers/$global/streams/out" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sbt_2.11/1.0/resolved.xml.properties" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sbt_2.11/1.0/resolved.xml.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_2.11/1.0/resolved.xml.properties" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_2.11/1.0/resolved.xml.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_javadoc_2.11/1.0/resolved.xml.properties" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_javadoc_2.11/1.0/resolved.xml.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sbt_2.11/1.0/resolved.xml.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sbt_2.11/1.0/resolved.xml.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_2.11/1.0/resolved.xml.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_2.11/1.0/resolved.xml.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_javadoc_2.11/1.0/resolved.xml.xml" afterPath="$PROJECT_DIR$/target/resolution-cache/default/lense-base$sources_javadoc_2.11/1.0/resolved.xml.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -61,55 +33,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="build.sbt" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/build.sbt">
+      <file leaf-file-name="AtmosphereClient.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereClient.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="465">
-              <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1153" max-vertical-offset="1620">
+              <caret line="96" column="4" selection-start-line="96" selection-start-column="4" selection-end-line="96" selection-end-column="4" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ScalatraBootstrap.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
-              <caret line="11" column="39" selection-start-line="11" selection-start-column="39" selection-end-line="11" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#35#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ApplicationConfig.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/ApplicationConfig.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="9383" max-vertical-offset="12480">
-              <caret line="650" column="45" selection-start-line="650" selection-start-column="45" selection-end-line="650" selection-end-column="45" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LenseTest.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/LenseTest.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="885">
-              <caret line="11" column="2" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
-              <folding>
-                <element signature="e#33#130#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="web.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml">
+      <file leaf-file-name="DefaultScalatraBroadcaster.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/DefaultScalatraBroadcaster.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
-              <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -118,8 +56,8 @@
       <file leaf-file-name="WorkUnitServlet.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.386121" vertical-offset="1508" max-vertical-offset="2475">
-              <caret line="115" column="8" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="8" />
+            <state vertical-scroll-proportion="-0.63811564" vertical-offset="2083" max-vertical-offset="2550">
+              <caret line="119" column="2" selection-start-line="119" selection-start-column="2" selection-end-line="119" selection-end-column="2" />
               <folding>
                 <element signature="e#40#61#0" expanded="true" />
               </folding>
@@ -127,45 +65,79 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ScalatraAtmosphereHandler.scala" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/ScalatraAtmosphereHandler.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1414" max-vertical-offset="3000">
-              <caret line="115" column="0" selection-start-line="115" selection-start-column="0" selection-end-line="115" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="example.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/reference/example.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="486" max-vertical-offset="1305">
-              <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="main.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/webapp/main.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="945">
-              <caret line="30" column="62" selection-start-line="30" selection-start-column="62" selection-end-line="30" selection-end-column="62" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="915">
+              <caret line="25" column="43" selection-start-line="25" selection-start-column="43" selection-end-line="25" selection-end-column="43" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/webapp/index.html">
+      <file leaf-file-name="ScalatraBroadcaster.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/ScalatraBroadcaster.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.125" vertical-offset="0" max-vertical-offset="330">
-              <caret line="13" column="12" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
+              <caret line="22" column="4" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="package.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/package.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="990">
+              <caret line="46" column="4" selection-start-line="46" selection-start-column="4" selection-end-line="46" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="wire_format.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/wire_format.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="1245">
+              <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="slf4j.scala" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/srcs/grizzled-slf4j_2.11-1.0.2-sources.jar!/grizzled/slf4j/slf4j.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4665">
+              <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AtmosphereResourceImpl.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/AtmosphereResourceImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="5710" max-vertical-offset="13185">
+              <caret line="444" column="0" selection-start-line="444" selection-start-column="0" selection-end-line="444" selection-end-column="0" />
               <folding>
-                <marker date="1430432846999" expanded="true" signature="32:322" placeholder="..." />
-                <marker date="1430432846999" expanded="true" signature="333:491" placeholder="..." />
-                <marker date="1430432846999" expanded="true" signature="438:479" placeholder="..." />
+                <element signature="e#8124#8125#0" expanded="true" />
+                <element signature="e#8151#8152#0" expanded="true" />
+                <element signature="e#16876#16877#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DefaultBroadcaster.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/DefaultBroadcaster.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="18790" max-vertical-offset="25770">
+              <caret line="1347" column="0" selection-start-line="1347" selection-start-column="0" selection-end-line="1347" selection-end-column="0" />
+              <folding>
+                <element signature="e#16993#16994#0" expanded="true" />
+                <element signature="e#17031#17032#0" expanded="true" />
+                <element signature="e#53909#53917#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -205,9 +177,9 @@
         <option value="$PROJECT_DIR$/src/main/webapp/index.html" />
         <option value="$PROJECT_DIR$/build.sbt" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WebsocketsServlet.scala" />
-        <option value="$PROJECT_DIR$/src/main/webapp/main.js" />
         <option value="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" />
+        <option value="$PROJECT_DIR$/src/main/webapp/main.js" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
       </list>
     </option>
@@ -777,7 +749,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28739694" sideWeight="0.49967888" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28739694" sideWeight="0.49967888" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30174217" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -785,7 +757,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39929327" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39929327" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -811,7 +783,6 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="Starting to stub out the TaskStream and NERExample code." />
     <MESSAGE value="Wrote basic test using some CoNLL data for NER." />
     <MESSAGE value="Massively reorganized GraphStream so that all the nested types don't ruin everyone's day" />
     <MESSAGE value="Added some mechanisms for adding human observation nodes to the graphs." />
@@ -836,123 +807,16 @@
     <MESSAGE value="Fabulous, have a simple self-contained server set up and integrated with IntelliJ. Now to make a real Q/A system..." />
     <MESSAGE value="Appear to have guts of an async socket in place. Now need to figure out how it works." />
     <MESSAGE value="Think I've figured out roughly how to make this all work. Now I need to go write some question formats." />
-    <option name="LAST_COMMIT_MESSAGE" value="Think I've figured out roughly how to make this all work. Now I need to go write some question formats." />
+    <MESSAGE value="Added a work unit queue, and some machinery for dispatching work to different annotators in-browser." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a work unit queue, and some machinery for dispatching work to different annotators in-browser." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="11" />
+      <option name="time" value="12" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/build.sbt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="100">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="9480" max-vertical-offset="10680">
-          <caret line="632" column="81" selection-start-line="632" selection-start-column="81" selection-end-line="632" selection-end-column="81" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="748" max-vertical-offset="2040">
-          <caret line="60" column="0" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="1065">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#33#77#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/LenseTest.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="345" max-vertical-offset="540">
-          <caret line="23" column="47" selection-start-line="23" selection-start-column="47" selection-end-line="23" selection-end-column="47" />
-          <folding>
-            <element signature="e#33#130#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1485">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/conll.iob.4class.train">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1590" max-vertical-offset="3068580">
-          <caret line="106" column="12" selection-start-line="106" selection-start-column="12" selection-end-line="106" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/conll.iob.4class.train">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1590" max-vertical-offset="3068580">
-          <caret line="106" column="12" selection-start-line="106" selection-start-column="12" selection-end-line="106" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/variable/Var.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33242133" vertical-offset="717" max-vertical-offset="1785">
-          <caret line="75" column="6" selection-start-line="75" selection-start-column="6" selection-end-line="75" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/infer/Summary.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1269" max-vertical-offset="2385">
-          <caret line="115" column="14" selection-start-line="115" selection-start-column="14" selection-end-line="115" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar!/scala/Function0.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="645">
-          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar!/scala/runtime/AbstractFunction0.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="210">
-          <caret line="11" column="46" selection-start-line="11" selection-start-column="46" selection-end-line="11" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar!/scala/App.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="669" max-vertical-offset="1215">
-          <caret line="75" column="4" selection-start-line="75" selection-start-column="4" selection-end-line="75" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar!/scala/collection/LinearSeqOptimized.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.27492446" vertical-offset="568" max-vertical-offset="4515">
-          <caret line="58" column="6" selection-start-line="58" selection-start-column="6" selection-end-line="58" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.ivy2/cache/org.scala-lang/scala-library/srcs/scala-library-2.11.4-sources.jar!/scala/collection/mutable/MutableList.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.47583082" vertical-offset="0" max-vertical-offset="2370">
@@ -1097,8 +961,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
           <caret line="8" column="21" selection-start-line="8" selection-start-column="21" selection-end-line="8" selection-end-column="21" />
           <folding>
-            <element signature="n#!!doc" expanded="true" />
-            <element signature="e#42#100#0" expanded="true" />
+            <element signature="n#!!doc" expanded="false" />
+            <element signature="e#42#100#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1108,7 +972,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1650">
           <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
-            <element signature="e#33#77#0" expanded="true" />
+            <element signature="e#33#77#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1142,9 +1006,9 @@
         <state vertical-scroll-proportion="-8.125" vertical-offset="0" max-vertical-offset="330">
           <caret line="13" column="12" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
           <folding>
-            <marker date="1430432846999" expanded="true" signature="32:322" placeholder="..." />
-            <marker date="1430432846999" expanded="true" signature="333:491" placeholder="..." />
-            <marker date="1430432846999" expanded="true" signature="438:479" placeholder="..." />
+            <marker date="1430432846999" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1430432846999" expanded="true" signature="-1:-1" placeholder="..." />
+            <marker date="1430432846999" expanded="true" signature="-1:-1" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -1165,14 +1029,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereClient.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33274022" vertical-offset="488" max-vertical-offset="1620">
-          <caret line="50" column="6" selection-start-line="50" selection-start-column="6" selection-end-line="50" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/messages.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.19372694" vertical-offset="540" max-vertical-offset="1245">
@@ -1185,14 +1041,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="730" max-vertical-offset="1305">
           <caret line="55" column="0" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/webapp/main.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="945">
-          <caret line="30" column="62" selection-start-line="30" selection-start-column="62" selection-end-line="30" selection-end-column="62" />
           <folding />
         </state>
       </provider>
@@ -1218,7 +1066,7 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="885">
           <caret line="11" column="2" selection-start-line="11" selection-start-column="2" selection-end-line="11" selection-end-column="2" />
           <folding>
-            <element signature="e#33#130#0" expanded="true" />
+            <element signature="e#33#130#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1241,10 +1089,157 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereClientFilters.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
+          <caret line="27" column="41" selection-start-line="27" selection-start-column="41" selection-end-line="27" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/srcs/jetty-all-server-8.1.16.v20140903-sources.jar!/org/eclipse/jetty/servlet/ServletHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3325" max-vertical-offset="23055">
+          <caret line="317" column="0" selection-start-line="317" selection-start-column="0" selection-end-line="317" selection-end-column="0" />
+          <folding>
+            <element signature="e#13087#13088#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/srcs/jetty-all-server-8.1.16.v20140903-sources.jar!/org/eclipse/jetty/servlet/Holder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3215" max-vertical-offset="4710">
+          <caret line="307" column="0" selection-start-line="307" selection-start-column="0" selection-end-line="307" selection-end-column="0" />
+          <folding>
+            <element signature="e#9579#9580#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/srcs/jetty-all-server-8.1.16.v20140903-sources.jar!/org/eclipse/jetty/server/handler/ContextHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="27475" max-vertical-offset="34875">
+          <caret line="2059" column="0" selection-start-line="2059" selection-start-column="0" selection-end-line="2059" selection-end-column="0" />
+          <folding>
+            <element signature="e#18481#18482#0" expanded="false" />
+            <element signature="e#18525#18526#0" expanded="false" />
+            <element signature="e#70217#70218#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereSupport.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="760" max-vertical-offset="3420">
+          <caret line="91" column="53" selection-start-line="91" selection-start-column="53" selection-end-line="91" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/AtmosphereFramework.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="9880" max-vertical-offset="42165">
+          <caret line="831" column="0" selection-start-line="831" selection-start-column="0" selection-end-line="831" selection-end-column="0" />
+          <folding>
+            <element signature="e#102971#102972#0" expanded="false" />
+            <element signature="e#103007#103008#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/AtmosphereConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="965" max-vertical-offset="4020">
+          <caret line="111" column="0" selection-start-line="111" selection-start-column="0" selection-end-line="111" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/AtmosphereResourceImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5710" max-vertical-offset="13185">
+          <caret line="444" column="0" selection-start-line="444" selection-start-column="0" selection-end-line="444" selection-end-column="0" />
+          <folding>
+            <element signature="e#8124#8125#0" expanded="true" />
+            <element signature="e#8151#8152#0" expanded="true" />
+            <element signature="e#16876#16877#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereClient.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1153" max-vertical-offset="1620">
+          <caret line="96" column="4" selection-start-line="96" selection-start-column="4" selection-end-line="96" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/srcs/grizzled-slf4j_2.11-1.0.2-sources.jar!/grizzled/slf4j/slf4j.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4665">
+          <caret line="64" column="0" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/wire_format.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="765" max-vertical-offset="1245">
+          <caret line="70" column="41" selection-start-line="70" selection-start-column="41" selection-end-line="70" selection-end-column="41" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/DefaultBroadcaster.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="18790" max-vertical-offset="25770">
+          <caret line="1347" column="0" selection-start-line="1347" selection-start-column="0" selection-end-line="1347" selection-end-column="0" />
+          <folding>
+            <element signature="e#16993#16994#0" expanded="true" />
+            <element signature="e#17031#17032#0" expanded="true" />
+            <element signature="e#53909#53917#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/package.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="990">
+          <caret line="46" column="4" selection-start-line="46" selection-start-column="4" selection-end-line="46" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/ScalatraBroadcaster.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
+          <caret line="22" column="4" selection-start-line="22" selection-start-column="4" selection-end-line="22" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/DefaultScalatraBroadcaster.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/webapp/main.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="915">
+          <caret line="25" column="43" selection-start-line="25" selection-start-column="43" selection-end-line="25" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.386121" vertical-offset="1508" max-vertical-offset="2475">
-          <caret line="115" column="8" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="8" />
+        <state vertical-scroll-proportion="-0.63811564" vertical-offset="2083" max-vertical-offset="2550">
+          <caret line="119" column="2" selection-start-line="119" selection-start-column="2" selection-end-line="119" selection-end-column="2" />
           <folding>
             <element signature="e#40#61#0" expanded="true" />
           </folding>

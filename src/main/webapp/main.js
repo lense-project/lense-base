@@ -13,15 +13,15 @@ $(function () {
     };
 
     request.onOpen = function(response) {
-        console.log("on open: ")
-        console.log(response)
+        console.log("on open: "+response)
 
         content.html($('<p>', { text: 'connected using ' + response.transport }));
+
+        subSocket.push(jQuery.stringifyJSON({ status: 'ready' }));
     };
 
     request.onMessage = function (response) {
-        console.log("on message: ")
-        console.log(response)
+        console.log("on message: "+response)
 
         var message = response.responseBody;
         try {
@@ -39,14 +39,12 @@ $(function () {
     };
 
     request.onClose = function(response) {
-        console.log("closed connection: ")
-        console.log(response)
+        console.log("closed connection: "+response)
         logged = false;
     };
 
     request.onError = function(response) {
-        console.log("on error: ")
-        console.log(response)
+        console.log("on error: "+response)
 
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
             + 'socket or the server is down' }));

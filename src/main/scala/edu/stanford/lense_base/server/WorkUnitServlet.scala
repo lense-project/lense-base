@@ -47,7 +47,7 @@ object WorkUnitServlet extends ScalatraServlet
 
   // Just for testing
 
-  for (i <- 0 to 10) {
+  for (i <- 0 to 3) {
     addWorkUnit(new MulticlassQuestion(
       "<p>Question #"+i+"</p>",
       List("ham", "eggs", "neither"),
@@ -113,27 +113,32 @@ class HCUClient extends AtmosphereClient {
   def performWork(newWork : WorkUnit[Any]) = {
     currentWork = newWork
     println("Doing work "+currentWork)
-    send(new JsonMessage(currentWork.getOutboundMessage))
+    val msg = new JsonMessage(currentWork.getOutboundMessage)
+    send(msg)
   }
 
   def returnCurrentWorkUnfinished() = {
-    WorkUnitServlet.workQueue.synchronized {
-      WorkUnitServlet.workQueue.enqueue(currentWork)
+    if (currentWork != null) {
+      WorkUnitServlet.workQueue.synchronized {
+        println("Returning work unit " + currentWork)
+        WorkUnitServlet.workQueue.enqueue(currentWork)
+      }
+      currentWork = null
     }
-    currentWork = null
   }
 
   def receive = {
     case Connected =>
       WorkUnitServlet.workerPool += this
 
-      // This should kick off an infinite loop of work-doing, until this object dies
-
-      checkForWork()
-
     case Disconnected(disconnector, Some(error)) =>
+      returnCurrentWorkUnfinished()
       WorkUnitServlet.workerPool -= this
+
     case Error(Some(error)) =>
+      returnCurrentWorkUnfinished()
+      WorkUnitServlet.workerPool -= this
+
     case TextMessage(text) =>
       send(new TextMessage("ECHO: "+text))
 
@@ -150,10 +155,10 @@ class HCUClient extends AtmosphereClient {
         checkForWork()
       }
 
-      // This is odd, we're receiving JSON even though we think we have no work outstanding...
+      // This probably means we should be checking for work, so do that
 
       else {
-        send(new JsonMessage(new JObject(List("status" -> JString("no_task")))))
+        checkForWork()
       }
   }
 }
