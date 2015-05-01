@@ -4,12 +4,15 @@ import edu.stanford.lense_base.Lense
 import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer, OneQuestionBaseline}
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream}
 import edu.stanford.lense_base.gui.Java2DGUI
+import edu.stanford.lense_base.server.{MulticlassQuestion, WorkUnitServlet}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent._
 import scala.io.Source
 import scala.util.{Try, Random}
+
+import scala.concurrent.duration._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -19,22 +22,22 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * Using hybrid crowd-ML to do accurate, cheap, fast NER
  */
 abstract class NERExample(classes : Set[String]) {
-  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String]
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String]
 }
 
 class SingleQueryBaseline(classes : Set[String]) extends NERExample(classes) {
-  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
-    (0 to tokenPOSPairs.size-1).map(simulateAskingHuman).toList
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String] = {
+    (0 to tokenPOSPairs.size-1).map(simulateAskingHuman).map(p => Await.result(p.future, 0 nanos)).toList
   }
 }
 
 class MultiQueryBaseline(classes : Set[String], numQueries : Int) extends NERExample(classes) {
-  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String] = {
     (0 to tokenPOSPairs.size-1).map(i => {
       val map : mutable.HashMap[String,Int] = mutable.HashMap()
       for (cl <- classes) map.put(cl, 0)
       for (j <- 0 to numQueries) {
-        val response = simulateAskingHuman(i)
+        val response = Await.result(simulateAskingHuman(i).future, 0 nanos)
         map.put(response, map(response)+1)
       }
 
@@ -55,7 +58,7 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
   // creates a GUI to use
   // println(new Java2DGUI(lense))
 
-  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => (String)) : List[String] = {
+  def predictNER(tokenPOSPairs : List[(String, String)], simulateAskingHuman : (Int) => Promise[String]) : List[String] = {
     val graph = graphStream.newGraph()
 
     var index = 0
@@ -77,9 +80,7 @@ class LenseFramework(classes : Set[String], gamePlayer : GamePlayer, lossFunctio
     // We wrap this in a "Future" even though there's really no need to here, because in the general case
     // we want web-requests to have the option to function somewhat asynchronously
     def askHuman(node : GraphNode): Promise[String] = {
-      val p = Promise[String]()
-      p.complete(Try { simulateAskingHuman(node.payload.asInstanceOf[Int]) })
-      p
+      simulateAskingHuman(node.payload.asInstanceOf[Int])
     }
 
     val assignments : Map[GraphNode, String] = lense.predict(graph,
@@ -114,7 +115,7 @@ object NERExample extends App {
     loadedData.toList
   }
 
-  def testSystem(ner : NERExample, data : List[List[(String,String,String)]], epsilon : Double) : (Double,Int) = {
+  def testSystem(ner : NERExample, data : List[List[(String,String,String)]], epsilon : Double = 0.3, askRealHuman : ((List[String], Int, List[String]) => Promise[String]) = null) : (Double,Int) = {
     val classes = data.flatMap(_.map(_._3)).distinct.toList
     val random = new Random(42)
 
@@ -124,19 +125,30 @@ object NERExample extends App {
     val confusionMatrix : mutable.HashMap[(String,String), Int] = mutable.HashMap()
 
     for (sentence <- data) {
-      val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)),
-      // This is our "query human" function
-      (i : Int) => {
+      def simulateQueryHuman(i : Int) : Promise[String] = {
         numQueries += 1
-        // With probability epsilon we choose at random
-        if (random.nextDouble() < epsilon) {
-          classes(random.nextInt(classes.size))
-        }
-        // Otherwise we return the correct result
-        else {
-          sentence(i)._3
-        }
-      })
+        val p = Promise[String]()
+        p.complete(Try {
+          // With probability epsilon we choose at random
+          if (random.nextDouble() < epsilon) {
+            classes(random.nextInt(classes.size))
+          }
+          // Otherwise we return the correct result
+          else {
+            sentence(i)._3
+          }
+        })
+        p
+      }
+
+      def queryRealHuman(i : Int) : Promise[String] = {
+        askRealHuman(sentence.map(_._1), i, classes)
+      }
+
+      val predictedTags = ner.predictNER(sentence.map(tuple => (tuple._1, tuple._2)),
+        // This is our "query human" function
+        if (askRealHuman == null) simulateQueryHuman else queryRealHuman
+      )
 
       for (i <- 0 to sentence.size - 1) {
         if (sentence(i)._3 == predictedTags(i)) correct += 1
@@ -171,4 +183,38 @@ object NERExample extends App {
   println(testSystem(new LenseFramework(classes, OneQuestionBaseline, lossFunction), data, 0.3))
   println("Basic Lost Function LookaheadOneHeuristic")
   println(testSystem(new LenseFramework(classes, LookaheadOneHeuristic, lossFunction), data, 0.3))
+
+  def testWithRealHumans() = {
+    println("****\n****\n****\nRunning a real NER test!")
+
+    val data = loadNER.filter(_.size < 15).take(100)
+    println(data(1))
+    val classes = data.flatMap(_.map(_._3)).distinct.toSet
+    println("Classes: "+classes)
+
+    def askRealHuman(sentence : List[String], i : Int, classes : List[String]) : Promise[String] = {
+
+      var question = "Dear NLP Researcher:<br>What NER type is this?<br>"
+      for (j <- 0 to sentence.length-1) {
+        if (j > 0) question += " "
+        if (i == j) question += "<b>[ "
+        question += sentence(j)
+        if (i == j) question += " ]</b>"
+      }
+
+      println("Asking human question: "+question)
+
+      val p = Promise[String]()
+      WorkUnitServlet.addWorkUnit(
+        new MulticlassQuestion(
+          question,
+          classes,
+          p
+        )
+      )
+      p
+    }
+
+    println(testSystem(new LenseFramework(classes, LookaheadOneHeuristic, lossFunction), data, 0.3, askRealHuman))
+  }
 }

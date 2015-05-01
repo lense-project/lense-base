@@ -106,12 +106,13 @@ case class GameState(graph : Graph,
 
   def takeRealMove(obs : MakeHumanObservation) : GameState = {
     try {
-      val s: String = Await.result(getHumanObservation(obs.node).future, 0 nanos)
+      val s: String = Await.result(getHumanObservation(obs.node).future, 10000 days /* no timeout here, we handle that elsewhere */)
       getNextStateForNodeObservation(obs.node, s)
     }
     catch {
       // Future has failed for some reason...
-      case _ : Throwable =>
+      case e : Throwable =>
+        e.printStackTrace()
         // So just return the current state
         GameState.this
     }

@@ -1,5 +1,6 @@
 import javax.servlet.ServletContext
 
+import edu.stanford.lense_base.Init
 import edu.stanford.lense_base.server.WorkUnitServlet
 import org.atmosphere.cpr.ApplicationConfig
 import org.atmosphere.interceptor.IdleResourceInterceptor
@@ -11,5 +12,11 @@ class ScalatraBootstrap extends LifeCycle {
     // Mount servlets.
     context.setInitParameter(ApplicationConfig.SCAN_CLASSPATH, "false")
     context.mount(WorkUnitServlet, "/*")
+
+    new Thread {
+      override def run() {
+        Init.main(Array())
+      }
+    }.start()
   }
 }

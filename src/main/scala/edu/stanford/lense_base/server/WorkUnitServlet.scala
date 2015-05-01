@@ -33,9 +33,9 @@ object WorkUnitServlet extends ScalatraServlet
 
   val workQueue = mutable.Queue[WorkUnit[Any]]()
 
-  def addWorkUnit(workUnit : WorkUnit[Any]) = {
+  def addWorkUnit[T](workUnit : WorkUnit[T]) = {
     workQueue.synchronized {
-      workQueue.enqueue(workUnit)
+      workQueue.enqueue(workUnit.asInstanceOf[WorkUnit[Any]])
       workQueue.notifyAll()
     }
   }
@@ -50,12 +50,14 @@ object WorkUnitServlet extends ScalatraServlet
 
   val runStupidTest = false
 
-  for (i <- 0 to 3) {
-    addWorkUnit(new MulticlassQuestion(
-      "<p>Do you like green eggs and ham? #"+i+"/3</p>",
-      List("ham", "eggs", "neither"),
-      Promise[String]()
-    ).asInstanceOf[WorkUnit[Any]])
+  if (runStupidTest) {
+    for (i <- 0 to 3) {
+      addWorkUnit(new MulticlassQuestion(
+        "<p>Do you like green eggs and ham? #" + i + "/3</p>",
+        List("ham", "eggs", "neither"),
+        Promise[String]()
+      ))
+    }
   }
 }
 
@@ -103,7 +105,7 @@ class HCUClient extends AtmosphereClient {
 
   var currentWork : WorkUnit[Any] = null
 
-  def checkForWork() = {
+  def checkForWork() : Unit = {
     WorkUnitServlet.workQueue.synchronized {
       if (WorkUnitServlet.workQueue.nonEmpty) {
         println("Work-queue non-empty. Performing work")
@@ -113,6 +115,7 @@ class HCUClient extends AtmosphereClient {
         // wait for new work to arrive
         println("Work-queue empty. Annotator waiting for work")
         WorkUnitServlet.workQueue.wait()
+        checkForWork()
       }
     }
   }
