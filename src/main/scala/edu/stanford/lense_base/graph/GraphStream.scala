@@ -113,9 +113,8 @@ case class Graph(stream : GraphStream) {
   }
 
   def mapEstimate(): Map[GraphNode, String] = {
-    val variables = allVariablesForFactorie()
+    val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    variables.foreach(_.includeHardConstantFactors = true)
 
     // Do exact inference via trees if possible.
     val sumMax = try {
@@ -125,13 +124,15 @@ case class Graph(stream : GraphStream) {
     catch {
       case _ : Throwable =>
         // run loopy bp
+        println("MAP Inference is falling back to loopy BP. Results may be inexact")
         MaximizeByBPLoopyTreewise.infer(variables, stream.model)
     }
 
     variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
         nodeVar.node -> (sumMax.getMarginal(nodeVar).get match {
-          case dm : DiscreteMarginal1[NodeVariable] => dm.value1.category
+          case dm : DiscreteMarginal1[NodeVariable] =>
+            dm.value1.category
           case sm : MAPSummary#SingletonMarginal =>
             sm.setToMaximize(null)
             nodeVar.categoryValue
@@ -140,9 +141,8 @@ case class Graph(stream : GraphStream) {
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
-    val variables = allVariablesForFactorie()
+    val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    variables.foreach(_.includeHardConstantFactors = true)
 
     // Do exact inference via trees if possible.
     val sumMarginal = try {
@@ -222,13 +222,11 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
 // This holds the Multi-class decision variable component of a given node.
 // The model expects a list of these to be passed in.
 
-case class NodeVariable(node : GraphNode, graph : Graph) extends CategoricalVariable[String] {
-
-  // TODO: Keeping this state here will lead to race conditions, unfortunately, but it seems there is no way to pass
-  // the variable through
-  var includeHardConstantFactors = false
-
+case class NodeVariable(node : GraphNode, graph : Graph) extends CategoricalVariable[String] with LabeledMutableCategoricalVar[String] {
   override def domain = node.nodeType.valueDomain
+
+  override type TargetType = CategoricalTargetVariable[String]
+  override def target: TargetType = new CategoricalTargetVariable[String](domain.index(node.observedValue), this)
 }
 
 class GraphStream {
@@ -281,18 +279,15 @@ class GraphStream {
               // we need the weight values for each possible assignment
               val tensor2 = tensor.asInstanceOf[Tensor2]
               val keyValue: ListBuffer[(String, Map[String, Double])] = ListBuffer()
-              nodeType.possibleValues.foreach(value => {
-                val valueIndex = nodeType.valueDomain.index(value)
-                for (val1 <- nodeType.possibleValues) {
-                  val index1 = nodeType.valueDomain.index(val1)
-                  keyValue += val1 ->
-                    nodeType.featureDomain.categories.map(feature => {
-                      val featIndex = nodeType.featureDomain.index(feature)
-                      val weight = tensor2(index1, featIndex)
-                      feature -> weight
-                    }).toMap
-                }
-              })
+              for (val1 <- nodeType.possibleValues) {
+                val index1 = nodeType.valueDomain.index(val1)
+                keyValue += val1 ->
+                  nodeType.featureDomain.categories.map(feature => {
+                    val featIndex = nodeType.featureDomain.index(feature)
+                    val weight = tensor2(index1, featIndex)
+                    feature -> weight
+                  }).toMap
+              }
               nodeType.weights = keyValue.toMap
 
             // Translate a factorType's weights back into the Map we use for weights
@@ -387,23 +382,7 @@ class GraphStream {
   // This will learn just Weight() values from the fully observed values in the graphs
 
   private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
-
-    // Need to clear all the weights beforehand, because for some reason if we don't then
-    // they simultaneously update and effect the updates (bc they change E[x])
-
-    model.weightsTensorCache.keySet().toArray.foreach(w => model.weightsTensorCache.get(w).value.*=(0.0))
-
-    // println(model.parameters.toSeq)
-
-    graphs.foreach(graph => graph.nodes.foreach(node => {
-      node.variable.includeHardConstantFactors = false
-      if (node.observedValue != null) {
-        node.variable.set(node.nodeType.valueDomain.index(node.observedValue))(null)
-      }
-    }))
-
     val likelihoodExamples = graphs.map(graph =>
-      // Regular LikelihoodExample should work fine, but seems to break down with exponential blowup sometimes...
       new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
     ).toSeq
 
@@ -449,6 +428,7 @@ class GraphStream {
                   val numNode1Values = factorType.neighborTypes(0).valueDomain.length
                   val numFeatures = factorType.featureDomain.length
                   val factorTensor = new la.DenseTensor2(numNode1Values, numFeatures)
+                  factorTensor.*=(0)
 
                   // Populate the tensor
                   if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
@@ -465,6 +445,7 @@ class GraphStream {
                   val numNode2Values = factorType.neighborTypes(1).valueDomain.length
                   val numFeatures = factorType.featureDomain.length
                   val factorTensor = new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures)
+                  factorTensor.*=(0)
 
                   // Populate the tensor
                   if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
@@ -483,6 +464,7 @@ class GraphStream {
                   val numNode3Values = factorType.neighborTypes(2).valueDomain.length
                   val numFeatures = factorType.featureDomain.length
                   val factorTensor = new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures)
+                  factorTensor.*=(0)
 
                   // Populate the tensor
                   if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
@@ -504,6 +486,7 @@ class GraphStream {
               val numNodeValues = nodeType.valueDomain.length
               val numFeatures = nodeType.featureDomain.length
               val nodeTensor = new la.DenseTensor2(numNodeValues, numFeatures)
+              nodeTensor.*=(0)
 
               // Populate the tensor
               if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
@@ -648,27 +631,12 @@ class GraphStream {
     }
 
     def getNodeFactor(nodeVar : NodeVariable) : Factor = {
-      if (nodeVar.node.observedValue != null && nodeVar.includeHardConstantFactors) {
-        getConstantFactor(nodeVar.node)
-      }
-      else {
-        val featureVariable = getFeatureVariableFor(nodeVar.node)
-        val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType)
-          // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
-          // cruft is necessary here
-          .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
-        family.Factor(nodeVar, featureVariable)
-      }
-    }
-
-    def getConstantFactor(node : GraphNode) : Factor1[NodeVariable] = {
-      val idx = node.nodeType.valueDomain.index(node.observedValue)
-      val hardWeights = new DenseTensor1(node.nodeType.valueDomain.dimensionSize)
-      for (i <- 0 to hardWeights.size-1) if (i != idx) hardWeights.+=(i, Double.NegativeInfinity)
-
-      new DotFactorWithStatistics1[NodeVariable](node.variable) {
-        override val weights: Tensor = hardWeights
-      }
+      val featureVariable = getFeatureVariableFor(nodeVar.node)
+      val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType)
+        // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
+        // cruft is necessary here
+        .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
+      family.Factor(nodeVar, featureVariable)
     }
 
     def getFactor(factor : GraphFactor) : Factor = {
@@ -703,6 +671,7 @@ class GraphStream {
       // Warm up the variable domains
 
       val graph : Graph = mutableList(0).graph
+      // TODO: this may be redundant, if we can carefully control other usages of inference
       warmUpIndexes(graph)
 
       // Create the factors collection
@@ -713,7 +682,8 @@ class GraphStream {
 
       mutableVariables.foreach{
         case nodeVar : NodeVariable =>
-          result += getNodeFactor(nodeVar)
+          val f = getNodeFactor(nodeVar)
+          result += f
       }
 
       def isMutableNode(n : GraphNode) : Boolean = {

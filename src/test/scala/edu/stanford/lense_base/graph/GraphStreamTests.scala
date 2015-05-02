@@ -127,7 +127,7 @@ object MapLearn extends App {
   )
 
   var longTrainingList = ListBuffer[(String,String,String)]()
-  for (i <- 0 to 10000) {
+  for (i <- 0 to 0) {
     longTrainingList ++= stubTrainingList
   }
 
@@ -143,7 +143,14 @@ object MapLearn extends App {
     graph
   })
 
+  val testGraph = graphs.head
+  val factors = s.model.factors(testGraph.allVariablesForFactorie())
+
   s.learn(graphs)
+
+  for (classWeights <- t.weights) {
+    println(classWeights)
+  }
 
   stubTrainingList.foreach(triplet => {
     val graph = s.newGraph()
