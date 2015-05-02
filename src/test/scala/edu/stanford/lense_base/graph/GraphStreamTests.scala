@@ -1,5 +1,6 @@
 package edu.stanford.lense_base.graph
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 /**
@@ -109,11 +110,50 @@ object EpsilonLearn extends App {
   println(nodeType.weights)
 }
 
-object SparseLearn extends App {
+object MapLearn extends App {
   val s = new GraphStream()
 
-  val t = s.makeNodeType(Set("true","false"))
-  val f = s.makeFactorType(List(t,t))
+  val t = s.makeNodeType(Set("0","ORG"))
 
+  val stubTrainingList = List(
+    ("EU", "NN", "ORG"),
+    ("rejects", "VBZ", "0"),
+    ("German", "NN", "ORG"),
+    ("call", "VBZ", "0"),
+    ("to", "PP", "0"),
+    ("boycott", "NN", "0"),
+    ("British", "NN", "ORG"),
+    ("lamb", "NN", "0")
+  )
 
+  var longTrainingList = ListBuffer[(String,String,String)]()
+  for (i <- 0 to 10000) {
+    longTrainingList ++= stubTrainingList
+  }
+
+  val graphs = longTrainingList.map(triplet => {
+    val graph = s.newGraph()
+    val node = graph.makeNode(t,
+      Map(
+        "token:"+triplet._1 -> 1.0,
+        "pos:"+triplet._2 -> 1.0
+      ),
+      observedValue = triplet._3
+    )
+    graph
+  })
+
+  s.learn(graphs)
+
+  stubTrainingList.foreach(triplet => {
+    val graph = s.newGraph()
+    val node = graph.makeNode(t,
+      Map(
+        "token:"+triplet._1 -> 1.0,
+        "pos:"+triplet._2 -> 1.0
+      )
+    )
+    val map = graph.mapEstimate()
+    println(triplet._1+":"+triplet._3+" -> guessed -> "+map(node))
+  })
 }

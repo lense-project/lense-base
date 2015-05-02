@@ -1,5 +1,7 @@
 package edu.stanford.lense_base.graph
 
+import java.util
+
 import cc.factorie.infer._
 import cc.factorie.la
 import cc.factorie.la._
@@ -389,9 +391,7 @@ class GraphStream {
     // Need to clear all the weights beforehand, because for some reason if we don't then
     // they simultaneously update and effect the updates (bc they change E[x])
 
-    for (w <- model.weightsTensorCache) {
-      w._2.value.*=(0.0)
-    }
+    model.weightsTensorCache.keySet().toArray.foreach(w => model.weightsTensorCache.get(w).value.*=(0.0))
 
     // println(model.parameters.toSeq)
 
@@ -402,9 +402,21 @@ class GraphStream {
       }
     }))
 
-    val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 10)
-    val likelihoodExamples = graphs.map(graph => new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain))
-    trainer.trainFromExamples(likelihoodExamples)
+    val likelihoodExamples = graphs.map(graph =>
+      // Regular LikelihoodExample should work fine, but seems to break down with exponential blowup sometimes...
+      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
+    ).toSeq
+
+    // Don't want to be doing this in parallel, things get broken
+
+    for (graph <- graphs) {
+      model.warmUpIndexes(graph)
+    }
+
+    Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random())
+
+    // val trainer = new BatchTrainer(model.parameters, new ConjugateGradient() with L2Regularization{variance = regularization}, maxIterations = 50)
+    // trainer.trainFromExamples(likelihoodExamples)
   }
 
 
@@ -424,169 +436,173 @@ class GraphStream {
     // for this factor. These are going to be treated as **constant** during inference. They will be **variable** during
     // learning.
 
-    val weightsTensorCache : mutable.Map[WithDomain, Weights] = mutable.Map()
+    val weightsTensorCache : util.IdentityHashMap[WithDomain, Weights] = new util.IdentityHashMap[WithDomain, Weights]()
     def getWeightTensorFor(elemType : WithDomain) : Weights = {
-      if (!weightsTensorCache.contains(elemType)) {
-        elemType match {
-          case factorType : FactorType =>
-            // Size the tensor
-            val tensor = factorType.neighborTypes.size match {
-              case 1 =>
-                val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                val numFeatures = factorType.featureDomain.length
-                val factorTensor = new la.DenseTensor2(numNode1Values, numFeatures)
+      // Do any updates threadsafe
+      weightsTensorCache.synchronized {
+        if (!weightsTensorCache.containsKey(elemType)) {
+          elemType match {
+            case factorType: FactorType =>
+              // Size the tensor
+              val tensor = factorType.neighborTypes.size match {
+                case 1 =>
+                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+                  val numFeatures = factorType.featureDomain.length
+                  val factorTensor = new la.DenseTensor2(numNode1Values, numFeatures)
 
-                // Populate the tensor
-                if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                  val assignment = assignmentFeaturesPair._1
-                  val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                  for (featureWeightPair <- assignmentFeaturesPair._2) {
-                    val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                    factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
+                  // Populate the tensor
+                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                    val assignment = assignmentFeaturesPair._1
+                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                    for (featureWeightPair <- assignmentFeaturesPair._2) {
+                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                      factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
+                    }
                   }
-                }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
-              case 2 =>
-                val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-                val numFeatures = factorType.featureDomain.length
-                val factorTensor = new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures)
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                case 2 =>
+                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+                  val numNode2Values = factorType.neighborTypes(1).valueDomain.length
+                  val numFeatures = factorType.featureDomain.length
+                  val factorTensor = new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures)
 
-                // Populate the tensor
-                if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                  val assignment = assignmentFeaturesPair._1
-                  val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                  val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
-                  for (featureWeightPair <- assignmentFeaturesPair._2) {
-                    val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                    factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
+                  // Populate the tensor
+                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                    val assignment = assignmentFeaturesPair._1
+                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                    val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
+                    for (featureWeightPair <- assignmentFeaturesPair._2) {
+                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                      factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
+                    }
                   }
-                }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
-              case 3 =>
-                val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-                val numNode3Values = factorType.neighborTypes(2).valueDomain.length
-                val numFeatures = factorType.featureDomain.length
-                val factorTensor = new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures)
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                case 3 =>
+                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+                  val numNode2Values = factorType.neighborTypes(1).valueDomain.length
+                  val numNode3Values = factorType.neighborTypes(2).valueDomain.length
+                  val numFeatures = factorType.featureDomain.length
+                  val factorTensor = new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures)
 
-                // Populate the tensor
-                if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                  val assignment = assignmentFeaturesPair._1
-                  val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                  val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
-                  val node3ValueIndex = getIndexCautious(factorType.neighborTypes(2).valueDomain, assignment(2), "neighborTypes(2).valueDomain")
-                  for (featureWeightPair <- assignmentFeaturesPair._2) {
-                    val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                    factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
+                  // Populate the tensor
+                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                    val assignment = assignmentFeaturesPair._1
+                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                    val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
+                    val node3ValueIndex = getIndexCautious(factorType.neighborTypes(2).valueDomain, assignment(2), "neighborTypes(2).valueDomain")
+                    for (featureWeightPair <- assignmentFeaturesPair._2) {
+                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                      factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
+                    }
                   }
-                }
-                weightsTensorCache.put(elemType, Weights(factorTensor))
-              case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-            }
-
-          case nodeType : NodeType =>
-            // Size the tensor
-            val numNodeValues = nodeType.valueDomain.length
-            val numFeatures = nodeType.featureDomain.length
-            val nodeTensor = new la.DenseTensor2(numNodeValues, numFeatures)
-
-            // Populate the tensor
-            if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
-              val valueIndex = getIndexCautious(nodeType.valueDomain, valueFeaturesPair._1, "nodeType.valueDomain")
-              for (featureWeightPair <- valueFeaturesPair._2) {
-                val featureIndex = getIndexCautious(nodeType.featureDomain, featureWeightPair._1, "nodeType.featureDomain")
-                nodeTensor.+=(valueIndex, featureIndex, featureWeightPair._2)
+                  weightsTensorCache.put(elemType, Weights(factorTensor))
+                case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
               }
-            }
 
-            // Cache the tensor as a Weight
-            weightsTensorCache.put(elemType, Weights(nodeTensor))
+            case nodeType: NodeType =>
+              // Size the tensor
+              val numNodeValues = nodeType.valueDomain.length
+              val numFeatures = nodeType.featureDomain.length
+              val nodeTensor = new la.DenseTensor2(numNodeValues, numFeatures)
+
+              // Populate the tensor
+              if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
+                val valueIndex = getIndexCautious(nodeType.valueDomain, valueFeaturesPair._1, "nodeType.valueDomain")
+                for (featureWeightPair <- valueFeaturesPair._2) {
+                  val featureIndex = getIndexCautious(nodeType.featureDomain, featureWeightPair._1, "nodeType.featureDomain")
+                  nodeTensor.+=(valueIndex, featureIndex, featureWeightPair._2)
+                }
+              }
+
+              // Cache the tensor as a Weight
+              weightsTensorCache.put(elemType, Weights(nodeTensor))
+          }
         }
+        weightsTensorCache.get(elemType)
       }
-      weightsTensorCache.get(elemType).get
     }
 
     val dotFamilyCache : mutable.Map[WithDomain, DotFamily] = mutable.Map()
     def getDotFamilyWithStatisticsFor(elemType : WithDomain) : DotFamily = {
-      if (!dotFamilyCache.contains(elemType)) {
-        elemType match {
-          case factorType: FactorType =>
-            factorType.neighborTypes.size match {
-              // TODO: Test this
-              case 1 =>
-                dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String],
-                  FeatureVectorVariable[String]] {
-                  val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
-                  // Initialize the vector
-                  limitedDiscreteValues1 = new SparseBinaryTensor1(factorType.neighborTypes(0).valueDomain.dimensionSize)
-                  // Set all entries to "true"
-                  for (i <- 0 to limitedDiscreteValues1.size-1) limitedDiscreteValues1.+=(i, 1.0)
-                })
-              case 2 =>
-                dotFamilyCache.put(elemType, new DotFamilyWithStatistics3[CategoricalVariable[String],
-                  CategoricalVariable[String],
-                  FeatureVectorVariable[String]] {
-                  val weights = getWeightTensorFor(elemType).asInstanceOf[Weights3]
-                  // Initialize the vector
-                  limitedDiscreteValues12 = new SparseBinaryTensor2(factorType.neighborTypes(0).valueDomain.dimensionSize, factorType.neighborTypes(1).valueDomain.dimensionSize)
-                  // Set all entries to "true"
-                  for (i <- 0 to limitedDiscreteValues12.size-1) limitedDiscreteValues12.+=(i, 1.0)
-                })
-              case 3 =>
-                dotFamilyCache.put(elemType, new DotFamilyWithStatistics4[CategoricalVariable[String],
-                  CategoricalVariable[String],
-                  CategoricalVariable[String],
-                  FeatureVectorVariable[String]] {
-                  val weights = getWeightTensorFor(elemType).asInstanceOf[Weights4]
-                })
-              case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-            }
-          case nodeType: NodeType => dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]] {
-            val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
-          })
+      dotFamilyCache.synchronized {
+        if (!dotFamilyCache.contains(elemType)) {
+          elemType match {
+            case factorType: FactorType =>
+              factorType.neighborTypes.size match {
+                // TODO: Test this
+                case 1 =>
+                  dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String],
+                    FeatureVectorVariable[String]] {
+                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
+                    // Initialize the vector
+                    limitedDiscreteValues1 = new SparseBinaryTensor1(factorType.neighborTypes(0).valueDomain.dimensionSize)
+                    // Set all entries to "true"
+                    for (i <- 0 to limitedDiscreteValues1.size - 1) limitedDiscreteValues1.+=(i, 1.0)
+                  })
+                case 2 =>
+                  dotFamilyCache.put(elemType, new DotFamilyWithStatistics3[CategoricalVariable[String],
+                    CategoricalVariable[String],
+                    FeatureVectorVariable[String]] {
+                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights3]
+                    // Initialize the vector
+                    limitedDiscreteValues12 = new SparseBinaryTensor2(factorType.neighborTypes(0).valueDomain.dimensionSize, factorType.neighborTypes(1).valueDomain.dimensionSize)
+                    // Set all entries to "true"
+                    for (i <- 0 to limitedDiscreteValues12.size - 1) limitedDiscreteValues12.+=(i, 1.0)
+                  })
+                case 3 =>
+                  dotFamilyCache.put(elemType, new DotFamilyWithStatistics4[CategoricalVariable[String],
+                    CategoricalVariable[String],
+                    CategoricalVariable[String],
+                    FeatureVectorVariable[String]] {
+                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights4]
+                  })
+                case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
+              }
+            case nodeType: NodeType => dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]] {
+              val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
+            })
+            case otherType => throw new IllegalStateException("Got type neither NodeType or FactorType")
+          }
         }
+
+        val dotFamily = dotFamilyCache.get(elemType).get
+        if (dotFamily == null) throw new IllegalStateException("Shouldn't ever return a null dotFamily")
+        dotFamily
       }
-      dotFamilyCache.get(elemType).get
     }
 
     // This can take both Node and Factor objects, and return a variable representing the feature values for the
     // object. This will always be a **constant**, so should never be passed into the model as part of the list of factors.
 
-    val featureVariableCache = mutable.Map[GraphVarWithDomain, FeatureVariable]()
-
     case class FeatureVariable(variable : GraphVarWithDomain) extends FeatureVectorVariable[String] {
       override def domain: CategoricalVectorDomain[String] = variable.domainType.domain
     }
     def getFeatureVariableFor(variable : GraphVarWithDomain) : FeatureVariable = {
-      if (!featureVariableCache.contains(variable)) {
-        val features = FeatureVariable(variable)
+      val features = FeatureVariable(variable)
 
-        variable match {
-          case factor: GraphFactor =>
-            factor.nodeList.size match {
-              case 1 =>
-              case 2 =>
-                if (factor.features != null) for (featureWeightPair <- factor.features) {
-                  val featureIndex = getIndexCautious(factor.factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                  features.update(featureIndex, featureWeightPair._2)(null)
-                }
-              case 3 =>
-              case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-            }
-          case node: GraphNode =>
-            if (node.features != null) for (featureWeightPair <- node.features) {
-              val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
-              features.update(featureIndex, featureWeightPair._2)(null)
-            }
-        }
-
-        featureVariableCache.put(variable, features)
+      variable match {
+        case factor: GraphFactor =>
+          factor.nodeList.size match {
+            case 1 =>
+            case 2 =>
+              if (factor.features != null) for (featureWeightPair <- factor.features) {
+                val featureIndex = getIndexCautious(factor.factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                features.update(featureIndex, featureWeightPair._2)(null)
+              }
+            case 3 =>
+            case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
+          }
+        case node: GraphNode =>
+          if (node.features != null) for (featureWeightPair <- node.features) {
+            val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
+            features.update(featureIndex, featureWeightPair._2)(null)
+          }
       }
-      featureVariableCache(variable)
+
+      features
     }
 
-    def warmUpIndexes(graph : Graph) = {
+    def warmUpIndexes(graph : Graph) : Unit = {
       // Pre-warm node type weights
       for (nodeType <- graph.nodes.map(_.nodeType).distinct) {
         if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
@@ -631,10 +647,9 @@ class GraphStream {
       }
     }
 
-    val nodeFactorCache : mutable.Map[NodeVariable, Factor] = mutable.Map()
     def getNodeFactor(nodeVar : NodeVariable) : Factor = {
       if (nodeVar.node.observedValue != null && nodeVar.includeHardConstantFactors) {
-        nodeFactorCache.put(nodeVar, getConstantFactor(nodeVar.node))
+        getConstantFactor(nodeVar.node)
       }
       else {
         val featureVariable = getFeatureVariableFor(nodeVar.node)
@@ -642,9 +657,8 @@ class GraphStream {
           // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
           // cruft is necessary here
           .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
-        nodeFactorCache.put(nodeVar, family.Factor(nodeVar, featureVariable))
+        family.Factor(nodeVar, featureVariable)
       }
-      nodeFactorCache(nodeVar)
     }
 
     def getConstantFactor(node : GraphNode) : Factor1[NodeVariable] = {
@@ -657,11 +671,9 @@ class GraphStream {
       }
     }
 
-    val factorCache : mutable.Map[GraphFactor, Factor] = mutable.Map()
     def getFactor(factor : GraphFactor) : Factor = {
-      //if (!factorCache.contains(factor)) {
         val featureVariable = getFeatureVariableFor(factor)
-        factorCache.put(factor, factor.nodeList.size match {
+        factor.nodeList.size match {
           case 1 =>
             val family = getDotFamilyWithStatisticsFor(factor.factorType)
               // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
@@ -681,9 +693,7 @@ class GraphStream {
               .asInstanceOf[DotFamilyWithStatistics4[CategoricalVariable[String], CategoricalVariable[String], CategoricalVariable[String], FeatureVectorVariable[String]]]
             family.Factor(factor.nodeList(0).variable, factor.nodeList(1).variable, factor.nodeList(2).variable, featureVariable)
           case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-        })
-      //}
-      factorCache(factor)
+        }
     }
 
     override def factors(mutableVariables: Iterable[Var]): Iterable[Factor] = {
@@ -707,7 +717,10 @@ class GraphStream {
       }
 
       def isMutableNode(n : GraphNode) : Boolean = {
-        mutableList.contains(n.variable)
+        for (m <- mutableList) {
+          if (m.node eq n) return true
+        }
+        false
       }
 
       // Add the multi-node factors
