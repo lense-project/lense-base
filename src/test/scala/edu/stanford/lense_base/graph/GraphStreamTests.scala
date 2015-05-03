@@ -111,6 +111,28 @@ object EpsilonLearn extends App {
   println(nodeType.weights)
 }
 
+object FeatureLearnClone extends App {
+
+  val s = new GraphStream()
+  val t = s.makeNodeType(Set("true", "false"))
+
+  val rand : Random = new Random()
+
+  val examples : List[Graph] = (0 to 1000).map(i => {
+    val g = s.newGraph()
+    val feat1 = rand.nextDouble()
+    val feat2 = rand.nextDouble()
+    val trueValue = if ((feat1 > feat2) ^ (rand.nextDouble() > 0.9)) "true" else "false"
+    g.makeNode(t, Map(
+      "Feature1" -> feat1,
+      "Feature2" -> feat2
+    ), observedValue = trueValue)
+    g
+  }).toList
+
+  s.learn(examples)
+}
+
 object NERLearn extends App {
   def loadNER : List[List[(String,String,String)]] = {
     val loadedData : ListBuffer[List[(String,String,String)]] = ListBuffer()

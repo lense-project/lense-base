@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" afterPath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -34,10 +32,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="GraphStream.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GraphStream.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.40268457" vertical-offset="6960" max-vertical-offset="10545">
+            <state vertical-scroll-proportion="0.0" vertical-offset="6960" max-vertical-offset="10545">
               <caret line="488" column="77" selection-start-line="488" selection-start-column="77" selection-end-line="488" selection-end-column="77" />
               <folding />
             </state>
@@ -54,11 +52,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphStreamTests.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GraphStreamTests.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1710" max-vertical-offset="3420">
-              <caret line="124" column="33" selection-start-line="124" selection-start-column="33" selection-end-line="124" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.65217394" vertical-offset="1620" max-vertical-offset="3750">
+              <caret line="130" column="3" selection-start-line="130" selection-start-column="3" selection-end-line="130" selection-end-column="3" />
               <folding />
             </state>
           </provider>
@@ -85,14 +83,14 @@
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
-        <option value="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
+        <option value="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="234" />
-    <option name="y" value="127" />
+    <option name="x" value="317" />
+    <option name="y" value="85" />
     <option name="width" value="1615" />
     <option name="height" value="898" />
   </component>
@@ -422,7 +420,7 @@
       <recent name="$PROJECT_DIR$/lib" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.NERLearn">
+  <component name="RunManager" selected="Application.FeatureLearnClone">
     <configuration default="false" name="EpsilonLearn" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.EpsilonLearn" />
       <option name="VM_PARAMETERS" />
@@ -483,8 +481,8 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="BasicMarginal" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.BasicMarginal" />
+    <configuration default="false" name="NERLearn" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.NERLearn" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -499,8 +497,8 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <configuration default="false" name="NERLearn" type="Application" factoryName="Application" temporary="true">
-      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.NERLearn" />
+    <configuration default="false" name="FeatureLearnClone" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.FeatureLearnClone" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -678,16 +676,16 @@
       <item index="0" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
       <item index="1" class="java.lang.String" itemvalue="Application.NERExample" />
       <item index="2" class="java.lang.String" itemvalue="Application.MapLearn" />
-      <item index="3" class="java.lang.String" itemvalue="Application.BasicMarginal" />
-      <item index="4" class="java.lang.String" itemvalue="Application.NERLearn" />
+      <item index="3" class="java.lang.String" itemvalue="Application.NERLearn" />
+      <item index="4" class="java.lang.String" itemvalue="Application.FeatureLearnClone" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.NERLearn" />
-        <item index="1" class="java.lang.String" itemvalue="Application.NERExample" />
-        <item index="2" class="java.lang.String" itemvalue="Application.MapLearn" />
-        <item index="3" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
-        <item index="4" class="java.lang.String" itemvalue="Application.BasicMarginal" />
+        <item index="0" class="java.lang.String" itemvalue="Application.FeatureLearnClone" />
+        <item index="1" class="java.lang.String" itemvalue="Application.NERLearn" />
+        <item index="2" class="java.lang.String" itemvalue="Application.NERExample" />
+        <item index="3" class="java.lang.String" itemvalue="Application.MapLearn" />
+        <item index="4" class="java.lang.String" itemvalue="Application.EpsilonLearn" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
@@ -733,7 +731,7 @@
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="ToolWindowManager">
-    <frame x="234" y="127" width="1615" height="898" extended-state="0" />
+    <frame x="317" y="85" width="1615" height="898" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -798,7 +796,8 @@
     <MESSAGE value="Multiple calls to learning doesn't restart cleanly. Disaster" />
     <MESSAGE value="Fixing some race conditions when using the parallel trainer. Map training still doesn't work, though, so that needs to get fixed." />
     <MESSAGE value="Think I found the exponential blowup bug, also working on early stopping optimizer bug." />
-    <option name="LAST_COMMIT_MESSAGE" value="Think I found the exponential blowup bug, also working on early stopping optimizer bug." />
+    <MESSAGE value="Tinkering with more changes to try to fix training early stopping" />
+    <option name="LAST_COMMIT_MESSAGE" value="Tinkering with more changes to try to fix training early stopping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1170,18 +1169,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1710" max-vertical-offset="3420">
-          <caret line="124" column="33" selection-start-line="124" selection-start-column="33" selection-end-line="124" selection-end-column="33" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="6960" max-vertical-offset="10545">
+          <caret line="488" column="77" selection-start-line="488" selection-start-column="77" selection-end-line="488" selection-end-column="77" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
+    <entry file="file://$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.40268457" vertical-offset="6960" max-vertical-offset="10545">
-          <caret line="488" column="77" selection-start-line="488" selection-start-column="77" selection-end-line="488" selection-end-column="77" />
+        <state vertical-scroll-proportion="0.65217394" vertical-offset="1620" max-vertical-offset="3750">
+          <caret line="130" column="3" selection-start-line="130" selection-start-column="3" selection-end-line="130" selection-end-column="3" />
           <folding />
         </state>
       </provider>
