@@ -131,6 +131,8 @@ object FeatureLearnClone extends App {
   }).toList
 
   s.learn(examples)
+
+  println(t.weights)
 }
 
 object NERLearn extends App {
@@ -158,7 +160,7 @@ object NERLearn extends App {
 
   val allData = loadNER
   val data = allData.filter(_.size < 15).take(100)
-  val trainSet = allData.filter(d => !data.contains(d)).take(1)
+  val trainSet = allData.filter(d => !data.contains(d)).take(3)
   val classes = (data ++ trainSet).flatMap(_.map(_._3)).distinct.toSet
 
   val s = new GraphStream()
@@ -168,7 +170,9 @@ object NERLearn extends App {
     val g = s.newGraph()
     g.makeNode(t, Map(
       "word:"+triple._1 -> 1.0,
-      "pos:"+triple._2 -> 1.0
+      "pos:"+triple._2 -> 1.0,
+      // In situations where one class dominates, sometimes this makes the likelihood objective harder to learn
+      "BIAS" -> 0.0
     ), observedValue = triple._3)
     g
   }))
@@ -186,7 +190,7 @@ object NERLearn extends App {
       "pos:"+triple._2 -> 1.0
     ))
     val guessedNER = g.mapEstimate()(n)
-    println(triple._3+":"+guessedNER)
+    println(triple._1+":"+triple._3+":"+guessedNER)
   }))
 }
 

@@ -390,13 +390,11 @@ class GraphStream {
       new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
     ).toSeq
 
-    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random())
-    // Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random())
+    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
+    Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random(42))
 
-    Logger.getRootLogger.setLevel(Logger.DEBUG)
-
-    val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
-    trainer.trainFromExamples(likelihoodExamples)
+    // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
+    // trainer.trainFromExamples(likelihoodExamples)
   }
 
 
