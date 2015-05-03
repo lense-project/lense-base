@@ -112,6 +112,7 @@ class LenseFrameworkForNER(classes : Set[String],
     val graph = graphStream.newGraph()
 
     var index = 0
+    var lastNode : GraphNode = null
     for (tuple <- tokenPOSPairs) {
       val token = tuple match {
         case pair : (String,String) => pair._1
@@ -133,11 +134,16 @@ class LenseFrameworkForNER(classes : Set[String],
       val features : Map[String, Double] = Map(
         "TOKEN:"+token -> 1.0,
         "POS:"+pos -> 1.0,
-        "CAPITALIZED:"+capitalized -> 1.0
+        "CAPITALIZED:"+capitalized -> 1.0,
+        "BIAS" -> 0.0
       )
 
-      graph.makeNode(nodeType, features, payload = index, toString = index+":"+token, observedValue = observed)
+      val newNode = graph.makeNode(nodeType, features, payload = index, toString = index+":"+token, observedValue = observed)
       index += 1
+      if (lastNode != null) {
+        graph.makeFactor(factorType,List(lastNode, newNode))
+      }
+      lastNode = newNode
     }
 
     graph
@@ -260,7 +266,7 @@ object NERExample extends App {
     expectedErrors + cost
   }
 
-  println("One Question Baseline, with only BIAS feature")
+  println("One Question Baseline")
   println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction, trainingData = trainSet), data, 0.3))
   println("Basic Lost Function LookaheadOneHeuristic")
   println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction, trainingData = trainSet), data, 0.3))

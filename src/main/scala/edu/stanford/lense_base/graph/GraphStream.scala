@@ -114,6 +114,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
   }
 
   def mapEstimate(): Map[GraphNode, String] = {
+    setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
 
@@ -123,7 +124,8 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     }
     // If that fails, perform loopy maximization
     catch {
-      case _ : Throwable =>
+      case e : Throwable =>
+        e.printStackTrace()
         // run loopy bp
         println("MAP Inference is falling back to loopy BP. Results may be inexact")
         MaximizeByBPLoopyTreewise.infer(variables, stream.model)
@@ -142,6 +144,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
   }
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
+    setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
 
@@ -180,6 +183,12 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
 
   def unobservedVariablesForFactorie(): Seq[NodeVariable] = {
     nodes.filter(_.observedValue == null).map(_.variable)
+  }
+
+  def setObservedVariablesForFactorie(): Unit = {
+    nodes.filter(_.observedValue != null).foreach(n => {
+      n.variable.set(n.nodeType.valueDomain.index(n.observedValue))(null)
+    })
   }
 
   def allVariablesForFactorie(): Seq[NodeVariable] = {
@@ -386,9 +395,10 @@ class GraphStream {
       model.warmUpIndexes(graph)
     }
 
-    val likelihoodExamples = graphs.map(graph =>
+    val likelihoodExamples = graphs.map(graph => {
+      graph.setObservedVariablesForFactorie()
       new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
-    ).toSeq
+    }).toSeq
 
     // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
     Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random(42))
