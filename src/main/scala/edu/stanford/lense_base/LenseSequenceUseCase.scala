@@ -1,6 +1,6 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.graph.{GraphNode, Graph}
+import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
 
 import scala.collection.mutable
 
@@ -20,8 +20,8 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
   def getHumanQuestion(sequence : List[String], i : Int) : GraphNodeQuestion
   def lossFunction(sequence : List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double) : Double
 
-  val nodeType = graphStream.makeNodeType(labelTypes)
-  val factorType = graphStream.makeFactorType(List(nodeType, nodeType))
+  lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
+  lazy val factorType : FactorType = graphStream.makeFactorType(List(nodeType, nodeType))
 
   /**
    * This function takes an Input
@@ -37,7 +37,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
 
     var lastNode : GraphNode = null
     for (i <- 0 to input.size-1) {
-      val newNode = graph.makeNode(nodeType, featureExtractor(input, i), payload = (input,i))
+      val newNode = graph.makeNode(nodeType, featureExtractor(input, i), payload = (input,i), toString = "Node["+input(i)+"]")
       if (lastNode != null) {
         graph.makeFactor(factorType, List(lastNode, newNode))
       }
@@ -83,17 +83,21 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
     }
   }
 
+  override def getCorrectLabel(node : GraphNode, goldOutput : List[String]) : String = {
+    goldOutput(node.payload.asInstanceOf[(List[String],Int)]._2)
+  }
+
   /**
-   * Returns the correct labels for all the nodes in the graph, given a graph and the corresponding gold output. This
-   * is used both for generating initial training data and for doing analysis during testing
-   *
-   * @param graph the graph we need to attach labels to
-   * @param goldOutput the output we expect from the graph labellings
-   * @return
+   * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
    */
-  override def toGoldGraphLabels(graph: Graph, goldOutput: List[String]): Map[GraphNode, String] = {
-    graph.nodes.map(n => {
-      (n, goldOutput(n.payload.asInstanceOf[(List[String],Int)]._2))
-    }).toMap
+  override def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {
+    if (graph.nodes.size > 0) {
+      val sequence = graph.nodes.head.payload.asInstanceOf[(List[String], Int)]._1
+      println(graph.nodes.map(n => (n,n.payload.asInstanceOf[(List[String], Int)]._2)).sortBy(_._2)
+        .map(n => sequence(n._2)+"(gold:"+goldMap(n._1)+",guess:"+guessMap(n._1)+")").mkString(" "))
+    }
+    else {
+      println("Classified an empty graph")
+    }
   }
 }

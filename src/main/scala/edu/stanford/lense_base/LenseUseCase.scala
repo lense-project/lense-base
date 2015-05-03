@@ -16,15 +16,19 @@ import scala.util.{Random, Try}
  */
 abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
 
-  val graphStream : GraphStream = new GraphStream()
-  val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
+  lazy val graphStream : GraphStream = new GraphStream()
+  lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
-  // Add the training data as a list of labeled graphs
-  lenseEngine.addTrainingData(
-    initialTrainingData.map(pair =>
-      toLabeledGraph(pair._1, pair._2)
+  def initialize() : Unit = {
+    // Add the training data as a list of labeled graphs
+    lenseEngine.addTrainingData(
+      initialTrainingData.map(pair =>
+        toLabeledGraph(pair._1, pair._2)
+      )
     )
-  )
+  }
+
+  initialize()
 
   /**
    * This function takes an Input
@@ -44,7 +48,13 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param goldOutput the output we expect from the graph labellings
    * @return
    */
-  def toGoldGraphLabels(graph : Graph, goldOutput : Output) : Map[GraphNode, String]
+  def toGoldGraphLabels(graph : Graph, goldOutput : Output) : Map[GraphNode, String] = {
+    graph.nodes.map(n => {
+      (n, getCorrectLabel(n, goldOutput))
+    }).toMap
+  }
+
+  def getCorrectLabel(node : GraphNode, goldOutput : Output) : String
 
   /**
    * Reads the MAP assignment out of the values object, and returns an Output corresponding to this graph having these
@@ -85,6 +95,11 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    */
   def gamePlayer : GamePlayer = LookaheadOneHeuristic
 
+  /**
+   * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
+   */
+  def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {}
+
   ////////////////////////////////////////////////
   //
   //  These are functions that LenseUseCase provides, assuming the above are correct
@@ -103,7 +118,11 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraphAndQuestions(pair._1)._1
       val goldMap = toGoldGraphLabels(graph, pair._2)
+      for (node <- graph.nodes) {
+        if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
+      }
       val guessMap = classifyWithArtificialHumans(graph, pair._2, humanErrorRate, rand)
+      renderClassification(graph, goldMap, guessMap)
       (graph, goldMap, guessMap)
     }))
   }
@@ -118,7 +137,11 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     analyzeOutput(goldPairs.map(pair => {
       val graphAndQuestions = toGraphAndQuestions(pair._1)
       val goldMap = toGoldGraphLabels(graphAndQuestions._1, pair._2)
+      for (node <- graphAndQuestions._1.nodes) {
+        if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
+      }
       val guessMap = classifyWithRealHumans(graphAndQuestions._1, graphAndQuestions._2)
+      renderClassification(graphAndQuestions._1, goldMap, guessMap)
       (graphAndQuestions._1, goldMap, guessMap)
     }))
   }
@@ -157,9 +180,8 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   private def classifyWithArtificialHumans(graph : Graph, output : Output, humanErrorRate : Double, rand : Random) : Map[GraphNode, String] = {
-    val correctLabels = toGoldGraphLabels(graph, output)
     lenseEngine.predict(graph, (n) => {
-      val correct = correctLabels(n)
+      val correct = getCorrectLabel(n, output)
       // Do the automatic error generation
       val guess = if (rand.nextDouble() > humanErrorRate) {
         correct

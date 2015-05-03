@@ -11,9 +11,9 @@ import scala.io.Source
  * Does NER using sequence use cases
  */
 class NERUseCase extends LenseSequenceUseCase {
-  def allData = loadNER
-  def data = allData.filter(_._1.size < 15).take(100)
-  def trainSet = allData.filter(d => !data.contains(d)).take(100)
+  lazy val allData : List[(List[String],List[String])] = loadNER
+  lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(100)
+  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
 
   override def initialTrainingData : List[(List[String], List[String])] = trainSet
 

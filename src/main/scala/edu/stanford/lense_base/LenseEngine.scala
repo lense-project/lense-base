@@ -56,7 +56,11 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
           pastGameTrajectories += gameTrajectory.clone().toList
           gameTrajectory.clear()
 
-          return mapEstimate
+          return mapEstimate.map(pair => {
+            val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
+            if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
+            (matches(0), pair._2)
+          })
         case obs : MakeHumanObservation =>
           gameState = gameState.takeRealMove(obs)
       }

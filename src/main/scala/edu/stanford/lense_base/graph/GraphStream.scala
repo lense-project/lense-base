@@ -47,7 +47,7 @@ case class GraphNode(graph : Graph,
 
   override def hashCode() : Int = nodeType.hashCode() + id.hashCode()
 
-  override def toString : String = if (stringName != null) "GraphNode("+stringName+")" else super.toString
+  override def toString : String = if (stringName != null) stringName else super.toString
 }
 
 case class GraphFactor(graph : Graph,
@@ -94,7 +94,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     }
 
     val oldToNew : Map[GraphNode, GraphNode] = nodes.map{node => {
-      (node, g.makeNode(node.nodeType, node.features, node.observedValue, node.payload))
+      (node, g.makeNode(node.nodeType, node.features, node.observedValue, node.payload, node.toString))
     }}.toMap
     for (factor <- factors) {
       g.makeFactor(factor.factorType, factor.nodes.map(oldToNew(_)), factor.features)
