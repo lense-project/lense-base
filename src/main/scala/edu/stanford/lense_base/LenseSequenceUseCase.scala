@@ -31,7 +31,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @param input the input that the graph will represent
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  override def toGraphAndQuestions(input: List[String]): (Graph, Map[GraphNode, GraphNodeQuestion]) = {
+  override def toGraph(input: List[String]): Graph = {
     val graph = graphStream.newGraph()
     val questionMap = mutable.Map[GraphNode, GraphNodeQuestion]()
 
@@ -41,11 +41,15 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
       if (lastNode != null) {
         graph.makeFactor(factorType, List(lastNode, newNode))
       }
-      questionMap.put(newNode, getHumanQuestion(input, i))
       lastNode = newNode
     }
 
-    (graph, questionMap.toMap)
+    graph
+  }
+
+  override def getQuestion(node : GraphNode) : GraphNodeQuestion = {
+    val pair = node.payload.asInstanceOf[(List[String],Int)]
+    getHumanQuestion(pair._1, pair._2)
   }
 
   /**

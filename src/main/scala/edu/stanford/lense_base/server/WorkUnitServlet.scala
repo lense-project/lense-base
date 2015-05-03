@@ -2,6 +2,10 @@ package edu.stanford.lense_base.server
 
 import java.util.Date
 
+import org.eclipse.jetty.server.nio.SelectChannelConnector
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.webapp.WebAppContext
+
 import org.atmosphere.interceptor.IdleResourceInterceptor
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -33,11 +37,33 @@ object WorkUnitServlet extends ScalatraServlet
 
   val workQueue = mutable.Queue[WorkUnit[Any]]()
 
+  lazy val server = {
+    val server = new Server()
+    val connector = new SelectChannelConnector()
+    connector.setPort(8080)
+    server.addConnector(connector)
+    val context: WebAppContext = new WebAppContext("src/main/webapp", "/")
+    context.setServer(server)
+    server.setHandler(context)
+
+    try {
+      server.start()
+    } catch {
+      case e: Exception => {
+        e.printStackTrace()
+        System.exit(1)
+      }
+    }
+  }
+
   def addWorkUnit[T](workUnit : WorkUnit[T]) = {
+    // Add work unit
     workQueue.synchronized {
       workQueue.enqueue(workUnit.asInstanceOf[WorkUnit[Any]])
       workQueue.notifyAll()
     }
+    // Boot server if we haven't
+    server
   }
 
   atmosphere("/work-socket") {
@@ -48,9 +74,7 @@ object WorkUnitServlet extends ScalatraServlet
 
   // Just for testing
 
-  val runStupidTest = false
-
-  if (runStupidTest) {
+  def main(args : Array[String]) : Unit = {
     for (i <- 0 to 3) {
       addWorkUnit(new MulticlassQuestion(
         "<p>Do you like green eggs and ham? #" + i + "/3</p>",

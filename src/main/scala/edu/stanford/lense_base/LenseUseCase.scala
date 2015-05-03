@@ -38,7 +38,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param input the input that the graph will represent
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  def toGraphAndQuestions(input : Input) : (Graph, Map[GraphNode, GraphNodeQuestion])
+  def toGraph(input : Input) : Graph
 
   /**
    * Returns the correct labels for all the nodes in the graph, given a graph and the corresponding gold output. This
@@ -55,6 +55,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   def getCorrectLabel(node : GraphNode, goldOutput : Output) : String
+  def getQuestion(node : GraphNode) : GraphNodeQuestion
 
   /**
    * Reads the MAP assignment out of the values object, and returns an Output corresponding to this graph having these
@@ -116,7 +117,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   def testWithArtificialHumans(goldPairs : List[(Input, Output)], humanErrorRate : Double) : Unit = {
     val rand = new Random()
     analyzeOutput(goldPairs.map(pair => {
-      val graph = toGraphAndQuestions(pair._1)._1
+      val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
@@ -135,14 +136,14 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
     analyzeOutput(goldPairs.map(pair => {
-      val graphAndQuestions = toGraphAndQuestions(pair._1)
-      val goldMap = toGoldGraphLabels(graphAndQuestions._1, pair._2)
-      for (node <- graphAndQuestions._1.nodes) {
+      val graph = toGraph(pair._1)
+      val goldMap = toGoldGraphLabels(graph, pair._2)
+      for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
-      val guessMap = classifyWithRealHumans(graphAndQuestions._1, graphAndQuestions._2)
-      renderClassification(graphAndQuestions._1, goldMap, guessMap)
-      (graphAndQuestions._1, goldMap, guessMap)
+      val guessMap = classifyWithRealHumans(graph)
+      renderClassification(graph, goldMap, guessMap)
+      (graph, goldMap, guessMap)
     }))
   }
 
@@ -153,8 +154,8 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @return the desired output
    */
   def getOutput(input : Input) : Output = {
-    val graphAndQuestion = toGraphAndQuestions(input)
-    toOutput(graphAndQuestion._1, classifyWithRealHumans(graphAndQuestion._1, graphAndQuestion._2))
+    val graphAndQuestion = toGraph(input)
+    toOutput(graphAndQuestion, classifyWithRealHumans(graphAndQuestion))
   }
 
   // Prints some outputs to stdout that are the result of analysis
@@ -175,8 +176,8 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     println("Confusion: "+confusion)
   }
 
-  private def classifyWithRealHumans(graph : Graph, humanQuestionMap : Map[GraphNode, GraphNodeQuestion]) : Map[GraphNode, String] = {
-    lenseEngine.predict(graph, (n) => humanQuestionMap(n).getHumanOpinion, lossFunction)
+  private def classifyWithRealHumans(graph : Graph) : Map[GraphNode, String] = {
+    lenseEngine.predict(graph, (n) => getQuestion(n).getHumanOpinion, lossFunction)
   }
 
   private def classifyWithArtificialHumans(graph : Graph, output : Output, humanErrorRate : Double, rand : Random) : Map[GraphNode, String] = {
@@ -198,7 +199,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   private def toLabeledGraph(input : Input, output : Output) : Graph = {
-    val graph = toGraphAndQuestions(input)._1
+    val graph = toGraph(input)
     val labels = toGoldGraphLabels(graph, output)
     for (node <- graph.nodes) {
       node.observedValue = labels(node)
