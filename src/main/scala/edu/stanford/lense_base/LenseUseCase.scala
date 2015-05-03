@@ -20,7 +20,11 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
   // Add the training data as a list of labeled graphs
-  lenseEngine.addTrainingData(initialTrainingData.map(pair => toLabeledGraph(pair._1, pair._2)))
+  lenseEngine.addTrainingData(
+    initialTrainingData.map(pair =>
+      toLabeledGraph(pair._1, pair._2)
+    )
+  )
 
   /**
    * This function takes an Input
@@ -136,7 +140,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     var correct = 0.0
     var incorrect = 0.0
     for (triple <- l) {
-      for (node <- triple._1) {
+      for (node <- triple._1.nodes) {
         val trueValue = triple._2(node)
         val guessedValue = triple._3(node)
         if (trueValue == guessedValue) correct += 1
