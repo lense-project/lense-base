@@ -12,7 +12,7 @@ import scala.concurrent.{Promise, Future}
  * This is the central static dispatcher to handle requests to the API
  */
 class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
-  val defaultEpsilon = 0.3
+  val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
@@ -79,7 +79,7 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     classes.flatMap(cl1 => {
       classes.map(cl2 => {
         (List(cl1, cl2),
-          Map[String,Double]("BIAS" -> (if (cl1 == cl2) Math.log((1-defaultEpsilon)/(classes.size*classes.size)) else Math.log(defaultEpsilon/(classes.size*classes.size*classes.size))))
+          Map[String,Double]("BIAS" -> (if (cl1 == cl2) Math.log((1-defaultHumanErrorEpsilon)/(classes.size*classes.size)) else Math.log(defaultHumanErrorEpsilon/(classes.size*classes.size*classes.size))))
         )
       })
     }).toMap
@@ -102,8 +102,6 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
   }
 
   /**
-   * THIS IS IMPORTANT:
-   *
    * This lets you pass extra training data into the Lense instance, so that it starts out with a better prior than just
    * plain old uniform.
    *
