@@ -18,9 +18,9 @@ Accuracy: 0.9105858170606372
 # human queries: 3892
 -------
 CRF with basic features [Token, POS and Capitalization] with NO HUMAN ASSISTANCE
-Map((I-ORG,I-ORG) -> 26, (I-PER,O) -> 1, (I-MISC,O) -> 3, (O,I-LOC) -> 4, (I-MISC,I-MISC) -> 36, (I-PER,I-PER) -> 35, (I-PER,I-LOC) -> 1, (I-LOC,O) -> 2, (I-PER,I-MISC) -> 1, (O,O) -> 814, (I-LOC,I-LOC) -> 44, (O,I-ORG) -> 2, (I-MISC,I-LOC) -> 2, (I-ORG,O) -> 2)
+Map((I-MISC,I-ORG) -> 11, (I-ORG,I-ORG) -> 7, (I-PER,I-ORG) -> 2, (I-PER,O) -> 11, (I-MISC,O) -> 7, (O,I-LOC) -> 6, (O,I-PER) -> 9, (I-ORG,I-LOC) -> 9, (I-MISC,I-MISC) -> 19, (I-PER,I-PER) -> 23, (I-ORG,I-PER) -> 3, (I-PER,I-LOC) -> 2, (I-LOC,O) -> 9, (O,I-MISC) -> 4, (I-LOC,I-ORG) -> 6, (I-LOC,I-PER) -> 3, (O,O) -> 762, (I-ORG,I-MISC) -> 3, (I-LOC,I-LOC) -> 28, (I-MISC,I-PER) -> 2, (O,I-ORG) -> 39, (I-MISC,I-LOC) -> 2, (I-ORG,O) -> 6)
 Accuracy: 0.8622816032887975
-# queries: 373
+# queries: 0
 -------
 CRF with basic features [Token, POS and Capitalization] with player who asks for one question per token uniformly
 Map((I-ORG,I-ORG) -> 21, (I-PER,I-ORG) -> 1, (I-PER,O) -> 5, (I-MISC,O) -> 5, (O,I-LOC) -> 2, (I-ORG,I-LOC) -> 2, (I-MISC,I-MISC) -> 36, (I-PER,I-PER) -> 27, (I-ORG,I-PER) -> 2, (I-PER,I-LOC) -> 2, (I-LOC,O) -> 3, (O,I-MISC) -> 3, (I-PER,I-MISC) -> 3, (I-LOC,I-ORG) -> 2, (O,O) -> 810, (I-ORG,I-MISC) -> 2, (I-LOC,I-LOC) -> 38, (I-LOC,I-MISC) -> 3, (O,I-ORG) -> 5, (I-ORG,O) -> 1)
