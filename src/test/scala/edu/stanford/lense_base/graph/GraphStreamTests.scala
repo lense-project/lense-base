@@ -135,7 +135,62 @@ object FeatureLearnClone extends App {
   println(t.weights)
 }
 
-object NERLearn extends App {
+object MapLearn extends App {
+  val s = new GraphStream()
+
+  val t = s.makeNodeType(Set("0","ORG"))
+
+  val stubTrainingList = List(
+    ("EU", "NN", "ORG"),
+    ("rejects", "VBZ", "0"),
+    ("German", "NN", "ORG"),
+    ("call", "VBZ", "0"),
+    ("to", "PP", "0"),
+    ("boycott", "NN", "0"),
+    ("British", "NN", "ORG"),
+    ("lamb", "NN", "0")
+  )
+
+  var longTrainingList = ListBuffer[(String,String,String)]()
+  for (i <- 0 to 10000) {
+    longTrainingList ++= stubTrainingList
+  }
+
+  val graphs = longTrainingList.map(triplet => {
+    val graph = s.newGraph()
+    val node = graph.makeNode(t,
+      Map(
+        "token:"+triplet._1 -> 1.0,
+        "pos:"+triplet._2 -> 1.0
+      ),
+      observedValue = triplet._3
+    )
+    graph
+  })
+
+  val testGraph = graphs.head
+  val factors = s.model.factors(testGraph.allVariablesForFactorie())
+
+  s.learn(graphs)
+
+  for (classWeights <- t.weights) {
+    println(classWeights)
+  }
+
+  stubTrainingList.foreach(triplet => {
+    val graph = s.newGraph()
+    val node = graph.makeNode(t,
+      Map(
+        "token:"+triplet._1 -> 1.0,
+        "pos:"+triplet._2 -> 1.0
+      )
+    )
+    val map = graph.mapEstimate()
+    println(triplet._1+":"+triplet._3+" -> guessed -> "+map(node))
+  })
+}
+
+object NERLearnUnary extends App {
   def loadNER : List[List[(String,String,String)]] = {
     val loadedData : ListBuffer[List[(String,String,String)]] = ListBuffer()
     val currentSentence : ListBuffer[(String,String,String)] = ListBuffer()
@@ -194,57 +249,89 @@ object NERLearn extends App {
   }))
 }
 
-object MapLearn extends App {
-  val s = new GraphStream()
+object NERLearnCRF extends App {
+  def loadNER : List[List[(String,String,String)]] = {
+    val loadedData : ListBuffer[List[(String,String,String)]] = ListBuffer()
+    val currentSentence : ListBuffer[(String,String,String)] = ListBuffer()
 
-  val t = s.makeNodeType(Set("0","ORG"))
+    for (line <- Source.fromFile("data/conll.iob.4class.train").getLines()) {
+      val parts = line.split("\t")
+      if (parts.size == 4) {
+        val word: String = parts(0)
+        val pos: String = parts(1)
+        val ner: String = parts(3)
+        currentSentence.+=((word, pos, ner))
 
-  val stubTrainingList = List(
-    ("EU", "NN", "ORG"),
-    ("rejects", "VBZ", "0"),
-    ("German", "NN", "ORG"),
-    ("call", "VBZ", "0"),
-    ("to", "PP", "0"),
-    ("boycott", "NN", "0"),
-    ("British", "NN", "ORG"),
-    ("lamb", "NN", "0")
-  )
+        if (word == ".") {
+          loadedData += currentSentence.toList
+          currentSentence.clear()
+        }
+      }
+    }
 
-  var longTrainingList = ListBuffer[(String,String,String)]()
-  for (i <- 0 to 10000) {
-    longTrainingList ++= stubTrainingList
+    loadedData.toList
   }
 
-  val graphs = longTrainingList.map(triplet => {
-    val graph = s.newGraph()
-    val node = graph.makeNode(t,
-      Map(
-        "token:"+triplet._1 -> 1.0,
-        "pos:"+triplet._2 -> 1.0
-      ),
-      observedValue = triplet._3
-    )
-    graph
+  val allData = loadNER
+  val data = allData.filter(_.size < 15).take(100)
+  val trainSet = allData.filter(d => !data.contains(d)).take(3)
+  val classes = (data ++ trainSet).flatMap(_.map(_._3)).distinct.toSet
+
+  val s = new GraphStream()
+  val t = s.makeNodeType(classes)
+  val f = s.makeFactorType(List(t,t))
+
+  val crfGraphs = trainSet.map(sentence => {
+    val g = s.newGraph()
+
+    var lastNode : GraphNode = null
+    for (triple <- sentence) {
+      val newNode = g.makeNode(t, Map(
+        "word:"+triple._1 -> 1.0,
+        "pos:"+triple._2 -> 1.0,
+        // In situations where one class dominates, sometimes this makes the likelihood objective harder to learn
+        "BIAS" -> 0.0
+      ), observedValue = triple._3)
+      if (lastNode != null) {
+        g.makeFactor(f, List(lastNode, newNode))
+      }
+      lastNode = newNode
+    }
+
+    g
   })
 
-  val testGraph = graphs.head
-  val factors = s.model.factors(testGraph.allVariablesForFactorie())
+  s.learn(crfGraphs)
 
-  s.learn(graphs)
-
-  for (classWeights <- t.weights) {
-    println(classWeights)
+  for (pair <- t.weights) {
+    println(pair)
+  }
+  for (pair <- f.weights) {
+    println(pair)
   }
 
-  stubTrainingList.foreach(triplet => {
-    val graph = s.newGraph()
-    val node = graph.makeNode(t,
-      Map(
-        "token:"+triplet._1 -> 1.0,
-        "pos:"+triplet._2 -> 1.0
-      )
-    )
-    val map = graph.mapEstimate()
-    println(triplet._1+":"+triplet._3+" -> guessed -> "+map(node))
+  trainSet.map(sentence => {
+    val g = s.newGraph()
+
+    var lastNode : GraphNode = null
+    for (triple <- sentence) {
+      val newNode = g.makeNode(t, Map(
+        "word:"+triple._1 -> 1.0,
+        "pos:"+triple._2 -> 1.0,
+        // In situations where one class dominates, sometimes this makes the likelihood objective harder to learn
+        "BIAS" -> 0.0
+      ), payload = triple)
+      if (lastNode != null) {
+        g.makeFactor(f, List(lastNode, newNode))
+      }
+      lastNode = newNode
+    }
+
+    for (pair <- g.mapEstimate()) {
+      val node = pair._1
+      val guessedNER = pair._2
+      val triple = node.payload.asInstanceOf[(String,String,String)]
+      println(triple._1+":"+triple._3+":"+guessedNER)
+    }
   })
 }
