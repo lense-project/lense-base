@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.graph
 
 import scala.collection.mutable.ListBuffer
+import scala.io.Source
 import scala.util.Random
 
 /**
@@ -110,6 +111,63 @@ object EpsilonLearn extends App {
   println(nodeType.weights)
 }
 
+object NERLearn extends App {
+  def loadNER : List[List[(String,String,String)]] = {
+    val loadedData : ListBuffer[List[(String,String,String)]] = ListBuffer()
+    val currentSentence : ListBuffer[(String,String,String)] = ListBuffer()
+
+    for (line <- Source.fromFile("data/conll.iob.4class.train").getLines()) {
+      val parts = line.split("\t")
+      if (parts.size == 4) {
+        val word: String = parts(0)
+        val pos: String = parts(1)
+        val ner: String = parts(3)
+        currentSentence.+=((word, pos, ner))
+
+        if (word == ".") {
+          loadedData += currentSentence.toList
+          currentSentence.clear()
+        }
+      }
+    }
+
+    loadedData.toList
+  }
+
+  val allData = loadNER
+  val data = allData.filter(_.size < 15).take(100)
+  val trainSet = allData.filter(d => !data.contains(d)).take(1)
+  val classes = (data ++ trainSet).flatMap(_.map(_._3)).distinct.toSet
+
+  val s = new GraphStream()
+  val t = s.makeNodeType(classes)
+
+  val unaryGraphs = trainSet.flatMap(_.map(triple => {
+    val g = s.newGraph()
+    g.makeNode(t, Map(
+      "word:"+triple._1 -> 1.0,
+      "pos:"+triple._2 -> 1.0
+    ), observedValue = triple._3)
+    g
+  }))
+
+  s.learn(unaryGraphs)
+
+  for (pair <- t.weights) {
+    println(pair)
+  }
+
+  trainSet.foreach(_.foreach(triple => {
+    val g = s.newGraph()
+    val n = g.makeNode(t, Map(
+      "word:"+triple._1 -> 1.0,
+      "pos:"+triple._2 -> 1.0
+    ))
+    val guessedNER = g.mapEstimate()(n)
+    println(triple._3+":"+guessedNER)
+  }))
+}
+
 object MapLearn extends App {
   val s = new GraphStream()
 
@@ -127,7 +185,7 @@ object MapLearn extends App {
   )
 
   var longTrainingList = ListBuffer[(String,String,String)]()
-  for (i <- 0 to 0) {
+  for (i <- 0 to 10000) {
     longTrainingList ++= stubTrainingList
   }
 

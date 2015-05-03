@@ -250,7 +250,7 @@ class GraphStream {
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
-  def learn(graphs : Iterable[Graph], regularization: Double = 1.0) = {
+  def learn(graphs : Iterable[Graph], regularization: Double = 0.1) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs)
@@ -392,9 +392,10 @@ class GraphStream {
       model.warmUpIndexes(graph)
     }
 
+    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random())
     Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random())
 
-    // val trainer = new BatchTrainer(model.parameters, new ConjugateGradient() with L2Regularization{variance = regularization}, maxIterations = 50)
+    // val trainer = new BatchTrainer(model.parameters, new ConjugateGradient() with L2Regularization{variance = regularization}, maxIterations = 100)
     // trainer.trainFromExamples(likelihoodExamples)
   }
 

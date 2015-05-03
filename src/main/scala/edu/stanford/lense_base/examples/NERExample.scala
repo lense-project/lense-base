@@ -240,9 +240,13 @@ object NERExample extends App {
     (correct / (correct + incorrect), numQueries)
   }
 
-  val data = loadNER.filter(_.size < 15).take(100)
+  val allData = loadNER
+
+  val data = allData.filter(_.size < 15).take(100)
+  val trainSet = allData.filter(d => !data.contains(d)).take(100)
+
   println(data(1))
-  val classes = data.flatMap(_.map(_._3)).distinct.toSet
+  val classes = (data ++ trainSet).flatMap(_.map(_._3)).distinct.toSet
 
   println(testSystem(new SingleQueryBaseline(classes), data, 0.3))
   println(testSystem(new MultiQueryBaseline(classes, 3), data, 0.3))
@@ -257,9 +261,9 @@ object NERExample extends App {
   }
 
   println("One Question Baseline, with only BIAS feature")
-  println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction), data, 0.3))
+  println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction, trainingData = trainSet), data, 0.3))
   println("Basic Lost Function LookaheadOneHeuristic")
-  println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction), data, 0.3))
+  println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction, trainingData = trainSet), data, 0.3))
 
   def testWithRealHumans() = {
     println("****\n****\n****\nRunning a real NER test!")
