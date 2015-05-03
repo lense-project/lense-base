@@ -54,7 +54,7 @@ object WorkUnitServlet extends ScalatraServlet
     for (i <- 0 to 3) {
       addWorkUnit(new MulticlassQuestion(
         "<p>Do you like green eggs and ham? #" + i + "/3</p>",
-        List("ham", "eggs", "neither"),
+        List(("ham", "H"), ("eggs", "E"), ("neither", "N")),
         Promise[String]()
       ))
     }
@@ -66,12 +66,12 @@ abstract class WorkUnit[T](resultFuture : Promise[T]) {
   def handleReplyMessage(m : JValue) : Boolean
 }
 
-case class MulticlassQuestion(questionHTML : String, choices : List[String], resultFuture : Promise[String]) extends WorkUnit[String](resultFuture) {
+case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultFuture : Promise[String]) extends WorkUnit[String](resultFuture) {
   override def getOutboundMessage: JValue = {
     new JObject(List(
       "type" -> new JString("multiclass"),
       "html" -> new JString(questionHTML),
-      "choices" -> new JArray(choices.map(choice => new JString(choice)))
+      "choices" -> new JArray(choices.map(choice => new JString(choice._1)))
     ))
   }
 
@@ -91,8 +91,12 @@ case class MulticlassQuestion(questionHTML : String, choices : List[String], res
 
     // If we can handle it, then do
 
+    val prettyResult = m.asInstanceOf[JObject].values("answer").asInstanceOf[String]
+    val matches = choices.filter(_._1 == prettyResult)
+    if (matches.size > 1) throw new IllegalStateException("Cannot have more than 1 option with same human display text: Got \""+prettyResult+"\"")
+    if (matches.size == 0) throw new IllegalStateException("Cannot have more than no options with same human display text: Got \""+prettyResult+"\"")
     resultFuture.complete(Try {
-      m.asInstanceOf[JObject].values("answer").asInstanceOf[String]
+      matches.head._2
     })
 
     true

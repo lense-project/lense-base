@@ -301,7 +301,7 @@ object NERExample extends App {
       WorkUnitServlet.addWorkUnit(
         new MulticlassQuestion(
           question,
-          classes,
+          classes.zip(classes),
           p
         )
       )
