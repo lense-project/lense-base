@@ -25,7 +25,7 @@ object LenseTest extends App {
   }
   def lossFunction(maxGuesses : List[(GraphNode, String, Double)], cost : Double, delay : Double) : Double = 1.0
 
-  val lense = new Lense(graphStream, OneQuestionBaseline)
+  val lense = new LenseEngine(graphStream, OneQuestionBaseline)
 
   val firstGameState = GameState(g, 0.0, 0.0, askHuman, lense.attachHumanObservation, lossFunction)
 

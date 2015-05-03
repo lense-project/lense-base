@@ -6,7 +6,7 @@ import java.awt.Graphics2D
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-import edu.stanford.lense_base.Lense
+import edu.stanford.lense_base.LenseEngine
 
 /**
  * Created by keenon on 4/29/15.
@@ -15,7 +15,7 @@ import edu.stanford.lense_base.Lense
  * always have access to a window manager when developing this anyways, so trying something more ambitious seems
  * somewhat appropriate
  */
-class Java2DGUI(lense : Lense) {
+class Java2DGUI(lense : LenseEngine) {
   class Surface extends JPanel {
     def doDrawing(g : Graphics) = {
       val g2d : Graphics2D = g.asInstanceOf[Graphics2D]

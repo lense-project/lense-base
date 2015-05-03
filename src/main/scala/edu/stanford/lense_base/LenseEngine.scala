@@ -11,7 +11,7 @@ import scala.concurrent.{Promise, Future}
  *
  * This is the central static dispatcher to handle requests to the API
  */
-class Lense(stream : GraphStream, gamePlayer : GamePlayer) {
+class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
   val defaultEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()

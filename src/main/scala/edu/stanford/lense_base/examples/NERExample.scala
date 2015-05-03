@@ -1,6 +1,6 @@
 package edu.stanford.lense_base.examples
 
-import edu.stanford.lense_base.Lense
+import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer, OneQuestionBaseline}
 import edu.stanford.lense_base.graph.{Graph, GraphNode, GraphStream}
 import edu.stanford.lense_base.gui.Java2DGUI
@@ -56,7 +56,7 @@ class LenseFrameworkForNER(classes : Set[String],
   val nodeType = graphStream.makeNodeType(classes)
   val factorType = graphStream.makeFactorType(List(nodeType,nodeType))
   // This keeps state for learning, etc
-  val lense : Lense = new Lense(graphStream, gamePlayer)
+  val lense : LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
   if (trainingData != null) {
     println("Training with initial batch of data")
@@ -263,11 +263,12 @@ object NERExample extends App {
       case (_,"0",p) => (1.0 - p)*5.0
       case t => 1.0 - t._3
     }.sum
-    expectedErrors + cost
+    expectedErrors*10 + cost
   }
 
-  println("One Question Baseline")
-  println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction, trainingData = trainSet), data, 0.3))
+  // println("One Question Baseline")
+  // println(testSystem(new LenseFrameworkForNER(classes, OneQuestionBaseline, lossFunction, trainingData = trainSet), data, 0.3))
+
   println("Basic Lost Function LookaheadOneHeuristic")
   println(testSystem(new LenseFrameworkForNER(classes, LookaheadOneHeuristic, lossFunction, trainingData = trainSet), data, 0.3))
 
