@@ -263,6 +263,7 @@ object NERExample extends App {
       case (_,"0",p) => (1.0 - p)*5.0
       case t => 1.0 - t._3
     }.sum
+    // This will trade 10 human labels for fully correct token
     expectedErrors*10 + cost
   }
 

@@ -8,7 +8,7 @@ import edu.stanford.lense_base.graph.{GraphStream, Graph}
  * This holds the abstract guts of a use case for Lense, which should help minimize crufty overhead when generating new
  * use cases
  */
-abstract class LenseUseCase[Input, Output] {
+abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   val graphStream : GraphStream = new GraphStream()
 
   /**
@@ -19,7 +19,7 @@ abstract class LenseUseCase[Input, Output] {
    * @param output a possibly null correct output, that should be used to assign observedValue's to the graph
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  def toGraph(input : Input, output : Output = null) : Graph
+  def toGraph(input : Input, output : Output = Nil.asInstanceOf[Output]) : Graph
 
   /**
    * An opportunity to provide some seed data for training the model before the online task begins. This data will
