@@ -7,6 +7,7 @@ import cc.factorie.la
 import cc.factorie.la._
 import cc.factorie.model._
 import cc.factorie.optimize._
+import cc.factorie.util.Logger
 import cc.factorie.variable.{CategoricalVectorDomain, FeatureVectorVariable, _}
 import edu.stanford.lense_base.util.CaseClassEq
 
@@ -78,7 +79,7 @@ case class GraphFactor(graph : Graph,
   override def toString : String = if (stringName != null) "GraphFactor("+stringName+")" else super.toString
 }
 
-case class Graph(stream : GraphStream) {
+case class Graph(stream : GraphStream) extends CaseClassEq {
   val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
   val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
 
@@ -200,7 +201,6 @@ case class NodeType(stream : GraphStream, possibleValues : Set[String], var weig
 
   def setWeights(newWeights : Map[String,Map[String,Double]]) = {
     weights = newWeights
-    stream.model.weightsTensorCache.remove(this)
     stream.model.dotFamilyCache.remove(this)
   }
 }
@@ -214,7 +214,6 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
 
   def setWeights(newWeights : Map[List[String],Map[String,Double]]) = {
     weights = newWeights
-    stream.model.weightsTensorCache.remove(this)
     stream.model.dotFamilyCache.remove(this)
   }
 }
@@ -382,21 +381,22 @@ class GraphStream {
   // This will learn just Weight() values from the fully observed values in the graphs
 
   private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
-    val likelihoodExamples = graphs.map(graph =>
-      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
-    ).toSeq
-
-    // Don't want to be doing this in parallel, things get broken
-
+    // Don't want to be doing this part in parallel, things get broken
     for (graph <- graphs) {
       model.warmUpIndexes(graph)
     }
 
-    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random())
-    Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random())
+    val likelihoodExamples = graphs.map(graph =>
+      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
+    ).toSeq
 
-    // val trainer = new BatchTrainer(model.parameters, new ConjugateGradient() with L2Regularization{variance = regularization}, maxIterations = 100)
-    // trainer.trainFromExamples(likelihoodExamples)
+    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random())
+    // Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random())
+
+    Logger.getRootLogger.setLevel(Logger.DEBUG)
+
+    val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
+    trainer.trainFromExamples(likelihoodExamples)
   }
 
 
@@ -416,93 +416,107 @@ class GraphStream {
     // for this factor. These are going to be treated as **constant** during inference. They will be **variable** during
     // learning.
 
-    val weightsTensorCache : util.IdentityHashMap[WithDomain, Weights] = new util.IdentityHashMap[WithDomain, Weights]()
-    def getWeightTensorFor(elemType : WithDomain) : Weights = {
+    // This should only ever get called from getDotFamilyWithStatisticsFor, otherwise it's a mess
+
+    private def getWeightTensorFor(elemType : WithDomain) : Weights = {
       // Do any updates threadsafe
-      weightsTensorCache.synchronized {
-        if (!weightsTensorCache.containsKey(elemType)) {
-          elemType match {
-            case factorType: FactorType =>
-              // Size the tensor
-              val tensor = factorType.neighborTypes.size match {
-                case 1 =>
-                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                  val numFeatures = factorType.featureDomain.length
-                  val factorTensor = new la.DenseTensor2(numNode1Values, numFeatures)
-                  factorTensor.*=(0)
+      elemType match {
+        case factorType: FactorType =>
+          // Size the tensor
+          factorType.neighborTypes.size match {
+            case 1 =>
+              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+              val numFeatures = factorType.featureDomain.length
 
-                  // Populate the tensor
-                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                    val assignment = assignmentFeaturesPair._1
-                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                    for (featureWeightPair <- assignmentFeaturesPair._2) {
-                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                      factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
-                    }
-                  }
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                case 2 =>
-                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                  val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-                  val numFeatures = factorType.featureDomain.length
-                  val factorTensor = new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures)
-                  factorTensor.*=(0)
+              // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
+              // weights will fail to clone correctly, and linesearch will flip a shit
+              val w = Weights(new la.DenseTensor2(numNode1Values, numFeatures))
 
-                  // Populate the tensor
-                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                    val assignment = assignmentFeaturesPair._1
-                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                    val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
-                    for (featureWeightPair <- assignmentFeaturesPair._2) {
-                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                      factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
-                    }
-                  }
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                case 3 =>
-                  val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-                  val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-                  val numNode3Values = factorType.neighborTypes(2).valueDomain.length
-                  val numFeatures = factorType.featureDomain.length
-                  val factorTensor = new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures)
-                  factorTensor.*=(0)
-
-                  // Populate the tensor
-                  if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
-                    val assignment = assignmentFeaturesPair._1
-                    val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                    val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
-                    val node3ValueIndex = getIndexCautious(factorType.neighborTypes(2).valueDomain, assignment(2), "neighborTypes(2).valueDomain")
-                    for (featureWeightPair <- assignmentFeaturesPair._2) {
-                      val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                      factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
-                    }
-                  }
-                  weightsTensorCache.put(elemType, Weights(factorTensor))
-                case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-              }
-
-            case nodeType: NodeType =>
-              // Size the tensor
-              val numNodeValues = nodeType.valueDomain.length
-              val numFeatures = nodeType.featureDomain.length
-              val nodeTensor = new la.DenseTensor2(numNodeValues, numFeatures)
-              nodeTensor.*=(0)
+              val factorTensor = w.value.asInstanceOf[DenseTensor2]
+              factorTensor.*=(0)
 
               // Populate the tensor
-              if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
-                val valueIndex = getIndexCautious(nodeType.valueDomain, valueFeaturesPair._1, "nodeType.valueDomain")
-                for (featureWeightPair <- valueFeaturesPair._2) {
-                  val featureIndex = getIndexCautious(nodeType.featureDomain, featureWeightPair._1, "nodeType.featureDomain")
-                  nodeTensor.+=(valueIndex, featureIndex, featureWeightPair._2)
+              if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                val assignment = assignmentFeaturesPair._1
+                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                for (featureWeightPair <- assignmentFeaturesPair._2) {
+                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
                 }
               }
+              w
+            case 2 =>
+              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+              val numNode2Values = factorType.neighborTypes(1).valueDomain.length
+              val numFeatures = factorType.featureDomain.length
 
-              // Cache the tensor as a Weight
-              weightsTensorCache.put(elemType, Weights(nodeTensor))
+              // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
+              // weights will fail to clone correctly, and linesearch will flip a shit
+              val w = Weights(new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures))
+
+              val factorTensor = w.value
+              factorTensor.*=(0)
+
+              // Populate the tensor
+              if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                val assignment = assignmentFeaturesPair._1
+                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
+                for (featureWeightPair <- assignmentFeaturesPair._2) {
+                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
+                }
+              }
+              w
+            case 3 =>
+              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
+              val numNode2Values = factorType.neighborTypes(1).valueDomain.length
+              val numNode3Values = factorType.neighborTypes(2).valueDomain.length
+              val numFeatures = factorType.featureDomain.length
+
+              // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
+              // weights will fail to clone correctly, and linesearch will flip a shit
+              val w = Weights(new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures))
+
+              val factorTensor = w.value
+              factorTensor.*=(0)
+
+              // Populate the tensor
+              if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
+                val assignment = assignmentFeaturesPair._1
+                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
+                val node3ValueIndex = getIndexCautious(factorType.neighborTypes(2).valueDomain, assignment(2), "neighborTypes(2).valueDomain")
+                for (featureWeightPair <- assignmentFeaturesPair._2) {
+                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
+                }
+              }
+              w
+            case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
           }
-        }
-        weightsTensorCache.get(elemType)
+
+        case nodeType: NodeType =>
+          // Size the tensor
+          val numNodeValues = nodeType.valueDomain.length
+          val numFeatures = nodeType.featureDomain.length
+
+          // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
+          // weights will fail to clone correctly, and linesearch will flip a shit
+          val w = Weights(new la.DenseTensor2(numNodeValues, numFeatures))
+
+          val nodeTensor = w.value
+          nodeTensor.*=(0)
+
+          // Populate the tensor
+          if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
+            val valueIndex = getIndexCautious(nodeType.valueDomain, valueFeaturesPair._1, "nodeType.valueDomain")
+            for (featureWeightPair <- valueFeaturesPair._2) {
+              val featureIndex = getIndexCautious(nodeType.featureDomain, featureWeightPair._1, "nodeType.featureDomain")
+              nodeTensor.+=(valueIndex, featureIndex, featureWeightPair._2)
+            }
+          }
+          w
       }
     }
 
@@ -513,7 +527,6 @@ class GraphStream {
           elemType match {
             case factorType: FactorType =>
               factorType.neighborTypes.size match {
-                // TODO: Test this
                 case 1 =>
                   dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String],
                     FeatureVectorVariable[String]] {
@@ -558,7 +571,7 @@ class GraphStream {
     // This can take both Node and Factor objects, and return a variable representing the feature values for the
     // object. This will always be a **constant**, so should never be passed into the model as part of the list of factors.
 
-    case class FeatureVariable(variable : GraphVarWithDomain) extends FeatureVectorVariable[String] {
+    case class FeatureVariable(variable : GraphVarWithDomain) extends FeatureVectorVariable[String] with CaseClassEq {
       override def domain: CategoricalVectorDomain[String] = variable.domainType.domain
     }
     def getFeatureVariableFor(variable : GraphVarWithDomain) : FeatureVariable = {
@@ -569,18 +582,20 @@ class GraphStream {
           factor.nodeList.size match {
             case 1 =>
             case 2 =>
-              if (factor.features != null) for (featureWeightPair <- factor.features) {
-                val featureIndex = getIndexCautious(factor.factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
-                features.update(featureIndex, featureWeightPair._2)(null)
-              }
+              if (factor.features != null)
+                for (featureWeightPair <- factor.features) {
+                  val featureIndex = getIndexCautious(factor.factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  features += (featureWeightPair._1, featureWeightPair._2)
+                }
             case 3 =>
             case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
           }
         case node: GraphNode =>
-          if (node.features != null) for (featureWeightPair <- node.features) {
-            val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
-            features.update(featureIndex, featureWeightPair._2)(null)
-          }
+          if (node.features != null)
+            for (featureWeightPair <- node.features) {
+              val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
+              features += (featureWeightPair._1, featureWeightPair._2)
+            }
       }
 
       features
@@ -611,7 +626,6 @@ class GraphStream {
           // Clear cached elements if we change the feature domain size
           if (node.nodeType.featureDomain.length > oldSize) {
             dotFamilyCache.remove(node.nodeType)
-            weightsTensorCache.remove(node.nodeType)
           }
         }
         if (node.observedValue != null) {
@@ -625,7 +639,6 @@ class GraphStream {
           // Clear cached elements if we change the feature domain size
           if (factor.factorType.featureDomain.length > oldSize) {
             dotFamilyCache.remove(factor.factorType)
-            weightsTensorCache.remove(factor.factorType)
           }
         }
       }
@@ -672,6 +685,7 @@ class GraphStream {
       // Warm up the variable domains
 
       val graph : Graph = mutableList(0).graph
+
       // TODO: this may be redundant, if we can carefully control other usages of inference
       warmUpIndexes(graph)
 
@@ -685,6 +699,7 @@ class GraphStream {
         case nodeVar : NodeVariable =>
           val f = getNodeFactor(nodeVar)
           result += f
+          nodeVar.set(0)(null)
       }
 
       def isMutableNode(n : GraphNode) : Boolean = {
