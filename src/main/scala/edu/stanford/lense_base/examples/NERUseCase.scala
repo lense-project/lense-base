@@ -40,7 +40,7 @@ class NERUseCase extends LenseSequenceUseCase {
       case t => 1.0 - t._3
     }.sum
     // This will trade 10 human labels for fully correct token
-    expectedErrors*10 + cost
+    expectedErrors*4 + cost
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] =

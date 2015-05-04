@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="compile-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150502153339"/>
+		date="20150503162024"/>
 	<dependencies>
 		<module organisation="org.scalatra" name="scalatra-scalate_2.11">
 			<revision name="2.4.0.RC1" status="release" pubdate="20150417191642" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="38">

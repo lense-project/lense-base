@@ -254,6 +254,13 @@ class GraphStream {
 
   def newGraph() : Graph = Graph(this)
 
+  def onlineUpdate(graphs : Iterable[Graph], regularization: Double = 0.1) = {
+    if (graphs.exists(graph => graph.nodes.exists(node => {
+      node.observedValue == null
+    }))) onlineEM(graphs)
+    else onlineUpdateFullyObserved(graphs, regularization)
+  }
+
   // learns the appropriate bits, which means any weight factors, and EM if there are any
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
@@ -385,6 +392,25 @@ class GraphStream {
 
   private def learnEM(graphs : Iterable[Graph]) = {
     throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
+  }
+
+  private def onlineEM(graphs : Iterable[Graph]) = {
+    throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
+  }
+
+  private def onlineUpdateFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
+    // Don't want to be doing this part in parallel, things get broken
+    for (graph <- graphs) {
+      model.warmUpIndexes(graph)
+    }
+
+    val likelihoodExamples = graphs.map(graph => {
+      graph.setObservedVariablesForFactorie()
+      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
+    }).toSeq
+
+    val trainer = new OnlineTrainer(model.parameters, new AdaGrad(), maxIterations = 100)
+    trainer.processExamples(likelihoodExamples)
   }
 
   // This will learn just Weight() values from the fully observed values in the graphs

@@ -22,11 +22,15 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
   def predict(graph : Graph, askHuman : GraphNode => Promise[String], lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
 
-    if (pastGuesses.size > 0) {
+    // This will run full optimization, which seems unnecessary. Just a few online updates should be sufficient.
+
+    /*
+    if (pastGuesses.size > 0 && pastGuesses.size % 20 == 0) {
       println("Learning...")
       learnHoldingPastGuessesConstant(1.0)
       println("Finished Learning:")
     }
+    */
 
     // Keep playing until the game player tells us to stop
 
@@ -47,6 +51,9 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
             n.observedValue = mapEstimate(gameState.oldToNew(n))
           })
           pastGuesses += gameState.originalGraph
+
+          // Perform an online parameter update
+          onlineUpdateHoldingPastGuessesConstant()
 
           // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
           // Learning from this will require learning with unobserved variables, so will be subject to local optima
@@ -72,6 +79,14 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
 
   def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = {
     stream.learn(pastGuesses, regularization)
+    // Reset human weights to default, because regularizer will have messed with them
+    for (humanObservationTypePair <- humanObservationTypesCache.values) {
+      humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
+    }
+  }
+
+  def onlineUpdateHoldingPastGuessesConstant(regularization : Double = 1.0) = {
+    stream.onlineUpdate(pastGuesses, regularization)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

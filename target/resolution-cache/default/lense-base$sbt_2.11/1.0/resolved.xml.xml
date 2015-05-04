@@ -4,7 +4,7 @@
 		module="lense-base$sbt_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150502153336"
+		publication="20150503162022"
 	/>
 	<configurations>
 		<conf name="default" visibility="public"/>
