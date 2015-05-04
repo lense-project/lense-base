@@ -23,14 +23,13 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
 
     // This will run full optimization, which seems unnecessary. Just a few online updates should be sufficient.
+    // TODO: it all breaks down if we don't do this frequently, because errors compound. Needs solution.
 
-    /*
-    if (pastGuesses.size > 0 && pastGuesses.size % 20 == 0) {
+    if (pastGuesses.size > 0) {
       println("Learning...")
       learnHoldingPastGuessesConstant(1.0)
       println("Finished Learning:")
     }
-    */
 
     // Keep playing until the game player tells us to stop
 
@@ -53,7 +52,7 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
           pastGuesses += gameState.originalGraph
 
           // Perform an online parameter update
-          onlineUpdateHoldingPastGuessesConstant()
+          onlineUpdateHoldingPastGuessesConstant(gameState.originalGraph)
 
           // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
           // Learning from this will require learning with unobserved variables, so will be subject to local optima
@@ -85,8 +84,8 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     }
   }
 
-  def onlineUpdateHoldingPastGuessesConstant(regularization : Double = 1.0) = {
-    stream.onlineUpdate(pastGuesses, regularization)
+  def onlineUpdateHoldingPastGuessesConstant(graph : Graph, regularization : Double = 1.0) = {
+    stream.onlineUpdate(List(graph), regularization)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

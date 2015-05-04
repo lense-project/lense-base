@@ -117,6 +117,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
+    stream.model.warmUpIndexes(this)
 
     // Do exact inference via trees if possible.
     val sumMax = try {
@@ -147,6 +148,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
+    stream.model.warmUpIndexes(this)
 
     // Do exact inference via trees if possible.
     val sumMarginal = try {
@@ -721,7 +723,8 @@ class GraphStream {
       val graph : Graph = mutableList(0).graph
 
       // TODO: this may be redundant, if we can carefully control other usages of inference
-      warmUpIndexes(graph)
+      // Actually, it is. It's also hugely slow, so that's nice to fix.
+      // warmUpIndexes(graph)
 
       // Create the factors collection
 
