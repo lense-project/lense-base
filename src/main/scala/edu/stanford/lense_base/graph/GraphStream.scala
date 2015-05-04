@@ -256,22 +256,22 @@ class GraphStream {
 
   def newGraph() : Graph = Graph(this)
 
-  def onlineUpdate(graphs : Iterable[Graph], regularization: Double = 0.1) = {
+  def onlineUpdate(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
-    }))) onlineEM(graphs)
-    else onlineUpdateFullyObserved(graphs, regularization)
+    }))) onlineEM(graphs, clearOptimizer)
+    else onlineUpdateFullyObserved(graphs, regularization, clearOptimizer)
   }
 
   // learns the appropriate bits, which means any weight factors, and EM if there are any
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
-  def learn(graphs : Iterable[Graph], regularization: Double = 0.1) = {
+  def learn(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
-    }))) learnEM(graphs)
-    else learnFullyObserved(graphs, regularization)
+    }))) learnEM(graphs, clearOptimizer)
+    else learnFullyObserved(graphs, regularization, clearOptimizer)
 
     // Now we need to decode the weights
 
@@ -392,15 +392,19 @@ class GraphStream {
 
   // performs EM on the graph. Still massively TODO
 
-  private def learnEM(graphs : Iterable[Graph]) = {
+  private def learnEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) = {
     throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
   }
 
-  private def onlineEM(graphs : Iterable[Graph]) = {
+  private def onlineEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) = {
     throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
   }
 
-  private def onlineUpdateFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
+  var onlineOptimizer : GradientOptimizer = null
+  private def onlineUpdateFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Unit = {
+    if (onlineOptimizer == null || clearOptimizer) {
+      onlineOptimizer = new AdaGrad()
+    }
     // Don't want to be doing this part in parallel, things get broken
     for (graph <- graphs) {
       model.warmUpIndexes(graph)
@@ -411,13 +415,17 @@ class GraphStream {
       new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
     }).toSeq
 
-    val trainer = new OnlineTrainer(model.parameters, new AdaGrad(), maxIterations = 100)
+    val trainer = new OnlineTrainer(model.parameters, onlineOptimizer, maxIterations = 100)
     trainer.processExamples(likelihoodExamples)
   }
 
   // This will learn just Weight() values from the fully observed values in the graphs
 
-  private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double): Unit = {
+  var batchOptimizer : GradientOptimizer = null
+  private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Unit = {
+    if (batchOptimizer == null || clearOptimizer) {
+      batchOptimizer = new LBFGS() with L2Regularization
+    }
     // Don't want to be doing this part in parallel, things get broken
     for (graph <- graphs) {
       model.warmUpIndexes(graph)
@@ -429,7 +437,7 @@ class GraphStream {
     }).toSeq
 
     // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-    Trainer.batchTrain(model.parameters, likelihoodExamples)(new scala.util.Random(42))
+    Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = batchOptimizer)(new scala.util.Random(42))
 
     // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
     // trainer.trainFromExamples(likelihoodExamples)
@@ -558,6 +566,9 @@ class GraphStream {
 
     val dotFamilyCache : mutable.Map[WithDomain, DotFamily] = mutable.Map()
     def getDotFamilyWithStatisticsFor(elemType : WithDomain) : DotFamily = {
+      if (dotFamilyCache.contains(elemType)) {
+        return dotFamilyCache(elemType)
+      }
       dotFamilyCache.synchronized {
         if (!dotFamilyCache.contains(elemType)) {
           elemType match {

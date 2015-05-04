@@ -52,7 +52,7 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
           pastGuesses += gameState.originalGraph
 
           // Perform an online parameter update
-          onlineUpdateHoldingPastGuessesConstant(gameState.originalGraph)
+          // onlineUpdateHoldingPastGuessesConstant(gameState.originalGraph)
 
           // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
           // Learning from this will require learning with unobserved variables, so will be subject to local optima
@@ -77,7 +77,8 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
   }
 
   def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = {
-    stream.learn(pastGuesses, regularization)
+    // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
+    stream.learn(pastGuesses, regularization, clearOptimizer = false)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
