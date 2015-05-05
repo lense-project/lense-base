@@ -1,13 +1,14 @@
 package edu.stanford.lense_base.graph
 
 import java.util
+import java.util.concurrent.locks.{ReentrantReadWriteLock, ReadWriteLock}
 
 import cc.factorie.infer._
 import cc.factorie.la
 import cc.factorie.la._
 import cc.factorie.model._
 import cc.factorie.optimize._
-import cc.factorie.util.Logger
+import cc.factorie.util.{DoubleSeq, Logger}
 import cc.factorie.variable.{CategoricalVectorDomain, FeatureVectorVariable, _}
 import edu.stanford.lense_base.util.CaseClassEq
 
@@ -117,7 +118,13 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    stream.model.warmUpIndexes(this)
+    stream.model.synchronized {
+      stream.model.warmUpIndexes(this)
+    }
+
+    ////////////////////////////
+    // SYNCHRONIZED SECTION
+    stream.weightsReadWriteLock.readLock().lock()
 
     // Do exact inference via trees if possible.
     val sumMax = try {
@@ -131,6 +138,10 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
         println("MAP Inference is falling back to loopy BP. Results may be inexact")
         MaximizeByBPLoopyTreewise.infer(variables, stream.model)
     }
+
+    stream.weightsReadWriteLock.readLock().unlock()
+    // END SYNCHRONIZED SECTION
+    ////////////////////////////
 
     variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
@@ -148,7 +159,14 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    stream.model.warmUpIndexes(this)
+    stream.model.synchronized {
+      stream.model.warmUpIndexes(this)
+    }
+
+
+    ////////////////////////////
+    // SYNCHRONIZED SECTION
+    stream.weightsReadWriteLock.readLock().lock()
 
     // Do exact inference via trees if possible.
     val sumMarginal = try {
@@ -170,6 +188,10 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
         */
         InferByBPLoopyTreewise.infer(variables, stream.model)
     }
+
+    stream.weightsReadWriteLock.readLock().unlock()
+    // END SYNCHRONIZED SECTION
+    ////////////////////////////
 
     variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
@@ -233,7 +255,10 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
 // The model expects a list of these to be passed in.
 
 case class NodeVariable(node : GraphNode, graph : Graph) extends CategoricalVariable[String] with LabeledMutableCategoricalVar[String] {
-  override def domain = node.nodeType.valueDomain
+  var frozenDomainMap : Map[CategoricalDomain[String], CategoricalDomain[String]] = null
+  override lazy val domain = if (frozenDomainMap == null || !frozenDomainMap.contains(node.nodeType.valueDomain))
+    node.nodeType.valueDomain
+  else frozenDomainMap(node.nodeType.valueDomain)
 
   override type TargetType = CategoricalTargetVariable[String]
   override def target: TargetType = new CategoricalTargetVariable[String](domain.index(node.observedValue), this)
@@ -423,24 +448,60 @@ class GraphStream {
 
   var batchOptimizer : GradientOptimizer = null
   private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Unit = {
-    if (batchOptimizer == null || clearOptimizer) {
-      batchOptimizer = new LBFGS() with L2Regularization
+    modelTrainingClone.synchronized {
+      if (batchOptimizer == null || clearOptimizer) {
+        batchOptimizer = new LBFGS() with L2Regularization
+      }
+
+      // Don't want to be doing this part in parallel, things get broken
+      val likelihoodExamples = model.synchronized {
+        for (graph <- graphs) {
+          modelTrainingClone.warmUpIndexes(graph)
+          modelTrainingClone.dotFamilyCache.clear()
+        }
+
+        val frozenDomainMap = withDomainList.map(withDomain => {
+          val newDomain = new CategoricalDomain[String]()
+          newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+          (withDomain.domain.dimensionDomain, newDomain)
+        }).toMap
+
+        graphs.map(graph => {
+          graph.setObservedVariablesForFactorie()
+          val nodeVariables = graph.allVariablesForFactorie()
+          for (nodeVariable <- nodeVariables) {
+            nodeVariable.frozenDomainMap = frozenDomainMap
+          }
+          new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+        }).toSeq
+      }
+
+      // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true)(new scala.util.Random(42))
+
+      // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
+      // trainer.trainFromExamples(likelihoodExamples)
+
+      ////////////////////////////
+      // SYNCHRONIZED SECTION
+      weightsReadWriteLock.writeLock().lock()
+
+      // Copy over weights from the modelTrainingClone's dotFamilies to the model's dotFamilies
+      for (w <- withDomainList) {
+        val trainedDotFamily = modelTrainingClone.getDotFamilyWithStatisticsFor(w)
+        val untrainedDotFamily = model.getDotFamilyWithStatisticsFor(w)
+        if (untrainedDotFamily.weights.value.size == trainedDotFamily.weights.value.size) {
+          untrainedDotFamily.weights.value := trainedDotFamily.weights.value
+        }
+        else {
+          println("Tensors are different size now")
+        }
+      }
+
+      weightsReadWriteLock.writeLock().unlock()
+      // END SYNCHRONIZED SECTION
+      ////////////////////////////
     }
-    // Don't want to be doing this part in parallel, things get broken
-    for (graph <- graphs) {
-      model.warmUpIndexes(graph)
-    }
-
-    val likelihoodExamples = graphs.map(graph => {
-      graph.setObservedVariablesForFactorie()
-      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
-    }).toSeq
-
-    // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-    Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = batchOptimizer)(new scala.util.Random(42))
-
-    // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
-    // trainer.trainFromExamples(likelihoodExamples)
   }
 
 
@@ -453,8 +514,11 @@ class GraphStream {
   }
 
   // Here's the Factorie objects
+  val model = new StreamModel()
+  val modelTrainingClone = new StreamModel()
+  val weightsReadWriteLock : ReadWriteLock = new ReentrantReadWriteLock()
 
-  val model = new Model with Parameters {
+  class StreamModel extends Model with Parameters {
 
     // This can take both NodeType and FactorType, and will return a Weights(Tensor) that represents the weights
     // for this factor. These are going to be treated as **constant** during inference. They will be **variable** during
@@ -474,7 +538,9 @@ class GraphStream {
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
-              val w = Weights(new la.DenseTensor2(numNode1Values, numFeatures))
+              val w = Weights(new la.DenseTensor2(
+                numNode1Values,
+                numFeatures))
 
               val factorTensor = w.value.asInstanceOf[DenseTensor2]
               factorTensor.*=(0)
@@ -496,7 +562,10 @@ class GraphStream {
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
-              val w = Weights(new la.DenseTensor3(numNode1Values, numNode2Values, numFeatures))
+              val w = Weights(new la.DenseTensor3(
+                numNode1Values,
+                numNode2Values,
+                numFeatures))
 
               val factorTensor = w.value
               factorTensor.*=(0)
@@ -520,7 +589,11 @@ class GraphStream {
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
-              val w = Weights(new la.DenseTensor4(numNode1Values, numNode2Values, numNode3Values, numFeatures))
+              val w = Weights(new la.DenseTensor4(
+                numNode1Values,
+                numNode2Values,
+                numNode3Values,
+                numFeatures))
 
               val factorTensor = w.value
               factorTensor.*=(0)
@@ -547,7 +620,8 @@ class GraphStream {
 
           // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
           // weights will fail to clone correctly, and linesearch will flip a shit
-          val w = Weights(new la.DenseTensor2(numNodeValues, numFeatures))
+          val w = Weights(new la.DenseTensor2(numNodeValues,
+            numFeatures))
 
           val nodeTensor = w.value
           nodeTensor.*=(0)
@@ -604,6 +678,14 @@ class GraphStream {
               }
             case nodeType: NodeType => dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]] {
               val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
+              override def valuesScore(tensor:Tensor): Double = {
+                if (!util.Arrays.equals(weights.value.dimensions, tensor.dimensions)) {
+                  println("My dimensions: " + weights.value.dimensions.toList + ", dot dimensions: " + tensor.dimensions.toList)
+                  println("New blank weight dimensions: " + weights.newBlankTensor.dimensions.toList)
+                  println("New weights tensor dims: " + getWeightTensorFor(elemType).newBlankTensor.dimensions.toList)
+                }
+                statisticsScore(tensor)
+              }
             })
             case otherType => throw new IllegalStateException("Got type neither NodeType or FactorType")
           }
@@ -618,29 +700,45 @@ class GraphStream {
     // This can take both Node and Factor objects, and return a variable representing the feature values for the
     // object. This will always be a **constant**, so should never be passed into the model as part of the list of factors.
 
-    case class FeatureVariable(variable : GraphVarWithDomain) extends FeatureVectorVariable[String] with CaseClassEq {
-      override def domain: CategoricalVectorDomain[String] = variable.domainType.domain
+    case class FeatureVariable(variable : GraphVarWithDomain, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) extends FeatureVectorVariable[String] with CaseClassEq {
+      override lazy val domain: CategoricalVectorDomain[String] = {
+        if (frozenDomain == null || !frozenDomain.contains(variable.domainType.domain.dimensionDomain)) {
+          variable.domainType.domain
+        }
+        else {
+          val newDimensionDomain = frozenDomain(variable.domainType.domain.dimensionDomain)
+          new CategoricalVectorDomain[String] {
+            override val dimensionDomain = newDimensionDomain
+          }
+        }
+      }
     }
-    def getFeatureVariableFor(variable : GraphVarWithDomain) : FeatureVariable = {
-      val features = FeatureVariable(variable)
+
+    def getFeatureVariableFor(variable : GraphVarWithDomain, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) : FeatureVariable = {
+      val features = FeatureVariable(variable, frozenDomain)
+      if (frozenDomain != null && frozenDomain.contains(features.domain.dimensionDomain)) {
+        throw new IllegalStateException("Should have replaced the domain of the features variable")
+      }
 
       variable match {
         case factor: GraphFactor =>
           factor.nodeList.size match {
             case 1 =>
+              throw new NotImplementedError()
             case 2 =>
               if (factor.features != null)
                 for (featureWeightPair <- factor.features) {
-                  val featureIndex = getIndexCautious(factor.factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  val featureIndex = getIndexCautious(features.domain.dimensionDomain, featureWeightPair._1, "factorType.featureDomain")
                   features += (featureWeightPair._1, featureWeightPair._2)
                 }
             case 3 =>
+              throw new NotImplementedError()
             case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
           }
         case node: GraphNode =>
           if (node.features != null)
             for (featureWeightPair <- node.features) {
-              val featureIndex = getIndexCautious(variable.domainType.featureDomain, featureWeightPair._1, "domainType.featureDomain")
+              val featureIndex = getIndexCautious(features.domain.dimensionDomain, featureWeightPair._1, "domainType.featureDomain")
               features += (featureWeightPair._1, featureWeightPair._2)
             }
       }
@@ -649,20 +747,29 @@ class GraphStream {
     }
 
     def warmUpIndexes(graph : Graph) : Unit = {
+      val clearCacheIfSizeChanges = false
       // Pre-warm node type weights
       for (nodeType <- graph.nodes.map(_.nodeType).distinct) {
         if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
+          val oldSize = nodeType.featureDomain.length
           nodeType.valueDomain.index(valueFeaturesPair._1)
           for (featureWeightPair <- valueFeaturesPair._2) {
             nodeType.featureDomain.index(featureWeightPair._1)
+          }
+          if (clearCacheIfSizeChanges && nodeType.featureDomain.length > oldSize) {
+            dotFamilyCache.remove(nodeType)
           }
         }
       }
       // Pre-warm factor type weights
       for (factorType <- graph.factors.map(_.factorType).distinct) {
         if (factorType.weights != null) for (valueFeaturesPair <- factorType.weights) {
+          val oldSize = factorType.featureDomain.length
           for (featureWeightPair <- valueFeaturesPair._2) {
             factorType.featureDomain.index(featureWeightPair._1)
+          }
+          if (clearCacheIfSizeChanges && factorType.featureDomain.length > oldSize) {
+            dotFamilyCache.remove(factorType)
           }
         }
       }
@@ -675,7 +782,7 @@ class GraphStream {
             dotFamilyCache.remove(node.nodeType)
           }
         }
-        if (node.observedValue != null) {
+        if (clearCacheIfSizeChanges && node.observedValue != null) {
           node.nodeType.valueDomain.index(node.observedValue)
         }
       }
@@ -684,15 +791,15 @@ class GraphStream {
           val oldSize = factor.factorType.featureDomain.length
           factor.factorType.featureDomain.index(featureWeightPair._1)
           // Clear cached elements if we change the feature domain size
-          if (factor.factorType.featureDomain.length > oldSize) {
+          if (clearCacheIfSizeChanges && factor.factorType.featureDomain.length > oldSize) {
             dotFamilyCache.remove(factor.factorType)
           }
         }
       }
     }
 
-    def getNodeFactor(nodeVar : NodeVariable) : Factor = {
-      val featureVariable = getFeatureVariableFor(nodeVar.node)
+    def getNodeFactor(nodeVar : NodeVariable, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) : Factor = {
+      val featureVariable = getFeatureVariableFor(nodeVar.node, frozenDomain)
       val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType)
         // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
         // cruft is necessary here
@@ -700,8 +807,8 @@ class GraphStream {
       family.Factor(nodeVar, featureVariable)
     }
 
-    def getFactor(factor : GraphFactor) : Factor = {
-        val featureVariable = getFeatureVariableFor(factor)
+    def getFactor(factor : GraphFactor, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) : Factor = {
+        val featureVariable = getFeatureVariableFor(factor, frozenDomain)
         factor.nodeList.size match {
           case 1 =>
             val family = getDotFamilyWithStatisticsFor(factor.factorType)
@@ -729,13 +836,13 @@ class GraphStream {
       if (mutableVariables.size == 0) return List()
       val mutableList : List[NodeVariable] = mutableVariables.toList.asInstanceOf[List[NodeVariable]]
 
+      // Get the frozen domain, for parallel learning, if we're using it
+
+      val frozenDomain = mutableList(0).frozenDomainMap
+
       // Warm up the variable domains
 
       val graph : Graph = mutableList(0).graph
-
-      // TODO: this may be redundant, if we can carefully control other usages of inference
-      // Actually, it is. It's also hugely slow, so that's nice to fix.
-      // warmUpIndexes(graph)
 
       // Create the factors collection
 
@@ -745,7 +852,7 @@ class GraphStream {
 
       mutableVariables.foreach{
         case nodeVar : NodeVariable =>
-          val f = getNodeFactor(nodeVar)
+          val f = getNodeFactor(nodeVar, frozenDomain)
           result += f
           nodeVar.set(0)(null)
       }
@@ -761,7 +868,7 @@ class GraphStream {
 
       graph.factors.foreach(factor => {
         if (factor.nodeList.exists(isMutableNode)) {
-          result += getFactor(factor)
+          result += getFactor(factor, frozenDomain)
         }
       })
 

@@ -19,17 +19,26 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
 
   val pastGameTrajectories = mutable.ListBuffer[List[(GameState,GameMove)]]()
 
+  // Create a thread to update retrain the weights asynchronously whenever there's an update
+  new Thread{
+    override def run() = {
+      var trainedOnGuesses = 0
+      while (true) {
+        if (pastGuesses.size > trainedOnGuesses) {
+          learnHoldingPastGuessesConstant(1.0)
+          trainedOnGuesses = pastGuesses.size
+        }
+        else {
+          pastGuesses.synchronized {
+            pastGuesses.wait()
+          }
+        }
+      }
+    }
+  }.start()
+
   def predict(graph : Graph, askHuman : GraphNode => Promise[String], lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
     var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
-
-    // This will run full optimization, which seems unnecessary. Just a few online updates should be sufficient.
-    // TODO: it all breaks down if we don't do this frequently, because errors compound. Needs solution.
-
-    if (pastGuesses.size > 0) {
-      println("Learning...")
-      learnHoldingPastGuessesConstant(1.0)
-      println("Finished Learning:")
-    }
 
     // Keep playing until the game player tells us to stop
 
@@ -51,12 +60,14 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
           })
           pastGuesses += gameState.originalGraph
 
-          // Perform an online parameter update
-          // onlineUpdateHoldingPastGuessesConstant(gameState.originalGraph)
-
           // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
           // Learning from this will require learning with unobserved variables, so will be subject to local optima
           pastQueryStructure += gameState.graph
+
+          // Wake up the parallel weights trainer:
+          pastGuesses.synchronized {
+            pastGuesses.notifyAll()
+          }
 
           // Store the game trajectory for debugging and analysis
           pastGameTrajectories += gameTrajectory.clone().toList
@@ -76,16 +87,16 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     throw new IllegalStateException("Code should never reach this point")
   }
 
-  def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = {
+  def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    stream.learn(pastGuesses, regularization, clearOptimizer = false)
+    stream.learn(pastGuesses, regularization, clearOptimizer = true)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
     }
   }
 
-  def onlineUpdateHoldingPastGuessesConstant(graph : Graph, regularization : Double = 1.0) = {
+  def onlineUpdateHoldingPastGuessesConstant(graph : Graph, regularization : Double = 1.0) = this.synchronized {
     stream.onlineUpdate(List(graph), regularization)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
