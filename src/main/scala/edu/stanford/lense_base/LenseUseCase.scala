@@ -114,7 +114,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    * @param humanErrorRate the error rate epsilon, so if 0.3, then with P=0.3 artificial humans will choose uniformly at random
    */
-  def testWithArtificialHumans(goldPairs : List[(Input, Output)], humanErrorRate : Double) : Unit = {
+  def testWithArtificialHumans(goldPairs : List[(Input, Output)], humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int) : Unit = {
     val rand = new Random()
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
@@ -122,7 +122,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
-      val guessMap = classifyWithArtificialHumans(graph, pair._2, humanErrorRate, rand)
+      val guessMap = classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand)
       renderClassification(graph, goldMap, guessMap)
       (graph, goldMap, guessMap)
     }))
@@ -180,7 +180,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     lenseEngine.predict(graph, (n) => getQuestion(n).getHumanOpinion, lossFunction)
   }
 
-  private def classifyWithArtificialHumans(graph : Graph, output : Output, humanErrorRate : Double, rand : Random) : Map[GraphNode, String] = {
+  private def classifyWithArtificialHumans(graph : Graph, output : Output, humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, rand : Random) : Map[GraphNode, String] = {
     lenseEngine.predict(graph, (n) => {
       val correct = getCorrectLabel(n, output)
       // Do the automatic error generation
@@ -193,7 +193,17 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       }
 
       val promise = Promise[String]()
-      promise.complete(Try { guess })
+
+      // Complete after a gaussian delay
+      new Thread {
+        override def run() = {
+          // Humans can never take less than 1s to make a classification
+          val msDelay = Math.max(1000, Math.round(humanDelayMean + (rand.nextGaussian()*humanDelayStd)).asInstanceOf[Int])
+          Thread.sleep(msDelay)
+          promise.complete(Try { guess })
+        }
+      }.start()
+
       promise
     }, lossFunction)
   }

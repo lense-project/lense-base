@@ -78,6 +78,6 @@ class NERUseCase extends LenseSequenceUseCase {
 
 object RunTestCase extends App {
   val nerUseCase = new NERUseCase()
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3)
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500)
   // nerUseCase.testWithRealHumans(nerUseCase.data)
 }
