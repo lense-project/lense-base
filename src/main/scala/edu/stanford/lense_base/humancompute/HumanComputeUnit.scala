@@ -65,7 +65,7 @@ trait HumanComputeUnit {
       })
     }
 
-    println("FINISHED WORK")
+    println("*** FINISHED WORK")
 
     workQueue.synchronized {
       if (workUnit == currentWork) {
@@ -73,24 +73,6 @@ trait HumanComputeUnit {
       }
       // Wake up the work performing code
       workQueue.notify()
-    }
-  }
-
-  def performWorkBlocking() : Unit = {
-    while (true) {
-      var workToPerform: WorkUnit = null
-      workQueue.synchronized {
-        while (currentWork != null || workQueue.isEmpty) {
-          workQueue.wait()
-        }
-
-        workToPerform = workQueue.dequeue()
-        println("Performing work: " + workToPerform)
-        println("Current queue: " + workQueue)
-        currentWork = workToPerform
-        startedWorkMillis = System.currentTimeMillis()
-        startWork(workToPerform)
-      }
     }
   }
 
@@ -122,7 +104,22 @@ trait HumanComputeUnit {
   // Kick off computation
   new Thread {
     override def run() = {
-      performWorkBlocking()
+      while (true) {
+        var workToPerform: WorkUnit = null
+        workQueue.synchronized {
+          while (currentWork != null || workQueue.isEmpty) {
+            println("Waiting for more work")
+            workQueue.wait()
+          }
+
+          workToPerform = workQueue.dequeue()
+          println("*** Performing work: " + workToPerform)
+          println("Current queue: " + workQueue)
+          currentWork = workToPerform
+          startedWorkMillis = System.currentTimeMillis()
+          startWork(workToPerform)
+        }
+      }
     }
   }.start()
 }

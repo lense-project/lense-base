@@ -285,7 +285,7 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
             // Humans can never take less than 1s to make a classification
             val msDelay = Math.max(1000, Math.round(humanDelayMean + (rand.nextGaussian()*humanDelayStd)).asInstanceOf[Int])
             Thread.sleep(msDelay)
-            artificial.resultPromise.complete(Try { artificial.guess })
+            finishWork(workUnit, artificial.guess)
           }
         }.start()
       }

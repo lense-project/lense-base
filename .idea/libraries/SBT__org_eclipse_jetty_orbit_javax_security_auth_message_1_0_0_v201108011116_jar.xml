@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="SBT: org.eclipse.jetty.orbit:javax.security.auth.message:1.0.0.v201108011116:jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/orbits/javax.security.auth.message-1.0.0.v201108011116.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/docs/javax.security.auth.message-1.0.0.v201108011116-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/srcs/javax.security.auth.message-1.0.0.v201108011116-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

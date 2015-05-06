@@ -461,6 +461,7 @@ class GraphStream {
       // Don't want to be doing this part in parallel, things get broken
       val likelihoodExamples = model.synchronized {
         for (graph <- graphs) {
+          model.warmUpIndexes(graph)
           modelTrainingClone.warmUpIndexes(graph)
           modelTrainingClone.dotFamilyCache.clear()
         }
@@ -482,7 +483,7 @@ class GraphStream {
       }
 
       // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = false)(new scala.util.Random(42))
 
       // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
       // trainer.trainFromExamples(likelihoodExamples)
@@ -513,7 +514,8 @@ class GraphStream {
   def getIndexCautious(domain : CategoricalDomain[String], value : String, nameForError : String) : Int = {
     val oldSize = domain.size
     val index = domain.index(value)
-    if (oldSize != domain.size) throw new IllegalStateException("Seems "+nameForError+" wasn't warmed up, and so is "+
+    if (oldSize != domain.size)
+      throw new IllegalStateException("Seems "+nameForError+" wasn't warmed up, and so is "+
     "sizing up to accomodate \""+value+"\", with new contents: "+domain.categories)
     index
   }
@@ -531,15 +533,28 @@ class GraphStream {
 
     // This should only ever get called from getDotFamilyWithStatisticsFor, otherwise it's a mess
 
-    private def getWeightTensorFor(elemType : WithDomain) : Weights = {
+    private def getWeightTensorFor(elemType : WithDomain, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) : Weights = {
+
+      def getFrozenDomainOrIdentity(domain : CategoricalDomain[String]) : CategoricalDomain[String] = {
+        if (frozenDomain != null && frozenDomain.contains(domain)) {
+          frozenDomain(domain)
+        }
+        else {
+          domain
+        }
+      }
+
       // Do any updates threadsafe
       elemType match {
         case factorType: FactorType =>
           // Size the tensor
           factorType.neighborTypes.size match {
             case 1 =>
-              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-              val numFeatures = factorType.featureDomain.length
+              val neighbor1Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(0).valueDomain)
+              val featureDomain = getFrozenDomainOrIdentity(factorType.featureDomain)
+
+              val numNode1Values = neighbor1Domain.length
+              val numFeatures = featureDomain.length
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
@@ -553,17 +568,21 @@ class GraphStream {
               // Populate the tensor
               if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
                 val assignment = assignmentFeaturesPair._1
-                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
+                val node1ValueIndex = getIndexCautious(neighbor1Domain, assignment(0), "neighborTypes(0).valueDomain")
                 for (featureWeightPair <- assignmentFeaturesPair._2) {
-                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  val featureIndex = getIndexCautious(featureDomain, featureWeightPair._1, "factorType.featureDomain")
                   factorTensor.+=(node1ValueIndex, featureIndex, featureWeightPair._2)
                 }
               }
               w
             case 2 =>
-              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-              val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-              val numFeatures = factorType.featureDomain.length
+              val neighbor1Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(0).valueDomain)
+              val neighbor2Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(1).valueDomain)
+              val featureDomain = getFrozenDomainOrIdentity(factorType.featureDomain)
+
+              val numNode1Values = neighbor1Domain.length
+              val numNode2Values = neighbor2Domain.length
+              val numFeatures = featureDomain.length
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
@@ -578,19 +597,24 @@ class GraphStream {
               // Populate the tensor
               if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
                 val assignment = assignmentFeaturesPair._1
-                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
+                val node1ValueIndex = getIndexCautious(neighbor1Domain, assignment(0), "neighborTypes(0).valueDomain")
+                val node2ValueIndex = getIndexCautious(neighbor2Domain, assignment(1), "neighborTypes(1).valueDomain")
                 for (featureWeightPair <- assignmentFeaturesPair._2) {
-                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  val featureIndex = getIndexCautious(featureDomain, featureWeightPair._1, "factorType.featureDomain")
                   factorTensor.+=(node1ValueIndex, node2ValueIndex, featureIndex, featureWeightPair._2)
                 }
               }
               w
             case 3 =>
-              val numNode1Values = factorType.neighborTypes(0).valueDomain.length
-              val numNode2Values = factorType.neighborTypes(1).valueDomain.length
-              val numNode3Values = factorType.neighborTypes(2).valueDomain.length
-              val numFeatures = factorType.featureDomain.length
+              val neighbor1Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(0).valueDomain)
+              val neighbor2Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(1).valueDomain)
+              val neighbor3Domain = getFrozenDomainOrIdentity(factorType.neighborTypes(2).valueDomain)
+              val featureDomain = getFrozenDomainOrIdentity(factorType.featureDomain)
+
+              val numNode1Values = neighbor1Domain.length
+              val numNode2Values = neighbor2Domain.length
+              val numNode3Values = neighbor3Domain.length
+              val numFeatures = featureDomain.length
 
               // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
               // weights will fail to clone correctly, and linesearch will flip a shit
@@ -606,11 +630,11 @@ class GraphStream {
               // Populate the tensor
               if (factorType.weights != null) for (assignmentFeaturesPair <- factorType.weights) {
                 val assignment = assignmentFeaturesPair._1
-                val node1ValueIndex = getIndexCautious(factorType.neighborTypes(0).valueDomain, assignment(0), "neighborTypes(0).valueDomain")
-                val node2ValueIndex = getIndexCautious(factorType.neighborTypes(1).valueDomain, assignment(1), "neighborTypes(1).valueDomain")
-                val node3ValueIndex = getIndexCautious(factorType.neighborTypes(2).valueDomain, assignment(2), "neighborTypes(2).valueDomain")
+                val node1ValueIndex = getIndexCautious(neighbor1Domain, assignment(0), "neighborTypes(0).valueDomain")
+                val node2ValueIndex = getIndexCautious(neighbor2Domain, assignment(1), "neighborTypes(1).valueDomain")
+                val node3ValueIndex = getIndexCautious(neighbor3Domain, assignment(2), "neighborTypes(2).valueDomain")
                 for (featureWeightPair <- assignmentFeaturesPair._2) {
-                  val featureIndex = getIndexCautious(factorType.featureDomain, featureWeightPair._1, "factorType.featureDomain")
+                  val featureIndex = getIndexCautious(featureDomain, featureWeightPair._1, "factorType.featureDomain")
                   factorTensor.+=(node1ValueIndex, node2ValueIndex, node3ValueIndex, featureIndex, featureWeightPair._2)
                 }
               }
@@ -620,8 +644,11 @@ class GraphStream {
 
         case nodeType: NodeType =>
           // Size the tensor
-          val numNodeValues = nodeType.valueDomain.length
-          val numFeatures = nodeType.featureDomain.length
+          val nodeDomain = getFrozenDomainOrIdentity(nodeType.valueDomain)
+          val featureDomain = getFrozenDomainOrIdentity(nodeType.featureDomain)
+
+          val numNodeValues = nodeDomain.length
+          val numFeatures = featureDomain.length
 
           // Need to be careful to provide a fresh initializer inside of the Weights() call, b/c otherwise
           // weights will fail to clone correctly, and linesearch will flip a shit
@@ -633,9 +660,9 @@ class GraphStream {
 
           // Populate the tensor
           if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
-            val valueIndex = getIndexCautious(nodeType.valueDomain, valueFeaturesPair._1, "nodeType.valueDomain")
+            val valueIndex = getIndexCautious(nodeDomain, valueFeaturesPair._1, "nodeType.valueDomain")
             for (featureWeightPair <- valueFeaturesPair._2) {
-              val featureIndex = getIndexCautious(nodeType.featureDomain, featureWeightPair._1, "nodeType.featureDomain")
+              val featureIndex = getIndexCautious(featureDomain, featureWeightPair._1, "nodeType.featureDomain")
               nodeTensor.+=(valueIndex, featureIndex, featureWeightPair._2)
             }
           }
@@ -644,7 +671,7 @@ class GraphStream {
     }
 
     val dotFamilyCache : mutable.Map[WithDomain, DotFamily] = mutable.Map()
-    def getDotFamilyWithStatisticsFor(elemType : WithDomain) : DotFamily = {
+    def getDotFamilyWithStatisticsFor(elemType : WithDomain, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]] = null) : DotFamily = {
       if (dotFamilyCache.contains(elemType)) {
         return dotFamilyCache(elemType)
       }
@@ -656,7 +683,7 @@ class GraphStream {
                 case 1 =>
                   dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String],
                     FeatureVectorVariable[String]] {
-                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
+                    val weights = getWeightTensorFor(elemType, frozenDomain).asInstanceOf[Weights2]
                     // Initialize the vector
                     limitedDiscreteValues1 = new SparseBinaryTensor1(factorType.neighborTypes(0).valueDomain.dimensionSize)
                     // Set all entries to "true"
@@ -666,7 +693,7 @@ class GraphStream {
                   dotFamilyCache.put(elemType, new DotFamilyWithStatistics3[CategoricalVariable[String],
                     CategoricalVariable[String],
                     FeatureVectorVariable[String]] {
-                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights3]
+                    val weights = getWeightTensorFor(elemType, frozenDomain).asInstanceOf[Weights3]
                     // Initialize the vector
                     limitedDiscreteValues12 = new SparseBinaryTensor2(factorType.neighborTypes(0).valueDomain.dimensionSize, factorType.neighborTypes(1).valueDomain.dimensionSize)
                     // Set all entries to "true"
@@ -677,12 +704,12 @@ class GraphStream {
                     CategoricalVariable[String],
                     CategoricalVariable[String],
                     FeatureVectorVariable[String]] {
-                    val weights = getWeightTensorFor(elemType).asInstanceOf[Weights4]
+                    val weights = getWeightTensorFor(elemType, frozenDomain).asInstanceOf[Weights4]
                   })
                 case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
               }
             case nodeType: NodeType => dotFamilyCache.put(elemType, new DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]] {
-              val weights = getWeightTensorFor(elemType).asInstanceOf[Weights2]
+              val weights = getWeightTensorFor(elemType, frozenDomain).asInstanceOf[Weights2]
             })
             case otherType => throw new IllegalStateException("Got type neither NodeType or FactorType")
           }
@@ -797,7 +824,7 @@ class GraphStream {
 
     def getNodeFactor(nodeVar : NodeVariable, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]]) : Factor = {
       val featureVariable = getFeatureVariableFor(nodeVar.node, frozenDomain)
-      val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType)
+      val family = getDotFamilyWithStatisticsFor(nodeVar.node.nodeType, frozenDomain)
         // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
         // cruft is necessary here
         .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
@@ -808,19 +835,19 @@ class GraphStream {
         val featureVariable = getFeatureVariableFor(factor, frozenDomain)
         factor.nodeList.size match {
           case 1 =>
-            val family = getDotFamilyWithStatisticsFor(factor.factorType)
+            val family = getDotFamilyWithStatisticsFor(factor.factorType, frozenDomain)
               // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
               // cruft is necessary here
               .asInstanceOf[DotFamilyWithStatistics2[CategoricalVariable[String], FeatureVectorVariable[String]]]
             family.Factor(factor.nodeList(0).variable, featureVariable)
           case 2 =>
-            val family = getDotFamilyWithStatisticsFor(factor.factorType)
+            val family = getDotFamilyWithStatisticsFor(factor.factorType, frozenDomain)
               // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
               // cruft is necessary here
               .asInstanceOf[DotFamilyWithStatistics3[CategoricalVariable[String], CategoricalVariable[String], FeatureVectorVariable[String]]]
             family.Factor(factor.nodeList(0).variable, factor.nodeList(1).variable, featureVariable)
           case 3 =>
-            val family = getDotFamilyWithStatisticsFor(factor.factorType)
+            val family = getDotFamilyWithStatisticsFor(factor.factorType, frozenDomain)
               // Due to irritations with the type system and FACTORIE design with multiple classes instead of varargs, this
               // cruft is necessary here
               .asInstanceOf[DotFamilyWithStatistics4[CategoricalVariable[String], CategoricalVariable[String], CategoricalVariable[String], FeatureVectorVariable[String]]]
