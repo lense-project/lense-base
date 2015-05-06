@@ -1,6 +1,6 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
 import edu.stanford.lense_base.server.{RealHumanHCUPool, MulticlassQuestion, WorkUnitServlet, WebWorkUnit}
@@ -97,7 +97,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    *
    * @return a game player
    */
-  def gamePlayer : GamePlayer = LookaheadOneHeuristic
+  def gamePlayer : GamePlayer = ThresholdHeuristic
 
   /**
    * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
@@ -125,6 +125,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                startNumArtificialHumans : Int) : Unit = {
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
+
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
@@ -135,6 +136,8 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       renderClassification(graph, goldMap, guessMap)
       (graph, goldMap, guessMap)
     }))
+
+    hcuPool.kill()
   }
 
   /**
@@ -144,6 +147,11 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
+    System.err.println("Starting server")
+    WorkUnitServlet.server
+    System.err.println("Waiting 5 seconds for you to connect")
+    Thread.sleep(5000)
+
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
@@ -219,7 +227,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       }
 
       val promise = Promise[String]()
-      val workUnit = ArtificialWorkUnit(promise, guess)
+      val workUnit = ArtificialWorkUnit(promise, guess, n)
       hcu.addWorkUnit(workUnit)
       workUnit
     },
@@ -240,36 +248,42 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
 case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HCUPool {
   for (i <- 1 to startNumHumans) addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
 
+  var running = true
+
+  def kill(): Unit = {
+    running = false
+  }
+
   // constantly be randomly adding and removing artificial HCU's
-  /*
   new Thread {
-    override def run() = {
+    override def run() : Unit = {
       while (true) {
         Thread.sleep(Math.max(500, 2000 + Math.round(rand.nextGaussian() * 1000).asInstanceOf[Int]))
+        if (!running) return
 
         // at random, remove a human
         if (rand.nextBoolean() && hcuPool.size > 0) {
+          System.err.println("** ARTIFICIAL HCU POOL ** Randomly removing an artificial human annotator")
           removeHCU(hcuPool.toList(rand.nextInt(hcuPool.size)))
         }
         // or add a human
         else {
+          System.err.println("** ARTIFICIAL HCU POOL ** Randomly adding a human annotator")
           addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
         }
       }
     }
   }.start()
-  */
 }
 
-case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String) extends WorkUnit(resultPromise)
+case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode) extends WorkUnit(resultPromise, node)
 
 class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HumanComputeUnit {
   // Gets the estimated required time to perform this task, in milliseconds
-  override def estimateRequiredTimeToFinishItem(workUnit: WorkUnit): Long = humanDelayMean
+  override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = humanDelayMean
 
   // Cancel the current job
-  override def cancelCurrentWork(): Unit = {
-  }
+  override def cancelCurrentWork(): Unit = {}
 
   // Get the cost
   override def cost: Double = workUnitCost
@@ -279,13 +293,14 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
     workUnit match {
       case artificial : ArtificialWorkUnit => {
         // Complete after a gaussian delay
-        println("**** Starting new work unit thread")
         new Thread {
           override def run() = {
             // Humans can never take less than 1s to make a classification
             val msDelay = Math.max(1000, Math.round(humanDelayMean + (rand.nextGaussian()*humanDelayStd)).asInstanceOf[Int])
             Thread.sleep(msDelay)
-            finishWork(workUnit, artificial.guess)
+            if (workUnit eq currentWork) {
+              finishWork(workUnit, artificial.guess)
+            }
           }
         }.start()
       }
@@ -294,13 +309,14 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
 }
 
 case class GraphNodeAnswer(displayText : String, internalClassName : String)
-case class GraphNodeQuestion(questionToDisplay : String, possibleAnswers : List[GraphNodeAnswer], hcu : HumanComputeUnit) {
+case class GraphNodeQuestion(questionToDisplay : String, possibleAnswers : List[GraphNodeAnswer], hcu : HumanComputeUnit, node : GraphNode) {
   def getHumanOpinion : WorkUnit = {
     val p = Promise[String]()
     val workUnit = new MulticlassQuestion(
       questionToDisplay,
       possibleAnswers.map(possibleAnswer => (possibleAnswer.displayText, possibleAnswer.internalClassName)),
-      p
+      p,
+      node
     )
     hcu.addWorkUnit(workUnit)
     workUnit

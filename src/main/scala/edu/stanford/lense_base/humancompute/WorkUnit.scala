@@ -1,5 +1,7 @@
 package edu.stanford.lense_base.humancompute
 
+import edu.stanford.lense_base.graph.GraphNode
+
 import scala.concurrent.Promise
 import scala.util.Try
 
@@ -8,7 +10,9 @@ import scala.util.Try
  *
  * Holds a single job to ask an HCU pool to complete
  */
-class WorkUnit(resultPromise : Promise[String]) {
+class WorkUnit(resultPromise : Promise[String], initNode : GraphNode) {
+
+  val graphNode = initNode
 
   private var _revoked = false
 

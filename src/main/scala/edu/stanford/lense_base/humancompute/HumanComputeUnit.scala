@@ -1,5 +1,6 @@
 package edu.stanford.lense_base.humancompute
 
+import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.server.WebWorkUnit
 
 import scala.collection.mutable
@@ -17,14 +18,19 @@ trait HumanComputeUnit {
   val workQueue = mutable.Queue[WorkUnit]()
   var currentWork : WorkUnit = null
   var startedWorkMillis : Long = 0
+  var running : Boolean = true
 
   def addWorkUnit(workUnit : WorkUnit) = {
-    // Add work unit
-    workQueue.synchronized {
-      workQueue.enqueue(workUnit.asInstanceOf[WorkUnit])
-      println("Adding work: "+workUnit)
-      println("Current queue: "+workQueue)
-      workQueue.notify()
+    if (!running) {
+      // If someone tries to add a task after we're dead, just kill the task immediately
+      workUnit.taskFailed()
+    }
+    else {
+      // Add work unit
+      workQueue.synchronized {
+        workQueue.enqueue(workUnit.asInstanceOf[WorkUnit])
+        workQueue.notify()
+      }
     }
   }
 
@@ -37,21 +43,23 @@ trait HumanComputeUnit {
       cancelCurrentWork()
       currentWork = null
       // Wake up the work performing code
-      workQueue.notify()
+      workQueue.synchronized {
+        workQueue.notify()
+      }
     }
   }
 
-  // This assumes that you won't want to be performing more work
-  def revokeAllWork() = {
-    workQueue.map(_.revoke())
+  def revokeAllWorkAndKill() = {
     workQueue.synchronized {
+      workQueue.map(_.revoke())
       workQueue.dequeueAll((unit) => true)
       if (currentWork != null) {
+        currentWork.revoke()
         cancelCurrentWork()
         currentWork = null
-        // Wake up the work performing code
-        workQueue.notify()
       }
+      running = false
+      workQueue.notify()
     }
   }
 
@@ -64,8 +72,6 @@ trait HumanComputeUnit {
         answer
       })
     }
-
-    println("*** FINISHED WORK")
 
     workQueue.synchronized {
       if (workUnit == currentWork) {
@@ -80,20 +86,20 @@ trait HumanComputeUnit {
     if (currentWork == null) 0
     else {
       val elapsedTime = System.currentTimeMillis() - startedWorkMillis
-      Math.max(0, estimateRequiredTimeToFinishItem(currentWork) - elapsedTime)
+      Math.max(0, estimateRequiredTimeToFinishItem(currentWork.graphNode) - elapsedTime)
     }
   }
 
   def estimateTimeToFinishQueue : Long = {
-    estimateTimeToFinishCurrentItem + workQueue.map(estimateRequiredTimeToFinishItem).sum
+    estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
   }
 
-  def estimateRequiredTimeIncludingQueue(workUnit : WorkUnit) : Long = {
-    estimateRequiredTimeToFinishItem(workUnit) + estimateTimeToFinishQueue
+  def estimateRequiredTimeIncludingQueue(node : GraphNode) : Long = {
+    estimateRequiredTimeToFinishItem(node) + estimateTimeToFinishQueue
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
-  def estimateRequiredTimeToFinishItem(workUnit : WorkUnit) : Long
+  def estimateRequiredTimeToFinishItem(node : GraphNode) : Long
   // Kick off a job
   def startWork(workUnit : WorkUnit)
   // Cancel the current job
@@ -103,18 +109,19 @@ trait HumanComputeUnit {
 
   // Kick off computation
   new Thread {
-    override def run() = {
+    override def run() : Unit = {
       while (true) {
+        if (!running) return
+
         var workToPerform: WorkUnit = null
         workQueue.synchronized {
           while (currentWork != null || workQueue.isEmpty) {
-            println("Waiting for more work")
             workQueue.wait()
+            if (!running) return
           }
+          if (!running) return
 
           workToPerform = workQueue.dequeue()
-          println("*** Performing work: " + workToPerform)
-          println("Current queue: " + workQueue)
           currentWork = workToPerform
           startedWorkMillis = System.currentTimeMillis()
           startWork(workToPerform)

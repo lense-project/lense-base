@@ -2,6 +2,7 @@ package edu.stanford.lense_base.server
 
 import java.util.Date
 
+import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
 import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.server.Server
@@ -80,18 +81,19 @@ object WorkUnitServlet extends ScalatraServlet
       addWorkUnit(new MulticlassQuestion(
         "<p>Do you like green eggs and ham? #" + i + "/3</p>",
         List(("ham", "H"), ("eggs", "E"), ("neither", "N")),
-        Promise[String]()
+        Promise[String](),
+        null
       ))
     }
   }
 }
 
-abstract class WebWorkUnit(resultPromise : Promise[String]) extends WorkUnit(resultPromise) {
+abstract class WebWorkUnit(resultPromise : Promise[String], node : GraphNode) extends WorkUnit(resultPromise, node) {
   def getOutboundMessage : JValue
   def parseReplyMessage(m : JValue) : String
 }
 
-case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultPromise : Promise[String]) extends WebWorkUnit(resultPromise) {
+case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultPromise : Promise[String], node : GraphNode) extends WebWorkUnit(resultPromise, node) {
   override def getOutboundMessage: JValue = {
     new JObject(List(
       "type" -> new JString("multiclass"),
@@ -186,7 +188,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
-  override def estimateRequiredTimeToFinishItem(workUnit: WorkUnit): Long = {
+  override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = {
     // TODO: this needs to be much more sophisticated
     1000
   }

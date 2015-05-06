@@ -23,8 +23,11 @@ class HCUPool {
 
   def removeHCU(hcu : HumanComputeUnit): Unit = {
     hcuPool.synchronized {
-      hcu.revokeAllWork()
       hcuPool.remove(hcu)
+      // It's important that we not revoke all work until after we've removed this from the pool,
+      // else the failed tasks can trigger a reassessment which may think this is still an active
+      // HCU
+      hcu.revokeAllWorkAndKill()
     }
   }
 

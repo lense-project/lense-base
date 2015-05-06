@@ -322,16 +322,15 @@ class GraphStream {
                 "factor that aren't nodeValues x nodeFeatures, which means dim=2. Instead got dim=" + tensor.dimensions.length)
               if (tensor.dimensions(0) != nodeType.possibleValues.size) throw new IllegalStateException("Have a set of possibleValues that"+
               " doesn't match the value domain: "+nodeType.valueDomain.categories+", "+nodeType.possibleValues)
-              if (tensor.dimensions(1) != nodeType.featureDomain.size) throw new IllegalStateException()
               // we need the weight values for each possible assignment
               val tensor2 = tensor.asInstanceOf[Tensor2]
               val keyValue: ListBuffer[(String, Map[String, Double])] = ListBuffer()
               for (val1 <- nodeType.possibleValues) {
                 val index1 = nodeType.valueDomain.index(val1)
                 keyValue += val1 ->
-                  nodeType.featureDomain.categories.map(feature => {
-                    val featIndex = nodeType.featureDomain.index(feature)
-                    val weight = tensor2(index1, featIndex)
+                  (0 to tensor2.dim2 - 1).map(featIndex => {
+                    val feature : String = nodeType.featureDomain.category(featIndex)
+                    val weight : Double = tensor2(index1, featIndex)
                     feature -> weight
                   }).toMap
               }
@@ -345,16 +344,14 @@ class GraphStream {
                   if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
                     "factor that isn't val1 x features, which means dim=2. Instead got dim=" + tensor.dimensions.length)
                   if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
-                  if (tensor.dimensions(1) != factorType.featureDomain.size) throw new IllegalStateException()
 
                   val tensor2 = tensor.asInstanceOf[Tensor2]
                   val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
                   for (val1 <- factorType.neighborTypes(0).possibleValues) {
                     val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
                     keyValue += List(val1) ->
-                      factorType.featureDomain.categories.map(feature => {
-                        val featIndex = factorType.featureDomain.index(feature)
-
+                      (0 to tensor2.dim2 - 1).map(featIndex => {
+                        val feature = factorType.featureDomain.category(featIndex)
                         val weight = tensor2(index1, featIndex)
                         feature -> weight
                       }).toMap
@@ -375,9 +372,8 @@ class GraphStream {
                       val index2 = factorType.neighborTypes(1).valueDomain.index(val2)
 
                       keyValue += List(val1, val2) ->
-                        factorType.featureDomain.categories.map(feature => {
-                          val featIndex = factorType.featureDomain.index(feature)
-
+                        (0 to tensor3.dim3 - 1).map(featIndex => {
+                          val feature = factorType.featureDomain.category(featIndex)
                           val weight = tensor3(index1, index2, featIndex)
                           feature -> weight
                         }).toMap
@@ -402,9 +398,8 @@ class GraphStream {
                         val index3 = factorType.neighborTypes(2).valueDomain.index(val3)
 
                         keyValue += List(val1, val2, val3) ->
-                          factorType.featureDomain.categories.map(feature => {
-                            val featIndex = factorType.featureDomain.index(feature)
-
+                          (0 to tensor4.dim4 - 1).map(featIndex => {
+                            val feature = factorType.featureDomain.category(featIndex)
                             val weight = tensor4(index1, index2, index3, featIndex)
                             feature -> weight
                           }).toMap
@@ -483,7 +478,7 @@ class GraphStream {
       }
 
       // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = false)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true)(new scala.util.Random(42))
 
       // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
       // trainer.trainFromExamples(likelihoodExamples)
