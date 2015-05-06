@@ -33,7 +33,7 @@ abstract class GamePlayer {
           // Take only HCU's we haven't used before for this node
           filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
           // And make an observation on them
-          map(hcu => MakeHumanObservation(state.oldToNew(n), hcu))
+          map(hcu => MakeHumanObservation(n, hcu))
       }
     }).toList
   }
@@ -47,7 +47,7 @@ object OneQuestionBaseline extends GamePlayer {
     val i = state.payload.asInstanceOf[(Int,Int)]
     if (i._1 < i._2) {
       state.payload = (i._1+1,i._2)
-      MakeHumanObservation(state.oldToNew(state.originalGraph.nodes(i._1)), state.hcuPool.hcuPool.minBy(hcu => hcu.estimateTimeToFinishQueue))
+      MakeHumanObservation(state.originalGraph.nodes(i._1), state.hcuPool.hcuPool.minBy(hcu => hcu.estimateTimeToFinishQueue))
     }
     else {
       if (state.inFlightRequests.size == 0) {
@@ -74,7 +74,9 @@ object LookaheadOneHeuristic extends GamePlayer {
         if (nextStates.size == 0) state.loss()
         else {
           // get expected loss at next state
-          nextStates.map(p => p._1 * p._2.loss()).sum
+          nextStates.map(p => {
+            p._1 * p._2.loss()
+          }).sum
         }
       (moveLoss, m)
     }).minBy(_._1)
@@ -117,16 +119,16 @@ case class GameState(graph : Graph,
     lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 
-  def copyMutableState(nextState : GameState, oldToNew : Map[GraphNode,GraphNode]) = {
+  def copyMutableState(nextState : GameState, copyOldToNew : Map[GraphNode,GraphNode]) = {
     nextState.payload = payload
     nextState.originalGraph = originalGraph
-    nextState.oldToNew = oldToNew.map(pair => (pair._1, oldToNew(pair._2)))
+    nextState.oldToNew = oldToNew.map(pair => (pair._1, copyOldToNew(pair._2)))
   }
 
   def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
     val clonePair = graph.clone()
     val nextState : GameState = GameState(clonePair._1,
-      cost + hcu.cost,
+      cost,
       hcuPool,
       addHumanObservation,
       lossFunction,
@@ -140,7 +142,7 @@ case class GameState(graph : Graph,
   def getNextStateForFailedRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
     val clonePair = graph.clone()
     val nextState : GameState = GameState(clonePair._1,
-      cost + hcu.cost,
+      cost,
       hcuPool,
       addHumanObservation,
       lossFunction,
@@ -163,6 +165,7 @@ case class GameState(graph : Graph,
       completedRequests ++ Set((node, hcu, workUnit)),
       startTime)
     copyMutableState(nextState, clonePair._2)
+    addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)
     nextState
   }
 
@@ -171,7 +174,7 @@ case class GameState(graph : Graph,
     move match {
       case obs : MakeHumanObservation => {
         obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          (marginals(obs.node)(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
+          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
         })
       }.toList
       case _ : TurnInGuess => List()

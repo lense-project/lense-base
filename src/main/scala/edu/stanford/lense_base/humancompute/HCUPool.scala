@@ -23,6 +23,7 @@ class HCUPool {
 
   def removeHCU(hcu : HumanComputeUnit): Unit = {
     hcuPool.synchronized {
+      hcu.revokeAllWork()
       hcuPool.remove(hcu)
     }
   }

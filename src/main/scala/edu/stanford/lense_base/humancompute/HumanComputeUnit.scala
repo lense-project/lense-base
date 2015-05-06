@@ -22,7 +22,9 @@ trait HumanComputeUnit {
     // Add work unit
     workQueue.synchronized {
       workQueue.enqueue(workUnit.asInstanceOf[WorkUnit])
-      workQueue.notifyAll()
+      println("Adding work: "+workUnit)
+      println("Current queue: "+workQueue)
+      workQueue.notify()
     }
   }
 
@@ -34,38 +36,62 @@ trait HumanComputeUnit {
     if (workUnit eq currentWork) {
       cancelCurrentWork()
       currentWork = null
+      // Wake up the work performing code
+      workQueue.notify()
+    }
+  }
+
+  // This assumes that you won't want to be performing more work
+  def revokeAllWork() = {
+    workQueue.map(_.revoke())
+    workQueue.synchronized {
+      workQueue.dequeueAll((unit) => true)
+      if (currentWork != null) {
+        cancelCurrentWork()
+        currentWork = null
+        // Wake up the work performing code
+        workQueue.notify()
+      }
     }
   }
 
   def finishWork(workUnit : WorkUnit, answer : String) = {
+    if (workUnit != currentWork) {
+      throw new IllegalStateException("Shouldn't be finishing something that isn't our current work")
+    }
     if (!workUnit.isRevoked) {
       workUnit.promise.complete(Try {
         answer
       })
     }
 
+    println("FINISHED WORK")
+
     workQueue.synchronized {
       if (workUnit == currentWork) {
         currentWork = null
       }
+      // Wake up the work performing code
+      workQueue.notify()
     }
   }
 
-  def blockToPerformMoreWork() : Unit = {
-    var workToPerform : WorkUnit = null
+  def performWorkBlocking() : Unit = {
     while (true) {
+      var workToPerform: WorkUnit = null
       workQueue.synchronized {
-        if (workQueue.isEmpty) {
+        while (currentWork != null || workQueue.isEmpty) {
           workQueue.wait()
         }
-        else {
-          workToPerform = workQueue.dequeue()
-        }
+
+        workToPerform = workQueue.dequeue()
+        println("Performing work: " + workToPerform)
+        println("Current queue: " + workQueue)
+        currentWork = workToPerform
+        startedWorkMillis = System.currentTimeMillis()
+        startWork(workToPerform)
       }
     }
-    currentWork = workToPerform
-    startedWorkMillis = System.currentTimeMillis()
-    startWork(workToPerform)
   }
 
   def estimateTimeToFinishCurrentItem : Long = {
@@ -92,4 +118,11 @@ trait HumanComputeUnit {
   def cancelCurrentWork()
   // Get the cost
   def cost : Double
+
+  // Kick off computation
+  new Thread {
+    override def run() = {
+      performWorkBlocking()
+    }
+  }.start()
 }

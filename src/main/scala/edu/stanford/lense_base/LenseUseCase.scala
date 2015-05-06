@@ -238,13 +238,14 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
 }
 
 case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HCUPool {
-  for (i <- 0 to startNumHumans) addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
+  for (i <- 1 to startNumHumans) addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
 
   // constantly be randomly adding and removing artificial HCU's
+  /*
   new Thread {
     override def run() = {
       while (true) {
-        Thread.sleep(2000 + Math.round(rand.nextGaussian() * 1000).asInstanceOf[Int])
+        Thread.sleep(Math.max(500, 2000 + Math.round(rand.nextGaussian() * 1000).asInstanceOf[Int]))
 
         // at random, remove a human
         if (rand.nextBoolean() && hcuPool.size > 0) {
@@ -257,6 +258,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
       }
     }
   }.start()
+  */
 }
 
 case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String) extends WorkUnit(resultPromise)
@@ -267,7 +269,6 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
 
   // Cancel the current job
   override def cancelCurrentWork(): Unit = {
-    // This is a no-op
   }
 
   // Get the cost
@@ -278,6 +279,7 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
     workUnit match {
       case artificial : ArtificialWorkUnit => {
         // Complete after a gaussian delay
+        println("**** Starting new work unit thread")
         new Thread {
           override def run() = {
             // Humans can never take less than 1s to make a classification

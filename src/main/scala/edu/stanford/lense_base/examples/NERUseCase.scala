@@ -87,6 +87,6 @@ object RunTestCase extends App {
   workUnitCost : Double,
   startNumArtificialHumans : Int) : Unit = {
   */
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, 5)
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, 1)
   // nerUseCase.testWithRealHumans(nerUseCase.data)
 }

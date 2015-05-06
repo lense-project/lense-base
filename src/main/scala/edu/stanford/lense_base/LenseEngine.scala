@@ -121,7 +121,11 @@ case class InFlightPrediction(engine : LenseEngine,
     gameplayerMove()
   })
 
+  // Initialize with a move
+  gameplayerMove()
+
   def gameplayerMove() : Unit = this.synchronized {
+    println("Attempting a gameplayer Move")
     // We already turned in this set, this request is being called from some stray delayed call
     if (turnedIn) return
 
@@ -129,6 +133,7 @@ case class InFlightPrediction(engine : LenseEngine,
 
     optimalMove match {
       case _ : TurnInGuess =>
+        println("Turning in guess")
         // Make sure no future gameplayerMoves happen
         turnedIn = true
         hcuPool.removeHCUArrivedCallback(this)
@@ -153,6 +158,7 @@ case class InFlightPrediction(engine : LenseEngine,
           engine.pastGuesses.notifyAll()
         }
 
+        println("Completing promise!")
         returnPromise.complete(Try {
             mapEstimate.map(pair => {
               val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
@@ -161,6 +167,7 @@ case class InFlightPrediction(engine : LenseEngine,
             })
           })
       case obs : MakeHumanObservation =>
+        println("Making human observation")
         // Create a new work unit
         val workUnit = askHuman(obs.node, obs.hcu)
 
@@ -169,17 +176,24 @@ case class InFlightPrediction(engine : LenseEngine,
           this.synchronized {
             if (t.isSuccess) {
               // If the workUnit succeeded, move the gamestate
+              println("Workunit Success!")
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
             }
             else {
+              println("Workunit Failed!")
+              t.failed.get.printStackTrace()
               // If the workUnit failed, then fail appropriately
+              println("Pre in flight requests: "+gameState.inFlightRequests)
               gameState = gameState.getNextStateForFailedRequest(obs.node, obs.hcu, workUnit)
+              println("Post in flight requests: "+gameState.inFlightRequests)
             }
           }
           // On every change we should recurse
           gameplayerMove()
         })
         gameState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, workUnit)
+        // Move again immediately
+        gameplayerMove()
 
       case wait : Wait =>
         // Do nothing, for now. Wait for stimulus

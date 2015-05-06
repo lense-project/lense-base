@@ -14,6 +14,7 @@ class WorkUnit(resultPromise : Promise[String]) {
 
   def revoke() = this.synchronized {
     _revoked = true
+    taskFailed()
   }
 
   def isRevoked : Boolean = this.synchronized {
