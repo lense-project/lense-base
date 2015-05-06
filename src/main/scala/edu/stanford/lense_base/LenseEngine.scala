@@ -2,22 +2,26 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
+import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
+import edu.stanford.lense_base.util.CaseClassEq
 
 import scala.collection.mutable
 import scala.concurrent.{Promise, Future}
+import scala.util.Try
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created by keenon on 4/27/15.
  *
  * This is the central static dispatcher to handle requests to the API
  */
-class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
+class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
 
-  val pastGameTrajectories = mutable.ListBuffer[List[(GameState,GameMove)]]()
+  def gamePlayer = initGamePlayer
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread{
@@ -37,54 +41,10 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     }
   }.start()
 
-  def predict(graph : Graph, askHuman : GraphNode => Promise[String], lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) : Map[GraphNode, String] = {
-    var gameState = GameState(graph, 0.0, 0.0, askHuman, attachHumanObservation, lossFunction)
-
-    // Keep playing until the game player tells us to stop
-
-    val gameTrajectory = mutable.ListBuffer[(GameState,GameMove)]()
-    while (true) {
-      val optimalMove = gamePlayer.getOptimalMove(gameState)
-
-      // Add this move to our recorded trajectory
-      gameTrajectory += ((gameState, optimalMove))
-
-      optimalMove match {
-        case _ : TurnInGuess =>
-          val mapEstimate = gameState.graph.mapEstimate()
-
-          // Store the original request graph, with our guessed labels, in our pastGuesses stream
-          // Learning from this should be convex, so provide at least a good initialization for later values
-          gameState.originalGraph.nodes.foreach(n => {
-            n.observedValue = mapEstimate(gameState.oldToNew(n))
-          })
-          pastGuesses += gameState.originalGraph
-
-          // Store the uncertainty, with all human queries attached, in pastQueryStructure stream
-          // Learning from this will require learning with unobserved variables, so will be subject to local optima
-          pastQueryStructure += gameState.graph
-
-          // Wake up the parallel weights trainer:
-          pastGuesses.synchronized {
-            pastGuesses.notifyAll()
-          }
-
-          // Store the game trajectory for debugging and analysis
-          pastGameTrajectories += gameTrajectory.clone().toList
-          gameTrajectory.clear()
-
-          return mapEstimate.map(pair => {
-            val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
-            if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
-            (matches(0), pair._2)
-          })
-        case obs : MakeHumanObservation =>
-          gameState = gameState.takeRealMove(obs)
-      }
-    }
-
-    // Code will never reach here, because the only way to exit while() loop is to TurnInGuess
-    throw new IllegalStateException("Code should never reach this point")
+  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[Map[GraphNode, String]] = {
+    val promise = Promise[Map[GraphNode,String]]()
+    InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
+    promise
   }
 
   def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = this.synchronized {
@@ -142,5 +102,87 @@ class LenseEngine(stream : GraphStream, gamePlayer : GamePlayer) {
     println("Doing initial learning...")
     learnHoldingPastGuessesConstant()
     println("Finished")
+  }
+}
+
+case class InFlightPrediction(engine : LenseEngine,
+                              originalGraph : Graph,
+                              askHuman : (GraphNode, HumanComputeUnit) => WorkUnit,
+                              hcuPool : HCUPool,
+                              lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
+                              returnPromise : Promise[Map[GraphNode, String]]) extends CaseClassEq {
+  // Create an initial game state
+  var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
+
+  var turnedIn = false
+
+  // Make sure that when new humans appear we reasses our gameplaying options
+  hcuPool.registerHCUArrivedCallback(this, () => {
+    gameplayerMove()
+  })
+
+  def gameplayerMove() : Unit = this.synchronized {
+    // We already turned in this set, this request is being called from some stray delayed call
+    if (turnedIn) return
+
+    val optimalMove = engine.gamePlayer.getOptimalMove(gameState)
+
+    optimalMove match {
+      case _ : TurnInGuess =>
+        // Make sure no future gameplayerMoves happen
+        turnedIn = true
+        hcuPool.removeHCUArrivedCallback(this)
+
+        val mapEstimate = gameState.graph.mapEstimate()
+
+        // Cancel all outstanding requests
+        gameState.inFlightRequests.foreach(triple => {
+          triple._2.revokeWorkUnit(triple._3)
+        })
+
+        // Store the original request graph, with our guessed labels, in our pastGuesses stream
+        // Learning from this should be convex, so provide at least a good initialization for later values
+        gameState.originalGraph.nodes.foreach(n => {
+          n.observedValue = mapEstimate(gameState.oldToNew(n))
+        })
+
+        engine.pastGuesses.synchronized {
+          engine.pastGuesses += gameState.originalGraph
+          engine.pastQueryStructure += gameState.graph
+          // Wake up the parallel weights trainer:
+          engine.pastGuesses.notifyAll()
+        }
+
+        returnPromise.complete(Try {
+            mapEstimate.map(pair => {
+              val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
+              if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
+              (matches(0), pair._2)
+            })
+          })
+      case obs : MakeHumanObservation =>
+        // Create a new work unit
+        val workUnit = askHuman(obs.node, obs.hcu)
+
+        // When the work unit returns, do the following
+        workUnit.promise.future.onComplete(t => {
+          this.synchronized {
+            if (t.isSuccess) {
+              // If the workUnit succeeded, move the gamestate
+              gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
+            }
+            else {
+              // If the workUnit failed, then fail appropriately
+              gameState = gameState.getNextStateForFailedRequest(obs.node, obs.hcu, workUnit)
+            }
+          }
+          // On every change we should recurse
+          gameplayerMove()
+        })
+        gameState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, workUnit)
+
+      case wait : Wait =>
+        // Do nothing, for now. Wait for stimulus
+    }
   }
 }

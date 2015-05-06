@@ -1,5 +1,6 @@
 package edu.stanford.lense_base.examples
 
+import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
 
 import scala.collection.mutable.ListBuffer
@@ -19,7 +20,7 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def labelTypes: Set[String] = (data ++ trainSet).flatMap(_._2).distinct.toSet
 
-  override def getHumanQuestion(sequence: List[String], i: Int): GraphNodeQuestion = {
+  override def getHumanQuestion(sequence: List[String], i: Int, hcu : HumanComputeUnit): GraphNodeQuestion = {
     val answers = labelTypes.map(s => GraphNodeAnswer("<b>"+s+"</b>", s)).toList
 
     var question = "Dear NLP Researcher:<br>What NER type is this?<br>"
@@ -30,7 +31,7 @@ class NERUseCase extends LenseSequenceUseCase {
       if (i == j) question += " ]</b>"
     }
 
-    GraphNodeQuestion(question, answers)
+    GraphNodeQuestion(question, answers, hcu)
   }
 
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
@@ -78,6 +79,14 @@ class NERUseCase extends LenseSequenceUseCase {
 
 object RunTestCase extends App {
   val nerUseCase = new NERUseCase()
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500)
+
+  /*
+  humanErrorRate : Double,
+  humanDelayMean : Int,
+  humanDelayStd : Int,
+  workUnitCost : Double,
+  startNumArtificialHumans : Int) : Unit = {
+  */
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, 5)
   // nerUseCase.testWithRealHumans(nerUseCase.data)
 }

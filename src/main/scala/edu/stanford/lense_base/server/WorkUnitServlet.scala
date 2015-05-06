@@ -2,6 +2,7 @@ package edu.stanford.lense_base.server
 
 import java.util.Date
 
+import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
 import org.eclipse.jetty.server.nio.SelectChannelConnector
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.webapp.WebAppContext
@@ -35,7 +36,7 @@ object WorkUnitServlet extends ScalatraServlet
 
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
 
-  val workQueue = mutable.Queue[WorkUnit[Any]]()
+  val workQueue = mutable.Queue[WebWorkUnit]()
 
   lazy val server = {
     val server = new Server()
@@ -56,10 +57,10 @@ object WorkUnitServlet extends ScalatraServlet
     }
   }
 
-  def addWorkUnit[T](workUnit : WorkUnit[T]) = {
+  def addWorkUnit[T](workUnit : WebWorkUnit) = {
     // Add work unit
     workQueue.synchronized {
-      workQueue.enqueue(workUnit.asInstanceOf[WorkUnit[Any]])
+      workQueue.enqueue(workUnit.asInstanceOf[WebWorkUnit])
       workQueue.notifyAll()
     }
     // Boot server if we haven't
@@ -85,12 +86,12 @@ object WorkUnitServlet extends ScalatraServlet
   }
 }
 
-abstract class WorkUnit[T](resultFuture : Promise[T]) {
+abstract class WebWorkUnit(resultPromise : Promise[String]) extends WorkUnit(resultPromise) {
   def getOutboundMessage : JValue
-  def handleReplyMessage(m : JValue) : Boolean
+  def parseReplyMessage(m : JValue) : String
 }
 
-case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultFuture : Promise[String]) extends WorkUnit[String](resultFuture) {
+case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultPromise : Promise[String]) extends WebWorkUnit(resultPromise) {
   override def getOutboundMessage: JValue = {
     new JObject(List(
       "type" -> new JString("multiclass"),
@@ -99,7 +100,7 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
     ))
   }
 
-  override def handleReplyMessage(m: JValue): Boolean = {
+  override def parseReplyMessage(m: JValue) : String = {
     println("Received: "+m)
 
     // If for whatever reason we can't handle this, don't pretend that we did
@@ -109,8 +110,7 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
     }
     catch {
       case e : Throwable =>
-        e.printStackTrace()
-        return false
+        taskFailed(e)
     }
 
     // If we can handle it, then do
@@ -119,53 +119,23 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
     val matches = choices.filter(_._1 == prettyResult)
     if (matches.size > 1) throw new IllegalStateException("Cannot have more than 1 option with same human display text: Got \""+prettyResult+"\"")
     if (matches.size == 0) throw new IllegalStateException("Cannot have more than no options with same human display text: Got \""+prettyResult+"\"")
-    resultFuture.complete(Try {
-      matches.head._2
-    })
+    matches.head._2
+  }
+}
 
-    true
+object RealHumanHCUPool extends HCUPool {
+  override def addHCU(hcu : HumanComputeUnit): Unit = {
+    WorkUnitServlet.server
+    super.addHCU(hcu)
   }
 }
 
 // The Human Compute Unit client
 // Handles storing state related to performing tasks
-class HCUClient extends AtmosphereClient {
+class HCUClient extends AtmosphereClient with HumanComputeUnit {
+  var ready = false
 
-  var currentWork : WorkUnit[Any] = null
-
-  def checkForWork() : Unit = {
-    WorkUnitServlet.workQueue.synchronized {
-      if (WorkUnitServlet.workQueue.nonEmpty) {
-        println("Work-queue non-empty. Performing work")
-        performWork(WorkUnitServlet.workQueue.dequeue())
-      }
-      else {
-        // wait for new work to arrive
-        println("Work-queue empty. Annotator waiting for work")
-        WorkUnitServlet.workQueue.wait()
-        checkForWork()
-      }
-    }
-  }
-
-  def performWork(newWork : WorkUnit[Any]) = {
-    currentWork = newWork
-    println("Doing work "+currentWork)
-    val msg = new JsonMessage(currentWork.getOutboundMessage)
-    send(msg)
-  }
-
-  def returnCurrentWorkUnfinished() = {
-    println("Attempting to return current unfinished work, if any")
-    if (currentWork != null) {
-      WorkUnitServlet.workQueue.synchronized {
-        println("Returning work unit " + currentWork)
-        WorkUnitServlet.workQueue.enqueue(currentWork)
-        WorkUnitServlet.workQueue.notifyAll()
-      }
-      currentWork = null
-    }
-  }
+  RealHumanHCUPool.addHCU(this)
 
   def receive = {
     case Connected =>
@@ -173,12 +143,14 @@ class HCUClient extends AtmosphereClient {
 
     case Disconnected(disconnector, errorOption) =>
       println("Got disconnected")
-      returnCurrentWorkUnfinished()
+      cancelCurrentWork()
+      RealHumanHCUPool.removeHCU(this)
       WorkUnitServlet.workerPool -= this
 
     case Error(Some(error)) =>
       println("Got error")
-      returnCurrentWorkUnfinished()
+      cancelCurrentWork()
+      RealHumanHCUPool.removeHCU(this)
       WorkUnitServlet.workerPool -= this
 
     case TextMessage(text) =>
@@ -189,12 +161,9 @@ class HCUClient extends AtmosphereClient {
       // Let our currentWork unit handle the returned value
 
       if (currentWork != null) {
-        val successfullyParsed = currentWork.handleReplyMessage(m.content)
-        if (!successfullyParsed) {
-          returnCurrentWorkUnfinished()
-        }
+        val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
         send(new JsonMessage(new JObject(List("status" -> JString("success")))))
-        checkForWork()
+        finishWork(currentWork, replyValue)
       }
 
       // This probably means we should be checking for work, so do that
@@ -204,12 +173,41 @@ class HCUClient extends AtmosphereClient {
         if (map.contains("status")) {
           val status = map.apply("status").values.asInstanceOf[String]
           if (status == "ready") {
-            checkForWork()
+            this.synchronized {
+              ready = true
+              this.notifyAll()
+            }
           }
         }
       }
 
     case uncaught =>
       println("Something made it through the match expressions: "+uncaught)
+  }
+
+  // Gets the estimated required time to perform this task, in milliseconds
+  override def estimateRequiredTimeToFinishItem(workUnit: WorkUnit): Long = {
+    // TODO: this needs to be much more sophisticated
+    1000
+  }
+
+  // Cancel the current job
+  override def cancelCurrentWork(): Unit = {
+    // TODO: send some message to client
+  }
+
+  // Get the cost
+  override def cost: Double = {
+    // TODO: this needs to be set in a flag someplace
+    0.01
+  }
+
+  // Kick off a job
+  override def startWork(workUnit: WorkUnit): Unit = {
+    this.synchronized {
+      while (!ready) this.wait()
+      val msg = new JsonMessage(workUnit.asInstanceOf[WebWorkUnit].getOutboundMessage)
+      send(msg)
+    }
   }
 }

@@ -1,10 +1,12 @@
 package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph._
+import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
 
 import scala.concurrent.{Await, Promise, Future}
 import scala.concurrent.duration._
 import scala.util.Try
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * Created by keenon on 4/27/15.
@@ -16,7 +18,8 @@ import scala.util.Try
 
 abstract class GameMove
 case class TurnInGuess() extends GameMove
-case class MakeHumanObservation(node : GraphNode) extends GameMove
+case class MakeHumanObservation(node : GraphNode, hcu : HumanComputeUnit) extends GameMove
+case class Wait() extends GameMove
 
 // This is the head of all game playing agents
 
@@ -24,7 +27,15 @@ abstract class GamePlayer {
   def getOptimalMove(state : GameState) : GameMove
 
   def getAllLegalMoves(state : GameState) : List[GameMove] = {
-    List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).map(n => MakeHumanObservation(state.oldToNew(n))).toList
+    List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
+      state.hcuPool.synchronized {
+        state.hcuPool.hcuPool.
+          // Take only HCU's we haven't used before for this node
+          filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
+          // And make an observation on them
+          map(hcu => MakeHumanObservation(state.oldToNew(n), hcu))
+      }
+    }).toList
   }
 }
 
@@ -36,9 +47,16 @@ object OneQuestionBaseline extends GamePlayer {
     val i = state.payload.asInstanceOf[(Int,Int)]
     if (i._1 < i._2) {
       state.payload = (i._1+1,i._2)
-      MakeHumanObservation(state.oldToNew(state.originalGraph.nodes(i._1)))
+      MakeHumanObservation(state.oldToNew(state.originalGraph.nodes(i._1)), state.hcuPool.hcuPool.minBy(hcu => hcu.estimateTimeToFinishQueue))
     }
-    else TurnInGuess()
+    else {
+      if (state.inFlightRequests.size == 0) {
+        TurnInGuess()
+      }
+      else {
+        Wait()
+      }
+    }
   }
 }
 
@@ -49,17 +67,23 @@ object LookaheadOneHeuristic extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
     println("Getting optimal move")
 
-    val optimal = getAllLegalMoves(state).map(m => {
+    var optimal = getAllLegalMoves(state).map(m => {
       val nextStates = state.getNextStates(m)
       // get loss now
       val moveLoss =
-        if (nextStates.size == 0) state.loss
+        if (nextStates.size == 0) state.loss()
         else {
           // get expected loss at next state
-          nextStates.map(p => p._1 * p._2.loss).sum
+          nextStates.map(p => p._1 * p._2.loss()).sum
         }
       (moveLoss, m)
     }).minBy(_._1)
+
+    if (optimal._2.isInstanceOf[TurnInGuess]) {
+      if (state.inFlightRequests.size > 0) {
+        optimal = (optimal._1, Wait())
+      }
+    }
 
     println(optimal)
 
@@ -71,51 +95,75 @@ object LookaheadOneHeuristic extends GamePlayer {
 
 case class GameState(graph : Graph,
                      cost : Double,
-                     delay : Double,
-                     getHumanObservation : GraphNode => Promise[String],
+                     hcuPool : HCUPool,
                      addHumanObservation : (Graph, GraphNode, String) => Unit,
-                     lossFunction : (List[(GraphNode, String, Double)], Double, Double) => Double) {
+                     lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
+                     inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
+                     completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
+                     startTime : Long = System.currentTimeMillis()) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
   var originalGraph : Graph = graph
   var oldToNew : Map[GraphNode,GraphNode] = graph.nodes.map(n => (n,n)).toMap
 
-  val assumedHumanCost = 1.0
-  val assumedHumanDelay = 1.0
-
   // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
   lazy val marginals : Map[GraphNode, Map[String, Double]] = graph.marginalEstimate()
-  lazy val loss : Double = {
+
+  def loss(hypotheticalExtraDelay : Long = 0) : Double = {
     val bestGuesses = marginals.toList.map(pair => {
       val maxPair = pair._2.maxBy(_._2)
       (pair._1, maxPair._1, maxPair._2)
     })
-    lossFunction(bestGuesses, cost, delay)
+    lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 
-  // Gets a GameState that corresponds to seeing observation "obs" on node "node"
-  private def getNextStateForNodeObservation(node : GraphNode, obs : String) : GameState = {
-    val clonePair = graph.clone()
-    val nextState : GameState = GameState(clonePair._1, cost + assumedHumanCost, delay + assumedHumanDelay, getHumanObservation, addHumanObservation, lossFunction)
+  def copyMutableState(nextState : GameState, oldToNew : Map[GraphNode,GraphNode]) = {
     nextState.payload = payload
     nextState.originalGraph = originalGraph
-    nextState.oldToNew = oldToNew.map(pair => (pair._1, clonePair._2(pair._2)))
-    addHumanObservation(nextState.graph, clonePair._2(node), obs)
+    nextState.oldToNew = oldToNew.map(pair => (pair._1, oldToNew(pair._2)))
+  }
+
+  def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
+    val clonePair = graph.clone()
+    val nextState : GameState = GameState(clonePair._1,
+      cost + hcu.cost,
+      hcuPool,
+      addHumanObservation,
+      lossFunction,
+      inFlightRequests ++ Set((node, hcu, workUnit)),
+      completedRequests,
+      startTime)
+    copyMutableState(nextState, clonePair._2)
     nextState
   }
 
-  def takeRealMove(obs : MakeHumanObservation) : GameState = {
-    try {
-      val s: String = Await.result(getHumanObservation(obs.node).future, 10000 days /* no timeout here, we handle that elsewhere */)
-      getNextStateForNodeObservation(obs.node, s)
-    }
-    catch {
-      // Future has failed for some reason...
-      case e : Throwable =>
-        e.printStackTrace()
-        // So just return the current state
-        GameState.this
-    }
+  def getNextStateForFailedRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
+    val clonePair = graph.clone()
+    val nextState : GameState = GameState(clonePair._1,
+      cost + hcu.cost,
+      hcuPool,
+      addHumanObservation,
+      lossFunction,
+      inFlightRequests -- Set((node, hcu, workUnit)),
+      completedRequests,
+      startTime)
+    copyMutableState(nextState, clonePair._2)
+    nextState
+  }
+
+  // Gets a GameState that corresponds to seeing observation "obs" on node "node"
+  def getNextStateForNodeObservation(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
+    val clonePair = graph.clone()
+    val nextState : GameState = GameState(clonePair._1,
+      cost + hcu.cost,
+      hcuPool,
+      addHumanObservation,
+      lossFunction,
+      inFlightRequests -- Set((node, hcu, workUnit)),
+      completedRequests ++ Set((node, hcu, workUnit)),
+      startTime)
+    copyMutableState(nextState, clonePair._2)
+    nextState
   }
 
   def getNextStates(move : GameMove) : List[(Double,GameState)] = {
@@ -123,7 +171,7 @@ case class GameState(graph : Graph,
     move match {
       case obs : MakeHumanObservation => {
         obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          (marginals(obs.node)(randomHumanResponse),getNextStateForNodeObservation(obs.node, randomHumanResponse))
+          (marginals(obs.node)(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
         })
       }.toList
       case _ : TurnInGuess => List()

@@ -161,11 +161,15 @@ class LenseFrameworkForNER(classes : Set[String],
       simulateAskingHuman(node.payload.asInstanceOf[Int])
     }
 
+    /*
+    TODO: This is now broken
     val assignments : Map[GraphNode, String] = lense.predict(graph,
       askHuman,
       lossFunction)
 
     assignments.toList.sortBy(_._1.payload.asInstanceOf[Int]).map(_._2)
+    */
+    List()
   }
 }
 
