@@ -297,7 +297,9 @@ class GraphStream {
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
-  def learn(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) = {
+  def learn(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) : Unit = {
+    if (graphs.size == 0) return
+
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs, clearOptimizer)

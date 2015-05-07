@@ -298,7 +298,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
   new Thread {
     override def run() : Unit = {
       while (true) {
-        Thread.sleep(Math.max(500, 2000 + Math.round(rand.nextGaussian() * 1000).asInstanceOf[Int]))
+        Thread.sleep(Math.max(5000, 20000 + Math.round(rand.nextGaussian() * 10000).asInstanceOf[Int]))
         if (!running) return
 
         // at random, remove a human

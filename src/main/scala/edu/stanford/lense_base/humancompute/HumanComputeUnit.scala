@@ -92,7 +92,9 @@ trait HumanComputeUnit {
   }
 
   def estimateTimeToFinishQueue : Long = {
-    estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
+    workQueue.synchronized {
+      estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
+    }
   }
 
   def estimateRequiredTimeIncludingQueue(node : GraphNode) : Long = {
