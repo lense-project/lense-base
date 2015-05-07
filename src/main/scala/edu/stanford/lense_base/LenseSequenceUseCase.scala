@@ -1,6 +1,7 @@
 package edu.stanford.lense_base
 
 import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
+import edu.stanford.lense_base.humancompute.HumanComputeUnit
 
 import scala.collection.mutable
 
@@ -17,7 +18,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
 
   def labelTypes : Set[String]
   def featureExtractor(sequence : List[String], i : Int) : Map[String, Double]
-  def getHumanQuestion(sequence : List[String], i : Int) : GraphNodeQuestion
+  def getHumanQuestion(sequence : List[String], i : Int, hcu : HumanComputeUnit, node : GraphNode) : GraphNodeQuestion
   def lossFunction(sequence : List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double) : Double
 
   lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
@@ -47,9 +48,9 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
     graph
   }
 
-  override def getQuestion(node : GraphNode) : GraphNodeQuestion = {
+  override def getQuestion(node : GraphNode, hcu : HumanComputeUnit) : GraphNodeQuestion = {
     val pair = node.payload.asInstanceOf[(List[String],Int)]
-    getHumanQuestion(pair._1, pair._2)
+    getHumanQuestion(pair._1, pair._2, hcu, node)
   }
 
   /**
@@ -76,7 +77,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @param time
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, time: Double): Double = {
+  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, time: Long): Double = {
     if (mostLikelyGuesses.size == 0) {
       lossFunction(List(), List(), cost, time)
     }
