@@ -6,7 +6,7 @@
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [compile->default(compile)]
 [info] Resolving com.googlecode.lanterna#lanterna;2.1.8 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7ea7e7bc
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@38759bcb
 [debug] sbt-chain: module revision found in cache: com.googlecode.lanterna#lanterna;2.1.8
 [debug] 	local: revision in cache: com.googlecode.lanterna#lanterna;2.1.8
 [debug] 	found com.googlecode.lanterna#lanterna;2.1.8 in sbt-chain
@@ -15,7 +15,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@706b6620
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@79d750ba
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903
 [debug] 	local: revision in cache: org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903
 [debug] 	found org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 in sbt-chain
@@ -24,7 +24,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@151940b6
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62a221b1
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016
 [debug] 	found org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 in sbt-chain
@@ -33,7 +33,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@47f21632
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3e1f559
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116
 [debug] 	found org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 in sbt-chain
@@ -42,7 +42,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e11cf0e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@f58defd
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020
 [debug] 	found org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 in sbt-chain
@@ -51,7 +51,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@21cde5ef
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6a1c3f47
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233
 [debug] 	found org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 in sbt-chain
@@ -60,7 +60,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@c047460
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@38b67c7f
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116
 [debug] 	found org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 in sbt-chain
@@ -69,7 +69,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@28df77bb
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57c58d31
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903
 [debug] 	local: revision in cache: org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903
 [debug] 	found org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 in sbt-chain
@@ -78,7 +78,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-jackson_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-jackson_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7b5679dc
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2c2aad14
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-jackson_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-jackson_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-jackson_2.11;3.3.0.RC1 in sbt-chain
@@ -87,7 +87,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-jackson_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-library;2.11.6 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-library;2.11.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6971dcb
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1643e42f
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-library;2.11.6
 [debug] 	local: revision in cache: org.scala-lang#scala-library;2.11.6
 [debug] 	found org.scala-lang#scala-library;2.11.6 in sbt-chain
@@ -97,7 +97,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-library;2.11.6 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-core_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-core_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@354bf238
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4c6bc36f
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-core_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-core_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-core_2.11;3.3.0.RC1 in sbt-chain
@@ -106,7 +106,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-core_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-ast_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-ast_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4d9de9b0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@792e43bf
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-ast_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-ast_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-ast_2.11;3.3.0.RC1 in sbt-chain
@@ -115,7 +115,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-ast_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-scalap_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-scalap_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@50f0ee20
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e762237
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-scalap_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-scalap_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-scalap_2.11;3.3.0.RC1 in sbt-chain
@@ -124,7 +124,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-scalap_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.thoughtworks.paranamer#paranamer;2.7 [compile->default(compile)]
 [info] Resolving com.thoughtworks.paranamer#paranamer;2.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@e5ec3e8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e7fcba9
 [debug] sbt-chain: module revision found in cache: com.thoughtworks.paranamer#paranamer;2.7
 [debug] 	local: revision in cache: com.thoughtworks.paranamer#paranamer;2.7
 [debug] 	found com.thoughtworks.paranamer#paranamer;2.7 in sbt-chain
@@ -133,7 +133,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.thoughtworks.paranamer#paranamer;2.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-xml_2.11;1.0.3 [compile->default(compile)]
 [info] Resolving org.scala-lang.modules#scala-xml_2.11;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2f5a7788
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5143398f
 [debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-xml_2.11;1.0.3
 [debug] 	local: revision in cache: org.scala-lang.modules#scala-xml_2.11;1.0.3
 [debug] 	found org.scala-lang.modules#scala-xml_2.11;1.0.3 in sbt-chain
@@ -142,7 +142,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-xml_2.11;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-databind;2.3.5 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-databind;2.3.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1763704c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1a9c12a
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-databind;2.3.5
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-databind;2.3.5
 [debug] 	found com.fasterxml.jackson.core#jackson-databind;2.3.5 in sbt-chain
@@ -151,7 +151,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-databind;2.3.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-annotations;2.3.0 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-annotations;2.3.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55854cb3
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@43739dbd
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-annotations;2.3.0
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-annotations;2.3.0
 [debug] 	found com.fasterxml.jackson.core#jackson-annotations;2.3.0 in sbt-chain
@@ -160,7 +160,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-annotations;2.3.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-core;2.3.5 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-core;2.3.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@258ff9dd
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@75ad5999
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-core;2.3.5
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-core;2.3.5
 [debug] 	found com.fasterxml.jackson.core#jackson-core;2.3.5 in sbt-chain
@@ -169,7 +169,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-core;2.3.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5d1b4545
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@34e054fe
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra_2.11;2.4.0.RC1 in sbt-chain
@@ -178,7 +178,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-common_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-common_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@67aa8c27
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@52c378f4
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-common_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-common_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-common_2.11;2.4.0.RC1 in sbt-chain
@@ -187,7 +187,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-common_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.slf4j#slf4j-api;1.7.10 [compile->default(compile)]
 [info] Resolving org.slf4j#slf4j-api;1.7.10 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@22810bbc
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@468d59c6
 [debug] sbt-chain: module revision found in cache: org.slf4j#slf4j-api;1.7.10
 [debug] 	local: revision in cache: org.slf4j#slf4j-api;1.7.10
 [debug] 	found org.slf4j#slf4j-api;1.7.10 in sbt-chain
@@ -196,7 +196,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.slf4j#slf4j-api;1.7.10 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.clapper#grizzled-slf4j_2.11;1.0.2 [compile->default(compile)]
 [info] Resolving org.clapper#grizzled-slf4j_2.11;1.0.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6d6ae96d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@50244993
 [debug] sbt-chain: module revision found in cache: org.clapper#grizzled-slf4j_2.11;1.0.2
 [debug] 	local: revision in cache: org.clapper#grizzled-slf4j_2.11;1.0.2
 [debug] 	found org.clapper#grizzled-slf4j_2.11;1.0.2 in sbt-chain
@@ -205,7 +205,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.clapper#grizzled-slf4j_2.11;1.0.2 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.rl#rl_2.11;0.4.10 [compile->default(compile)]
 [info] Resolving org.scalatra.rl#rl_2.11;0.4.10 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@15d27a95
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6a8e6a09
 [debug] sbt-chain: module revision found in cache: org.scalatra.rl#rl_2.11;0.4.10
 [debug] 	local: revision in cache: org.scalatra.rl#rl_2.11;0.4.10
 [debug] 	found org.scalatra.rl#rl_2.11;0.4.10 in sbt-chain
@@ -214,7 +214,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.rl#rl_2.11;0.4.10 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.juniversalchardet#juniversalchardet;1.0.3 [compile->default(compile)]
 [info] Resolving com.googlecode.juniversalchardet#juniversalchardet;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5ce7e134
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@545b2efd
 [debug] sbt-chain: module revision found in cache: com.googlecode.juniversalchardet#juniversalchardet;1.0.3
 [debug] 	local: revision in cache: com.googlecode.juniversalchardet#juniversalchardet;1.0.3
 [debug] 	found com.googlecode.juniversalchardet#juniversalchardet;1.0.3 in sbt-chain
@@ -223,7 +223,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.juniversalchardet#juniversalchardet;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->joda-time#joda-time;2.7 [compile->default(compile)]
 [info] Resolving joda-time#joda-time;2.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@28e7bd3b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4a1e4271
 [debug] sbt-chain: module revision found in cache: joda-time#joda-time;2.7
 [debug] 	local: revision in cache: joda-time#joda-time;2.7
 [debug] 	found joda-time#joda-time;2.7 in sbt-chain
@@ -232,7 +232,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->joda-time#joda-time;2.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.joda#joda-convert;1.7 [compile->default(compile)]
 [info] Resolving org.joda#joda-convert;1.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6bb2da78
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57c5573e
 [debug] sbt-chain: module revision found in cache: org.joda#joda-convert;1.7
 [debug] 	local: revision in cache: org.joda#joda-convert;1.7
 [debug] 	found org.joda#joda-convert;1.7 in sbt-chain
@@ -241,7 +241,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.joda#joda-convert;1.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 [compile->default(compile)]
 [info] Resolving org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62fd7e6f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@16e06e19
 [debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3
 [debug] 	local: revision in cache: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3
 [debug] 	found org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 in sbt-chain
@@ -250,7 +250,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@56b73b2d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62e8c155
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 in sbt-chain
@@ -259,7 +259,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-json_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-json_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@736464f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5aa00935
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-json_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-json_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-json_2.11;2.4.0.RC1 in sbt-chain
@@ -268,7 +268,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-json_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe.akka#akka-actor_2.11;2.3.9 [compile->default(compile)]
 [info] Resolving com.typesafe.akka#akka-actor_2.11;2.3.9 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@13caa7e8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@711a9f08
 [debug] sbt-chain: module revision found in cache: com.typesafe.akka#akka-actor_2.11;2.3.9
 [debug] 	local: revision in cache: com.typesafe.akka#akka-actor_2.11;2.3.9
 [debug] 	found com.typesafe.akka#akka-actor_2.11;2.3.9 in sbt-chain
@@ -277,7 +277,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe.akka#akka-actor_2.11;2.3.9 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe#config;1.2.1 [compile->default(compile)]
 [info] Resolving com.typesafe#config;1.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5652e9d4
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@25d48bae
 [debug] sbt-chain: module revision found in cache: com.typesafe#config;1.2.1
 [debug] 	local: revision in cache: com.typesafe#config;1.2.1
 [debug] 	found com.typesafe#config;1.2.1 in sbt-chain
@@ -286,7 +286,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe#config;1.2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-runtime;2.2.6 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-runtime;2.2.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@60b3f1db
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4354ef3e
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-runtime;2.2.6
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-runtime;2.2.6
 [debug] 	found org.atmosphere#atmosphere-runtime;2.2.6 in sbt-chain
@@ -295,7 +295,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-runtime;2.2.6 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-redis;2.2.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-redis;2.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1b006d12
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@af2d030
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-redis;2.2.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-redis;2.2.1
 [debug] 	found org.atmosphere#atmosphere-redis;2.2.1 in sbt-chain
@@ -304,7 +304,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-redis;2.2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->redis.clients#jedis;2.0.0 [compile->default(compile)]
 [info] Resolving redis.clients#jedis;2.0.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@14fcf671
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e309b3f
 [debug] sbt-chain: module revision found in cache: redis.clients#jedis;2.0.0
 [debug] 	local: revision in cache: redis.clients#jedis;2.0.0
 [debug] 	found redis.clients#jedis;2.0.0 in sbt-chain
@@ -313,7 +313,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->redis.clients#jedis;2.0.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-pool#commons-pool;1.5.5 [compile->default(compile)]
 [info] Resolving commons-pool#commons-pool;1.5.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3cba22c9
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1ee10d3d
 [debug] sbt-chain: module revision found in cache: commons-pool#commons-pool;1.5.5
 [debug] 	local: revision in cache: commons-pool#commons-pool;1.5.5
 [debug] 	found commons-pool#commons-pool;1.5.5 in sbt-chain
@@ -322,7 +322,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-pool#commons-pool;1.5.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-jbossweb;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-jbossweb;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@26901080
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@a4afbfb
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-jbossweb;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-jbossweb;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-jbossweb;2.0.1 in sbt-chain
@@ -331,7 +331,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-jbossweb;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-tomcat;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@76690599
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6fdd4959
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-tomcat;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-tomcat;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-tomcat;2.0.1 in sbt-chain
@@ -340,7 +340,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat7;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-tomcat7;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@34987f4c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@69f74b69
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-tomcat7;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-tomcat7;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-tomcat7;2.0.1 in sbt-chain
@@ -349,7 +349,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat7;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@110b3ac
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@24aa2fc2
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-scalate_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-scalate_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 in sbt-chain
@@ -358,7 +358,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-core_2.11;1.7.1 [compile->default(compile)]
 [info] Resolving org.scalatra.scalate#scalate-core_2.11;1.7.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6796128b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@69cc97f1
 [debug] sbt-chain: module revision found in cache: org.scalatra.scalate#scalate-core_2.11;1.7.1
 [debug] 	local: revision in cache: org.scalatra.scalate#scalate-core_2.11;1.7.1
 [debug] 	found org.scalatra.scalate#scalate-core_2.11;1.7.1 in sbt-chain
@@ -367,7 +367,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-core_2.11;1.7.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-util_2.11;1.7.1 [compile->default(compile)]
 [info] Resolving org.scalatra.scalate#scalate-util_2.11;1.7.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7236e69f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@61139bbf
 [debug] sbt-chain: module revision found in cache: org.scalatra.scalate#scalate-util_2.11;1.7.1
 [debug] 	local: revision in cache: org.scalatra.scalate#scalate-util_2.11;1.7.1
 [debug] 	found org.scalatra.scalate#scalate-util_2.11;1.7.1 in sbt-chain
@@ -376,7 +376,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-util_2.11;1.7.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.0 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-compiler;2.11.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@ebc2c4a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@8fd7f2f
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.11.0
 [debug] 	local: revision in cache: org.scala-lang#scala-compiler;2.11.0
 [debug] 	found org.scala-lang#scala-compiler;2.11.0 in sbt-chain
@@ -385,7 +385,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.0 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-reflect;2.11.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@77c434c7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2c15a0ff
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.0
 [debug] 	local: revision in cache: org.scala-lang#scala-reflect;2.11.0
 [debug] 	found org.scala-lang#scala-reflect;2.11.0 in sbt-chain
@@ -395,7 +395,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->default(compile)]
 [info] Resolving javax.servlet#javax.servlet-api;3.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7816c4b9
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@44777698
 [debug] sbt-chain: module revision found in cache: javax.servlet#javax.servlet-api;3.1.0
 [debug] 	local: revision in cache: javax.servlet#javax.servlet-api;3.1.0
 [debug] 	found javax.servlet#javax.servlet-api;3.1.0 in sbt-chain
@@ -759,7 +759,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->default(compile)]
 [info] Resolving ch.qos.logback#logback-classic;1.1.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@11d74ce5
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@10f489a0
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-classic;1.1.2
 [debug] 	local: revision in cache: ch.qos.logback#logback-classic;1.1.2
 [debug] 	found ch.qos.logback#logback-classic;1.1.2 in sbt-chain
@@ -768,7 +768,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-core;1.1.2 [runtime->default(compile)]
 [info] Resolving ch.qos.logback#logback-core;1.1.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4b900d2e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@25f2ecc8
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-core;1.1.2
 [debug] 	local: revision in cache: ch.qos.logback#logback-core;1.1.2
 [debug] 	found ch.qos.logback#logback-core;1.1.2 in sbt-chain
@@ -1305,7 +1305,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-core;1.1.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 [test->default(compile)]
 [info] Resolving org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@70686e57
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7bfbaf81
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-specs2_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-specs2_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 in sbt-chain
@@ -1314,7 +1314,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-test_2.11;2.4.0.RC1 [test->default(compile)]
 [info] Resolving org.scalatra#scalatra-test_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@327383fa
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6f7ba4b8
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-test_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-test_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-test_2.11;2.4.0.RC1 in sbt-chain
@@ -1323,7 +1323,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-test_2.11;2.4.0.RC1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@451ce3d7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e8a26d6
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-webapp;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-webapp;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 in sbt-chain
@@ -1332,7 +1332,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-xml;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-xml;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6184eab7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@709864fa
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-xml;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-xml;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-xml;9.2.10.v20150310 in sbt-chain
@@ -1341,7 +1341,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-xml;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-util;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-util;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3e501be8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@27173801
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-util;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-util;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-util;9.2.10.v20150310 in sbt-chain
@@ -1350,7 +1350,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-util;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5c76099
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3148634b
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-servlet;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-servlet;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 in sbt-chain
@@ -1359,7 +1359,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-security;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-security;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e77ab07
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e84615c
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-security;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-security;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-security;9.2.10.v20150310 in sbt-chain
@@ -1368,7 +1368,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-security;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-server;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-server;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9a4e54d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@563440f7
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-server;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-server;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-server;9.2.10.v20150310 in sbt-chain
@@ -1377,7 +1377,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-server;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-http;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-http;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@592bb9c3
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5b4841c7
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-http;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-http;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-http;9.2.10.v20150310 in sbt-chain
@@ -1386,7 +1386,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-http;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-io;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-io;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7ada2d79
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@72301ae8
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-io;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-io;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-io;9.2.10.v20150310 in sbt-chain
@@ -1395,7 +1395,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-io;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-all;1.10.19 [test->default(compile)]
 [info] Resolving org.mockito#mockito-all;1.10.19 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@36684425
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9e6f825
 [debug] sbt-chain: module revision found in cache: org.mockito#mockito-all;1.10.19
 [debug] 	local: revision in cache: org.mockito#mockito-all;1.10.19
 [debug] 	found org.mockito#mockito-all;1.10.19 in sbt-chain
@@ -1404,7 +1404,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-all;1.10.19 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.commons#commons-lang3;3.3.2 [test->default(compile)]
 [info] Resolving org.apache.commons#commons-lang3;3.3.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@54fb4602
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@425cd2b9
 [debug] sbt-chain: module revision found in cache: org.apache.commons#commons-lang3;3.3.2
 [debug] 	local: revision in cache: org.apache.commons#commons-lang3;3.3.2
 [debug] 	found org.apache.commons#commons-lang3;3.3.2 in sbt-chain
@@ -1413,7 +1413,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.commons#commons-lang3;3.3.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpclient;4.3.6 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpclient;4.3.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7e88f488
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7dbd1cc6
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpclient;4.3.6
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpclient;4.3.6
 [debug] 	found org.apache.httpcomponents#httpclient;4.3.6 in sbt-chain
@@ -1422,7 +1422,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpclient;4.3.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpcore;4.3.3 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpcore;4.3.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3dd5957f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3ce92e1c
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpcore;4.3.3
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpcore;4.3.3
 [debug] 	found org.apache.httpcomponents#httpcore;4.3.3 in sbt-chain
@@ -1431,7 +1431,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpcore;4.3.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-logging#commons-logging;1.1.3 [test->default(compile)]
 [info] Resolving commons-logging#commons-logging;1.1.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@10399c57
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@726b9c32
 [debug] sbt-chain: module revision found in cache: commons-logging#commons-logging;1.1.3
 [debug] 	local: revision in cache: commons-logging#commons-logging;1.1.3
 [debug] 	found commons-logging#commons-logging;1.1.3 in sbt-chain
@@ -1440,7 +1440,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-logging#commons-logging;1.1.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-codec#commons-codec;1.6 [test->default(compile)]
 [info] Resolving commons-codec#commons-codec;1.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1d880c83
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@d533d7f
 [debug] sbt-chain: module revision found in cache: commons-codec#commons-codec;1.6
 [debug] 	local: revision in cache: commons-codec#commons-codec;1.6
 [debug] 	found commons-codec#commons-codec;1.6 in sbt-chain
@@ -1449,7 +1449,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-codec#commons-codec;1.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpmime;4.3.6 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpmime;4.3.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6721b447
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@62e00214
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpmime;4.3.6
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpmime;4.3.6
 [debug] 	found org.apache.httpcomponents#httpmime;4.3.6 in sbt-chain
@@ -1458,7 +1458,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpmime;4.3.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#specs2_2.11;2.4.17 [test->default(compile)]
 [info] Resolving org.specs2#specs2_2.11;2.4.17 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@46d8bb24
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e806597
 [debug] sbt-chain: module revision found in cache: org.specs2#specs2_2.11;2.4.17
 [debug] 	local: revision in cache: org.specs2#specs2_2.11;2.4.17
 [debug] 	found org.specs2#specs2_2.11;2.4.17 in sbt-chain
@@ -1467,7 +1467,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#specs2_2.11;2.4.17 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.5 [test->default(compile)]
 [info] Resolving org.scala-lang#scala-compiler;2.11.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@18c50039
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5001fe07
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.11.5
 [debug] 	local: revision in cache: org.scala-lang#scala-compiler;2.11.5
 [debug] 	found org.scala-lang#scala-compiler;2.11.5 in sbt-chain
@@ -1476,7 +1476,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.5 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.5 [test->default(compile)]
 [info] Resolving org.scala-lang#scala-reflect;2.11.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@150a5133
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6d06d769
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.5
 [debug] 	local: revision in cache: org.scala-lang#scala-reflect;2.11.5
 [debug] 	found org.scala-lang#scala-reflect;2.11.5 in sbt-chain
@@ -1486,7 +1486,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.5 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz.stream#scalaz-stream_2.11;0.5a [test->default(compile)]
 [info] Resolving org.scalaz.stream#scalaz-stream_2.11;0.5a ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1c883cf9
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@69b485d5
 [debug] sbt-chain: module revision found in cache: org.scalaz.stream#scalaz-stream_2.11;0.5a
 [debug] 	local: revision in cache: org.scalaz.stream#scalaz-stream_2.11;0.5a
 [debug] 	found org.scalaz.stream#scalaz-stream_2.11;0.5a in sbt-chain
@@ -1496,7 +1496,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz.stream#scalaz-stream_2.11;0.5a [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-core_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-core_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@468ae120
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@374c503a
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-core_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-core_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-core_2.11;7.1.0 in sbt-chain
@@ -1505,7 +1505,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-core_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-concurrent_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-concurrent_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@76b283ee
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@576cc4b1
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-concurrent_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-concurrent_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-concurrent_2.11;7.1.0 in sbt-chain
@@ -1514,7 +1514,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-concurrent_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-effect_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-effect_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@47ff37ea
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@207924b4
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-effect_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-effect_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-effect_2.11;7.1.0 in sbt-chain
@@ -1523,7 +1523,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-effect_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.typelevel#scodec-bits_2.11;1.0.2 [test->default(compile)]
 [info] Resolving org.typelevel#scodec-bits_2.11;1.0.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@438cf43e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@29d61ece
 [debug] sbt-chain: module revision found in cache: org.typelevel#scodec-bits_2.11;1.0.2
 [debug] 	local: revision in cache: org.typelevel#scodec-bits_2.11;1.0.2
 [debug] 	found org.typelevel#scodec-bits_2.11;1.0.2 in sbt-chain
@@ -1533,7 +1533,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.typelevel#scodec-bits_2.11;1.0.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.pegdown#pegdown;1.2.1 [test->default(compile)]
 [info] Resolving org.pegdown#pegdown;1.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@40dbe766
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@39c937c6
 [debug] sbt-chain: module revision found in cache: org.pegdown#pegdown;1.2.1
 [debug] 	local: revision in cache: org.pegdown#pegdown;1.2.1
 [debug] 	found org.pegdown#pegdown;1.2.1 in sbt-chain
@@ -1542,7 +1542,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.pegdown#pegdown;1.2.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-java;1.1.4 [test->default(compile)]
 [info] Resolving org.parboiled#parboiled-java;1.1.4 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@36255320
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@23d146aa
 [debug] sbt-chain: module revision found in cache: org.parboiled#parboiled-java;1.1.4
 [debug] 	local: revision in cache: org.parboiled#parboiled-java;1.1.4
 [debug] 	found org.parboiled#parboiled-java;1.1.4 in sbt-chain
@@ -1551,7 +1551,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-java;1.1.4 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-core;1.1.4 [test->default(compile)]
 [info] Resolving org.parboiled#parboiled-core;1.1.4 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3f1510a2
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@64df6d5a
 [debug] sbt-chain: module revision found in cache: org.parboiled#parboiled-core;1.1.4
 [debug] 	local: revision in cache: org.parboiled#parboiled-core;1.1.4
 [debug] 	found org.parboiled#parboiled-core;1.1.4 in sbt-chain
@@ -1560,7 +1560,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-core;1.1.4 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@349d4176
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@64551d56
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm;4.1
 [debug] 	found org.ow2.asm#asm;4.1 in sbt-chain
@@ -1569,7 +1569,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-tree;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-tree;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@566687c2
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@79ebaff3
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-tree;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-tree;4.1
 [debug] 	found org.ow2.asm#asm-tree;4.1 in sbt-chain
@@ -1578,7 +1578,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-tree;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-analysis;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-analysis;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@548ebdad
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1c0f847
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-analysis;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-analysis;4.1
 [debug] 	found org.ow2.asm#asm-analysis;4.1 in sbt-chain
@@ -1587,7 +1587,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-analysis;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-util;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-util;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5b3c0a59
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1b925f2e
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-util;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-util;4.1
 [debug] 	found org.ow2.asm#asm-util;4.1 in sbt-chain
@@ -1596,7 +1596,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-util;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalacheck#scalacheck_2.11;1.12.1 [test->default(compile)]
 [info] Resolving org.scalacheck#scalacheck_2.11;1.12.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2261d014
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@716404b0
 [debug] sbt-chain: module revision found in cache: org.scalacheck#scalacheck_2.11;1.12.1
 [debug] 	local: revision in cache: org.scalacheck#scalacheck_2.11;1.12.1
 [debug] 	found org.scalacheck#scalacheck_2.11;1.12.1 in sbt-chain
@@ -1605,7 +1605,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalacheck#scalacheck_2.11;1.12.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-sbt#test-interface;1.0 [test->default(compile)]
 [info] Resolving org.scala-sbt#test-interface;1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@280f4285
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@14031e10
 [debug] sbt-chain: module revision found in cache: org.scala-sbt#test-interface;1.0
 [debug] 	local: revision in cache: org.scala-sbt#test-interface;1.0
 [debug] 	found org.scala-sbt#test-interface;1.0 in sbt-chain
@@ -1614,7 +1614,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-sbt#test-interface;1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.hamcrest#hamcrest-core;1.3 [test->default(compile)]
 [info] Resolving org.hamcrest#hamcrest-core;1.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@788d3829
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7528b2cb
 [debug] sbt-chain: module revision found in cache: org.hamcrest#hamcrest-core;1.3
 [debug] 	local: revision in cache: org.hamcrest#hamcrest-core;1.3
 [debug] 	found org.hamcrest#hamcrest-core;1.3 in sbt-chain
@@ -1623,7 +1623,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.hamcrest#hamcrest-core;1.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->default(compile)]
 [info] Resolving org.mockito#mockito-core;1.9.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7ccc7635
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@33f9ab79
 [debug] sbt-chain: module revision found in cache: org.mockito#mockito-core;1.9.5
 [debug] 	local: revision in cache: org.mockito#mockito-core;1.9.5
 [debug] 	found org.mockito#mockito-core;1.9.5 in sbt-chain
@@ -1632,7 +1632,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->default(compile)]
 [info] Resolving org.objenesis#objenesis;1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@490add25
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7ef90439
 [debug] sbt-chain: module revision found in cache: org.objenesis#objenesis;1.0
 [debug] 	local: revision in cache: org.objenesis#objenesis;1.0
 [debug] 	found org.objenesis#objenesis;1.0 in sbt-chain
@@ -1641,7 +1641,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->default(compile)]
 [info] Resolving junit#junit;4.11 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@61e8144d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@f265afa
 [debug] sbt-chain: module revision found in cache: junit#junit;4.11
 [debug] 	local: revision in cache: junit#junit;4.11
 [debug] 	found junit#junit;4.11 in sbt-chain
@@ -1650,7 +1650,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#classycle;1.4.3 [test->default(compile)]
 [info] Resolving org.specs2#classycle;1.4.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@75967ac7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6aa24640
 [debug] sbt-chain: module revision found in cache: org.specs2#classycle;1.4.3
 [debug] 	local: revision in cache: org.specs2#classycle;1.4.3
 [debug] 	found org.specs2#classycle;1.4.3 in sbt-chain
@@ -3937,18 +3937,18 @@
 [debug] 	[NOT REQUIRED] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.2!scala-parser-combinators_2.11.jar(doc)
 [debug] 	[NOT REQUIRED] jline#jline;2.12!jline.jar(doc)
 [debug] 	[NOT REQUIRED] jline#jline;2.12!jline.jar(src)
-[debug] :: resolution report :: resolve 1249ms :: artifacts dl 55ms
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 compile produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 runtime produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 test produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 provided produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-provided.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 optional produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-optional.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 compile-internal produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile-internal.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 runtime-internal produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime-internal.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 test-internal produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test-internal.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 plugin produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-plugin.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 sources produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-sources.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 docs produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-docs.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 pom produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-pom.xml
-[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 scala-tool produced in /Users/keenon/IdeaProjects/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-scala-tool.xml
-[debug] 	resolve done (1249ms resolve - 55ms download)
+[debug] :: resolution report :: resolve 1736ms :: artifacts dl 118ms
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 compile produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 runtime produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 test produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 provided produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-provided.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 optional produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-optional.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 compile-internal produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile-internal.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 runtime-internal produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime-internal.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 test-internal produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test-internal.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 plugin produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-plugin.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 sources produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-sources.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 docs produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-docs.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 pom produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-pom.xml
+[debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 scala-tool produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-scala-tool.xml
+[debug] 	resolve done (1736ms resolve - 118ms download)

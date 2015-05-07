@@ -1,5 +1,8 @@
 package edu.stanford.lense_base
 
+import java.io.{FileWriter, BufferedWriter, File}
+
+import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
@@ -187,24 +190,61 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   // Prints some outputs to stdout that are the result of analysis
-  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], Double)], hcuPool : HCUPool) : Unit = {
+  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "results/default") : Unit = {
     val confusion : mutable.Map[(String,String), Int] = mutable.Map()
     var correct = 0.0
     var incorrect = 0.0
-    for (triple <- l) {
-      for (node <- triple._1.nodes) {
-        val trueValue = triple._2(node)
-        val guessedValue = triple._3(node)
+    var requested = 0.0
+    var completed = 0.0
+    for (quadruple <- l) {
+      for (node <- quadruple._1.nodes) {
+        val trueValue = quadruple._2(node)
+        val guessedValue = quadruple._3(node)
         if (trueValue == guessedValue) correct += 1
         else incorrect += 1
         confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
       }
+      requested += quadruple._4.numRequests
+      completed += quadruple._4.numRequestsCompleted
     }
     println("Accuracy: "+(correct/(correct+incorrect)))
     println("Confusion: "+confusion)
+    println("Requested task completion percentage: "+(completed / requested))
+
+    val f = new File(outputPath)
+    if (!f.exists()) f.mkdirs()
+    if (!f.isDirectory) {
+      f.delete()
+      f.mkdir()
+    }
+
+    val summaryResultFile = new File(outputPath+"/summary.txt")
+    if (!summaryResultFile.exists()) summaryResultFile.createNewFile()
+    val bw = new BufferedWriter(new FileWriter(summaryResultFile))
+    bw.write("Accuracy: "+(correct/(correct+incorrect))+"\n")
+    bw.write("Confusion: "+confusion+"\n")
+    bw.write("Requested task completion percentage: "+(completed / requested)+"\n")
+    bw.close()
+
+    val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
+    def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
+      val plot = new GNUPlot
+      plot.addLine(queries, timeSeriesData)
+      plot.title = xLabel+" vs time"
+      plot.yLabel = xLabel
+      plot.xLabel = "time"
+      plot.saveAnalysis(outputPath+"/"+xLabel.replaceAll(" ","_")+"_plot")
+    }
+    plotAgainstQueries("loss", l.map(_._4.loss).toArray)
+    plotAgainstQueries("cost", l.map(_._4.requestCost).toArray)
+    plotAgainstQueries("queries", l.map(_._4.numRequests).toArray.map(_.asInstanceOf[Double]))
+    plotAgainstQueries("delay", l.map(_._4.timeRequired).toArray.map(_.asInstanceOf[Double]))
+
+
+    println("Detailed charts printed to \""+outputPath+"\"")
   }
 
-  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[(Map[GraphNode, String],Double)] = {
+  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
     lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction)
   }
 
@@ -214,7 +254,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                            humanDelayMean : Int,
                                            humanDelayStd : Int,
                                            rand : Random,
-                                           hcuPool : HCUPool) : Promise[(Map[GraphNode, String],Double)] = {
+                                           hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
     lenseEngine.predict(graph, (n, hcu) => {
       val correct = getCorrectLabel(n, output)
       // Do the automatic error generation

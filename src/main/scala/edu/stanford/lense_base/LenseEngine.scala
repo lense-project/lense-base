@@ -41,8 +41,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }.start()
 
-  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], Double)] = {
-    val promise = Promise[(Map[GraphNode,String], Double)]()
+  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
+    val promise = Promise[(Map[GraphNode,String], PredictionSummary)]()
     InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
     promise
   }
@@ -105,16 +105,28 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 }
 
+case class PredictionSummary(loss : Double,
+                             numRequests : Int,
+                             numRequestsCompleted : Int,
+                             numRequestsFailed : Int,
+                             requestCost : Double,
+                             timeRequired : Long)
+
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
                               askHuman : (GraphNode, HumanComputeUnit) => WorkUnit,
                               hcuPool : HCUPool,
                               lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
-                              returnPromise : Promise[(Map[GraphNode, String], Double)]) extends CaseClassEq {
+                              returnPromise : Promise[(Map[GraphNode, String], PredictionSummary)]) extends CaseClassEq {
   // Create an initial game state
   var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
 
   var turnedIn = false
+
+  var numRequests = 0
+  var numRequestsCompleted = 0
+  var numRequestsFailed = 0
+  var totalCost = 0.0
 
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
@@ -161,13 +173,20 @@ case class InFlightPrediction(engine : LenseEngine,
               val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
               if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
               (matches(0), pair._2)
-            }), gameState.loss())
+            }), PredictionSummary(gameState.loss(),
+              numRequests,
+              numRequestsCompleted,
+              numRequestsFailed,
+              totalCost,
+              System.currentTimeMillis() - gameState.startTime))
           })
       case obs : MakeHumanObservation =>
         // Create a new work unit
         val workUnit = askHuman(obs.node, obs.hcu)
 
         println("Asking human about "+obs.node)
+
+        numRequests += 1
 
         // When the work unit returns, do the following
         workUnit.promise.future.onComplete(t => {
@@ -176,11 +195,14 @@ case class InFlightPrediction(engine : LenseEngine,
               // If the workUnit succeeded, move the gamestate
               println("Received response for "+obs.node+": "+t.get)
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
+              numRequestsCompleted += 1
+              totalCost += obs.hcu.cost
             }
             else {
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)
               // If the workUnit failed, then fail appropriately
               gameState = gameState.getNextStateForFailedRequest(obs.node, obs.hcu, workUnit)
+              numRequestsFailed += 1
             }
           }
           // On every change we should recurse

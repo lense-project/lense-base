@@ -4,7 +4,7 @@
 		module="lense-base-build"
 		revision="0.1-SNAPSHOT"
 		status="integration"
-		publication="20150506105933"
+		publication="20150507112246"
 		e:sbtVersion="0.13" e:scalaVersion="2.10"
 	>
 		<description>
