@@ -1,10 +1,89 @@
 \section{Model}
 \label{sec:model}
 
-MATH HERE.
+\paragraph{Synchronous binary classification}
 
-Should we include "revisiting old examples" as part of model?
+We are given a conditional model $p_\theta(y \given x)$. % and an initial $\theta$,  
+Let $x\oft{t} \in \Re^d$, $y\oft{t} \in \{0,1\}$ be a stream of examples. 
+We get to observe $x\oft{t}$, but not $y\oft{t}$. 
+We decide on queries, $q\oft{t}$, and make the prediction:
+\begin{align*}
+  \yt\oft{t} &= 
+  \begin{cases}
+    \yo\oft{t} = \argmax_y p_\theta(y \given x\oft{t}) & \text{when}~ q\oft{t} = 0 \\
+    \yh\oft{t} \sim h(y\oft{t}) & \text{when}~ q\oft{t} = 1
+  \end{cases},
+\end{align*}
+where $h(y)$ is a human error model.
+Our objective is to minimize regret:
+\begin{align*}
+  \Regret &= \sum_{t=1}^T \ell(y\oft{t}, \yt\oft{t}) + \lambda c(q\oft{t}),
+\end{align*}
+where $c(q)$ is a query cost model.
 
-How do we make this approach more general?
+We get to update $\theta\oft{t}$ only on instances with $q\oft{t} = 1$.
+
+Do we get to make updates after looking at $x\oft{t}$? If we are Bayesian, we could.
+
+\paragraph{Exponential family model, with SGD}
+
+Consider an exponential family model with binary labels. This is equivalent to softmax regression:
+\begin{align*}
+p_\theta(y \given x) 
+&= \softmax{\theta^\top \phi(x,y)} \\
+&=  \frac{1}{1 + \exp(-\theta^\top \phi(x,y))}.
+\end{align*}
+
+In this model, with a cross-entropic loss, we would update our
+parameters as follows:
+\begin{align*}
+  \theta\oft{t+1} &\gets \theta\oft{t} + q\oft{t} \alpha (y\oft{t} - \yt\oft{t}) \phi(x,y).
+\end{align*}
+
+\paragraph{Synchronous structured classification}
+
+Now, let $y\oft{t} \in L^k$. Once again, we have the same model, except that the queries can be for individual labels, e.g.\ $y\oft{t}_{i}$. Then, we have for $i : q\oft{t}_i = 1$,
+\begin{align*}
+  \yh_i\oft{t} &\sim h(y_i\oft{t}) \\
+  \yt\oft{t} &= \argmax_y p_\theta(y | x\oft{t}, \yh_i\oft{t}).
+\end{align*}
+
+\paragraph{Choosing $q\oft{t}$}
+
+The main question in this paper is when should you query a person.
+One strategy is to be myopic, and choose the local best decision:
+\begin{align*}
+  q\oft{t} &= \argmax \{\E_{y\oft{t}}[\ell(y\oft{t}, \yt\oft{t}], \E_{y\oft{t}, \yh\oft{t}}[\ell(y\oft{t}, \yt\oft{t} + \lambda c] \}.
+\end{align*}
+
+Another way to make a decision is to choose a discounted future reward, \todo{complicated expression}.
+
+\todo{Compute the closed form expression of regret? At least for a model.}
 
 
+\paragraph{Asynchronous structured classification}
+
+In practice, it is useful to be asynchronous. One must choose the top-n queries to make, given the current state. I think we could make each subsequent query (after a response) basically come from the argmax of queries not in flight, conditioned on the responses.
+
+\paragraph{Candidate human and cost models}
+
+\begin{align*}
+  h(y) &= 
+  \begin{cases}
+    y  & \text{with probability $\alpha$} \\
+    1 - y  & \text{with probability $1 - \alpha$} \\
+  \end{cases}.
+\end{align*}
+
+\begin{align*}
+  c(q) &= q \gamma.
+\end{align*}
+
+%
+%MATH HERE.
+%
+%Should we include "revisiting old examples" as part of model?
+%
+%How do we make this approach more general?
+%
+%

@@ -1,11 +1,10 @@
 
 LATEX = pdflatex -interaction=nonstopmode
 OUTPUT=$(shell basename `pwd`)
-SECTIONS = 
 
-all: final
+all: $(OUTPUT).pdf
 
-$(OUTPUT).pdf: paper.tex $(SECTIONS)
+$(OUTPUT).pdf: paper.tex *.tex
 	$(LATEX) $< 
 	mv $(subst .tex,.pdf,$<) $(OUTPUT).pdf
 
