@@ -12,7 +12,7 @@ object JettyEmbedded {
     val connector = new SelectChannelConnector()
     connector.setPort(8080)
     server.addConnector(connector)
-    val context: WebAppContext = new WebAppContext("src/main/webapp", "/")
+    val context: WebAppContext = new WebAppContext("src/main/lense-webapp", "/")
     context.setServer(server)
     server.setHandler(context)
 

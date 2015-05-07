@@ -30,11 +30,7 @@ import scala.util.parsing.json.JSONObject
  *
  * A dummy little Websocket implementation
  */
-object WorkUnitServlet extends ScalatraServlet
-  with ScalateSupport with JValueResult
-  with JacksonJsonSupport with SessionSupport
-  with AtmosphereSupport {
-
+object WorkUnitServlet {
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
 
   val workQueue = mutable.Queue[WebWorkUnit]()
@@ -44,7 +40,7 @@ object WorkUnitServlet extends ScalatraServlet
     val connector = new SelectChannelConnector()
     connector.setPort(8080)
     server.addConnector(connector)
-    val context: WebAppContext = new WebAppContext("src/main/webapp", "/")
+    val context: WebAppContext = new WebAppContext("src/main/lense-webapp", "/")
     context.setServer(server)
     server.setHandler(context)
 
@@ -57,15 +53,21 @@ object WorkUnitServlet extends ScalatraServlet
       }
     }
   }
+}
+
+class WorkUnitServlet extends ScalatraServlet
+  with ScalateSupport with JValueResult
+  with JacksonJsonSupport with SessionSupport
+  with AtmosphereSupport {
 
   def addWorkUnit[T](workUnit : WebWorkUnit) = {
     // Add work unit
-    workQueue.synchronized {
-      workQueue.enqueue(workUnit.asInstanceOf[WebWorkUnit])
-      workQueue.notifyAll()
+    WorkUnitServlet.workQueue.synchronized {
+      WorkUnitServlet.workQueue.enqueue(workUnit.asInstanceOf[WebWorkUnit])
+      WorkUnitServlet.workQueue.notifyAll()
     }
     // Boot server if we haven't
-    server
+    WorkUnitServlet.server
   }
 
   atmosphere("/work-socket") {
@@ -135,52 +137,38 @@ object RealHumanHCUPool extends HCUPool {
 // The Human Compute Unit client
 // Handles storing state related to performing tasks
 class HCUClient extends AtmosphereClient with HumanComputeUnit {
-  var ready = false
-
-  RealHumanHCUPool.addHCU(this)
-
   def receive = {
     case Connected =>
-      WorkUnitServlet.workerPool += this
 
     case Disconnected(disconnector, errorOption) =>
       println("Got disconnected")
-      cancelCurrentWork()
       RealHumanHCUPool.removeHCU(this)
-      WorkUnitServlet.workerPool -= this
 
     case Error(Some(error)) =>
       println("Got error")
-      cancelCurrentWork()
       RealHumanHCUPool.removeHCU(this)
-      WorkUnitServlet.workerPool -= this
 
     case TextMessage(text) =>
       send(new TextMessage("ECHO: "+text))
 
     case m : JsonMessage =>
 
+      val map = m.content.asInstanceOf[JObject].obj.toMap
+      if (map.contains("status")) {
+        val status = map.apply("status").values.asInstanceOf[String]
+        if (status == "ready") {
+          if (!RealHumanHCUPool.hcuPool.contains(this)) {
+            RealHumanHCUPool.addHCU(this)
+          }
+        }
+      }
+
       // Let our currentWork unit handle the returned value
 
-      if (currentWork != null) {
+      else if (currentWork != null) {
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
         send(new JsonMessage(new JObject(List("status" -> JString("success")))))
         finishWork(currentWork, replyValue)
-      }
-
-      // This probably means we should be checking for work, so do that
-
-      else {
-        val map = m.content.asInstanceOf[JObject].obj.toMap
-        if (map.contains("status")) {
-          val status = map.apply("status").values.asInstanceOf[String]
-          if (status == "ready") {
-            this.synchronized {
-              ready = true
-              this.notifyAll()
-            }
-          }
-        }
       }
 
     case uncaught =>
@@ -207,8 +195,8 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   // Kick off a job
   override def startWork(workUnit: WorkUnit): Unit = {
     this.synchronized {
-      while (!ready) this.wait()
       val msg = new JsonMessage(workUnit.asInstanceOf[WebWorkUnit].getOutboundMessage)
+      println("Sending message: "+msg)
       send(msg)
     }
   }

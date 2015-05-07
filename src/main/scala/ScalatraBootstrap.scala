@@ -10,12 +10,7 @@ class ScalatraBootstrap extends LifeCycle {
   override def init(context : ServletContext) {
     // Mount servlets.
     context.setInitParameter(ApplicationConfig.SCAN_CLASSPATH, "false")
-    context.mount(WorkUnitServlet, "/*")
 
-    new Thread {
-      override def run(): Unit = {
-        // Do init stuff
-      }
-    }.start()
+    System.out.println("****** Mounting SCALATRA")
   }
 }

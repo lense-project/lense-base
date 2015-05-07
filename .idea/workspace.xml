@@ -2,18 +2,28 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HCUPool.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HCUPool.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseSequenceUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseSequenceUseCase.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/chinese_restaurant/ChatServlet.scala" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/reference/example.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/index.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/lib/jquery-2.1.3.min.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/lib/jquery.atmosphere.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/main.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/style.css" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/test.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/lense-webapp/WEB-INF/web.xml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/WEB-INF/web.xml" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/index.html" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/index.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/lib/jquery-2.1.3.min.js" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/lib/jquery-2.1.3.min.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/lib/jquery.atmosphere.js" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/lib/jquery.atmosphere.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/main.js" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/main.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/reference/example.js" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/reference/example.js" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/style.css" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/style.css" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/webapp/test.txt" afterPath="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/test.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/JettyEmbeded.scala" afterPath="$PROJECT_DIR$/src/main/scala/JettyEmbeded.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" afterPath="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/lense-base.iml" afterPath="$PROJECT_DIR$/.idea/modules/lense-base.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -43,98 +53,76 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="GraphStream.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4605" max-vertical-offset="13560">
-              <caret line="307" column="39" selection-start-line="307" selection-start-column="39" selection-end-line="307" selection-end-column="39" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LenseEngine.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1257" max-vertical-offset="2910">
-              <caret line="170" column="0" selection-start-line="170" selection-start-column="0" selection-end-line="170" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LenseUseCase.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1080" max-vertical-offset="4815">
-              <caret line="99" column="2" selection-start-line="99" selection-start-column="2" selection-end-line="99" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GamePlayer.scala" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.66543436" vertical-offset="750" max-vertical-offset="3630">
-              <caret line="80" column="6" selection-start-line="80" selection-start-column="6" selection-end-line="80" selection-end-column="6" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LenseSequenceUseCase.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseSequenceUseCase.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1665">
-              <caret line="20" column="112" selection-start-line="20" selection-start-column="112" selection-end-line="20" selection-end-column="112" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HumanComputeUnit.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="2070">
-              <caret line="45" column="6" selection-start-line="45" selection-start-column="6" selection-end-line="45" selection-end-column="6" />
-              <folding>
-                <element signature="e#46#92#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="WorkUnitServlet.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="788" max-vertical-offset="2970">
-              <caret line="100" column="75" selection-start-line="100" selection-start-column="75" selection-end-line="100" selection-end-column="75" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="3135">
+              <caret line="160" column="40" selection-start-line="160" selection-start-column="40" selection-end-line="160" selection-end-column="40" />
+              <folding>
+                <element signature="e#40#61#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="web.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/lense-webapp/WEB-INF/web.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="WorkUnit.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala">
+      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="38" max-vertical-offset="630">
-              <caret line="14" column="2" selection-start-line="14" selection-start-column="2" selection-end-line="14" selection-end-column="2" />
+            <state vertical-scroll-proportion="-8.125" vertical-offset="0" max-vertical-offset="345">
+              <caret line="13" column="25" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="style.css" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/style.css">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/main.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.22181146" vertical-offset="0" max-vertical-offset="1065">
+              <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ChatServlet.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/chinese_restaurant/ChatServlet.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="899" max-vertical-offset="1455">
+              <caret line="75" column="20" selection-start-line="75" selection-start-column="20" selection-end-line="75" selection-end-column="20" />
               <folding>
-                <element signature="e#46#92#0" expanded="true" />
+                <element signature="e#45#66#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NERUseCase.scala" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
+      <file leaf-file-name="ScalatraBootstrap.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1485">
-              <caret line="15" column="25" selection-start-line="15" selection-start-column="25" selection-end-line="15" selection-end-column="25" />
-              <folding>
-                <element signature="e#42#88#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -160,18 +148,25 @@
         <option value="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/graph/GraphStreamTests.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/Lense.scala" />
         <option value="$PROJECT_DIR$/results/allowed-pre-training.txt" />
-        <option value="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HCUPool.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseSequenceUseCase.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERExample.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/JettyEmbeded.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/chinese_restaurant/ChatServer.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala" />
+        <option value="$PROJECT_DIR$/src/main/lense-webapp/WEB-INF/web.xml" />
+        <option value="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/WEB-INF/web.xml" />
+        <option value="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/index.html" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/chinese_restaurant/ChatServlet.scala" />
+        <option value="$PROJECT_DIR$/src/main/chinese-restaurant-webapp/main.js" />
       </list>
     </option>
   </component>
@@ -180,7 +175,7 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="104" />
+    <option name="x" value="98" />
     <option name="y" value="109" />
     <option name="width" value="1760" />
     <option name="height" value="971" />
@@ -289,24 +284,6 @@
               <option name="myItemId" value="main" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lense-base" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="lense-base" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="scala" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
@@ -331,6 +308,70 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="JettyEmbeded.scala" />
+              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="stanford" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="chinese_restaurant" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ChatServlet.scala" />
+              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="stanford" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -360,12 +401,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="stanford" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="lense_base" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="gameplaying" />
+              <option name="myItemId" value="server" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="WorkUnitServlet.scala" />
+              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -387,6 +436,10 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="stanford" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
@@ -395,6 +448,50 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="examples" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="NERUseCase.scala" />
+              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lense-base" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="main" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="chinese-restaurant-webapp" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -450,55 +547,17 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../spark-training" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="restartRequiresConfirmation" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main" />
       <recent name="$PROJECT_DIR$/data" />
       <recent name="$PROJECT_DIR$/src/main/scala" />
       <recent name="$PROJECT_DIR$/lib" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RunTestCase">
-    <configuration default="false" name="NERExample" type="Application" factoryName="Application" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.examples.NERExample" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="lense-base" />
-      <envs />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Debug" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
-    <configuration default="false" name="NERLearn" type="Application" factoryName="Application" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
-      <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.NERLearn" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="lense-base" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Application.ChatServer">
     <configuration default="false" name="NERLearnCRF" type="Application" factoryName="Application" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.graph.NERLearnCRF" />
@@ -548,6 +607,23 @@
     <configuration default="false" name="WorkUnitServlet" type="Application" factoryName="Application" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="edu.stanford.lense_base.server.WorkUnitServlet" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="lense-base" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ChatServer" type="Application" factoryName="Application" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" value="edu.stanford.nlp.chinese_restaurant.ChatServer" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -730,20 +806,18 @@
       <envs />
       <method />
     </configuration>
-    <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Application.NERExample" />
-      <item index="1" class="java.lang.String" itemvalue="Application.NERLearn" />
-      <item index="2" class="java.lang.String" itemvalue="Application.NERLearnCRF" />
-      <item index="3" class="java.lang.String" itemvalue="Application.RunTestCase" />
-      <item index="4" class="java.lang.String" itemvalue="Application.WorkUnitServlet" />
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Application.NERLearnCRF" />
+      <item index="1" class="java.lang.String" itemvalue="Application.RunTestCase" />
+      <item index="2" class="java.lang.String" itemvalue="Application.WorkUnitServlet" />
+      <item index="3" class="java.lang.String" itemvalue="Application.ChatServer" />
     </list>
     <recent_temporary>
-      <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.RunTestCase" />
-        <item index="1" class="java.lang.String" itemvalue="Application.NERLearnCRF" />
-        <item index="2" class="java.lang.String" itemvalue="Application.WorkUnitServlet" />
-        <item index="3" class="java.lang.String" itemvalue="Application.NERExample" />
-        <item index="4" class="java.lang.String" itemvalue="Application.NERLearn" />
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="Application.ChatServer" />
+        <item index="1" class="java.lang.String" itemvalue="Application.RunTestCase" />
+        <item index="2" class="java.lang.String" itemvalue="Application.NERLearnCRF" />
+        <item index="3" class="java.lang.String" itemvalue="Application.WorkUnitServlet" />
       </list>
     </recent_temporary>
   </component>
@@ -798,8 +872,8 @@
     <option name="totallyTimeSpent" value="3297000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="104" y="109" width="1760" height="971" extended-state="0" />
-    <editor active="false" />
+    <frame x="98" y="109" width="1760" height="971" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -813,7 +887,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34742856" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2176196" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2176196" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -877,7 +951,6 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="Making le changes" />
     <MESSAGE value="Multiple calls to learning doesn't restart cleanly. Disaster" />
     <MESSAGE value="Fixing some race conditions when using the parallel trainer. Map training still doesn't work, though, so that needs to get fixed." />
     <MESSAGE value="Think I found the exponential blowup bug, also working on early stopping optimizer bug." />
@@ -902,7 +975,8 @@
     <MESSAGE value="Slight optimization so online training behaves properly." />
     <MESSAGE value="Delaying simulated humans along a normal curve." />
     <MESSAGE value="Have promise machinery in, now bugfixing." />
-    <option name="LAST_COMMIT_MESSAGE" value="Have promise machinery in, now bugfixing." />
+    <MESSAGE value="Have threshold based player who can operate in an asynchronous setting, where annotator churn is huge." />
+    <option name="LAST_COMMIT_MESSAGE" value="Have threshold based player who can operate in an asynchronous setting, where annotator churn is huge." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -929,110 +1003,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="180" column="12" selection-start-line="180" selection-start-column="12" selection-end-line="180" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="245" column="25" selection-start-line="245" selection-start-column="25" selection-end-line="245" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="66" column="20" selection-start-line="66" selection-start-column="20" selection-end-line="66" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#46#92#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HCUPool.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#46#92#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="89" column="30" selection-start-line="89" selection-start-column="30" selection-end-line="89" selection-end-column="30" />
-          <folding>
-            <element signature="e#42#88#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/la/Tensor3.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="392" column="0" selection-start-line="392" selection-start-column="0" selection-end-line="392" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/JettyEmbeded.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/optimize/GradientStep.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3321234" vertical-offset="0" max-vertical-offset="0">
-          <caret line="28" column="27" selection-start-line="28" selection-start-column="27" selection-end-line="28" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/util/Threading.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/la/Tensor.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="0">
-          <caret line="48" column="18" selection-start-line="48" selection-start-column="18" selection-end-line="48" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1-sources.jar!/cc/factorie/variable/VectorVariable.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.9034335" vertical-offset="0" max-vertical-offset="0">
@@ -1257,29 +1227,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="788" max-vertical-offset="2970">
-          <caret line="100" column="75" selection-start-line="100" selection-start-column="75" selection-end-line="100" selection-end-column="75" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1080" max-vertical-offset="4815">
           <caret line="99" column="2" selection-start-line="99" selection-start-column="2" selection-end-line="99" selection-end-column="2" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1485">
-          <caret line="15" column="25" selection-start-line="15" selection-start-column="25" selection-end-line="15" selection-end-column="25" />
-          <folding>
-            <element signature="e#42#88#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1303,8 +1255,140 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.66543436" vertical-offset="750" max-vertical-offset="3630">
+        <state vertical-scroll-proportion="0.0" vertical-offset="750" max-vertical-offset="3630">
           <caret line="80" column="6" selection-start-line="80" selection-start-column="6" selection-end-line="80" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/lense-webapp/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.40618956" vertical-offset="0" max-vertical-offset="517">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/lib/jquery-2.1.3.min.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="528">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/JettyEmbeded.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
+          <caret line="14" column="4" selection-start-line="14" selection-start-column="4" selection-end-line="14" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/ApplicationConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334" vertical-offset="9394" max-vertical-offset="12480">
+          <caret line="652" column="29" selection-start-line="652" selection-start-column="29" selection-end-line="652" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="580" max-vertical-offset="1425">
+          <caret line="92" column="2" selection-start-line="92" selection-start-column="2" selection-end-line="92" selection-end-column="2" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/ScalatraBootstrap.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="240">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.eclipse.jetty/jetty-servlet/srcs/jetty-servlet-9.2.10.v20150310-sources.jar!/org/eclipse/jetty/servlet/ServletContextHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="12840" max-vertical-offset="18165">
+          <caret line="1017" column="45" selection-start-line="1017" selection-start-column="45" selection-end-line="1017" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/srcs/scalatra-atmosphere_2.11-2.4.0.RC1-sources.jar!/org/scalatra/atmosphere/AtmosphereSupport.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1099" max-vertical-offset="3420">
+          <caret line="115" column="0" selection-start-line="115" selection-start-column="0" selection-end-line="115" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/lense-webapp/WEB-INF/web.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="3135">
+          <caret line="160" column="40" selection-start-line="160" selection-start-column="40" selection-end-line="160" selection-end-column="40" />
+          <folding>
+            <element signature="e#40#61#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/WEB-INF/web.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.74861366" vertical-offset="0" max-vertical-offset="615">
+          <caret line="27" column="43" selection-start-line="27" selection-start-column="43" selection-end-line="27" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.ivy2/cache/org.atmosphere/atmosphere-runtime/srcs/atmosphere-runtime-2.2.6-sources.jar!/org/atmosphere/cpr/AtmosphereFramework.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="28050" max-vertical-offset="42135">
+          <caret line="2075" column="23" selection-start-line="2075" selection-start-column="23" selection-end-line="2075" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/style.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="541">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-8.125" vertical-offset="0" max-vertical-offset="345">
+          <caret line="13" column="25" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/chinese_restaurant/ChatServlet.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="899" max-vertical-offset="1455">
+          <caret line="75" column="20" selection-start-line="75" selection-start-column="20" selection-end-line="75" selection-end-column="20" />
+          <folding>
+            <element signature="e#45#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/chinese-restaurant-webapp/main.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.22181146" vertical-offset="0" max-vertical-offset="1065">
+          <caret line="8" column="27" selection-start-line="8" selection-start-column="27" selection-end-line="8" selection-end-column="27" />
           <folding />
         </state>
       </provider>
