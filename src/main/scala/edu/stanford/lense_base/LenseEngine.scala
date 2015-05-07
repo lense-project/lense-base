@@ -41,8 +41,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }.start()
 
-  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[Map[GraphNode, String]] = {
-    val promise = Promise[Map[GraphNode,String]]()
+  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], Double)] = {
+    val promise = Promise[(Map[GraphNode,String], Double)]()
     InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
     promise
   }
@@ -110,7 +110,7 @@ case class InFlightPrediction(engine : LenseEngine,
                               askHuman : (GraphNode, HumanComputeUnit) => WorkUnit,
                               hcuPool : HCUPool,
                               lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
-                              returnPromise : Promise[Map[GraphNode, String]]) extends CaseClassEq {
+                              returnPromise : Promise[(Map[GraphNode, String], Double)]) extends CaseClassEq {
   // Create an initial game state
   var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
 
@@ -157,11 +157,11 @@ case class InFlightPrediction(engine : LenseEngine,
         }
 
         returnPromise.complete(Try {
-            mapEstimate.map(pair => {
+            (mapEstimate.map(pair => {
               val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
               if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
               (matches(0), pair._2)
-            })
+            }), gameState.loss())
           })
       case obs : MakeHumanObservation =>
         // Create a new work unit

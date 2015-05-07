@@ -68,6 +68,7 @@ trait HumanComputeUnit {
       throw new IllegalStateException("Shouldn't be finishing something that isn't our current work")
     }
     if (!workUnit.isRevoked) {
+      workUnit.finished(this)
       workUnit.promise.complete(Try {
         answer
       })

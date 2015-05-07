@@ -10,14 +10,16 @@ import scala.util.Try
  *
  * Holds a single job to ask an HCU pool to complete
  */
-class WorkUnit(resultPromise : Promise[String], initNode : GraphNode) {
+class WorkUnit(resultPromise : Promise[String], initNode : GraphNode, hcuPool : HCUPool) {
 
   val graphNode = initNode
-
   private var _revoked = false
+
+  hcuPool.numWorkUnitsRequested += 1
 
   def revoke() = this.synchronized {
     _revoked = true
+    hcuPool.numWorkUnitsRevoked += 1
     taskFailed()
   }
 
@@ -30,7 +32,13 @@ class WorkUnit(resultPromise : Promise[String], initNode : GraphNode) {
       throw e
     })
   }
+
   def promise = resultPromise
+
+  def finished(finisher : HumanComputeUnit) = {
+    hcuPool.numWorkUnitsCompleted += 1
+    hcuPool.totalMoneySpent += finisher.cost
+  }
 }
 
 class WorkNotCompletedException extends Exception

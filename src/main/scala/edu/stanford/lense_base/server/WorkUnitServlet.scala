@@ -90,7 +90,7 @@ class WorkUnitServlet extends ScalatraServlet
   }
 }
 
-abstract class WebWorkUnit(resultPromise : Promise[String], node : GraphNode) extends WorkUnit(resultPromise, node) {
+abstract class WebWorkUnit(resultPromise : Promise[String], node : GraphNode) extends WorkUnit(resultPromise, node, RealHumanHCUPool) {
   def getOutboundMessage : JValue
   def parseReplyMessage(m : JValue) : String
 }

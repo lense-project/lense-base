@@ -133,9 +133,9 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
-      renderClassification(graph, goldMap, guessMap)
-      (graph, goldMap, guessMap)
-    }))
+      renderClassification(graph, goldMap, guessMap._1)
+      (graph, goldMap, guessMap._1, guessMap._2)
+    }), hcuPool)
 
     hcuPool.kill()
   }
@@ -149,7 +149,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
     System.err.println("Starting server")
     WorkUnitServlet.server
-    System.err.println("Waiting 5 seconds for you to connect")
+    System.err.println("Waiting 5 seconds for you to connect, because some gameplayers will see an empty worker pool and just rip through the data")
     Thread.sleep(5000)
 
     analyzeOutput(goldPairs.map(pair => {
@@ -159,9 +159,9 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithRealHumans(graph, RealHumanHCUPool).future, 1000 days)
-      renderClassification(graph, goldMap, guessMap)
-      (graph, goldMap, guessMap)
-    }))
+      renderClassification(graph, goldMap, guessMap._1)
+      (graph, goldMap, guessMap._1, guessMap._2)
+    }), RealHumanHCUPool)
   }
 
   /**
@@ -175,7 +175,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     val promise = Promise[Output]()
     classifyWithRealHumans(graphAndQuestion, RealHumanHCUPool).future.onComplete(t => {
       if (t.isSuccess) {
-        promise.complete(Try { toOutput(graphAndQuestion, t.get) })
+        promise.complete(Try { toOutput(graphAndQuestion, t.get._1) })
       }
       else {
         promise.complete(Try {
@@ -187,7 +187,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   // Prints some outputs to stdout that are the result of analysis
-  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String])]) : Unit = {
+  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], Double)], hcuPool : HCUPool) : Unit = {
     val confusion : mutable.Map[(String,String), Int] = mutable.Map()
     var correct = 0.0
     var incorrect = 0.0
@@ -204,7 +204,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     println("Confusion: "+confusion)
   }
 
-  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[Map[GraphNode, String]] = {
+  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[(Map[GraphNode, String],Double)] = {
     lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction)
   }
 
@@ -214,7 +214,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                            humanDelayMean : Int,
                                            humanDelayStd : Int,
                                            rand : Random,
-                                           hcuPool : HCUPool) : Promise[Map[GraphNode, String]] = {
+                                           hcuPool : HCUPool) : Promise[(Map[GraphNode, String],Double)] = {
     lenseEngine.predict(graph, (n, hcu) => {
       val correct = getCorrectLabel(n, output)
       // Do the automatic error generation
@@ -227,7 +227,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       }
 
       val promise = Promise[String]()
-      val workUnit = ArtificialWorkUnit(promise, guess, n)
+      val workUnit = ArtificialWorkUnit(promise, guess, n, hcuPool)
       hcu.addWorkUnit(workUnit)
       workUnit
     },
@@ -276,7 +276,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
   }.start()
 }
 
-case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode) extends WorkUnit(resultPromise, node)
+case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode, hcuPool : HCUPool) extends WorkUnit(resultPromise, node, hcuPool)
 
 class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HumanComputeUnit {
   // Gets the estimated required time to perform this task, in milliseconds
