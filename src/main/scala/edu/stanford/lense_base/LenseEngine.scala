@@ -42,7 +42,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
       while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
           System.err.println("Retraining model")
-          learnHoldingPastGuessesConstant(1.0)
+          learnHoldingPastGuessesConstant(10.0)
           System.err.println("Hot swapping model")
           trainedOnGuesses = pastGuesses.size
         }

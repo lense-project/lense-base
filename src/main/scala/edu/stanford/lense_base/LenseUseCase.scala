@@ -161,6 +161,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
 
+      val confidenceSet = graph.marginalEstimate().map(pair => {
+        pair._2.maxBy(_._2)._2
+      })
+      val initialAverageConfidence = confidenceSet.sum / confidenceSet.size
+      val initialMinConfidence = confidenceSet.min
+      val initialMaxConfidence = confidenceSet.max
+
       val guessMap = graph.mapEstimate()
 
       // Retrain after each example
@@ -174,12 +181,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       val idx = goldPairs.indexOf(pair)
       if (idx < 50 || (idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
-        graphStream.learn(trainingExamples)
+        graphStream.learn(trainingExamples, 10.0)
       }
 
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
-      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0))
+      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence))
     }), null, "offline_baseline")
 
     System.exit(0)
@@ -261,7 +268,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   // Prints some outputs to stdout that are the result of analysis
   private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "default") : Unit = {
-    val confusion : mutable.Map[(String,String), Int] = mutable.Map()
     var correct = 0.0
     var incorrect = 0.0
     var requested = 0.0
@@ -274,7 +280,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         val guessedValue = quad._3(node)
         if (trueValue == guessedValue) correct += 1
         else incorrect += 1
-        confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
         tokens += 1
       }
       requested += quad._4.numRequests
@@ -282,7 +287,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       time += quad._4.timeRequired
     }
     println("Accuracy: "+(correct/(correct+incorrect)))
-    println("Confusion: "+confusion)
     println("Requested task completion percentage: "+(completed / requested))
     println("Avg time/token: "+(time / tokens))
     println("Avg requests/token: "+(requested / tokens))
@@ -301,21 +305,60 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     if (!summaryResultFile.exists()) summaryResultFile.createNewFile()
     val bw = new BufferedWriter(new FileWriter(summaryResultFile))
     bw.write("Accuracy: "+(correct/(correct+incorrect))+"\n")
-    bw.write("Confusion: "+confusion+"\n")
     bw.write("Requested task completion percentage: "+(completed / requested)+"\n")
     bw.write("Avg time/token: "+(time / tokens)+"\n")
     bw.write("Avg requests/token: "+(requested / tokens)+"\n")
     bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
     bw.close()
 
-    val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
+    val nodeTypes = l.flatMap(_._1.nodes).map(_.nodeType).distinct.toList
+    for (nodeType <- nodeTypes) {
+      // Get the confusion matrix
+      val confusion : mutable.Map[(String,String), Int] = mutable.Map()
+      for (quad <- l) {
+        for (node <- quad._1.nodes) {
+          if (node.nodeType eq nodeType) {
+            val trueValue = quad._2(node)
+            val guessedValue = quad._3(node)
+            confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
+          }
+        }
+      }
+      // Write out to the file
+      val confusionResultFile = new File(resultsPrefix+outputPath+"/confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv")
+      if (!confusionResultFile.exists()) confusionResultFile.createNewFile()
+      val cw = new BufferedWriter(new FileWriter(confusionResultFile))
+      // Write out header row
+      cw.write("COL=GUESS;ROW=GOLD")
+      for (guess <- nodeType.possibleValues) {
+        cw.write(",")
+        cw.write(guess)
+      }
+      cw.write("\n")
+
+      for (gold <- nodeType.possibleValues) {
+        cw.write(gold)
+        cw.write(",")
+        var j = 0
+        for (guess <- nodeType.possibleValues) {
+          if (j > 0) {
+            cw.write(",")
+          }
+          j += 1
+          cw.write(""+confusion.getOrElse((gold, guess), 0))
+        }
+        cw.write("\n")
+      }
+      cw.close()
+    }
+
     def smoothTimeSeries(timeSeriesData : Array[Double], timeToAvg : Int) : Array[Double] = {
       var sum = 0.0
       val newData = new Array[Double](timeSeriesData.length)
       for (i <- 0 to timeSeriesData.length-1) {
         sum += timeSeriesData(i)
         if (i < timeToAvg) {
-          newData.update(i, sum / i)
+          newData.update(i, sum / (i+1))
         }
         else {
           sum -= timeSeriesData(i-timeToAvg)
@@ -325,6 +368,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       newData
     }
 
+    val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
     def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
       val plot = new GNUPlot
       plot.addLine(queries, timeSeriesData)
@@ -341,7 +385,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     plotAgainstQueries("delay per token", l.map(quad => quad._4.timeRequired.asInstanceOf[Double] / quad._1.nodes.size).toArray)
     plotAgainstQueries("prior min confidence", l.map(quad => quad._4.initialMinConfidence).toArray)
     plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialMaxConfidence).toArray)
-    plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialAvgConfidence).toArray)
+    plotAgainstQueries("prior avg confidence", l.map(quad => quad._4.initialAvgConfidence).toArray)
     plotAgainstQueries("accuracy", l.map(quad => {
       var localCorrect = 0.0
       var localIncorrect = 0.0
