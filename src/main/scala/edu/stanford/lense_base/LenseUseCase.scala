@@ -295,9 +295,27 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     bw.close()
 
     val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
+    def smoothTimeSeries(timeSeriesData : Array[Double], timeToAvg : Int) : Array[Double] = {
+      var sum = 0.0
+      val newData = new Array[Double](timeSeriesData.length)
+      for (i <- 0 to timeSeriesData.length-1) {
+        sum += timeSeriesData(i)
+        if (i < timeToAvg) {
+          newData.update(i, sum / i)
+        }
+        else {
+          sum -= timeSeriesData(i-timeToAvg)
+          newData.update(i, sum / timeToAvg)
+        }
+      }
+      newData
+    }
+
     def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
       val plot = new GNUPlot
       plot.addLine(queries, timeSeriesData)
+      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 30))
+      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 100))
       plot.title = xLabel+" vs time"
       plot.yLabel = xLabel
       plot.xLabel = "time"

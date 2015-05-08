@@ -67,7 +67,8 @@ object OneQuestionBaseline extends NQuestionBaseline(1)
 // count against the uncertainty of a node already.
 
 object ThresholdHeuristic extends GamePlayer {
-  val threshold = 0.7
+  // This actually seems fairly reasonable to expect the model to do. 50% on a several class problem is totally ok.
+  val threshold = 0.5
   // One obsevation cuts uncertainty by half, in expectation
   val humanUncertaintyMultiple = 0.5
 
