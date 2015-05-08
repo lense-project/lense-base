@@ -47,7 +47,12 @@ class NQuestionBaseline(n : Int) extends GamePlayer {
     for (node <- state.originalGraph.nodes) {
       val numReqs = state.completedRequests.count(_._1 eq node) + state.inFlightRequests.count(_._1 eq node)
       if (numReqs < n) {
-        return MakeHumanObservation(node, state.hcuPool.hcuPool.minBy(hcu => hcu.estimateRequiredTimeIncludingQueue(node)))
+        if (state.hcuPool.hcuPool.size > 0) {
+          return MakeHumanObservation(node, state.hcuPool.hcuPool.minBy(hcu => hcu.estimateRequiredTimeIncludingQueue(node)))
+        }
+        else {
+          return Wait()
+        }
       }
     }
 

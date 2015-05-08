@@ -21,9 +21,7 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def labelTypes: Set[String] = (data ++ trainSet).flatMap(_._2).distinct.toSet
 
-  override def getHumanQuestion(sequence: List[String], i: Int, hcu : HumanComputeUnit, node : GraphNode): GraphNodeQuestion = {
-    val answers = labelTypes.map(s => GraphNodeAnswer("<b>"+s+"</b>", s)).toList
-
+  override def getHumanQuestion(sequence: List[String], i: Int): String = {
     var question = "Dear NLP Researcher:<br>What NER type is this?<br>"
     for (j <- 0 to sequence.length-1) {
       if (j > 0) question += " "
@@ -31,9 +29,10 @@ class NERUseCase extends LenseSequenceUseCase {
       question += sequence(j)
       if (i == j) question += " ]</b>"
     }
-
-    GraphNodeQuestion(question, answers, hcu, node)
+    question
   }
+
+  override def getHumanVersionOfLabel(label: String): String = "<b>"+label+"<\b>"
 
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
@@ -45,12 +44,13 @@ class NERUseCase extends LenseSequenceUseCase {
     expectedErrors*4 + cost
   }
 
-  override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] =
+  override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
     Map(
-      "token:"+sequence(i) -> 1.0,
-      "upperCase:"+sequence(i)(0).isUpper -> 1.0,
+      "token:" + sequence(i).toLowerCase -> 1.0,
+      "capitalized:" + (sequence(i)(0).isUpper && sequence(i).exists(_.isLower)) -> 1.0,
       "BIAS" -> 0.0
     )
+  }
 
   def loadNER : List[(List[String],List[String])] = {
     val loadedData : ListBuffer[(List[String],List[String])] = ListBuffer()

@@ -2,6 +2,7 @@ $(function () {
     "use strict";
 
     var content = $('#content');
+    var input = $('#input');
     var socket = $.atmosphere;
 
     // We are now ready to cut the request
@@ -26,25 +27,8 @@ $(function () {
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
-            if (json.type === "multiclass") {
-                // We need to create a multiclass question here
-                content.html(json.html+"<br>");
-
-                for (var choiceID in json.choices) {
-                    var choice = json.choices[choiceID];
-                    var b = $('<button/>', {class: 'choice'});
-                    b.html(choice);
-                    content.append(b);
-
-                    // I hate Javascript so much. I just can't even describe it.
-                    b.click((function(closureChoice) {
-                        return function() {
-                            console.log("Choosing "+closureChoice);
-                            subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
-                            content.html("Congratulations! You've finished everything. Waiting for next question from the server...");
-                        }
-                    })(choice));
-                }
+            if (json.message) {
+                addMessage("server", json.message, "red", new Date());
             }
         } catch (e) {
             console.log('This doesn\'t look like a valid JSON: ', message);
@@ -61,6 +45,26 @@ $(function () {
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
             + 'socket or the server is down' }));
     };
+
+    input.keydown(function(e) {
+        if (e.keyCode === 13) {
+            var msg = $(this).val();
+
+            var json = {
+                message: msg
+            };
+
+            addMessage("me", msg, "blue", new Date());
+
+            subSocket.push(jQuery.stringifyJSON(json));
+            $(this).val('');
+        }
+    });
+
+    function addMessage(author, message, color, datetime) {
+        content.append(
+            '<p><span style="color:' + color + '">' + author + '</span> @ ' + +(datetime.getHours() < 10 ? '0' + datetime.getHours() : datetime.getHours()) + ':' + (datetime.getMinutes() < 10 ? '0' + datetime.getMinutes() : datetime.getMinutes()) + ': ' + message + '</p>');
+    }
 
     var subSocket = socket.subscribe(request);
 });

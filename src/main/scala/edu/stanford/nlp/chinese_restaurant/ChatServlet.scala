@@ -62,7 +62,26 @@ class ChatServlet extends ScalatraServlet
   implicit protected def jsonFormats: Formats = org.json4s.DefaultFormats
 }
 
+abstract class ChatEngine {
+  def receiveMessage(msg : String, sendReply : (String) => Unit) : Unit
+}
+
+object YourMomChatEngine extends ChatEngine {
+  override def receiveMessage(msg: String, sendReply: (String) => Unit): Unit = {
+    sendReply("Your mom likes \""+msg+"\"")
+  }
+}
+
 class ChatSocket extends AtmosphereClient {
+  val chatEngine = YourMomChatEngine
+
+  def sendMessage(msg : String): Unit = {
+    System.err.println("Sending message: "+msg)
+    send(new JsonMessage(new JObject(List(
+      "message" -> msg
+    ))))
+  }
+
   def receive = {
     case Connected =>
 
@@ -82,6 +101,11 @@ class ChatSocket extends AtmosphereClient {
         if (status == "ready") {
           System.err.println("Got a new chat customer!")
         }
+      }
+      if (map.contains("message")) {
+        val msg = map.apply("message").values.asInstanceOf[String]
+        System.err.println("Got new message: "+msg)
+        chatEngine.receiveMessage(msg, sendMessage)
       }
 
     case uncaught =>

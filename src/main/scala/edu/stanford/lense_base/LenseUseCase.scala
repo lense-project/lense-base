@@ -136,6 +136,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
     }), hcuPool, "artificial_human")
@@ -160,7 +161,12 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       }
       trainingExamples = trainingExamples :+ graph
 
-      graphStream.learn(trainingExamples)
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
+
+      val idx = goldPairs.indexOf(pair)
+      if (idx < 50 || (idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
+        graphStream.learn(trainingExamples)
+      }
 
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
@@ -190,6 +196,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
     }), hcuPool, "all_human_"+numQueriesPerNode)
@@ -218,6 +225,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithRealHumans(graph, RealHumanHCUPool).future, 1000 days)
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
     }), RealHumanHCUPool, "real_human")

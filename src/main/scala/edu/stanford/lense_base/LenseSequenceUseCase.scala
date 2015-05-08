@@ -18,7 +18,8 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
 
   def labelTypes : Set[String]
   def featureExtractor(sequence : List[String], i : Int) : Map[String, Double]
-  def getHumanQuestion(sequence : List[String], i : Int, hcu : HumanComputeUnit, node : GraphNode) : GraphNodeQuestion
+  def getHumanQuestion(sequence : List[String], i : Int) : String
+  def getHumanVersionOfLabel(label : String) : String
   def lossFunction(sequence : List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double) : Double
 
   lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
@@ -50,7 +51,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
 
   override def getQuestion(node : GraphNode, hcu : HumanComputeUnit) : GraphNodeQuestion = {
     val pair = node.payload.asInstanceOf[(List[String],Int)]
-    getHumanQuestion(pair._1, pair._2, hcu, node)
+    GraphNodeQuestion(getHumanQuestion(pair._1, pair._2), labelTypes.toList.map(l => new GraphNodeAnswer(getHumanVersionOfLabel(l), l)), hcu, node)
   }
 
   /**
