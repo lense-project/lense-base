@@ -20,10 +20,17 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * This holds the abstract guts of a use case for Lense, which should help minimize crufty overhead when generating new
  * use cases. You can of course still use LenseEngine directly, but this might be a time-saver in general
  */
-abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
+abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   lazy val graphStream : GraphStream = new GraphStream()
   lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
+
+  lazy val ensureWorkServerWithDelay = {
+    System.err.println("Starting server")
+    WorkUnitServlet.server
+    System.err.println("Waiting 5 seconds for you to connect, because some gameplayers will see an empty worker pool and just rip through the data")
+    Thread.sleep(5000)
+  }
 
   def initialize() : Unit = {
     // Add the training data as a list of labeled graphs
@@ -125,7 +132,9 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                humanDelayMean : Int,
                                humanDelayStd : Int,
                                workUnitCost : Double,
-                               startNumArtificialHumans : Int) : Unit = {
+                               startNumArtificialHumans : Int,
+                               saveTitle : String) : Unit = {
+    ensureWorkServerWithDelay
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
 
@@ -139,7 +148,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
-    }), hcuPool, "artificial_human")
+    }), hcuPool, saveTitle)
 
     hcuPool.kill()
 
@@ -213,10 +222,6 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
-    System.err.println("Starting server")
-    WorkUnitServlet.server
-    System.err.println("Waiting 5 seconds for you to connect, because some gameplayers will see an empty worker pool and just rip through the data")
-    Thread.sleep(5000)
 
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
@@ -350,6 +355,9 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
+    // Just ensure that we have a server up, this will start it if it isn't running yet
+    WorkUnitServlet.server
+    // Run actual prediction
     lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction)
   }
 
@@ -399,7 +407,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
     running = false
   }
 
-  val churn = true
+  val churn = false
 
   // constantly be randomly adding and removing artificial HCU's
   if (churn) {

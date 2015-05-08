@@ -1,5 +1,7 @@
 package edu.stanford.lense_base.examples
 
+import java.io.{FileWriter, BufferedWriter, File}
+
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
@@ -89,8 +91,27 @@ object RunTestCase extends App {
   startNumArtificialHumans : Int) : Unit = {
   */
 
+  def dumpData(data : List[(List[String],List[String])], name : String): Unit = {
+    val file = new File("results/"+name+".txt")
+    if (file.exists()) file.delete()
+    if (!file.exists()) file.createNewFile()
+    val bw = new BufferedWriter(new FileWriter(file))
+    for (pair <- data) {
+      bw.write("#"+data.indexOf(pair)+": ")
+      for (token <- pair._1) {
+        bw.write(token)
+        bw.write(" ")
+      }
+      bw.write("\n")
+    }
+    bw.close()
+  }
+
+  dumpData(nerUseCase.data, "test_data")
+  dumpData(nerUseCase.trainSet, "train_data")
+
   val poolSize = 10
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize)
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, "artificial_human_no_churn")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)

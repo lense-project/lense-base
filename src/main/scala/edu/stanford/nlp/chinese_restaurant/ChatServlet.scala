@@ -73,7 +73,7 @@ object YourMomChatEngine extends ChatEngine {
 }
 
 class ChatSocket extends AtmosphereClient {
-  val chatEngine = YourMomChatEngine
+  val chatEngine = new CentralChatEngine()
 
   def sendMessage(msg : String): Unit = {
     System.err.println("Sending message: "+msg)
