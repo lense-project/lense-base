@@ -30,7 +30,9 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   def turnOffLearning() : Unit = {
     runLearningThread = false
     // Wake up the thread, so it can die
-    pastGuesses.notify()
+    pastGuesses.synchronized {
+      pastGuesses.notify()
+    }
   }
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update

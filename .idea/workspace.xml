@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -45,11 +43,21 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="LenseEngine.scala" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="190" max-vertical-offset="3450">
+              <caret line="34" column="4" selection-start-line="34" selection-start-column="4" selection-end-line="34" selection-end-column="4" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="LenseUseCase.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5490" max-vertical-offset="6795">
-              <caret line="377" column="2" selection-start-line="377" selection-start-column="2" selection-end-line="377" selection-end-column="2" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2410" max-vertical-offset="6795">
+              <caret line="173" column="30" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
               <folding>
                 <element signature="e#33#82#0" expanded="true" />
               </folding>
@@ -67,11 +75,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GamePlayer.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GamePlayer.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4837476" vertical-offset="932" max-vertical-offset="3765">
-              <caret line="79" column="49" selection-start-line="79" selection-start-column="49" selection-end-line="79" selection-end-column="49" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="932" max-vertical-offset="3765">
+              <caret line="89" column="67" selection-start-line="89" selection-start-column="67" selection-end-line="89" selection-end-column="67" />
               <folding>
                 <element signature="e#45#83#0" expanded="true" />
               </folding>
@@ -109,11 +117,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NERUseCase.scala" pinned="false" current-in-tab="false">
+      <file leaf-file-name="NERUseCase.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="188" max-vertical-offset="1455">
-              <caret line="44" column="4" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.4837476" vertical-offset="932" max-vertical-offset="1485">
+              <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="84" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -149,10 +157,10 @@
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanComputeUnit.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
         <option value="$PROJECT_DIR$/results/default/summary.txt" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala" />
       </list>
     </option>
   </component>
@@ -369,6 +377,10 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="examples" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="NERUseCase.scala" />
+              <option name="myItemType" value="org.jetbrains.plugins.scala.components.ScalaDefsProjectViewProvider$ScalaFileTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -827,7 +839,6 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="Think I found the exponential blowup bug, also working on early stopping optimizer bug." />
     <MESSAGE value="Tinkering with more changes to try to fix training early stopping" />
     <MESSAGE value="Added a clone (as far as I can tell) of the Feature learning in humansampler, and it has the early-stopping problem. Needs investigation." />
     <MESSAGE value="Fixed bug that was terminating learning early. Need to be very, very careful with pass-by-constructor in Scala." />
@@ -852,7 +863,8 @@
     <MESSAGE value="Still facing bugs with syncing, going to bed before I do any more damage. Seems good so far. Needs a slight debugging. Verification will be a bitch." />
     <MESSAGE value="Now creating graphs based on performance over time." />
     <MESSAGE value="Generating a from-zero run graph." />
-    <option name="LAST_COMMIT_MESSAGE" value="Generating a from-zero run graph." />
+    <MESSAGE value="Setup several baselines to perform, also tweaked params on the threshold heuristic gameplayer. no new features, so ok." />
+    <option name="LAST_COMMIT_MESSAGE" value="Setup several baselines to perform, also tweaked params on the threshold heuristic gameplayer. no new features, so ok." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1196,14 +1208,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5943396" vertical-offset="2130" max-vertical-offset="3420">
-          <caret line="171" column="27" selection-start-line="171" selection-start-column="27" selection-end-line="171" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="4075" max-vertical-offset="13380">
@@ -1212,31 +1216,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="932" max-vertical-offset="3765">
+          <caret line="89" column="67" selection-start-line="89" selection-start-column="67" selection-end-line="89" selection-end-column="67" />
+          <folding>
+            <element signature="e#45#83#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5490" max-vertical-offset="6795">
-          <caret line="377" column="2" selection-start-line="377" selection-start-column="2" selection-end-line="377" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2410" max-vertical-offset="6795">
+          <caret line="173" column="30" selection-start-line="173" selection-start-column="30" selection-end-line="173" selection-end-column="30" />
           <folding>
             <element signature="e#33#82#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="188" max-vertical-offset="1455">
-          <caret line="44" column="4" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="190" max-vertical-offset="3450">
+          <caret line="34" column="4" selection-start-line="34" selection-start-column="4" selection-end-line="34" selection-end-column="4" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4837476" vertical-offset="932" max-vertical-offset="3765">
-          <caret line="79" column="49" selection-start-line="79" selection-start-column="49" selection-end-line="79" selection-end-column="49" />
-          <folding>
-            <element signature="e#45#83#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.4837476" vertical-offset="932" max-vertical-offset="1485">
+          <caret line="84" column="25" selection-start-line="84" selection-start-column="25" selection-end-line="84" selection-end-column="25" />
+          <folding />
         </state>
       </provider>
     </entry>

@@ -89,8 +89,10 @@ object RunTestCase extends App {
   startNumArtificialHumans : Int) : Unit = {
   */
 
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, 10)
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, 3, 1)
+  val poolSize = 10
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize)
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 1) // 1 query baseline
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
   // nerUseCase.testWithRealHumans(nerUseCase.data)
 }
