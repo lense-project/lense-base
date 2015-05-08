@@ -21,15 +21,27 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
 
-  def gamePlayer = initGamePlayer
+  var gamePlayer = initGamePlayer
+
+  var runLearningThread = true
+
+  // You probably don't want to call this.
+  // This turns off the learning thread, and will prevent your model from updating as it gains experience
+  def turnOffLearning() : Unit = {
+    runLearningThread = false
+    // Wake up the thread, so it can die
+    pastGuesses.notify()
+  }
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
-  new Thread{
+  new Thread {
     override def run() = {
       var trainedOnGuesses = 0
-      while (true) {
+      while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
+          System.err.println("Retraining model")
           learnHoldingPastGuessesConstant(1.0)
+          System.err.println("Hot swapping model")
           trainedOnGuesses = pastGuesses.size
         }
         else {

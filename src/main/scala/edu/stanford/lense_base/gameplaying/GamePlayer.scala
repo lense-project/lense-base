@@ -3,6 +3,7 @@ package edu.stanford.lense_base.gameplaying
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
 
+import scala.collection.mutable
 import scala.concurrent.{Await, Promise, Future}
 import scala.concurrent.duration._
 import scala.util.Try
@@ -41,32 +42,34 @@ abstract class GamePlayer {
 
 // This is the dumb one question per node baseline, just to make sure that everything is working as expected
 
-object OneQuestionBaseline extends GamePlayer {
+class NQuestionBaseline(n : Int) extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
-    if (state.payload == null) state.payload = (0, state.graph.nodes.size)
-    val i = state.payload.asInstanceOf[(Int,Int)]
-    if (i._1 < i._2) {
-      state.payload = (i._1+1,i._2)
-      MakeHumanObservation(state.originalGraph.nodes(i._1), state.hcuPool.hcuPool.minBy(hcu => hcu.estimateTimeToFinishQueue))
+    for (node <- state.originalGraph.nodes) {
+      val numReqs = state.completedRequests.count(_._1 eq node) + state.inFlightRequests.count(_._1 eq node)
+      if (numReqs < n) {
+        return MakeHumanObservation(node, state.hcuPool.hcuPool.minBy(hcu => hcu.estimateRequiredTimeIncludingQueue(node)))
+      }
+    }
+
+    if (state.inFlightRequests.size == 0) {
+      TurnInGuess()
     }
     else {
-      if (state.inFlightRequests.size == 0) {
-        TurnInGuess()
-      }
-      else {
-        Wait()
-      }
+      Wait()
     }
   }
 }
+
+object OneQuestionBaseline extends NQuestionBaseline(1)
 
 // This game player is the only one currently able to handle the asynchronous setting. It uses a very simple threshold,
 // where if the uncertainty of a node is above a certain value, we get another query for it. We assume all in flight queries
 // count against the uncertainty of a node already.
 
 object ThresholdHeuristic extends GamePlayer {
-  val threshold = 0.85
-  val humanUncertaintyMultiple = 0.6
+  val threshold = 0.7
+  // One obsevation cuts uncertainty by half, in expectation
+  val humanUncertaintyMultiple = 0.5
 
   override def getOptimalMove(state: GameState): GameMove = {
     // We should probably be cacheing this if it's every used in production, but no matter
