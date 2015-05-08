@@ -99,6 +99,8 @@
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -190,6 +192,5 @@
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:specs2_2.11:2.4.17" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.typelevel:scodec-bits_2.11:1.0.2" level="project" />
     <orderEntry type="library" name="SBT: redis.clients:jedis:2.0.0" level="project" />
-    <orderEntry type="library" name="scala-sdk-2.11.4" level="application" />
   </component>
 </module>

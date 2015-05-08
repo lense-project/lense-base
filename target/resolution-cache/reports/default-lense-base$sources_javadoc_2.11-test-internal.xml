@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="test-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150507112251"/>
+		date="20150508140326"/>
 	<dependencies>
 		<module organisation="ch.qos.logback" name="logback-classic">
 			<revision name="1.1.2" status="release" pubdate="20140402124238" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="44">
@@ -644,11 +644,11 @@
 					<artifact name="parboiled-java" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="110275" time="0" location="/home/keenon/.ivy2/cache/org.parboiled/parboiled-java/docs/parboiled-java-1.1.4-javadoc.jar">
 						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/parboiled/parboiled-java/1.1.4/parboiled-java-1.1.4-javadoc.jar"/>
 					</artifact>
-					<artifact name="parboiled-java" type="jar" ext="jar" status="no" details="" size="73180" time="0" location="/home/keenon/.ivy2/cache/org.parboiled/parboiled-java/jars/parboiled-java-1.1.4.jar">
-						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/parboiled/parboiled-java/1.1.4/parboiled-java-1.1.4.jar"/>
-					</artifact>
 					<artifact name="parboiled-java" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="72597" time="0" location="/home/keenon/.ivy2/cache/org.parboiled/parboiled-java/srcs/parboiled-java-1.1.4-sources.jar">
 						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/parboiled/parboiled-java/1.1.4/parboiled-java-1.1.4-sources.jar"/>
+					</artifact>
+					<artifact name="parboiled-java" type="jar" ext="jar" status="no" details="" size="73180" time="0" location="/home/keenon/.ivy2/cache/org.parboiled/parboiled-java/jars/parboiled-java-1.1.4.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/parboiled/parboiled-java/1.1.4/parboiled-java-1.1.4.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>

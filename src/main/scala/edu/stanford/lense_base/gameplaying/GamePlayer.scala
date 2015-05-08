@@ -72,10 +72,9 @@ object OneQuestionBaseline extends NQuestionBaseline(1)
 // count against the uncertainty of a node already.
 
 object ThresholdHeuristic extends GamePlayer {
-  // This actually seems fairly reasonable to expect the model to do. 50% on a several class problem is totally ok.
-  val threshold = 0.5
-  // One obsevation cuts uncertainty by half, in expectation
-  val humanUncertaintyMultiple = 0.5
+  val threshold = 0.9
+  // One obsevation cuts uncertainty to the human error rate, as a rough heuristic
+  val humanUncertaintyMultiple = 0.3
 
   override def getOptimalMove(state: GameState): GameMove = {
     // We should probably be cacheing this if it's every used in production, but no matter

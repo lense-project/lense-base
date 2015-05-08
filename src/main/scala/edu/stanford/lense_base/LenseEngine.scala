@@ -124,7 +124,10 @@ case class PredictionSummary(loss : Double,
                              numRequestsCompleted : Int,
                              numRequestsFailed : Int,
                              requestCost : Double,
-                             timeRequired : Long)
+                             timeRequired : Long,
+                             initialMinConfidence : Double,
+                             initialMaxConfidence : Double,
+                             initialAvgConfidence : Double)
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -146,6 +149,13 @@ case class InFlightPrediction(engine : LenseEngine,
   hcuPool.registerHCUArrivedCallback(this, () => {
     gameplayerMove()
   })
+
+  val confidenceSet = originalGraph.marginalEstimate().map(pair => {
+    pair._2.maxBy(_._2)._2
+  })
+  val initialAverageConfidence = confidenceSet.sum / confidenceSet.size
+  val initialMinConfidence = confidenceSet.min
+  val initialMaxConfidence = confidenceSet.max
 
   // Initialize with a move
   gameplayerMove()
@@ -192,7 +202,10 @@ case class InFlightPrediction(engine : LenseEngine,
               numRequestsCompleted,
               numRequestsFailed,
               totalCost,
-              System.currentTimeMillis() - gameState.startTime))
+              System.currentTimeMillis() - gameState.startTime,
+              initialMinConfidence,
+              initialMaxConfidence,
+              initialAverageConfidence))
           })
       case obs : MakeHumanObservation =>
         // Create a new work unit

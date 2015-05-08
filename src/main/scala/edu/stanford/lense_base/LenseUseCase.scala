@@ -134,7 +134,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                                workUnitCost : Double,
                                startNumArtificialHumans : Int,
                                saveTitle : String) : Unit = {
-    ensureWorkServerWithDelay
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
 
@@ -165,10 +164,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val guessMap = graph.mapEstimate()
 
       // Retrain after each example
+      val cloneGraphPair = graph.clone()
       for (n <- graph.nodes) {
-        n.observedValue = goldMap(n)
+        cloneGraphPair._2(n).observedValue = goldMap(n)
       }
-      trainingExamples = trainingExamples :+ graph
+      trainingExamples = trainingExamples :+ cloneGraphPair._1
 
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
 
@@ -222,6 +222,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
+    ensureWorkServerWithDelay
 
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
@@ -338,6 +339,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     plotAgainstQueries("cost per token", l.map(quad => quad._4.requestCost / quad._1.nodes.size).toArray)
     plotAgainstQueries("queries per token", l.map(quad => quad._4.numRequests.asInstanceOf[Double] / quad._1.nodes.size).toArray)
     plotAgainstQueries("delay per token", l.map(quad => quad._4.timeRequired.asInstanceOf[Double] / quad._1.nodes.size).toArray)
+    plotAgainstQueries("prior min confidence", l.map(quad => quad._4.initialMinConfidence).toArray)
+    plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialMaxConfidence).toArray)
+    plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialAvgConfidence).toArray)
     plotAgainstQueries("accuracy", l.map(quad => {
       var localCorrect = 0.0
       var localIncorrect = 0.0
