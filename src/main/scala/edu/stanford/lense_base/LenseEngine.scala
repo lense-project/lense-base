@@ -25,8 +25,10 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
 
   var runLearningThread = true
 
+  var currentModelLoss = 0.0
+
   def currentLoss() : Double = {
-    stream.checkValue(pastGuesses)
+    currentModelLoss
   }
 
   // You probably don't want to call this.
@@ -40,7 +42,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 
   var numSwapsSoFar = 0
-  val modelRegularization = 2.0
+  val modelRegularization = 0.05
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
@@ -71,7 +73,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
 
   def learnHoldingPastGuessesConstant(l2regularization : Double = 0.1) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
+    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

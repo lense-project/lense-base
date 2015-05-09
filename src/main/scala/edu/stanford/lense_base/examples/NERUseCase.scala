@@ -35,7 +35,7 @@ class NERUseCase extends LenseSequenceUseCase {
     question
   }
 
-  override def getHumanVersionOfLabel(label: String): String = "<b>"+label+"<\b>"
+  override def getHumanVersionOfLabel(label: String): String = "<b>"+label+"<\\b>"
 
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
