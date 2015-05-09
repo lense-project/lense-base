@@ -36,6 +36,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 
   var numSwapsSoFar = 0
+  val modelRegularization = 2.0
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
@@ -44,7 +45,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
       while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
           System.err.println("Retraining model")
-          learnHoldingPastGuessesConstant(0.1)
+          learnHoldingPastGuessesConstant(modelRegularization)
           System.err.println("Hot swapping model")
           numSwapsSoFar += 1
           trainedOnGuesses = pastGuesses.size
@@ -117,7 +118,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   def addTrainingData(labels : List[Graph]) : Unit = {
     pastGuesses ++= labels
     println("Doing initial learning...")
-    learnHoldingPastGuessesConstant()
+    learnHoldingPastGuessesConstant(modelRegularization)
     println("Finished")
   }
 }

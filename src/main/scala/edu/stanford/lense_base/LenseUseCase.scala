@@ -122,6 +122,24 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   //
   ////////////////////////////////////////////////
 
+  def progressivelyAnalyze(goldPairs : List[(Input, Output)],
+                           fn : ((Input, Output)) => (Graph, Map[GraphNode,String], Map[GraphNode,String], PredictionSummary),
+                           hcuPool : HCUPool,
+                           saveTitle : String) = {
+    val mutableAnalysis = mutable.ListBuffer[(Graph, Map[GraphNode,String], Map[GraphNode,String], PredictionSummary)]()
+
+    var i = 0
+    for (pair <- goldPairs) {
+      mutableAnalysis.+=(fn(pair))
+      i += 1
+      if (i % 10 == 0) {
+        analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+      }
+    }
+
+    analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+  }
+
   /**
    * This will run a test against artificial humans, with a "probability epsilon choose uniformly at random" error
    * function. It will print results to stdout.
@@ -139,7 +157,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
 
-    analyzeOutput(goldPairs.map(pair => {
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
@@ -149,7 +167,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
-    }), hcuPool, saveTitle)
+    }, hcuPool, saveTitle)
 
     hcuPool.kill()
 
@@ -160,7 +178,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     var trainingExamples : List[Graph] = List[Graph]()
     var numSwapsSoFar = 0
 
-    analyzeOutput(goldPairs.map(pair => {
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
 
@@ -191,7 +209,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
       (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar))
-    }), null, "offline_baseline")
+    }, null, "offline_baseline")
 
     System.exit(0)
   }
@@ -209,7 +227,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
     lenseEngine.turnOffLearning()
 
-    analyzeOutput(goldPairs.map(pair => {
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
@@ -219,7 +237,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
-    }), hcuPool, "all_human_"+numQueriesPerNode)
+    }, hcuPool, "all_human_"+numQueriesPerNode)
 
     hcuPool.kill()
 
@@ -235,7 +253,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
     ensureWorkServerWithDelay
 
-    analyzeOutput(goldPairs.map(pair => {
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
@@ -245,7 +263,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
-    }), RealHumanHCUPool, "real_human")
+    }, RealHumanHCUPool, "real_human")
   }
 
   /**

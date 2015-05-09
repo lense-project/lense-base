@@ -300,10 +300,21 @@ class GraphStream {
   def learn(graphs : Iterable[Graph], l2regularization: Double = 0.1, clearOptimizer : Boolean = true) : Unit = {
     if (graphs.size == 0) return
 
+    val checkValues = false
+
+    if (checkValues) {
+      System.err.println("Pre training value (should match first line)")
+      checkValue(graphs)
+    }
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs, clearOptimizer)
     else learnFullyObserved(graphs, l2regularization, clearOptimizer)
+
+    if (checkValues) {
+      System.err.println("Post training value (should match last line)")
+      checkValue(graphs)
+    }
 
     // Now we need to decode the weights
 
@@ -415,6 +426,11 @@ class GraphStream {
         }
       }
     }
+
+    if (checkValues) {
+      System.err.println("Post copy value (should match last line)")
+      checkValue(graphs)
+    }
   }
 
   // performs EM on the graph. Still massively TODO
@@ -446,37 +462,80 @@ class GraphStream {
     trainer.processExamples(likelihoodExamples)
   }
 
+  private def checkValue(graphs : Iterable[Graph]): Unit = {
+    val likelihoodExamples = model.synchronized {
+      for (graph <- graphs) {
+        model.warmUpIndexes(graph)
+        modelTrainingClone.warmUpIndexes(graph)
+        modelTrainingClone.dotFamilyCache.clear()
+      }
+
+      val frozenDomainMap = withDomainList.map(withDomain => {
+        val newDomain = new CategoricalDomain[String]()
+        newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+        (withDomain.domain.dimensionDomain, newDomain)
+      }).toMap
+
+      graphs.map(graph => {
+        graph.setObservedVariablesForFactorie()
+        val nodeVariables = graph.allVariablesForFactorie()
+        for (nodeVariable <- nodeVariables) {
+          nodeVariable.frozenDomainMap = frozenDomainMap
+        }
+        new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+      }).toSeq
+    }
+
+    val value = new SynchronizedDoubleAccumulator()
+    for (likelihoodExample <- likelihoodExamples) {
+      likelihoodExample.accumulateValueAndGradient(value, null)
+    }
+    System.err.println("*** VALUE NOW: "+value.l.value)
+  }
+
   // This will learn just Weight() values from the fully observed values in the graphs
 
   var batchOptimizer : GradientOptimizer = null
   private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Unit = {
     modelTrainingClone.synchronized {
       if (batchOptimizer == null || clearOptimizer) {
-        // TODO:
-        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
-        // with large sparse matrices, when things start to get slow
-        /*
+
         batchOptimizer = new LBFGS() with L2Regularization{
-          variance = 1.0 / regularization
-        }
-        */
-        /*
-        batchOptimizer = new AdaGrad() {
-          // We just override to put in our regularizer... muahahaha
-          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
-            // gradient += (weights, -l2regularization)
-            super.processGradient(weights, gradient)
+          variance = 1.0 / l2regularization
+          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
+            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
+            gradient *= (1.0 / graphs.size)
+
+            super.step(weights, gradient, value)
           }
         }
-        */
 
-        batchOptimizer = new InvSqrtTLengthStepSize {
+        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
+        // with large sparse matrices, when things start to get slow
+
+        /*
+        batchOptimizer = new AdaGrad() {
           // We just override to put in our regularizer... muahahaha
           override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
             gradient += (weights, -l2regularization)
             super.processGradient(weights, gradient)
           }
         }
+        */
+
+        /*
+        batchOptimizer = new ConstantLearningRate { // InvSqrtTStepSize
+          private var _isConverged = false
+          override def isConverged = _isConverged
+
+          // We just override to put in our regularizer... muahahaha
+          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
+            gradient += (weights, -l2regularization)
+            if (10.0 > gradient.twoNorm) _isConverged = true
+            super.processGradient(weights, gradient)
+          }
+        }
+        */
       }
 
       // Don't want to be doing this part in parallel, things get broken
@@ -504,7 +563,7 @@ class GraphStream {
       }
 
       // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
 
       // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
       // trainer.trainFromExamples(likelihoodExamples)
