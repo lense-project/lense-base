@@ -297,13 +297,13 @@ class GraphStream {
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
-  def learn(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) : Unit = {
+  def learn(graphs : Iterable[Graph], l2regularization: Double = 0.1, clearOptimizer : Boolean = true) : Unit = {
     if (graphs.size == 0) return
 
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs, clearOptimizer)
-    else learnFullyObserved(graphs, regularization, clearOptimizer)
+    else learnFullyObserved(graphs, l2regularization, clearOptimizer)
 
     // Now we need to decode the weights
 
@@ -449,11 +449,33 @@ class GraphStream {
   // This will learn just Weight() values from the fully observed values in the graphs
 
   var batchOptimizer : GradientOptimizer = null
-  private def learnFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Unit = {
+  private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Unit = {
     modelTrainingClone.synchronized {
       if (batchOptimizer == null || clearOptimizer) {
+        // TODO:
+        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
+        // with large sparse matrices, when things start to get slow
+        /*
         batchOptimizer = new LBFGS() with L2Regularization{
           variance = 1.0 / regularization
+        }
+        */
+        /*
+        batchOptimizer = new AdaGrad() {
+          // We just override to put in our regularizer... muahahaha
+          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
+            // gradient += (weights, -l2regularization)
+            super.processGradient(weights, gradient)
+          }
+        }
+        */
+
+        batchOptimizer = new InvSqrtTLengthStepSize {
+          // We just override to put in our regularizer... muahahaha
+          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
+            gradient += (weights, -l2regularization)
+            super.processGradient(weights, gradient)
+          }
         }
       }
 

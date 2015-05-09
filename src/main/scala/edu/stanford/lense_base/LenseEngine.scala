@@ -44,7 +44,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
       while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
           System.err.println("Retraining model")
-          learnHoldingPastGuessesConstant(10.0)
+          learnHoldingPastGuessesConstant(0.1)
           System.err.println("Hot swapping model")
           numSwapsSoFar += 1
           trainedOnGuesses = pastGuesses.size
@@ -64,9 +64,9 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     promise
   }
 
-  def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = this.synchronized {
+  def learnHoldingPastGuessesConstant(l2regularization : Double = 0.1) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    stream.learn(pastGuesses, regularization, clearOptimizer = true)
+    stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

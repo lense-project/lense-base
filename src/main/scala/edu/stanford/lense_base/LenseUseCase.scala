@@ -43,6 +43,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   initialize()
 
+  def useCaseReportSubpath : String = ""
+
   /**
    * This function takes an Input
    * This must return a graph created in the local GraphStream, and it should create a GraphNodeQuestion for each node
@@ -302,7 +304,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     println("Avg requests/token: "+(requested / tokens))
     println("Avg completed requests/token: "+(completed / tokens))
 
-    val resultsPrefix = "results/"
+    val resultsPrefix = "results/"+useCaseReportSubpath+(if (useCaseReportSubpath.endsWith("/")) "" else "/")
 
     val f = new File(resultsPrefix+outputPath)
     if (!f.exists()) f.mkdirs()
@@ -384,7 +386,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       if (idx > 0) {
         val thisPrediction = pair._1._4
         val lastPrediction = l(idx-1)._4
-        println(idx+": "+thisPrediction.numSwapsSoFar+","+lastPrediction.numSwapsSoFar)
         if (thisPrediction.numSwapsSoFar > lastPrediction.numSwapsSoFar) {
           List(idx)
         }
