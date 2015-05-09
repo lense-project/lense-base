@@ -35,6 +35,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }
 
+  var numSwapsSoFar = 0
+
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
     override def run() = {
@@ -44,6 +46,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
           System.err.println("Retraining model")
           learnHoldingPastGuessesConstant(10.0)
           System.err.println("Hot swapping model")
+          numSwapsSoFar += 1
           trainedOnGuesses = pastGuesses.size
         }
         else {
@@ -127,7 +130,8 @@ case class PredictionSummary(loss : Double,
                              timeRequired : Long,
                              initialMinConfidence : Double,
                              initialMaxConfidence : Double,
-                             initialAvgConfidence : Double)
+                             initialAvgConfidence : Double,
+                             numSwapsSoFar : Int)
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -205,7 +209,8 @@ case class InFlightPrediction(engine : LenseEngine,
               System.currentTimeMillis() - gameState.startTime,
               initialMinConfidence,
               initialMaxConfidence,
-              initialAverageConfidence))
+              initialAverageConfidence,
+              engine.numSwapsSoFar))
           })
       case obs : MakeHumanObservation =>
         // Create a new work unit

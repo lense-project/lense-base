@@ -156,6 +156,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)]) = {
     var trainingExamples : List[Graph] = List[Graph]()
+    var numSwapsSoFar = 0
 
     analyzeOutput(goldPairs.map(pair => {
       val graph = toGraph(pair._1)
@@ -182,11 +183,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val idx = goldPairs.indexOf(pair)
       if (idx < 50 || (idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
         graphStream.learn(trainingExamples, 10.0)
+        numSwapsSoFar += 1
       }
 
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
-      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence))
+      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar))
     }), null, "offline_baseline")
 
     System.exit(0)
@@ -275,16 +277,24 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     var time = 0L
     var tokens = 0
     for (quad <- l) {
-      for (node <- quad._1.nodes) {
-        val trueValue = quad._2(node)
-        val guessedValue = quad._3(node)
-        if (trueValue == guessedValue) correct += 1
-        else incorrect += 1
-        tokens += 1
+      try {
+        for (node <- quad._1.nodes) {
+          val trueValue = quad._2(node)
+          val guessedValue = quad._3(node)
+          if (trueValue == guessedValue) correct += 1
+          else incorrect += 1
+          tokens += 1
+        }
+        requested += quad._4.numRequests
+        completed += quad._4.numRequestsCompleted
+        time += quad._4.timeRequired
       }
-      requested += quad._4.numRequests
-      completed += quad._4.numRequestsCompleted
-      time += quad._4.timeRequired
+      catch {
+        case e : Throwable => {
+          System.err.println("Had issue while doing analysis")
+          e.printStackTrace()
+        }
+      }
     }
     println("Accuracy: "+(correct/(correct+incorrect)))
     println("Requested task completion percentage: "+(completed / requested))
@@ -369,6 +379,23 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
 
     val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
+    val hotSwapIndexes : List[Int] = l.zipWithIndex.flatMap(pair => {
+      val idx = pair._2
+      if (idx > 0) {
+        val thisPrediction = pair._1._4
+        val lastPrediction = l(idx-1)._4
+        println(idx+": "+thisPrediction.numSwapsSoFar+","+lastPrediction.numSwapsSoFar)
+        if (thisPrediction.numSwapsSoFar > lastPrediction.numSwapsSoFar) {
+          List(idx)
+        }
+        else {
+          List[Int]()
+        }
+      }
+      else {
+        List[Int]()
+      }
+    })
     def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
       val plot = new GNUPlot
       plot.addLine(queries, timeSeriesData)
@@ -377,6 +404,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       plot.title = xLabel+" vs time"
       plot.yLabel = xLabel
       plot.xLabel = "time"
+      for (idx <- hotSwapIndexes) {
+        plot.addVerticalLine(idx)
+      }
       plot.saveAnalysis(resultsPrefix+outputPath+"/"+xLabel.replaceAll(" ","_")+"_plot")
     }
     plotAgainstQueries("loss per token", l.map(quad => quad._4.loss / quad._1.nodes.size).toArray)
