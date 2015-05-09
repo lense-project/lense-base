@@ -25,6 +25,10 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
 
   var runLearningThread = true
 
+  def currentLoss() : Double = {
+    stream.checkValue(pastGuesses)
+  }
+
   // You probably don't want to call this.
   // This turns off the learning thread, and will prevent your model from updating as it gains experience
   def turnOffLearning() : Unit = {
@@ -132,7 +136,9 @@ case class PredictionSummary(loss : Double,
                              initialMinConfidence : Double,
                              initialMaxConfidence : Double,
                              initialAvgConfidence : Double,
-                             numSwapsSoFar : Int)
+                             numSwapsSoFar : Int,
+                             modelTrainingLoss : Double,
+                             numExamplesSeen : Int)
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -211,7 +217,9 @@ case class InFlightPrediction(engine : LenseEngine,
               initialMinConfidence,
               initialMaxConfidence,
               initialAverageConfidence,
-              engine.numSwapsSoFar))
+              engine.numSwapsSoFar,
+              engine.currentLoss(),
+              engine.pastGuesses.size))
           })
       case obs : MakeHumanObservation =>
         // Create a new work unit

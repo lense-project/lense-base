@@ -208,7 +208,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
-      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar))
+      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size))
     }, null, "offline_baseline")
 
     System.exit(0)
@@ -435,6 +435,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     plotAgainstQueries("prior min confidence", l.map(quad => quad._4.initialMinConfidence).toArray)
     plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialMaxConfidence).toArray)
     plotAgainstQueries("prior avg confidence", l.map(quad => quad._4.initialAvgConfidence).toArray)
+    plotAgainstQueries("model training loss", l.map(quad => quad._4.modelTrainingLoss).toArray)
+    plotAgainstQueries("model training loss per example", l.map(quad => quad._4.modelTrainingLoss / quad._4.numExamplesSeen).toArray)
     plotAgainstQueries("accuracy", l.map(quad => {
       var localCorrect = 0.0
       var localIncorrect = 0.0

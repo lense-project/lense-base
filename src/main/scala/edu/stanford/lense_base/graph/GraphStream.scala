@@ -303,8 +303,7 @@ class GraphStream {
     val checkValues = false
 
     if (checkValues) {
-      System.err.println("Pre training value (should match first line)")
-      checkValue(graphs)
+      System.err.println("Pre training value (should match last line): "+checkValue(graphs))
     }
     if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
@@ -312,8 +311,7 @@ class GraphStream {
     else learnFullyObserved(graphs, l2regularization, clearOptimizer)
 
     if (checkValues) {
-      System.err.println("Post training value (should match last line)")
-      checkValue(graphs)
+      System.err.println("Post training value (should match last line): "+checkValue(graphs))
     }
 
     // Now we need to decode the weights
@@ -428,8 +426,7 @@ class GraphStream {
     }
 
     if (checkValues) {
-      System.err.println("Post copy value (should match last line)")
-      checkValue(graphs)
+      System.err.println("Post copy value (should match last line): "+checkValue(graphs))
     }
   }
 
@@ -462,7 +459,7 @@ class GraphStream {
     trainer.processExamples(likelihoodExamples)
   }
 
-  private def checkValue(graphs : Iterable[Graph]): Unit = {
+  def checkValue(graphs : Iterable[Graph]): Double = {
     val likelihoodExamples = model.synchronized {
       for (graph <- graphs) {
         model.warmUpIndexes(graph)
@@ -490,7 +487,8 @@ class GraphStream {
     for (likelihoodExample <- likelihoodExamples) {
       likelihoodExample.accumulateValueAndGradient(value, null)
     }
-    System.err.println("*** VALUE NOW: "+value.l.value)
+
+    value.l.value
   }
 
   // This will learn just Weight() values from the fully observed values in the graphs
