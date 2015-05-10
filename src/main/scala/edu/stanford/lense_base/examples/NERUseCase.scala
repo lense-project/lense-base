@@ -5,6 +5,7 @@ import java.io.{FileWriter, BufferedWriter, File}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
+import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -19,6 +20,17 @@ class NERUseCase extends LenseSequenceUseCase {
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
+
+  lazy val word2vec : java.util.Map[String, Array[Double]] = try {
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+  } catch {
+    case e : Throwable =>
+      // Couldn't load word vectors
+      System.err.println("*** COULDN'T LOAD WORD VECTORS")
+      e.printStackTrace()
+      // return an empty map
+      new java.util.HashMap[String, Array[Double]]()
+  }
 
   override def initialTrainingData : List[(List[String], List[String])] = trainSet
 
@@ -48,11 +60,16 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
-    Map(
+    val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
       "capitalized:" + (sequence(i)(0).isUpper && sequence(i).exists(_.isLower)) -> 1.0,
       "BIAS" -> 0.0
     )
+    word2vec.get(sequence(i)) match {
+      case vec : Array[Double] =>
+        (0 to vec.length-1).map(i => "word2vec" + i -> vec(i)).toMap ++ basicFeatures
+      case null => basicFeatures
+    }
   }
 
   override def useCaseReportSubpath : String = "ner"
@@ -114,7 +131,7 @@ object RunTestCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 10
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, "artificial_human")
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, "artificial_human_word_vectors")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)

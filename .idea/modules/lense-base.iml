@@ -101,6 +101,8 @@
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
           <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../lib/factorie_2.11-1.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -156,7 +158,6 @@
     <orderEntry type="library" name="SBT: org.json4s:json4s-scalap_2.11:3.3.0.RC1" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.mockito:mockito-all:1.10.19" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.mockito:mockito-core:1.9.5" level="project" />
-    <orderEntry type="library" scope="TEST" name="SBT: org.objenesis:objenesis:1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm:4.1" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm-analysis:4.1" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.ow2.asm:asm-tree:4.1" level="project" />
@@ -192,5 +193,8 @@
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:specs2_2.11:2.4.17" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.typelevel:scodec-bits_2.11:1.0.2" level="project" />
     <orderEntry type="library" name="SBT: redis.clients:jedis:2.0.0" level="project" />
+    <orderEntry type="library" name="SBT: com.esotericsoftware.kryo:kryo:2.24.0" level="project" />
+    <orderEntry type="library" name="SBT: com.esotericsoftware.minlog:minlog:1.2" level="project" />
+    <orderEntry type="library" name="SBT: org.objenesis:objenesis:2.1" level="project" />
   </component>
 </module>

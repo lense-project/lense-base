@@ -6,7 +6,7 @@
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [compile->default(compile)]
 [info] Resolving com.googlecode.lanterna#lanterna;2.1.8 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4dcb98fe
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3bb3f6e8
 [debug] sbt-chain: module revision found in cache: com.googlecode.lanterna#lanterna;2.1.8
 [debug] 	local: revision in cache: com.googlecode.lanterna#lanterna;2.1.8
 [debug] 	found com.googlecode.lanterna#lanterna;2.1.8 in sbt-chain
@@ -15,7 +15,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6db3998d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3d651ee8
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903
 [debug] 	local: revision in cache: org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903
 [debug] 	found org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 in sbt-chain
@@ -24,7 +24,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-all-server;8.1.16.v20140903 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7c3c0914
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6e604841
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016
 [debug] 	found org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 in sbt-chain
@@ -33,7 +33,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.servlet;3.0.0.v201112011016 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@70bd2335
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2511ffb8
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116
 [debug] 	found org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 in sbt-chain
@@ -42,7 +42,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.security.auth.message;1.0.0.v201108011116 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@31cd0d18
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@388fb56f
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020
 [debug] 	found org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 in sbt-chain
@@ -51,7 +51,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.mail.glassfish;1.4.1.v201005082020 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@56ca8b87
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@357875ae
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233
 [debug] 	found org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 in sbt-chain
@@ -60,7 +60,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.activation;1.1.0.v201105071233 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7accd195
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@69beee9f
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116
 [debug] 	local: revision in cache: org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116
 [debug] 	found org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 in sbt-chain
@@ -69,7 +69,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.orbit#javax.annotation;1.1.0.v201108011116 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 [compile->default(compile)]
 [info] Resolving org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4a0fb1b6
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4eb1f986
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903
 [debug] 	local: revision in cache: org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903
 [debug] 	found org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 in sbt-chain
@@ -78,7 +78,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty.aggregate#jetty-websocket;8.1.16.v20140903 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-jackson_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-jackson_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@e4e5f8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@66ae5cc6
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-jackson_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-jackson_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-jackson_2.11;3.3.0.RC1 in sbt-chain
@@ -87,7 +87,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-jackson_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-library;2.11.6 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-library;2.11.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@11175c00
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@24d52b01
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-library;2.11.6
 [debug] 	local: revision in cache: org.scala-lang#scala-library;2.11.6
 [debug] 	found org.scala-lang#scala-library;2.11.6 in sbt-chain
@@ -97,7 +97,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-library;2.11.6 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-core_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-core_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7bc0b47e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@725c6629
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-core_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-core_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-core_2.11;3.3.0.RC1 in sbt-chain
@@ -106,7 +106,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-core_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-ast_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-ast_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@b59c4e7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6dab15f
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-ast_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-ast_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-ast_2.11;3.3.0.RC1 in sbt-chain
@@ -115,7 +115,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-ast_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-scalap_2.11;3.3.0.RC1 [compile->default(compile)]
 [info] Resolving org.json4s#json4s-scalap_2.11;3.3.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@148e767e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5d81153b
 [debug] sbt-chain: module revision found in cache: org.json4s#json4s-scalap_2.11;3.3.0.RC1
 [debug] 	local: revision in cache: org.json4s#json4s-scalap_2.11;3.3.0.RC1
 [debug] 	found org.json4s#json4s-scalap_2.11;3.3.0.RC1 in sbt-chain
@@ -124,7 +124,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.json4s#json4s-scalap_2.11;3.3.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.thoughtworks.paranamer#paranamer;2.7 [compile->default(compile)]
 [info] Resolving com.thoughtworks.paranamer#paranamer;2.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@23fbb0ce
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@d7dd009
 [debug] sbt-chain: module revision found in cache: com.thoughtworks.paranamer#paranamer;2.7
 [debug] 	local: revision in cache: com.thoughtworks.paranamer#paranamer;2.7
 [debug] 	found com.thoughtworks.paranamer#paranamer;2.7 in sbt-chain
@@ -133,7 +133,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.thoughtworks.paranamer#paranamer;2.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-xml_2.11;1.0.3 [compile->default(compile)]
 [info] Resolving org.scala-lang.modules#scala-xml_2.11;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@272d909b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6dbd4d4e
 [debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-xml_2.11;1.0.3
 [debug] 	local: revision in cache: org.scala-lang.modules#scala-xml_2.11;1.0.3
 [debug] 	found org.scala-lang.modules#scala-xml_2.11;1.0.3 in sbt-chain
@@ -142,7 +142,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-xml_2.11;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-databind;2.3.5 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-databind;2.3.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5b5e8a72
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7beedca2
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-databind;2.3.5
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-databind;2.3.5
 [debug] 	found com.fasterxml.jackson.core#jackson-databind;2.3.5 in sbt-chain
@@ -151,7 +151,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-databind;2.3.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-annotations;2.3.0 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-annotations;2.3.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@20a4f13e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@53264af0
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-annotations;2.3.0
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-annotations;2.3.0
 [debug] 	found com.fasterxml.jackson.core#jackson-annotations;2.3.0 in sbt-chain
@@ -160,7 +160,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-annotations;2.3.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-core;2.3.5 [compile->default(compile)]
 [info] Resolving com.fasterxml.jackson.core#jackson-core;2.3.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55e6261c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@691ab31d
 [debug] sbt-chain: module revision found in cache: com.fasterxml.jackson.core#jackson-core;2.3.5
 [debug] 	local: revision in cache: com.fasterxml.jackson.core#jackson-core;2.3.5
 [debug] 	found com.fasterxml.jackson.core#jackson-core;2.3.5 in sbt-chain
@@ -169,7 +169,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.fasterxml.jackson.core#jackson-core;2.3.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5ad4f3f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@773bd28d
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra_2.11;2.4.0.RC1 in sbt-chain
@@ -178,7 +178,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-common_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-common_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5d579c60
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2d74a296
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-common_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-common_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-common_2.11;2.4.0.RC1 in sbt-chain
@@ -187,7 +187,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-common_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.slf4j#slf4j-api;1.7.10 [compile->default(compile)]
 [info] Resolving org.slf4j#slf4j-api;1.7.10 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@55a97480
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@634fadc5
 [debug] sbt-chain: module revision found in cache: org.slf4j#slf4j-api;1.7.10
 [debug] 	local: revision in cache: org.slf4j#slf4j-api;1.7.10
 [debug] 	found org.slf4j#slf4j-api;1.7.10 in sbt-chain
@@ -196,7 +196,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.slf4j#slf4j-api;1.7.10 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.clapper#grizzled-slf4j_2.11;1.0.2 [compile->default(compile)]
 [info] Resolving org.clapper#grizzled-slf4j_2.11;1.0.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@499a958b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3269d1f9
 [debug] sbt-chain: module revision found in cache: org.clapper#grizzled-slf4j_2.11;1.0.2
 [debug] 	local: revision in cache: org.clapper#grizzled-slf4j_2.11;1.0.2
 [debug] 	found org.clapper#grizzled-slf4j_2.11;1.0.2 in sbt-chain
@@ -205,7 +205,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.clapper#grizzled-slf4j_2.11;1.0.2 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.rl#rl_2.11;0.4.10 [compile->default(compile)]
 [info] Resolving org.scalatra.rl#rl_2.11;0.4.10 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@77dd188b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1e088126
 [debug] sbt-chain: module revision found in cache: org.scalatra.rl#rl_2.11;0.4.10
 [debug] 	local: revision in cache: org.scalatra.rl#rl_2.11;0.4.10
 [debug] 	found org.scalatra.rl#rl_2.11;0.4.10 in sbt-chain
@@ -214,7 +214,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.rl#rl_2.11;0.4.10 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.juniversalchardet#juniversalchardet;1.0.3 [compile->default(compile)]
 [info] Resolving com.googlecode.juniversalchardet#juniversalchardet;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@63e28ba
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2e91370e
 [debug] sbt-chain: module revision found in cache: com.googlecode.juniversalchardet#juniversalchardet;1.0.3
 [debug] 	local: revision in cache: com.googlecode.juniversalchardet#juniversalchardet;1.0.3
 [debug] 	found com.googlecode.juniversalchardet#juniversalchardet;1.0.3 in sbt-chain
@@ -223,7 +223,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.juniversalchardet#juniversalchardet;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->joda-time#joda-time;2.7 [compile->default(compile)]
 [info] Resolving joda-time#joda-time;2.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@11ca05a8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3245a836
 [debug] sbt-chain: module revision found in cache: joda-time#joda-time;2.7
 [debug] 	local: revision in cache: joda-time#joda-time;2.7
 [debug] 	found joda-time#joda-time;2.7 in sbt-chain
@@ -232,7 +232,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->joda-time#joda-time;2.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.joda#joda-convert;1.7 [compile->default(compile)]
 [info] Resolving org.joda#joda-convert;1.7 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2d206390
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57b26f08
 [debug] sbt-chain: module revision found in cache: org.joda#joda-convert;1.7
 [debug] 	local: revision in cache: org.joda#joda-convert;1.7
 [debug] 	found org.joda#joda-convert;1.7 in sbt-chain
@@ -241,7 +241,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.joda#joda-convert;1.7 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 [compile->default(compile)]
 [info] Resolving org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@29a0b822
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7ddbbea2
 [debug] sbt-chain: module revision found in cache: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3
 [debug] 	local: revision in cache: org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3
 [debug] 	found org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 in sbt-chain
@@ -250,7 +250,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang.modules#scala-parser-combinators_2.11;1.0.3 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@24f7a953
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@aab2866
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 in sbt-chain
@@ -259,7 +259,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-atmosphere_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-json_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-json_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@33133bf8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@271f6a16
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-json_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-json_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-json_2.11;2.4.0.RC1 in sbt-chain
@@ -268,7 +268,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-json_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe.akka#akka-actor_2.11;2.3.9 [compile->default(compile)]
 [info] Resolving com.typesafe.akka#akka-actor_2.11;2.3.9 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4447d6b1
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@63310634
 [debug] sbt-chain: module revision found in cache: com.typesafe.akka#akka-actor_2.11;2.3.9
 [debug] 	local: revision in cache: com.typesafe.akka#akka-actor_2.11;2.3.9
 [debug] 	found com.typesafe.akka#akka-actor_2.11;2.3.9 in sbt-chain
@@ -277,7 +277,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe.akka#akka-actor_2.11;2.3.9 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe#config;1.2.1 [compile->default(compile)]
 [info] Resolving com.typesafe#config;1.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@65f337ac
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@59cf14a2
 [debug] sbt-chain: module revision found in cache: com.typesafe#config;1.2.1
 [debug] 	local: revision in cache: com.typesafe#config;1.2.1
 [debug] 	found com.typesafe#config;1.2.1 in sbt-chain
@@ -286,7 +286,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.typesafe#config;1.2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-runtime;2.2.6 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-runtime;2.2.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@25eee08d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@13bcc4b3
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-runtime;2.2.6
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-runtime;2.2.6
 [debug] 	found org.atmosphere#atmosphere-runtime;2.2.6 in sbt-chain
@@ -295,7 +295,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-runtime;2.2.6 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-redis;2.2.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-redis;2.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@38e94b38
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2fe22c5d
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-redis;2.2.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-redis;2.2.1
 [debug] 	found org.atmosphere#atmosphere-redis;2.2.1 in sbt-chain
@@ -304,7 +304,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-redis;2.2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->redis.clients#jedis;2.0.0 [compile->default(compile)]
 [info] Resolving redis.clients#jedis;2.0.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3f51d99c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3c51fdde
 [debug] sbt-chain: module revision found in cache: redis.clients#jedis;2.0.0
 [debug] 	local: revision in cache: redis.clients#jedis;2.0.0
 [debug] 	found redis.clients#jedis;2.0.0 in sbt-chain
@@ -313,7 +313,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->redis.clients#jedis;2.0.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-pool#commons-pool;1.5.5 [compile->default(compile)]
 [info] Resolving commons-pool#commons-pool;1.5.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@257f1cdf
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@44dc884c
 [debug] sbt-chain: module revision found in cache: commons-pool#commons-pool;1.5.5
 [debug] 	local: revision in cache: commons-pool#commons-pool;1.5.5
 [debug] 	found commons-pool#commons-pool;1.5.5 in sbt-chain
@@ -322,7 +322,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-pool#commons-pool;1.5.5 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-jbossweb;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-jbossweb;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@49ba3c8d
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6cea0adb
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-jbossweb;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-jbossweb;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-jbossweb;2.0.1 in sbt-chain
@@ -331,7 +331,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-jbossweb;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-tomcat;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4e32293a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6443a392
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-tomcat;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-tomcat;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-tomcat;2.0.1 in sbt-chain
@@ -340,7 +340,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat7;2.0.1 [compile->default(compile)]
 [info] Resolving org.atmosphere#atmosphere-compat-tomcat7;2.0.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7738a88
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6b5a833b
 [debug] sbt-chain: module revision found in cache: org.atmosphere#atmosphere-compat-tomcat7;2.0.1
 [debug] 	local: revision in cache: org.atmosphere#atmosphere-compat-tomcat7;2.0.1
 [debug] 	found org.atmosphere#atmosphere-compat-tomcat7;2.0.1 in sbt-chain
@@ -349,7 +349,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.atmosphere#atmosphere-compat-tomcat7;2.0.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 [compile->default(compile)]
 [info] Resolving org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2fd5efb2
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@71908370
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-scalate_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-scalate_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 in sbt-chain
@@ -358,7 +358,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-scalate_2.11;2.4.0.RC1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-core_2.11;1.7.1 [compile->default(compile)]
 [info] Resolving org.scalatra.scalate#scalate-core_2.11;1.7.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6ae23cac
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2f7c24be
 [debug] sbt-chain: module revision found in cache: org.scalatra.scalate#scalate-core_2.11;1.7.1
 [debug] 	local: revision in cache: org.scalatra.scalate#scalate-core_2.11;1.7.1
 [debug] 	found org.scalatra.scalate#scalate-core_2.11;1.7.1 in sbt-chain
@@ -367,7 +367,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-core_2.11;1.7.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-util_2.11;1.7.1 [compile->default(compile)]
 [info] Resolving org.scalatra.scalate#scalate-util_2.11;1.7.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@506f998b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4f2f7f6b
 [debug] sbt-chain: module revision found in cache: org.scalatra.scalate#scalate-util_2.11;1.7.1
 [debug] 	local: revision in cache: org.scalatra.scalate#scalate-util_2.11;1.7.1
 [debug] 	found org.scalatra.scalate#scalate-util_2.11;1.7.1 in sbt-chain
@@ -376,7 +376,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra.scalate#scalate-util_2.11;1.7.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.0 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-compiler;2.11.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@67d3a81b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5da19b03
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.11.0
 [debug] 	local: revision in cache: org.scala-lang#scala-compiler;2.11.0
 [debug] 	found org.scala-lang#scala-compiler;2.11.0 in sbt-chain
@@ -385,7 +385,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.0 [compile->default(compile)]
 [info] Resolving org.scala-lang#scala-reflect;2.11.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@66f6e2a0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@166cc774
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.0
 [debug] 	local: revision in cache: org.scala-lang#scala-reflect;2.11.0
 [debug] 	found org.scala-lang#scala-reflect;2.11.0 in sbt-chain
@@ -395,13 +395,40 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.0 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->default(compile)]
 [info] Resolving javax.servlet#javax.servlet-api;3.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3bfd020c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4ee77a4a
 [debug] sbt-chain: module revision found in cache: javax.servlet#javax.servlet-api;3.1.0
 [debug] 	local: revision in cache: javax.servlet#javax.servlet-api;3.1.0
 [debug] 	found javax.servlet#javax.servlet-api;3.1.0 in sbt-chain
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[info] Resolving com.esotericsoftware.kryo#kryo;2.24.0 ...
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5f094067
+[debug] sbt-chain: module revision found in cache: com.esotericsoftware.kryo#kryo;2.24.0
+[debug] 	local: revision in cache: com.esotericsoftware.kryo#kryo;2.24.0
+[debug] 	found com.esotericsoftware.kryo#kryo;2.24.0 in sbt-chain
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[info] Resolving com.esotericsoftware.minlog#minlog;1.2 ...
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@dee2e74
+[debug] sbt-chain: module revision found in cache: com.esotericsoftware.minlog#minlog;1.2
+[debug] 	local: revision in cache: com.esotericsoftware.minlog#minlog;1.2
+[debug] 	found com.esotericsoftware.minlog#minlog;1.2 in sbt-chain
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[info] Resolving org.objenesis#objenesis;2.1 ...
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9e1a0f8
+[debug] sbt-chain: module revision found in cache: org.objenesis#objenesis;2.1
+[debug] 	local: revision in cache: org.objenesis#objenesis;2.1
+[debug] 	found org.objenesis#objenesis;2.1 in sbt-chain
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] resolving dependencies for configuration 'runtime'
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [runtime]
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [compile]
@@ -581,6 +608,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->compile]
@@ -757,9 +796,21 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->default(compile)]
 [info] Resolving ch.qos.logback#logback-classic;1.1.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5cbf0bab
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1c454861
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-classic;1.1.2
 [debug] 	local: revision in cache: ch.qos.logback#logback-classic;1.1.2
 [debug] 	found ch.qos.logback#logback-classic;1.1.2 in sbt-chain
@@ -768,7 +819,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-core;1.1.2 [runtime->default(compile)]
 [info] Resolving ch.qos.logback#logback-core;1.1.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7d97dfa
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@29f3a00c
 [debug] sbt-chain: module revision found in cache: ch.qos.logback#logback-core;1.1.2
 [debug] 	local: revision in cache: ch.qos.logback#logback-core;1.1.2
 [debug] 	found ch.qos.logback#logback-core;1.1.2 in sbt-chain
@@ -949,6 +1000,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->compile]
@@ -1119,6 +1182,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->compile]
@@ -1295,6 +1370,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->compile]
@@ -1305,7 +1392,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-core;1.1.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 [test->default(compile)]
 [info] Resolving org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6bb451e9
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2c80ee66
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-specs2_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-specs2_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 in sbt-chain
@@ -1314,7 +1401,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-specs2_2.11;2.4.0.RC1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-test_2.11;2.4.0.RC1 [test->default(compile)]
 [info] Resolving org.scalatra#scalatra-test_2.11;2.4.0.RC1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@274c7850
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@35c98085
 [debug] sbt-chain: module revision found in cache: org.scalatra#scalatra-test_2.11;2.4.0.RC1
 [debug] 	local: revision in cache: org.scalatra#scalatra-test_2.11;2.4.0.RC1
 [debug] 	found org.scalatra#scalatra-test_2.11;2.4.0.RC1 in sbt-chain
@@ -1323,7 +1410,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalatra#scalatra-test_2.11;2.4.0.RC1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4df0d040
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@45b4ff33
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-webapp;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-webapp;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 in sbt-chain
@@ -1332,7 +1419,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-webapp;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-xml;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-xml;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5be89ce3
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@23784195
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-xml;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-xml;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-xml;9.2.10.v20150310 in sbt-chain
@@ -1341,7 +1428,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-xml;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-util;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-util;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@714f0798
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@53568aaa
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-util;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-util;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-util;9.2.10.v20150310 in sbt-chain
@@ -1350,7 +1437,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-util;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57d37264
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6f84f21
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-servlet;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-servlet;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 in sbt-chain
@@ -1359,7 +1446,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-servlet;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-security;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-security;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5cadcf28
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9ff8152
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-security;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-security;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-security;9.2.10.v20150310 in sbt-chain
@@ -1368,7 +1455,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-security;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-server;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-server;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@18c3d82
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@29f6e086
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-server;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-server;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-server;9.2.10.v20150310 in sbt-chain
@@ -1377,7 +1464,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-server;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-http;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-http;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@13624a1f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@10ae98e1
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-http;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-http;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-http;9.2.10.v20150310 in sbt-chain
@@ -1386,7 +1473,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-http;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-io;9.2.10.v20150310 [test->default(compile)]
 [info] Resolving org.eclipse.jetty#jetty-io;9.2.10.v20150310 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@354cf699
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7bd158b4
 [debug] sbt-chain: module revision found in cache: org.eclipse.jetty#jetty-io;9.2.10.v20150310
 [debug] 	local: revision in cache: org.eclipse.jetty#jetty-io;9.2.10.v20150310
 [debug] 	found org.eclipse.jetty#jetty-io;9.2.10.v20150310 in sbt-chain
@@ -1395,7 +1482,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.eclipse.jetty#jetty-io;9.2.10.v20150310 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-all;1.10.19 [test->default(compile)]
 [info] Resolving org.mockito#mockito-all;1.10.19 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@6d9d5c3a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@246812a3
 [debug] sbt-chain: module revision found in cache: org.mockito#mockito-all;1.10.19
 [debug] 	local: revision in cache: org.mockito#mockito-all;1.10.19
 [debug] 	found org.mockito#mockito-all;1.10.19 in sbt-chain
@@ -1404,7 +1491,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-all;1.10.19 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.commons#commons-lang3;3.3.2 [test->default(compile)]
 [info] Resolving org.apache.commons#commons-lang3;3.3.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@344af346
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2009ccc1
 [debug] sbt-chain: module revision found in cache: org.apache.commons#commons-lang3;3.3.2
 [debug] 	local: revision in cache: org.apache.commons#commons-lang3;3.3.2
 [debug] 	found org.apache.commons#commons-lang3;3.3.2 in sbt-chain
@@ -1413,7 +1500,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.commons#commons-lang3;3.3.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpclient;4.3.6 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpclient;4.3.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2d0e0fc8
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7d677c0f
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpclient;4.3.6
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpclient;4.3.6
 [debug] 	found org.apache.httpcomponents#httpclient;4.3.6 in sbt-chain
@@ -1422,7 +1509,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpclient;4.3.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpcore;4.3.3 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpcore;4.3.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@67667b3f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@543eda9c
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpcore;4.3.3
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpcore;4.3.3
 [debug] 	found org.apache.httpcomponents#httpcore;4.3.3 in sbt-chain
@@ -1431,7 +1518,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpcore;4.3.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-logging#commons-logging;1.1.3 [test->default(compile)]
 [info] Resolving commons-logging#commons-logging;1.1.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3eada27c
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7783fc77
 [debug] sbt-chain: module revision found in cache: commons-logging#commons-logging;1.1.3
 [debug] 	local: revision in cache: commons-logging#commons-logging;1.1.3
 [debug] 	found commons-logging#commons-logging;1.1.3 in sbt-chain
@@ -1440,7 +1527,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-logging#commons-logging;1.1.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-codec#commons-codec;1.6 [test->default(compile)]
 [info] Resolving commons-codec#commons-codec;1.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@9bd8bc0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@68f1ea63
 [debug] sbt-chain: module revision found in cache: commons-codec#commons-codec;1.6
 [debug] 	local: revision in cache: commons-codec#commons-codec;1.6
 [debug] 	found commons-codec#commons-codec;1.6 in sbt-chain
@@ -1449,7 +1536,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->commons-codec#commons-codec;1.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpmime;4.3.6 [test->default(compile)]
 [info] Resolving org.apache.httpcomponents#httpmime;4.3.6 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3bbe8c35
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@53b939d4
 [debug] sbt-chain: module revision found in cache: org.apache.httpcomponents#httpmime;4.3.6
 [debug] 	local: revision in cache: org.apache.httpcomponents#httpmime;4.3.6
 [debug] 	found org.apache.httpcomponents#httpmime;4.3.6 in sbt-chain
@@ -1458,7 +1545,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.apache.httpcomponents#httpmime;4.3.6 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#specs2_2.11;2.4.17 [test->default(compile)]
 [info] Resolving org.specs2#specs2_2.11;2.4.17 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@7e742bb3
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@57db1c30
 [debug] sbt-chain: module revision found in cache: org.specs2#specs2_2.11;2.4.17
 [debug] 	local: revision in cache: org.specs2#specs2_2.11;2.4.17
 [debug] 	found org.specs2#specs2_2.11;2.4.17 in sbt-chain
@@ -1467,7 +1554,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#specs2_2.11;2.4.17 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.5 [test->default(compile)]
 [info] Resolving org.scala-lang#scala-compiler;2.11.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@31fb9a4b
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2ee3306d
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-compiler;2.11.5
 [debug] 	local: revision in cache: org.scala-lang#scala-compiler;2.11.5
 [debug] 	found org.scala-lang#scala-compiler;2.11.5 in sbt-chain
@@ -1476,7 +1563,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-compiler;2.11.5 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.5 [test->default(compile)]
 [info] Resolving org.scala-lang#scala-reflect;2.11.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2d12393f
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@496b8c92
 [debug] sbt-chain: module revision found in cache: org.scala-lang#scala-reflect;2.11.5
 [debug] 	local: revision in cache: org.scala-lang#scala-reflect;2.11.5
 [debug] 	found org.scala-lang#scala-reflect;2.11.5 in sbt-chain
@@ -1486,7 +1573,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-lang#scala-reflect;2.11.5 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz.stream#scalaz-stream_2.11;0.5a [test->default(compile)]
 [info] Resolving org.scalaz.stream#scalaz-stream_2.11;0.5a ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@18aac014
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@15d281c4
 [debug] sbt-chain: module revision found in cache: org.scalaz.stream#scalaz-stream_2.11;0.5a
 [debug] 	local: revision in cache: org.scalaz.stream#scalaz-stream_2.11;0.5a
 [debug] 	found org.scalaz.stream#scalaz-stream_2.11;0.5a in sbt-chain
@@ -1496,7 +1583,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz.stream#scalaz-stream_2.11;0.5a [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-core_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-core_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@470cb8cf
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2bdfd476
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-core_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-core_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-core_2.11;7.1.0 in sbt-chain
@@ -1505,7 +1592,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-core_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-concurrent_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-concurrent_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@79fc4fa7
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4b63f0c1
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-concurrent_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-concurrent_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-concurrent_2.11;7.1.0 in sbt-chain
@@ -1514,7 +1601,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-concurrent_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-effect_2.11;7.1.0 [test->default(compile)]
 [info] Resolving org.scalaz#scalaz-effect_2.11;7.1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1150a0e4
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1cc47417
 [debug] sbt-chain: module revision found in cache: org.scalaz#scalaz-effect_2.11;7.1.0
 [debug] 	local: revision in cache: org.scalaz#scalaz-effect_2.11;7.1.0
 [debug] 	found org.scalaz#scalaz-effect_2.11;7.1.0 in sbt-chain
@@ -1523,7 +1610,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalaz#scalaz-effect_2.11;7.1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.typelevel#scodec-bits_2.11;1.0.2 [test->default(compile)]
 [info] Resolving org.typelevel#scodec-bits_2.11;1.0.2 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@11f87c55
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3eecdf48
 [debug] sbt-chain: module revision found in cache: org.typelevel#scodec-bits_2.11;1.0.2
 [debug] 	local: revision in cache: org.typelevel#scodec-bits_2.11;1.0.2
 [debug] 	found org.typelevel#scodec-bits_2.11;1.0.2 in sbt-chain
@@ -1533,7 +1620,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.typelevel#scodec-bits_2.11;1.0.2 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.pegdown#pegdown;1.2.1 [test->default(compile)]
 [info] Resolving org.pegdown#pegdown;1.2.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@60ce1f90
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4eceb26f
 [debug] sbt-chain: module revision found in cache: org.pegdown#pegdown;1.2.1
 [debug] 	local: revision in cache: org.pegdown#pegdown;1.2.1
 [debug] 	found org.pegdown#pegdown;1.2.1 in sbt-chain
@@ -1542,7 +1629,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.pegdown#pegdown;1.2.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-java;1.1.4 [test->default(compile)]
 [info] Resolving org.parboiled#parboiled-java;1.1.4 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3b33b68e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3ca05182
 [debug] sbt-chain: module revision found in cache: org.parboiled#parboiled-java;1.1.4
 [debug] 	local: revision in cache: org.parboiled#parboiled-java;1.1.4
 [debug] 	found org.parboiled#parboiled-java;1.1.4 in sbt-chain
@@ -1551,7 +1638,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-java;1.1.4 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-core;1.1.4 [test->default(compile)]
 [info] Resolving org.parboiled#parboiled-core;1.1.4 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1b2e729e
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5f61ed9c
 [debug] sbt-chain: module revision found in cache: org.parboiled#parboiled-core;1.1.4
 [debug] 	local: revision in cache: org.parboiled#parboiled-core;1.1.4
 [debug] 	found org.parboiled#parboiled-core;1.1.4 in sbt-chain
@@ -1560,7 +1647,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.parboiled#parboiled-core;1.1.4 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@100e871a
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@32bea8dd
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm;4.1
 [debug] 	found org.ow2.asm#asm;4.1 in sbt-chain
@@ -1569,7 +1656,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-tree;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-tree;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@26680448
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@35934577
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-tree;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-tree;4.1
 [debug] 	found org.ow2.asm#asm-tree;4.1 in sbt-chain
@@ -1578,7 +1665,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-tree;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-analysis;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-analysis;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@10586304
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@3f1f716d
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-analysis;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-analysis;4.1
 [debug] 	found org.ow2.asm#asm-analysis;4.1 in sbt-chain
@@ -1587,7 +1674,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-analysis;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-util;4.1 [test->default(compile)]
 [info] Resolving org.ow2.asm#asm-util;4.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1c7d3c0
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@40d3a3bf
 [debug] sbt-chain: module revision found in cache: org.ow2.asm#asm-util;4.1
 [debug] 	local: revision in cache: org.ow2.asm#asm-util;4.1
 [debug] 	found org.ow2.asm#asm-util;4.1 in sbt-chain
@@ -1596,7 +1683,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.ow2.asm#asm-util;4.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalacheck#scalacheck_2.11;1.12.1 [test->default(compile)]
 [info] Resolving org.scalacheck#scalacheck_2.11;1.12.1 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@133686a1
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@70faa376
 [debug] sbt-chain: module revision found in cache: org.scalacheck#scalacheck_2.11;1.12.1
 [debug] 	local: revision in cache: org.scalacheck#scalacheck_2.11;1.12.1
 [debug] 	found org.scalacheck#scalacheck_2.11;1.12.1 in sbt-chain
@@ -1605,7 +1692,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scalacheck#scalacheck_2.11;1.12.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-sbt#test-interface;1.0 [test->default(compile)]
 [info] Resolving org.scala-sbt#test-interface;1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@18e2bd3
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4c6d23a5
 [debug] sbt-chain: module revision found in cache: org.scala-sbt#test-interface;1.0
 [debug] 	local: revision in cache: org.scala-sbt#test-interface;1.0
 [debug] 	found org.scala-sbt#test-interface;1.0 in sbt-chain
@@ -1614,7 +1701,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.scala-sbt#test-interface;1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.hamcrest#hamcrest-core;1.3 [test->default(compile)]
 [info] Resolving org.hamcrest#hamcrest-core;1.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@5bb93d09
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@aae7514
 [debug] sbt-chain: module revision found in cache: org.hamcrest#hamcrest-core;1.3
 [debug] 	local: revision in cache: org.hamcrest#hamcrest-core;1.3
 [debug] 	found org.hamcrest#hamcrest-core;1.3 in sbt-chain
@@ -1623,25 +1710,16 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.hamcrest#hamcrest-core;1.3 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->default(compile)]
 [info] Resolving org.mockito#mockito-core;1.9.5 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@2d2f1018
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@1f0a389a
 [debug] sbt-chain: module revision found in cache: org.mockito#mockito-core;1.9.5
 [debug] 	local: revision in cache: org.mockito#mockito-core;1.9.5
 [debug] 	found org.mockito#mockito-core;1.9.5 in sbt-chain
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->master]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->default(compile)]
-[info] Resolving org.objenesis#objenesis;1.0 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4143daf4
-[debug] sbt-chain: module revision found in cache: org.objenesis#objenesis;1.0
-[debug] 	local: revision in cache: org.objenesis#objenesis;1.0
-[debug] 	found org.objenesis#objenesis;1.0 in sbt-chain
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->runtime]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->compile]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->default(compile)]
 [info] Resolving junit#junit;4.11 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@4740a532
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@73b87f1e
 [debug] sbt-chain: module revision found in cache: junit#junit;4.11
 [debug] 	local: revision in cache: junit#junit;4.11
 [debug] 	found junit#junit;4.11 in sbt-chain
@@ -1650,7 +1728,7 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.specs2#classycle;1.4.3 [test->default(compile)]
 [info] Resolving org.specs2#classycle;1.4.3 ...
-[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@22a5f494
+[debug] sbt-chain: Checking cache for: sbt.ivyint.MergedDescriptors@90cf7fe
 [debug] sbt-chain: module revision found in cache: org.specs2#classycle;1.4.3
 [debug] 	local: revision in cache: org.specs2#classycle;1.4.3
 [debug] 	found org.specs2#classycle;1.4.3 in sbt-chain
@@ -1840,6 +1918,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [optional]
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [provided]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [compile-internal->default(compile)]
@@ -2018,6 +2108,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile-internal->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile-internal->master]
 [debug] resolving dependencies for configuration 'runtime-internal'
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [runtime-internal]
 [debug] == resolving dependencies for default#lense-base$sources_javadoc_2.11;1.0 [runtime]
@@ -2198,6 +2300,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->compile]
@@ -2374,6 +2488,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->compile]
@@ -2559,6 +2685,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime-internal->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime-internal->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime-internal->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime-internal->compile]
@@ -2750,6 +2888,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [compile->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [compile->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.googlecode.lanterna#lanterna;2.1.8 [runtime->compile]
@@ -2928,6 +3078,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [runtime->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [runtime->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [runtime->compile]
@@ -3104,6 +3266,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test->compile]
@@ -3256,10 +3430,6 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test->master]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->default(compile)]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->runtime]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->compile]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test->compile]
@@ -3438,6 +3608,18 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test-internal->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->javax.servlet#javax.servlet-api;3.1.0 [test-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.kryo#kryo;2.24.0 [test-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->com.esotericsoftware.minlog#minlog;1.2 [test-internal->master]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test-internal->default(compile)]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test-internal->runtime]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test-internal->compile]
+[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;2.1 [test-internal->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test-internal->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->ch.qos.logback#logback-classic;1.1.2 [test-internal->compile]
@@ -3590,10 +3772,6 @@
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test-internal->compile]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.mockito#mockito-core;1.9.5 [test-internal->master]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test-internal->default(compile)]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test-internal->runtime]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test-internal->compile]
-[debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->org.objenesis#objenesis;1.0 [test-internal->master]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test-internal->default(compile)]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test-internal->runtime]
 [debug] == resolving dependencies default#lense-base$sources_javadoc_2.11;1.0->junit#junit;4.11 [test-internal->compile]
@@ -3802,6 +3980,45 @@
 [debug] 	[NOT REQUIRED] javax.servlet#javax.servlet-api;3.1.0!javax.servlet-api.jar
 [debug] 	[NOT REQUIRED] javax.servlet#javax.servlet-api;3.1.0!javax.servlet-api.jar(src)
 [debug] 	[NOT REQUIRED] javax.servlet#javax.servlet-api;3.1.0!javax.servlet-api.jar(doc)
+[debug] 		tried /home/keenon/.ivy2/local/com.esotericsoftware.kryo/kryo/2.24.0/docs/kryo-javadoc.jar
+[debug] 		tried /home/keenon/.ivy2/local/com.esotericsoftware.kryo/kryo/2.24.0/srcs/kryo-sources.jar
+[debug] 		tried /home/keenon/.ivy2/local/com.esotericsoftware.kryo/kryo/2.24.0/jars/kryo.jar
+[debug] 		tried http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar
+[info] downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar ...
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar.sha1
+[debug] sha1 OK for http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar
+[info] 	[SUCCESSFUL ] com.esotericsoftware.kryo#kryo;2.24.0!kryo.jar(doc) (902ms)
+[debug] 		tried http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar
+[info] downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar ...
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar.sha1
+[debug] sha1 OK for http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar
+[info] 	[SUCCESSFUL ] com.esotericsoftware.kryo#kryo;2.24.0!kryo.jar(src) (398ms)
+[debug] 		tried http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar
+[info] downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar ...
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar
+[debug] 	public: downloading http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar.sha1
+[debug] sha1 OK for http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar
+[info] 	[SUCCESSFUL ] com.esotericsoftware.kryo#kryo;2.24.0!kryo.jar (342ms)
+[debug] 	[NOT REQUIRED] com.esotericsoftware.minlog#minlog;1.2!minlog.jar(doc)
+[debug] 	[NOT REQUIRED] com.esotericsoftware.minlog#minlog;1.2!minlog.jar(src)
+[debug] 	[NOT REQUIRED] com.esotericsoftware.minlog#minlog;1.2!minlog.jar
+[debug] 		tried /home/keenon/.ivy2/local/org.objenesis/objenesis/2.1/srcs/objenesis-sources.jar
+[debug] 	[NOT REQUIRED] org.objenesis#objenesis;2.1!objenesis.jar
+[debug] 		tried /home/keenon/.ivy2/local/org.objenesis/objenesis/2.1/docs/objenesis-javadoc.jar
+[debug] 		tried http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar
+[info] downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar ...
+[debug] 	public: downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar
+[debug] 	public: downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar.sha1
+[debug] sha1 OK for http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar
+[info] 	[SUCCESSFUL ] org.objenesis#objenesis;2.1!objenesis.jar(src) (328ms)
+[debug] 		tried http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar
+[info] downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar ...
+[debug] 	public: downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar
+[debug] 	public: downloading http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar.sha1
+[debug] sha1 OK for http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar
+[info] 	[SUCCESSFUL ] org.objenesis#objenesis;2.1!objenesis.jar(doc) (377ms)
 [debug] 	[NOT REQUIRED] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar(src)
 [debug] 	[NOT REQUIRED] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar(doc)
 [debug] 	[NOT REQUIRED] ch.qos.logback#logback-classic;1.1.2!logback-classic.jar
@@ -3916,9 +4133,6 @@
 [debug] 	[NOT REQUIRED] org.mockito#mockito-core;1.9.5!mockito-core.jar(doc)
 [debug] 	[NOT REQUIRED] org.mockito#mockito-core;1.9.5!mockito-core.jar(src)
 [debug] 	[NOT REQUIRED] org.mockito#mockito-core;1.9.5!mockito-core.jar
-[debug] 	[NOT REQUIRED] org.objenesis#objenesis;1.0!objenesis.jar
-[debug] 	[NOT REQUIRED] org.objenesis#objenesis;1.0!objenesis.jar(src)
-[debug] 	[NOT REQUIRED] org.objenesis#objenesis;1.0!objenesis.jar(doc)
 [debug] 	[NOT REQUIRED] junit#junit;4.11!junit.jar(src)
 [debug] 	[NOT REQUIRED] junit#junit;4.11!junit.jar
 [debug] 	[NOT REQUIRED] junit#junit;4.11!junit.jar(doc)
@@ -3937,7 +4151,7 @@
 [debug] 	[NOT REQUIRED] org.scala-lang.modules#scala-parser-combinators_2.11;1.0.2!scala-parser-combinators_2.11.jar(doc)
 [debug] 	[NOT REQUIRED] jline#jline;2.12!jline.jar(doc)
 [debug] 	[NOT REQUIRED] jline#jline;2.12!jline.jar(src)
-[debug] :: resolution report :: resolve 2948ms :: artifacts dl 169ms
+[debug] :: resolution report :: resolve 1850ms :: artifacts dl 2504ms
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 compile produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-compile.xml
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 runtime produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-runtime.xml
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 test produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-test.xml
@@ -3951,4 +4165,4 @@
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 docs produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-docs.xml
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 pom produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-pom.xml
 [debug] 	report for default#lense-base$sources_javadoc_2.11;1.0 scala-tool produced in /home/keenon/Desktop/lense-base/target/resolution-cache/reports/default-lense-base$sources_javadoc_2.11-scala-tool.xml
-[debug] 	resolve done (2948ms resolve - 169ms download)
+[debug] 	resolve done (1850ms resolve - 2504ms download)

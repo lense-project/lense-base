@@ -4,7 +4,7 @@
 		module="lense-base_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150507112249"
+		publication="20150510134510"
 	>
 		<description>
 		lense-base
@@ -42,5 +42,6 @@
 		<dependency org="org.scalatra" name="scalatra-specs2_2.11" rev="2.4.0.RC1" conf="test->default(compile)"/>
 		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2" conf="runtime->default(compile)"/>
 		<dependency org="javax.servlet" name="javax.servlet-api" rev="3.1.0" conf="compile->default(compile)"/>
+		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.24.0" conf="compile->default(compile)"/>
 	</dependencies>
 </ivy-module>

@@ -4,7 +4,7 @@
 		module="lense-base$sources_javadoc_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150509133606"
+		publication="20150510134513"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
@@ -200,6 +200,18 @@
 			<artifact name="javax.servlet-api" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="javax.servlet-api" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
+		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.24.0" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="kryo" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="kryo" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.esotericsoftware.minlog" name="minlog" rev="1.2" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="minlog" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="minlog" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.objenesis" name="objenesis" rev="2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="objenesis" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="objenesis" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
 		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2" transitive="false" conf="runtime->default(compile);test->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="logback-classic" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="logback-classic" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
@@ -351,10 +363,6 @@
 		<dependency org="org.mockito" name="mockito-core" rev="1.9.5" transitive="false" conf="test->default(compile);test-internal->default(compile)">
 			<artifact name="mockito-core" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="mockito-core" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.objenesis" name="objenesis" rev="1.0" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="objenesis" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="objenesis" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
 		<dependency org="junit" name="junit" rev="4.11" transitive="false" conf="test->default(compile);test-internal->default(compile)">
 			<artifact name="junit" type="src" ext="jar" conf="sources" e:classifier="sources"/>

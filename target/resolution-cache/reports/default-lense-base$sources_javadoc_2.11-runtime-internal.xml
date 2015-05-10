@@ -7,10 +7,10 @@
 		revision="1.0"
 		conf="runtime-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150509133607"/>
+		date="20150510134513"/>
 	<dependencies>
 		<module organisation="ch.qos.logback" name="logback-classic">
-			<revision name="1.1.2" status="release" pubdate="20140402124238" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="44">
+			<revision name="1.1.2" status="release" pubdate="20140402124238" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="47">
 				<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html"/>
 				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"/>
 				<metadata-artifact status="no" details="" size="10622" time="0" location="/home/keenon/.ivy2/cache/ch.qos.logback/logback-classic/ivy-1.1.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom"/>
@@ -29,7 +29,7 @@
 			</revision>
 		</module>
 		<module organisation="ch.qos.logback" name="logback-core">
-			<revision name="1.1.2" status="release" pubdate="20140402124047" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="45">
+			<revision name="1.1.2" status="release" pubdate="20140402124047" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="48">
 				<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html"/>
 				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"/>
 				<metadata-artifact status="no" details="" size="9800" time="0" location="/home/keenon/.ivy2/cache/ch.qos.logback/logback-core/ivy-1.1.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom"/>
@@ -43,6 +43,59 @@
 					</artifact>
 					<artifact name="logback-core" type="jar" ext="jar" status="no" details="" size="427729" time="0" location="/home/keenon/.ivy2/cache/ch.qos.logback/logback-core/jars/logback-core-1.1.2.jar">
 						<origin-location is-local="false" location="https://repo1.maven.org/maven2/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.esotericsoftware.kryo" name="kryo">
+			<revision name="2.24.0" status="release" pubdate="20140504060438" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/EsotericSoftware/kryo" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="44">
+				<license name="New BSD License" url="http://www.opensource.org/licenses/bsd-license.php"/>
+				<metadata-artifact status="no" details="" size="3358" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.kryo/kryo/ivy-2.24.0.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile, runtime-internal, runtime, optional" rev="2.24.0" rev-constraint-default="2.24.0" rev-constraint-dynamic="2.24.0" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="kryo" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="728352" time="902" location="/home/keenon/.ivy2/cache/com.esotericsoftware.kryo/kryo/docs/kryo-2.24.0-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-javadoc.jar"/>
+					</artifact>
+					<artifact name="kryo" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="126718" time="398" location="/home/keenon/.ivy2/cache/com.esotericsoftware.kryo/kryo/srcs/kryo-2.24.0-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0-sources.jar"/>
+					</artifact>
+					<artifact name="kryo" type="jar" ext="jar" status="successful" details="" size="339283" time="342" location="/home/keenon/.ivy2/cache/com.esotericsoftware.kryo/kryo/jars/kryo-2.24.0.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.objenesis" name="objenesis">
+			<revision name="2.1" status="release" pubdate="20131010142537" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://objenesis.org" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="46">
+				<metadata-artifact status="no" details="" size="3127" time="0" location="/home/keenon/.ivy2/cache/org.objenesis/objenesis/ivy-2.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile, runtime-internal, runtime, optional" rev="2.1" rev-constraint-default="2.1" rev-constraint-dynamic="2.1" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="objenesis" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="44014" time="328" location="/home/keenon/.ivy2/cache/org.objenesis/objenesis/srcs/objenesis-2.1-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-sources.jar"/>
+					</artifact>
+					<artifact name="objenesis" type="jar" ext="jar" status="no" details="" size="41755" time="0" location="/home/keenon/.ivy2/cache/org.objenesis/objenesis/jars/objenesis-2.1.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1.jar"/>
+					</artifact>
+					<artifact name="objenesis" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="241742" time="377" location="/home/keenon/.ivy2/cache/org.objenesis/objenesis/docs/objenesis-2.1-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1-javadoc.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.esotericsoftware.minlog" name="minlog">
+			<revision name="1.2" status="release" pubdate="20120531052649" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/minlog/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="45">
+				<license name="New BSD License" url="http://www.opensource.org/licenses/bsd-license.php"/>
+				<metadata-artifact status="no" details="" size="2539" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.minlog/minlog/ivy-1.2.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2.pom"/>
+				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile, runtime-internal, runtime, optional" rev="1.2" rev-constraint-default="1.2" rev-constraint-dynamic="1.2" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="minlog" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="29161" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.minlog/minlog/docs/minlog-1.2-javadoc.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2-javadoc.jar"/>
+					</artifact>
+					<artifact name="minlog" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="2458" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.minlog/minlog/srcs/minlog-1.2-sources.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2-sources.jar"/>
+					</artifact>
+					<artifact name="minlog" type="jar" ext="jar" status="no" details="" size="4965" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.minlog/minlog/jars/minlog-1.2.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>

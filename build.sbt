@@ -24,5 +24,7 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2" % "runtime
 
 libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0"
 
+libraryDependencies += "com.esotericsoftware.kryo" % "kryo" % "2.24.0"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
