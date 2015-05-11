@@ -42,7 +42,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 
   var numSwapsSoFar = 0
-  val modelRegularization = 0.05
+  val modelRegularization = 0.3
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {

@@ -4,7 +4,7 @@
 		module="lense-base$sources_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150510134513"
+		publication="20150510181631"
 	/>
 	<configurations>
 		<conf name="default" visibility="public" description=""/>

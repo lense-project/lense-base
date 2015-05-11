@@ -465,6 +465,7 @@ class GraphStream {
     modelTrainingClone.synchronized {
       if (batchOptimizer == null || clearOptimizer) {
 
+        /*
         batchOptimizer = new LBFGS() with L2Regularization{
           variance = 1.0 / l2regularization
           override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
@@ -473,19 +474,55 @@ class GraphStream {
             super.step(weights, gradient, value / graphs.size)
           }
         }
+        */
+
+        /*
+        batchOptimizer = new ConjugateGradient() with L2Regularization{
+          variance = 1.0 / l2regularization
+          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
+            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
+            gradient *= (1.0 / graphs.size)
+            super.step(weights, gradient, value / graphs.size)
+          }
+        }
+        */
 
         // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
         // with large sparse matrices, when things start to get slow
 
-        /*
         batchOptimizer = new AdaGrad() {
+          private var _isConverged = false
+          override def isConverged = _isConverged
+
+          var lastValue = Double.NegativeInfinity
+          var convergenceCounter = 0
+
+          override def lRate(weights: WeightsSet, gradient: WeightsMap, value: Double): Double = {
+            if (lastValue != Double.NegativeInfinity) {
+              val percentageImprovement = Math.abs(lastValue-value)/Math.abs(lastValue)
+              System.err.println("Value percentage improvment: "+percentageImprovement)
+              if ((lastValue < value) && percentageImprovement < 0.01) {
+                convergenceCounter += 1
+                System.err.println("Convergence counter: "+convergenceCounter)
+                if (convergenceCounter > 3) {
+                  _isConverged = true
+                }
+              }
+              else {
+                convergenceCounter = 0
+              }
+            }
+            lastValue = value
+
+            super.lRate(weights, gradient, value)
+          }
+
           // We just override to put in our regularizer... muahahaha
           override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
             gradient += (weights, -l2regularization)
             super.processGradient(weights, gradient)
           }
         }
-        */
 
         /*
         batchOptimizer = new ConstantLearningRate { // InvSqrtTStepSize
