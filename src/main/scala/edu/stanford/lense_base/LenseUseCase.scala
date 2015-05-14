@@ -175,7 +175,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)]) = {
-    var trainingExamples : List[Graph] = List[Graph]()
     var numSwapsSoFar = 0
 
     progressivelyAnalyze(goldPairs, pair => {
@@ -196,13 +195,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       for (n <- graph.nodes) {
         cloneGraphPair._2(n).observedValue = goldMap(n)
       }
-      trainingExamples = trainingExamples :+ cloneGraphPair._1
+      lenseEngine.pastGuesses += cloneGraphPair._1
 
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
 
       val idx = goldPairs.indexOf(pair)
-      if (idx < 50 || (idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
-        graphStream.learn(trainingExamples, 10.0)
+      if ((idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
+        lenseEngine.learnHoldingPastGuessesConstant()
         numSwapsSoFar += 1
       }
 

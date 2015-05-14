@@ -51,7 +51,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
       while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
           System.err.println("Retraining model")
-          learnHoldingPastGuessesConstant(modelRegularization)
+          // Important to think about how to correctly handle removing regularization over time, or not...
+          learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
           System.err.println("Hot swapping model")
           numSwapsSoFar += 1
           trainedOnGuesses = pastGuesses.size
@@ -65,13 +66,17 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }.start()
 
+  def getModelRegularization(dataSize : Int) : Double = {
+    modelRegularization
+  }
+
   def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
     val promise = Promise[(Map[GraphNode,String], PredictionSummary)]()
     InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
     promise
   }
 
-  def learnHoldingPastGuessesConstant(l2regularization : Double = 0.1) = this.synchronized {
+  def learnHoldingPastGuessesConstant(l2regularization : Double = getModelRegularization(pastGuesses.size)) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
     currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
     // Reset human weights to default, because regularizer will have messed with them

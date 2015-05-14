@@ -508,6 +508,7 @@ class GraphStream {
       }
 
       batchOptimizer.asInstanceOf[BatchAdaGrad]._isConverged = false
+      batchOptimizer.asInstanceOf[BatchAdaGrad].l2regularization = l2regularization
 
 
       // Don't want to be doing this part in parallel, things get broken
@@ -564,7 +565,11 @@ class GraphStream {
       for (likelihoodExample <- likelihoodExamples) {
         likelihoodExample.accumulateValueAndGradient(value, null)
       }
-      value.l.value
+      val regularizer = - (modelTrainingClone.parameters.dot(modelTrainingClone.parameters) * l2regularization / 2)
+      println("SYSTEM RETURN REGULARIZER: "+regularizer)
+      println("SYSTEM RETURN VALUE: "+value.l.value)
+      println("SYSTEM RETURN VALUE+REGURLAIZER: "+(value.l.value+regularizer))
+      value.l.value + regularizer
     }
   }
 
