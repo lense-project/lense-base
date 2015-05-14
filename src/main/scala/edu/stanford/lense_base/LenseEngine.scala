@@ -199,7 +199,10 @@ case class InFlightPrediction(engine : LenseEngine,
         })
 
         engine.pastGuesses.synchronized {
-          engine.pastGuesses += gameState.originalGraph
+          // If we queried at least 2 humans for this one, hopefully minimizes noise in training data
+          if (gameState.graph.nodes.size > gameState.originalGraph.nodes.size + 1) {
+            engine.pastGuesses += gameState.originalGraph
+          }
           engine.pastQueryStructure += gameState.graph
           // Wake up the parallel weights trainer:
           engine.pastGuesses.notifyAll()

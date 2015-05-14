@@ -131,9 +131,9 @@ object RunTestCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 10
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, "artificial_human_adagrad")
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, "artificial_human_adagrad_clip2")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 1.0, poolSize, 3) // 3 query baseline
-  // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
+  nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
   // nerUseCase.testWithRealHumans(nerUseCase.data)
 }

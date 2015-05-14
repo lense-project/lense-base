@@ -41,7 +41,7 @@ class BatchAdaGrad extends AdaGrad {
 
       val percentageImprovement = Math.abs(lastValue-value)/Math.abs(lastValue)
       System.err.println("Value percentage improvment: "+percentageImprovement)
-      if ((lastValue < value) && percentageImprovement < 0.01) {
+      if ((lastValue <= value) && percentageImprovement < 0.01) {
         convergenceCounter += 1
         System.err.println("Convergence counter: "+convergenceCounter)
         if (convergenceCounter > 3) {
