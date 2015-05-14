@@ -1,14 +1,17 @@
 package edu.stanford.lense_base.graph
 
 import cc.factorie.model.{WeightsMap, WeightsSet}
-import cc.factorie.optimize.AdaGrad
+import cc.factorie.optimize.{ParameterAveraging, AdaGrad}
 
 import scala.collection.mutable.ListBuffer
 
 /**
  * Created by keenon on 5/10/15.
+ *
+ * It seems that ParameterAveraging slows down convergence, but perhaps lends stability to outcomes...?
+ * Needs a more systematic exploration
  */
-class BatchAdaGrad() extends AdaGrad {
+class BatchAdaGrad() extends AdaGrad(rate = 1.0) { // with ParameterAveraging {
   var _isConverged = false
   override def isConverged = _isConverged
 
@@ -38,7 +41,7 @@ class BatchAdaGrad() extends AdaGrad {
 
         val percentageDifferenceFromFloatingValue = Math.abs(lastKAvg - valuePlusRegularizer) / Math.abs(lastKAvg)
         System.err.println("Percentage difference from avg of last "+K+": "+percentageDifferenceFromFloatingValue)
-        if (valuePlusRegularizer > lastKAvg && percentageDifferenceFromFloatingValue < 0.01) {
+        if (valuePlusRegularizer > lastKAvg && percentageDifferenceFromFloatingValue < 0.005) {
           System.err.println("Converged to within %1 of avg of last " + K + " losses, quitting b/c oscillating")
           _isConverged = true
         }
@@ -46,10 +49,10 @@ class BatchAdaGrad() extends AdaGrad {
 
       val percentageImprovement = Math.abs(lastValue-valuePlusRegularizer)/Math.abs(lastValue)
       System.err.println("Value percentage improvment: "+percentageImprovement)
-      if ((lastValue <= valuePlusRegularizer) && percentageImprovement < 0.001) {
+      if ((lastValue <= valuePlusRegularizer) && percentageImprovement < 0.002) {
         convergenceCounter += 1
         System.err.println("Convergence counter: "+convergenceCounter)
-        if (convergenceCounter > 7) {
+        if (convergenceCounter > 3) {
           _isConverged = true
         }
       }

@@ -463,7 +463,7 @@ class GraphStream {
   var batchOptimizer : GradientOptimizer = null
   private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Double = {
     modelTrainingClone.synchronized {
-      if (batchOptimizer == null) {
+      if (batchOptimizer == null || clearOptimizer) {
 
         /*
         batchOptimizer = new LBFGS() with L2Regularization{
