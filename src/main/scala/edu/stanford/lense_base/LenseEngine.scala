@@ -67,7 +67,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }.start()
 
   def getModelRegularization(dataSize : Int) : Double = {
-    modelRegularization
+    modelRegularization / Math.sqrt(dataSize)
   }
 
   def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
