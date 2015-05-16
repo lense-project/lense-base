@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="mturk (2)">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/mturk" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/lib/mturk" />
+    </SOURCES>
+    <jarDirectory url="file://$PROJECT_DIR$/lib/mturk" recursive="false" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/mturk" recursive="false" type="SOURCES" />
+  </library>
+</component>

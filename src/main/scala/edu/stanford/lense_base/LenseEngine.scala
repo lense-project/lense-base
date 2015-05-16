@@ -42,7 +42,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 
   var numSwapsSoFar = 0
-  val modelRegularization = 0.3
+  val modelRegularization = 0.5
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
@@ -67,7 +67,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }.start()
 
   def getModelRegularization(dataSize : Int) : Double = {
-    modelRegularization / Math.sqrt(dataSize)
+    modelRegularization / Math.log(dataSize)
   }
 
   def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
@@ -129,7 +129,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   def addTrainingData(labels : List[Graph]) : Unit = {
     pastGuesses ++= labels
     println("Doing initial learning...")
-    learnHoldingPastGuessesConstant(modelRegularization)
+    learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
     println("Finished")
   }
 }

@@ -4,12 +4,7 @@ import java.util.Date
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
-import org.eclipse.jetty.server.nio.SelectChannelConnector
-import org.eclipse.jetty.server.Server
-import org.eclipse.jetty.webapp.WebAppContext
 
-import org.atmosphere.interceptor.IdleResourceInterceptor
-import org.json4s.JsonDSL._
 import org.json4s._
 import org.json4s.jackson.Json
 import org.scalatra._
@@ -23,6 +18,7 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Promise, Future}
 import scala.util.Try
+
 import scala.util.parsing.json.JSONObject
 
 /**
@@ -35,24 +31,7 @@ object WorkUnitServlet {
 
   val workQueue = mutable.Queue[WebWorkUnit]()
 
-  lazy val server = {
-    val server = new Server()
-    val connector = new SelectChannelConnector()
-    connector.setPort(8080)
-    server.addConnector(connector)
-    val context: WebAppContext = new WebAppContext("src/main/lense-webapp", "/")
-    context.setServer(server)
-    server.setHandler(context)
-
-    try {
-      server.start()
-    } catch {
-      case e: Exception => {
-        e.printStackTrace()
-        System.exit(1)
-      }
-    }
-  }
+  lazy val server = new JettyStandalone("src/main/lense-webapp")
 }
 
 class WorkUnitServlet extends ScalatraServlet

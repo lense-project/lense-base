@@ -14,5 +14,14 @@
         <div id="content">
             connecting...
         </div>
+
+        <form action="https://workersandbox.mturk.com/mturk/externalSubmit"
+              method="POST" style="display:none" id="successForm">
+            <!-- This field gets populated by JavaScript when the page loads: -->
+            <input type="hidden" name="assignmentId" id="assignmentId" value="" />
+            <input type="hidden" name="hitId" id="hitId" value="" />
+            <input type="hidden" name="completionCode" value="" />
+        </form>
+
     </body>
 </html>

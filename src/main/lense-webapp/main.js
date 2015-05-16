@@ -1,5 +1,25 @@
+$.urlParam = function(name){
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null){
+       return null;
+    }
+    else{
+       return decodeURIComponent(results[1]) || 0;
+    }
+}
+
 $(function () {
     "use strict";
+
+    var assignmentId = $.urlParam("assignmentId");
+    var hitId = $.urlParam("hitId");
+    var turkSubmitTo = $.urlParam("turkSubmitTo");
+    var workerId = $.urlParam("workerId");
+
+    var form = $("#successForm")
+    form.attr("action", turkSubmitTo+"/mturk/externalSubmit");
+    $("#assignmentId").val(assignmentId);
+    $("#hitId").val(hitId);
 
     var content = $('#content');
     var socket = $.atmosphere;
@@ -63,4 +83,14 @@ $(function () {
     };
 
     var subSocket = socket.subscribe(request);
+
+    function workComplete(code) {
+        $("#completionCode").val(code);
+        form.submit();
+    }
+
+    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE") {
+        console.log("submitting success in 3 s")
+        setTimeout(workComplete, 3000);
+    }
 });
