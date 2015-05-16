@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="compile-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150515161249"/>
+		date="20150515211740"/>
 	<dependencies>
 		<module organisation="com.esotericsoftware.kryo" name="kryo">
 			<revision name="2.24.0" status="release" pubdate="20140504060438" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/EsotericSoftware/kryo" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="44">
