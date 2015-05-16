@@ -18,7 +18,7 @@ class JettyStandalone(webapp : String) {
 
   // the keystore (with one key) we'll use to make the connection with the
   // broker
-  private val KEYSTORE_LOCATION = "src/main/resources/jetty/keystore"
+  private val KEYSTORE_LOCATION = "/etc/apache2/ssl/keystore"
   private val KEYSTORE_PASS = "passwd"
 
   val server = new Server()
@@ -42,9 +42,8 @@ class JettyStandalone(webapp : String) {
   try {
     server.start()
   } catch {
-    case e: Exception => {
+    case e: Exception =>
       e.printStackTrace()
       System.exit(1)
-    }
   }
 }

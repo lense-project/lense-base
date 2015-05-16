@@ -2,6 +2,8 @@ package edu.stanford.lense_base.server
 
 import java.util.Date
 
+import com.amazonaws.mturk.service.axis.RequesterService
+import com.amazonaws.mturk.util.PropertiesClientConfig
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
 
@@ -32,6 +34,8 @@ object WorkUnitServlet {
   val workQueue = mutable.Queue[WebWorkUnit]()
 
   lazy val server = new JettyStandalone("src/main/lense-webapp")
+
+  lazy val service : RequesterService = new RequesterService(new PropertiesClientConfig("/home/keenon/.aws/mturk.properties"))
 }
 
 class WorkUnitServlet extends ScalatraServlet
@@ -116,6 +120,12 @@ object RealHumanHCUPool extends HCUPool {
 // The Human Compute Unit client
 // Handles storing state related to performing tasks
 class HCUClient extends AtmosphereClient with HumanComputeUnit {
+  var assignmentId : String = null
+  var workerId : String = null
+  var hitId : String = null
+  var bonus : Double = 0.0
+  var startTime : Long = 0
+
   def receive = {
     case Connected =>
 
@@ -131,7 +141,6 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       send(new TextMessage("ECHO: "+text))
 
     case m : JsonMessage =>
-
       val map = m.content.asInstanceOf[JObject].obj.toMap
       if (map.contains("status")) {
         val status = map.apply("status").values.asInstanceOf[String]
@@ -140,13 +149,28 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
             RealHumanHCUPool.addHCU(this)
           }
         }
+        startTime = System.currentTimeMillis()
+        assignmentId = map.apply("assignmentId").values.asInstanceOf[String]
+        workerId = map.apply("workerId").values.asInstanceOf[String]
+        hitId = map.apply("hitId").values.asInstanceOf[String]
+
+        send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+      }
+      else if (map.contains("request") && (System.currentTimeMillis() - startTime > retainerDuration())) {
+        val request = map.apply("request").values.asInstanceOf[String]
+        if (request == "turn-in") {
+          send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
+          // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
+          grantBonusInNSeconds()
+        }
       }
 
       // Let our currentWork unit handle the returned value
 
       else if (currentWork != null) {
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
-        send(new JsonMessage(new JObject(List("status" -> JString("success")))))
+        bonus += cost
+        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(bonus)))))
         finishWork(currentWork, replyValue)
       }
 
@@ -171,6 +195,11 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
     0.01
   }
 
+  // Milliseconds that this worker is expected to remain on call
+  def retainerDuration(): Long = {
+    10000L
+  }
+
   // Kick off a job
   override def startWork(workUnit: WorkUnit): Unit = {
     this.synchronized {
@@ -178,5 +207,17 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       println("Sending message: "+msg)
       send(msg)
     }
+  }
+
+  def grantBonusInNSeconds() : Unit = {
+    println("Waiting 15 seconds to grant bonus")
+    new Thread(new Runnable {
+      override def run(): Unit = {
+        Thread.sleep(15000)
+        println("Granting bonus of: "+bonus)
+        WorkUnitServlet.service.approveAssignment(assignmentId, "Good work on real-time tasks")
+        WorkUnitServlet.service.grantBonus(workerId, bonus, assignmentId, "Earned while completing real-time tasks")
+      }
+    }).start()
   }
 }

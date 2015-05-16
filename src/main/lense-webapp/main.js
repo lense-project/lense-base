@@ -16,12 +16,14 @@ $(function () {
     var turkSubmitTo = $.urlParam("turkSubmitTo");
     var workerId = $.urlParam("workerId");
 
+    var content = $('#content');
+    var bonus = $('#bonus');
+    var retainer = $('#retainer');
     var form = $("#successForm")
     form.attr("action", turkSubmitTo+"/mturk/externalSubmit");
     $("#assignmentId").val(assignmentId);
     $("#hitId").val(hitId);
 
-    var content = $('#content');
     var socket = $.atmosphere;
 
     // We are now ready to cut the request
@@ -37,7 +39,12 @@ $(function () {
 
         content.html($('<p>', { text: 'connected using ' + response.transport }));
 
-        subSocket.push(jQuery.stringifyJSON({ status: 'ready' }));
+        subSocket.push(jQuery.stringifyJSON({
+            status: 'ready',
+            assignmentId: assignmentId,
+            hitId: hitId,
+            workerId: workerId
+        }));
     };
 
     request.onMessage = function (response) {
@@ -46,7 +53,46 @@ $(function () {
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
-            if (json.type === "multiclass") {
+            if (json['bonus'] !== undefined) {
+                bonus.html("Your current bonus: $"+json.bonus);
+            }
+            if (json['on-call-duration'] !== undefined) {
+                var onCallDuration = json['on-call-duration'];
+                var startTimeMillis = (new Date()).getTime();
+                var interval = setInterval(function() {
+                    var currentTimeMillis = (new Date()).getTime();
+                    var elapsedMillis = currentTimeMillis - startTimeMillis;
+                    var remainingMillis = onCallDuration - elapsedMillis;
+                    if (remainingMillis < 0) {
+                        retainer.html('');
+                        var input = $('<button>Collect your earnings!</button>');
+                        input.click(function() {
+                            console.log("Turning in results");
+                            subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
+                        });
+                        input.appendTo(retainer);
+                        window.clearInterval(interval);
+                    }
+                    else {
+                        var totalSeconds = Math.ceil(remainingMillis / 1000);
+                        var totalMinutes = Math.floor(totalSeconds / 60);
+                        var hours = Math.floor(totalMinutes / 60);
+                        var seconds = totalSeconds % 60;
+                        var minutes = totalMinutes % 60;
+                        retainer.html("Remaining retainer: "+hours+":"+minutes+":"+seconds);
+                    }
+                }, 1000);
+            }
+            if (json['completion-code'] !== undefined) {
+                retainer.html('');
+                content.html("Thanks for participating! Your bonus will be approved within 30 seconds. This page will refresh in 3 seconds. DO NOT NAVIGATE AWAY FROM THIS PAGE BEFORE IT REFRESHES, OR YOU WILL NOT GET PAID.");
+                setTimeout(function() {
+                    var code = json['completion-code'];
+                    console.log("Turning in final work! Using code "+code);
+                    workComplete(code);
+                }, 3000);
+            }
+            if (json['type'] !== undefined && json.type === "multiclass") {
                 // We need to create a multiclass question here
                 content.html(json.html+"<br>");
 
@@ -82,15 +128,16 @@ $(function () {
             + 'socket or the server is down' }));
     };
 
-    var subSocket = socket.subscribe(request);
-
     function workComplete(code) {
         $("#completionCode").val(code);
         form.submit();
     }
 
-    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE") {
+    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE" && assignmentId != "null" && assignmentId != null) {
+        var subSocket = socket.subscribe(request);
+        /*
         console.log("submitting success in 3 s")
         setTimeout(workComplete, 3000);
+        */
     }
 });

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <ExternalQuestion xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2006-07-14/ExternalQuestion.xsd">
-    <ExternalURL>https://171.64.68.57</ExternalURL>
+    <ExternalURL>https://hybridcrowd.io</ExternalURL>
     <FrameHeight>400</FrameHeight>
 </ExternalQuestion>
