@@ -101,6 +101,12 @@ $(function () {
                     var choice = json.choices[choiceID];
                     var b = $('<button/>', {class: 'choice'});
                     b.html(choice);
+
+                    var shortcut = $('<span/>', {class: 'key'});
+                    shortcut.html = choice[0];
+                    console.log(shortcut);
+                    b.append(shortcut);
+
                     content.append(b);
 
                     // I hate Javascript so much. I just can't even describe it.

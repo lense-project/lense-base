@@ -25,6 +25,7 @@ class JettyStandalone(webapp : String) {
 
   val context: WebAppContext = new WebAppContext(webapp, "/")
   context.setServer(server)
+  context.setInitParameter("cacheControl", "max-age=0,public")
   server.setHandler(context)
 
   val sslContextFactory = new SslContextFactory(KEYSTORE_LOCATION)
