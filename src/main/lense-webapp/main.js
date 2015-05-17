@@ -54,7 +54,8 @@ $(function () {
         try {
             var json = jQuery.parseJSON(message);
             if (json['bonus'] !== undefined) {
-                bonus.html("Your current bonus: $"+json.bonus);
+                var roundedBonus = Math.round(json.bonus * 100) / 100;
+                bonus.html("Your current bonus: $"+roundedBonus);
             }
             if (json['on-call-duration'] !== undefined) {
                 var onCallDuration = json['on-call-duration'];
@@ -133,11 +134,7 @@ $(function () {
         form.submit();
     }
 
-    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE" && assignmentId != "null" && assignmentId != null) {
+    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE") {
         var subSocket = socket.subscribe(request);
-        /*
-        console.log("submitting success in 3 s")
-        setTimeout(workComplete, 3000);
-        */
     }
 });
