@@ -38,7 +38,7 @@ class NERUseCase extends LenseSequenceUseCase {
   override def labelTypes: Set[String] = (data ++ trainSet).flatMap(_._2).distinct.toSet
 
   override def getHumanQuestion(sequence: List[String], i: Int): String = {
-    var question = "Dear NLP Researcher:<br>What NER type is this?<br>"
+    var question = "What type of thing is the bolded word?<br>"
     for (j <- 0 to sequence.length-1) {
       if (j > 0) question += " "
       if (i == j) question += "<b>[ "
@@ -48,7 +48,14 @@ class NERUseCase extends LenseSequenceUseCase {
     question
   }
 
-  override def getHumanVersionOfLabel(label: String): String = "<b>"+label+"<\\b>"
+  override def getHumanVersionOfLabel(label: String): String = label match {
+    case "I-ORG" => "Organization"
+    case "I-MISC" => "Miscellaneous"
+    case "I-LOC" => "Location"
+    case "I-PER" => "Person"
+    case "O" => "NONE"
+    case a => a
+  }
 
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{

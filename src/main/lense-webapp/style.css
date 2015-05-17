@@ -1,5 +1,16 @@
 .choice {
-    width: 200px;
-    height: 100px;
-    margin: 10px;
+    margin: 1.0em;
+    padding: 1.0em;
+}
+
+.info {
+    background-color: beige;
+    margin: 0.5em;
+}
+
+.upperright {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+
 }

@@ -108,7 +108,7 @@ $(function () {
                         return function() {
                             console.log("Choosing "+closureChoice);
                             subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
-                            content.html("Congratulations! You've finished everything. Waiting for next question from the server...");
+                            content.html("Waiting for next question from the server...");
                         }
                     })(choice));
                 }

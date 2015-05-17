@@ -22,9 +22,6 @@ class JettyStandalone(webapp : String) {
   private val KEYSTORE_PASS = "passwd"
 
   val server = new Server()
-  val connector = new SelectChannelConnector()
-  connector.setPort(8080)
-  server.addConnector(connector)
 
   val context: WebAppContext = new WebAppContext(webapp, "/")
   context.setServer(server)
@@ -38,6 +35,10 @@ class JettyStandalone(webapp : String) {
   val sslConnector = new SslSocketConnector(sslContextFactory)
   sslConnector.setPort(8443)
   server.addConnector(sslConnector)
+
+  val connector = new SelectChannelConnector()
+  connector.setPort(8080)
+  server.addConnector(connector)
 
   try {
     server.start()

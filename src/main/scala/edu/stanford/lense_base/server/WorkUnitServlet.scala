@@ -128,6 +128,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   def receive = {
     case Connected =>
+      println("Connected on Atmosphere socket")
 
     case Disconnected(disconnector, errorOption) =>
       println("Got disconnected")
@@ -197,7 +198,8 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Milliseconds that this worker is expected to remain on call
   def retainerDuration(): Long = {
-    10000L
+    // 10 minutes retainer
+    10 * 60 * 1000L
   }
 
   // Kick off a job
