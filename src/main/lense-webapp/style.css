@@ -1,3 +1,7 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
 .choice {
     margin: 1.0em;
     padding: 1.0em;
@@ -18,6 +22,7 @@
     top: 0.5em;
     right: 0.5em;
     font-size: large;
+    text-align: right;
 }
 
 .key {
@@ -29,16 +34,49 @@
     height: 20px;
     display: inline-block;
     padding: 5px;
-    margin: 5px;
+    margin-left: 5px;
     text-align: center;
+    font-family: 'Slabo 27px', serif;
+    font-weight: normal;
 }
 
 button {
     background-color: #eeeeee;
     border: 2px solid black;
     border-radius: 2px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
 }
 
 button:hover {
     background-color: #aaaaaa;
+}
+
+/* Hack to allow JS hovering too */
+button.hover {
+    background-color: #aaaaaa;
+}
+
+#retainer {
+    font-size: larger;
+    background-color: black;
+    color: aqua;
+    padding: 2px;
+    border-radius: 5px;
+}
+
+#bonus {
+    font-size: larger;
+    background-color: black;
+    color: lawngreen;
+    padding: 2px;
+    border-radius: 5px;
+}
+
+.bonus-ping {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    color: yellow;
+    font-size: 5em;
 }

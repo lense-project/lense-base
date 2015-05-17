@@ -6,21 +6,19 @@
         <script type="text/javascript" src="/lib/jquery.atmosphere.js"></script>
         <script type="text/javascript" src="/main.js"></script>
         <link type="text/css" rel="stylesheet" href="/style.css">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
     </head>
     <body>
         <h1>Real-Time HITs</h1>
 
         <div class="upperright">
-            <div id="bonus">
-                Your current Bonus: $0.00
+            <div>
+                Your current Bonus: <span id="bonus">$0.00</span>
             </div>
-            <div id="retainer">
-                Remaining retainer time: Accept the HIT to start your time
+            <div>
+                Remaining retainer time: <span id="retainer">00:00:00</span>
             </div>
-        </div>
-
-        <div id="content">
-            connecting...
         </div>
 
         <div class="info">
@@ -45,9 +43,13 @@
             -->
             <ol>
                 <li>Simple multiple choice questions will appear below in real time.</li>
-                <li>Click on the <button style="padding: 10px">button</button> that <b>best answers the question</b> (there are also keyboard shortcuts which look like <span class="key">K</span>).</li>
+                <li>Click on the <button style="padding: 10px">button</button> that <b>best answers the question</b> (there are also keyboard shortcuts which look like <span class="key">k</span>).</li>
                 <li>Earn a bonus of $0.01 for each question you answer.</li>
             </ol>
+        </div>
+
+        <div id="content">
+            connecting...
         </div>
 
         <form action="https://workersandbox.mturk.com/mturk/externalSubmit"

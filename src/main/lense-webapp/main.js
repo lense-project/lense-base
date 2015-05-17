@@ -55,7 +55,17 @@ $(function () {
             var json = jQuery.parseJSON(message);
             if (json['bonus'] !== undefined) {
                 var roundedBonus = Math.round(json.bonus * 100) / 100;
-                bonus.html("Your current bonus: $"+roundedBonus);
+                bonus.html("$"+roundedBonus);
+                var bonusDiv = $('<div/>', {class: "bonus-ping"});
+                bonusDiv.html("+$0.01");
+                $("body").append(bonusDiv);
+                bonusDiv.animate({
+                    top: "0px",
+                    "font-size": "7em",
+                    opacity: "0"
+                }, 600, "swing", function() {
+                    bonusDiv.remove();
+                });
             }
             if (json['on-call-duration'] !== undefined) {
                 var onCallDuration = json['on-call-duration'];
@@ -80,7 +90,11 @@ $(function () {
                         var hours = Math.floor(totalMinutes / 60);
                         var seconds = totalSeconds % 60;
                         var minutes = totalMinutes % 60;
-                        retainer.html("Remaining retainer: "+hours+":"+minutes+":"+seconds);
+                        function to2Tokens(number) {
+                            if (number < 10) return "0"+number;
+                            else return ""+number;
+                        }
+                        retainer.html(to2Tokens(hours)+":"+to2Tokens(minutes)+":"+to2Tokens(seconds));
                     }
                 }, 1000);
             }
@@ -97,29 +111,70 @@ $(function () {
                 // We need to create a multiclass question here
                 content.html(json.html+"<br>");
 
+                var keys = [];
+                var refKeys = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
                 for (var choiceID in json.choices) {
                     var choice = json.choices[choiceID];
                     var b = $('<button/>', {class: 'choice'});
                     b.html(choice);
 
                     var shortcut = $('<span/>', {class: 'key'});
-                    shortcut.html = choice[0];
-                    console.log(shortcut);
+
+                    var key = choice.toLowerCase().charAt(0);
+                    if (!$.inArray(key, keys)) {
+                        for (var i in refKeys) {
+                            key = refKeys[i];
+                            if (!$.inArray(key, keys)) break;
+                        }
+                    }
+                    keys.push(key);
+
                     b.append(shortcut);
+                    shortcut.html(key);
 
                     content.append(b);
+
+                    function makeChoice(closureChoice) {
+                        console.log("Choosing "+closureChoice);
+                        subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
+                        content.html("Waiting for next question from the server...");
+                        $(document).unbind("keypress");
+                        $(document).unbind("keyup");
+                    }
+
+                    // I hate Javascript so much. I just can't even describe it.
+                    var handler = $(document).keyup((function(closureChoice, closureKey) {
+                        return function(e) {
+                            console.log("Released "+e.which);
+                            var index = 65+refKeys.indexOf(closureKey)
+                            if (e.which == index) {
+                                makeChoice(closureChoice);
+                            }
+                        }
+                    })(choice, key));
 
                     // I hate Javascript so much. I just can't even describe it.
                     b.click((function(closureChoice) {
                         return function() {
-                            console.log("Choosing "+closureChoice);
-                            subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
-                            content.html("Waiting for next question from the server...");
+                            makeChoice(closureChoice);
                         }
                     })(choice));
+
+                    var handler = $(document).keydown((function(closureChoice, closureKey, closureButton) {
+                        return function(e) {
+                            console.log("Pressed "+e.which);
+                            var index = 65+refKeys.indexOf(closureKey)
+                            if (e.which == index) {
+                                closureButton.addClass("hover");
+                                $(document).unbind("keypress");
+                            }
+                        }
+                    })(choice, key, b));
                 }
             }
         } catch (e) {
+            console.log(e);
             console.log('This doesn\'t look like a valid JSON: ', message);
         }
     };

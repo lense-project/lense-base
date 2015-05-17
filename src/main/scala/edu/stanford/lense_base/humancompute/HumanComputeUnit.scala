@@ -69,9 +69,11 @@ trait HumanComputeUnit {
     }
     if (!workUnit.isRevoked) {
       workUnit.finished(this)
-      workUnit.promise.complete(Try {
-        answer
-      })
+      if (!workUnit.promise.isCompleted) {
+        workUnit.promise.complete(Try {
+          answer
+        })
+      }
     }
 
     workQueue.synchronized {
