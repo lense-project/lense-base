@@ -18,6 +18,7 @@ $(function () {
 
     var content = $('#content');
     var bonus = $('#bonus');
+    var ready = $('#ready');
     var retainer = $('#retainer');
     var form = $("#successForm")
     form.attr("action", turkSubmitTo+"/mturk/externalSubmit");
@@ -35,9 +36,7 @@ $(function () {
     };
 
     request.onOpen = function(response) {
-        console.log("on open: "+response)
-
-        content.html($('<p>', { text: 'connected using ' + response.transport }));
+        console.log('connected using ' + response.transport);
 
         subSocket.push(jQuery.stringifyJSON({
             status: 'ready',
@@ -54,8 +53,15 @@ $(function () {
         try {
             var json = jQuery.parseJSON(message);
             if (json['bonus'] !== undefined) {
-                var roundedBonus = Math.round(json.bonus * 100) / 100;
-                bonus.html("$"+roundedBonus);
+                var roundedBonus = Math.round((json.bonus+0.1) * 100) / 100;
+                if (roundedBonus % 0.1 == 0) {
+                    bonus.html("$"+roundedBonus+"0");
+                }
+                else {
+                    bonus.html("$"+roundedBonus);
+                }
+
+                // Create animating bonus
                 var bonusDiv = $('<div/>', {class: "bonus-ping"});
                 bonusDiv.html("+$0.01");
                 $("body").append(bonusDiv);
@@ -63,7 +69,7 @@ $(function () {
                     top: "0px",
                     "font-size": "7em",
                     opacity: "0"
-                }, 600, "swing", function() {
+                }, 1200, "swing", function() {
                     bonusDiv.remove();
                 });
             }
@@ -109,6 +115,10 @@ $(function () {
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
                 // We need to create a multiclass question here
+                content.css({
+                    height: 'auto'
+                });
+
                 content.html(json.html+"<br>");
 
                 var keys = [];
@@ -138,7 +148,13 @@ $(function () {
                     function makeChoice(closureChoice) {
                         console.log("Choosing "+closureChoice);
                         subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
+                        content.css({
+                            height: content.height()
+                        });
+
                         content.html("Waiting for next question from the server...");
+
+
                         $(document).unbind("keypress");
                         $(document).unbind("keyup");
                     }
@@ -195,7 +211,32 @@ $(function () {
         form.submit();
     }
 
-    if (assignmentId != "ASSIGNMENT_ID_NOT_AVAILABLE") {
-        var subSocket = socket.subscribe(request);
+    var subSocket;
+
+    if (assignmentId == "ASSIGNMENT_ID_NOT_AVAILABLE") {
+        ready.html("Accept the HIT to get started!");
+        ready.addClass("disabled");
+    }
+    else {
+        ready.click(function() {
+            bonus.html("$0.10");
+
+            var instructions = $("#instructions");
+            var instructionsHeader = $("#instructions-header");
+            instructionsHeader.animate({
+                height: 0,
+            }, 200, "swing", function() {
+                instructionsHeader.remove();
+            });
+            ready.animate({
+                height: 0,
+            }, 200, "swing", function() {
+                ready.remove();
+            });
+
+            setTimeout(function() {
+                subSocket = socket.subscribe(request);
+            }, 200);
+        });
     }
 });

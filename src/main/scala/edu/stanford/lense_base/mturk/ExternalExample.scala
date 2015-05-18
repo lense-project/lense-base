@@ -14,7 +14,7 @@ object ExternalExample {
   lazy val service : RequesterService = new RequesterService(new PropertiesClientConfig("/home/keenon/.aws/mturk.properties"))
 
   def createHelloWorld() : Unit = {
-    val title = "Hybridcrowd SSL frame"
+    val title = "Real time BONUS work"
     val description = "Test test"
     val reward = 0.03
     val question = new HITQuestion("src/main/resources/mturk/external.question").getQuestion

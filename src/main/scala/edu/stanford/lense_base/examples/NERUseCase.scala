@@ -39,12 +39,14 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def getHumanQuestion(sequence: List[String], i: Int): String = {
     var question = "What type of thing is the bolded word?<br>"
+    question += "<span class='content'>"
     for (j <- 0 to sequence.length-1) {
       if (j > 0) question += " "
-      if (i == j) question += "<b>[ "
+      if (i == j) question += "<span class='focus'> "
       question += sequence(j)
-      if (i == j) question += " ]</b>"
+      if (i == j) question += "</span>"
     }
+    question += "</span>"
     question
   }
 

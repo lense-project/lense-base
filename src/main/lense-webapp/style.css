@@ -57,7 +57,7 @@ button.hover {
     background-color: #aaaaaa;
 }
 
-#retainer {
+.retainer {
     font-size: larger;
     background-color: black;
     color: aqua;
@@ -65,7 +65,7 @@ button.hover {
     border-radius: 5px;
 }
 
-#bonus {
+.bonus {
     font-size: larger;
     background-color: black;
     color: lawngreen;
@@ -79,4 +79,35 @@ button.hover {
     top: 10px;
     color: yellow;
     font-size: 5em;
+}
+
+.ready {
+    padding: 10px 50px;
+    margin: 10px;
+    font-size: 1.2em;
+}
+
+.disabled {
+    background-color: #eeeeee;
+    color: #333333;
+}
+
+.disabled:hover {
+    background-color: #eeeeee;
+}
+
+.content {
+    display: inline-block;
+    background-color: black;
+    padding: 4px;
+    margin: 20px;
+    color: white;
+    border-radius: 5px;
+}
+
+.focus {
+    color: yellow;
+    font-weight: bold;
+    font-size: 120%;
+    margin: 0.5em;
 }

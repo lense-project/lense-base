@@ -14,17 +14,20 @@
 
         <div class="upperright">
             <div>
-                Your current Bonus: <span id="bonus">$0.00</span>
+                Your current earnings: <span class="bonus" id="bonus">$0.00</span>
             </div>
             <div>
-                Remaining retainer time: <span id="retainer">00:00:00</span>
+                Remaining retainer time: <span class="retainer" id="retainer">00:00:00</span>
             </div>
         </div>
 
-        <div class="info">
-            <h3>Instructions</h3>
+        <div id="content">
+        </div>
 
-            You will be paid the flat <b>retainer of $0.10</b> at the end of the retainer time of <b>10 minutes</b>.
+        <div class="info" id="instruction">
+            <h3 id="instructions-header">Instructions</h3>
+
+            You will be paid the flat <b>retainer of $0.10</b> at the end of the retainer time of <span class="retainer">10 minutes</span>.
             <br>
             <b>You must stay the whole 10 minutes to get paid</b>.
             <br>
@@ -44,12 +47,10 @@
             <ol>
                 <li>Simple multiple choice questions will appear below in real time.</li>
                 <li>Click on the <button style="padding: 10px">button</button> that <b>best answers the question</b> (there are also keyboard shortcuts which look like <span class="key">k</span>).</li>
-                <li>Earn a bonus of $0.01 for each question you answer.</li>
+                <li>Earn a bonus of <span class="bonus">$0.01</span> for each question you answer.</li>
             </ol>
-        </div>
 
-        <div id="content">
-            connecting...
+            <button class="ready" id="ready">I get it. Let's get started!</button>
         </div>
 
         <form action="https://workersandbox.mturk.com/mturk/externalSubmit"

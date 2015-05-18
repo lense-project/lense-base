@@ -143,6 +143,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
     case m : JsonMessage =>
       val map = m.content.asInstanceOf[JObject].obj.toMap
+
       if (map.contains("status")) {
         val status = map.apply("status").values.asInstanceOf[String]
         if (status == "ready") {
