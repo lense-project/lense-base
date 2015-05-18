@@ -51,11 +51,11 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def getHumanVersionOfLabel(label: String): String = label match {
-    case "I-ORG" => "Organization"
-    case "I-MISC" => "Miscellaneous"
-    case "I-LOC" => "Location"
-    case "I-PER" => "Person"
-    case "O" => "NONE"
+    case "ORG" => "Organization"
+    case "MISC" => "Miscellaneous"
+    case "LOC" => "Location"
+    case "PER" => "Person"
+    case "O" => "None of the above"
     case a => a
   }
 
