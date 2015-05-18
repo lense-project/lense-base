@@ -52,6 +52,11 @@ $(function () {
         var message = response.responseBody;
         try {
             var json = jQuery.parseJSON(message);
+            if (json['status'] !== undefined) {
+                if (json['status'] === 'failure') {
+                    content.html(json['display']);
+                }
+            }
             if (json['bonus'] !== undefined) {
                 var roundedBonus = Math.round((json.bonus+0.1) * 100) / 100;
                 if (roundedBonus % 0.1 == 0) {
@@ -203,12 +208,19 @@ $(function () {
         console.log("on error: "+response)
 
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
-            + 'socket or the server is down' }));
+            + 'socket or the server is down. We\'re going to pay you for the work you did so far, minus the retainer. Turning in HIT in 6 seconds.' }));
+
+        setTimeout(function() {
+            workComplete('timeout');
+        }, 6000);
     };
 
     function workComplete(code) {
+        content.html($('<p>', { text: 'Received a completion code from the server! Thanks for all your hard work. Turning in HIT in 3 seconds.' }));
         $("#completionCode").val(code);
-        form.submit();
+        setTimeout(function() {
+            form.submit();
+        }, 3000);
     }
 
     var subSocket;

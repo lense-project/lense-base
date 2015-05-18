@@ -6,6 +6,7 @@ import com.amazonaws.mturk.service.axis.RequesterService
 import com.amazonaws.mturk.util.PropertiesClientConfig
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
+import edu.stanford.lense_base.mturk.{MTurkDBState, MTurkDatabase}
 
 import org.json4s._
 import org.json4s.jackson.Json
@@ -36,6 +37,60 @@ object WorkUnitServlet {
   lazy val server = new JettyStandalone("src/main/lense-webapp")
 
   lazy val service : RequesterService = new RequesterService(new PropertiesClientConfig("/home/keenon/.aws/mturk.properties"))
+
+  lazy val workerIdConnectionMap = mutable.Map[String,HCUClient]()
+
+  def claimWorkerIdIfPossible(client : HCUClient, workerId : String) : Boolean = workerIdConnectionMap.synchronized {
+    if (!workerIdConnectionMap.contains(workerId)) {
+      workerIdConnectionMap.put(workerId, client)
+      true
+    }
+    else {
+      workerIdConnectionMap(workerId) eq client
+    }
+  }
+
+  def hasWorkerId(client : HCUClient, workerId : String) : Boolean = workerIdConnectionMap.synchronized {
+    if (workerIdConnectionMap.contains(workerId)) {
+      workerIdConnectionMap(workerId) eq client
+    }
+    else false
+  }
+
+  def releaseWorkerId(client : HCUClient, workerId : String) = workerIdConnectionMap.synchronized {
+    if (workerIdConnectionMap.contains(workerId)) {
+      if (workerIdConnectionMap(workerId) eq client) {
+        workerIdConnectionMap.remove(workerId)
+      }
+      else {
+        throw new IllegalStateException("Shouldn't be releasing an ID that isn't yours")
+      }
+    }
+  }
+
+  Runtime.getRuntime.addShutdownHook( new Thread(){
+    @Override
+    override def run(): Unit = {
+      for (client <- workerPool) {
+        client.completeAndPay()
+      }
+    }
+  })
+
+  def attemptGrantBonus(workerId : String) = {
+    // We want to be careful never to double-pay
+    MTurkDatabase.synchronized {
+      val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
+      if (state.queriesAnswered > 0) {
+        println("Granting bonus of: " + state.outstandingBonus)
+        // Reset all info on this worker
+        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
+        // Do the approval
+        WorkUnitServlet.service.approveAssignment(state.workerId, "Good work on real-time tasks")
+        WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, state.assignmentId, "Earned while completing real-time tasks")
+      }
+    }
+  }
 }
 
 class WorkUnitServlet extends ScalatraServlet
@@ -123,8 +178,34 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   var assignmentId : String = null
   var workerId : String = null
   var hitId : String = null
-  var bonus : Double = 0.0
   var startTime : Long = 0
+
+  def noteDisconnection() = {
+    if (WorkUnitServlet.hasWorkerId(this, workerId)) {
+      WorkUnitServlet.releaseWorkerId(this, workerId)
+      val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
+      if (state == null) {
+        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
+          0,
+          0L,
+          0.0,
+          currentlyConnected = false))
+      }
+      else {
+        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
+          state.queriesAnswered,
+          state.connectionDuration,
+          state.outstandingBonus,
+          currentlyConnected = false))
+      }
+    }
+  }
+
+  def completeAndPay() = {
+    send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
+    // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
+    grantBonusInNSeconds()
+  }
 
   def receive = {
     case Connected =>
@@ -132,10 +213,12 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
     case Disconnected(disconnector, errorOption) =>
       println("Got disconnected")
+      noteDisconnection()
       RealHumanHCUPool.removeHCU(this)
 
     case Error(Some(error)) =>
       println("Got error")
+      noteDisconnection()
       RealHumanHCUPool.removeHCU(this)
 
     case TextMessage(text) =>
@@ -146,24 +229,41 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
       if (map.contains("status")) {
         val status = map.apply("status").values.asInstanceOf[String]
-        if (status == "ready") {
-          if (!RealHumanHCUPool.hcuPool.contains(this)) {
-            RealHumanHCUPool.addHCU(this)
-          }
-        }
         startTime = System.currentTimeMillis()
         assignmentId = map.apply("assignmentId").values.asInstanceOf[String]
         workerId = map.apply("workerId").values.asInstanceOf[String]
         hitId = map.apply("hitId").values.asInstanceOf[String]
 
-        send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+        val canClaim : Boolean = WorkUnitServlet.claimWorkerIdIfPossible(this, workerId)
+        // This means that this workerId already has a connection to us... can't allow it
+        if (!canClaim) {
+          send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: It appears that "+
+            "someone with this workerId is already connected and working on a copy of this HIT."+
+            " Please close any other copies of this task before trying to create new ones.")))))
+        }
+        // Otherwise, we're good to go, so let's initialize this worker
+        else {
+          val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
+          if (state != null) {
+            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true))
+          }
+          else {
+            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true))
+          }
+
+          if (status == "ready") {
+            if (!RealHumanHCUPool.hcuPool.contains(this)) {
+              RealHumanHCUPool.addHCU(this)
+            }
+          }
+          send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+        }
       }
+
       else if (map.contains("request") && (System.currentTimeMillis() - startTime > retainerDuration())) {
         val request = map.apply("request").values.asInstanceOf[String]
         if (request == "turn-in") {
-          send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
-          // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
-          grantBonusInNSeconds()
+          completeAndPay()
         }
       }
 
@@ -171,8 +271,10 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
       else if (currentWork != null) {
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
-        bonus += cost
-        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(bonus)))))
+        val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
+        val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost)
+        MTurkDatabase.updateOrCreateWorker(newState)
+        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(newState.outstandingBonus)))))
         finishWork(currentWork, replyValue)
       }
 
@@ -197,7 +299,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
     0.01
   }
 
-  // Milliseconds that this worker is expected to remain on call
+  // Milliseconds that this worker is expected to remain on call before being paid
   def retainerDuration(): Long = {
     // 10 minutes retainer
     10 * 60 * 1000L
@@ -217,9 +319,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
     new Thread(new Runnable {
       override def run(): Unit = {
         Thread.sleep(15000)
-        println("Granting bonus of: "+bonus)
-        WorkUnitServlet.service.approveAssignment(assignmentId, "Good work on real-time tasks")
-        WorkUnitServlet.service.grantBonus(workerId, bonus, assignmentId, "Earned while completing real-time tasks")
+        WorkUnitServlet.attemptGrantBonus(workerId)
       }
     }).start()
   }

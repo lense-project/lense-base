@@ -38,5 +38,7 @@ libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0"
 
 libraryDependencies += "com.esotericsoftware.kryo" % "kryo" % "2.24.0"
 
+libraryDependencies += "com.h2database" % "h2" % "1.4.187"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

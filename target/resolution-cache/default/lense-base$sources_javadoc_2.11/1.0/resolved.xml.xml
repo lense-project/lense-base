@@ -4,7 +4,7 @@
 		module="lense-base$sources_javadoc_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150517210754"
+		publication="20150518121531"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
@@ -235,6 +235,10 @@
 		<dependency org="org.objenesis" name="objenesis" rev="2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="objenesis" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="objenesis" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.h2database" name="h2" rev="1.4.187" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="h2" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="h2" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
 		<dependency org="ch.qos.logback" name="logback-classic" rev="1.1.2" transitive="false" conf="runtime->default(compile);test->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="logback-classic" type="src" ext="jar" conf="sources" e:classifier="sources"/>
