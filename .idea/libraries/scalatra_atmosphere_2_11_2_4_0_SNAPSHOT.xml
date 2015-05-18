@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="scalatra-atmosphere_2.11-2.4.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/scalatra-atmosphere_2.11-2.4.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -4,7 +4,7 @@ import java.util.Date
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
-import org.eclipse.jetty.server.nio.SelectChannelConnector
+import edu.stanford.lense_base.server.JettyStandalone
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.webapp.WebAppContext
 
@@ -27,21 +27,7 @@ import scala.util.parsing.json.JSONObject
 
 object ChatServer {
   def main(args : Array[String]) = {
-    val server = new Server()
-    val connector = new SelectChannelConnector()
-    connector.setPort(9000)
-    server.addConnector(connector)
-    val context: WebAppContext = new WebAppContext("src/main/chinese-restaurant-webapp", "/")
-    context.setServer(server)
-    server.setHandler(context)
-
-    try {
-      server.start()
-    } catch {
-      case e: Exception =>
-        e.printStackTrace()
-        System.exit(1)
-    }
+    new JettyStandalone("src/main/chinese-restaurant-webapp")
   }
 }
 

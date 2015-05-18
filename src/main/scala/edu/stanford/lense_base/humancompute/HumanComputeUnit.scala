@@ -69,17 +69,18 @@ trait HumanComputeUnit {
     }
     if (!workUnit.isRevoked) {
       workUnit.finished(this)
-      if (!workUnit.promise.isCompleted) {
-        workUnit.promise.complete(Try {
-          answer
-        })
+      if (workUnit.promise.isCompleted) {
+        throw new IllegalStateException("Shouldn't be trying to double-complete a work unit! INVESTIGATE THIS!")
+      }
+      workUnit.promise.complete(Try {
+        answer
+      })
+      if (workUnit == currentWork) {
+        currentWork = null
       }
     }
 
     workQueue.synchronized {
-      if (workUnit == currentWork) {
-        currentWork = null
-      }
       // Wake up the work performing code
       workQueue.notify()
     }

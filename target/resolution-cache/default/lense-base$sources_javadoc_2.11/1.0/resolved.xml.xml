@@ -4,7 +4,7 @@
 		module="lense-base$sources_javadoc_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150516175635"
+		publication="20150517210754"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
@@ -24,37 +24,73 @@
 	<publications>
 	</publications>
 	<dependencies>
+		<dependency org="com.typesafe.akka" name="akka-actor_2.11" rev="2.3.10" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="akka-actor_2.11" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="akka-actor_2.11" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="com.typesafe" name="config" rev="1.2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="config" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="config" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
 		<dependency org="com.googlecode.lanterna" name="lanterna" rev="2.1.8" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="lanterna" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="lanterna" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.aggregate" name="jetty-all-server" rev="8.1.16.v20140903" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-all-server" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-all-server" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-server" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-server" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.orbit" name="javax.servlet" rev="3.0.0.v201112011016" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.servlet" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.servlet" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="javax.servlet" name="javax.servlet-api" rev="3.1.0" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="javax.servlet-api" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="javax.servlet-api" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.orbit" name="javax.security.auth.message" rev="1.0.0.v201108011116" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.security.auth.message" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.security.auth.message" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-http" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-http" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-http" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.orbit" name="javax.mail.glassfish" rev="1.4.1.v201005082020" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.mail.glassfish" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.mail.glassfish" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-util" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-util" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-util" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.orbit" name="javax.activation" rev="1.1.0.v201105071233" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.activation" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.activation" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-io" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-io" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-io" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.orbit" name="javax.annotation" rev="1.1.0.v201108011116" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.annotation" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.annotation" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-webapp" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-webapp" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="org.eclipse.jetty.aggregate" name="jetty-websocket" rev="8.1.16.v20140903" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-websocket" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-websocket" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		<dependency org="org.eclipse.jetty" name="jetty-xml" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-xml" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-xml" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty" name="jetty-servlet" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-servlet" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-servlet" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty" name="jetty-security" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="jetty-security" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="jetty-security" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty.websocket" name="websocket-server" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="websocket-server" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="websocket-server" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty.websocket" name="websocket-common" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="websocket-common" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="websocket-common" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty.websocket" name="websocket-api" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="websocket-api" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="websocket-api" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty.websocket" name="websocket-client" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="websocket-client" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="websocket-client" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
+		</dependency>
+		<dependency org="org.eclipse.jetty.websocket" name="websocket-servlet" rev="9.2.10.v20150310" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
+			<artifact name="websocket-servlet" type="src" ext="jar" conf="sources" e:classifier="sources"/>
+			<artifact name="websocket-servlet" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
 		<dependency org="org.json4s" name="json4s-jackson_2.11" rev="3.3.0.RC1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="json4s-jackson_2.11" type="src" ext="jar" conf="sources" e:classifier="sources"/>
@@ -140,14 +176,6 @@
 			<artifact name="scalatra-json_2.11" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="scalatra-json_2.11" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="com.typesafe.akka" name="akka-actor_2.11" rev="2.3.9" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="akka-actor_2.11" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="akka-actor_2.11" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="com.typesafe" name="config" rev="1.2.1" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="config" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="config" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
 		<dependency org="org.atmosphere" name="atmosphere-runtime" rev="2.2.6" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="atmosphere-runtime" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="atmosphere-runtime" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
@@ -196,10 +224,6 @@
 			<artifact name="scala-reflect" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="scala-reflect" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
-		<dependency org="javax.servlet" name="javax.servlet-api" rev="3.1.0" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
-			<artifact name="javax.servlet-api" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="javax.servlet-api" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
 		<dependency org="com.esotericsoftware.kryo" name="kryo" rev="2.24.0" transitive="false" conf="compile->default(compile);runtime->default(compile);test->default(compile);compile-internal->default(compile);runtime-internal->default(compile);test-internal->default(compile)">
 			<artifact name="kryo" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="kryo" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
@@ -227,38 +251,6 @@
 		<dependency org="org.scalatra" name="scalatra-test_2.11" rev="2.4.0.RC1" transitive="false" conf="test->default(compile);test-internal->default(compile)">
 			<artifact name="scalatra-test_2.11" type="src" ext="jar" conf="sources" e:classifier="sources"/>
 			<artifact name="scalatra-test_2.11" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-webapp" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-webapp" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-xml" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-xml" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-xml" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-util" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-util" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-util" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-servlet" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-servlet" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-servlet" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-security" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-security" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-security" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-server" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-server" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-http" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-http" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-http" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
-		</dependency>
-		<dependency org="org.eclipse.jetty" name="jetty-io" rev="9.2.10.v20150310" transitive="false" conf="test->default(compile);test-internal->default(compile)">
-			<artifact name="jetty-io" type="src" ext="jar" conf="sources" e:classifier="sources"/>
-			<artifact name="jetty-io" type="doc" ext="jar" conf="docs" e:classifier="javadoc"/>
 		</dependency>
 		<dependency org="org.mockito" name="mockito-all" rev="1.10.19" transitive="false" conf="test->default(compile);test-internal->default(compile)">
 			<artifact name="mockito-all" type="src" ext="jar" conf="sources" e:classifier="sources"/>

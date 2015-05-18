@@ -7,10 +7,10 @@
 		revision="1.0"
 		conf="runtime"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150516175632"/>
+		date="20150517210751"/>
 	<dependencies>
 		<module organisation="ch.qos.logback" name="logback-classic">
-			<revision name="1.1.2" status="release" pubdate="20140402124238" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="48">
+			<revision name="1.1.2" status="release" pubdate="20140402124238" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="54">
 				<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html"/>
 				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"/>
 				<metadata-artifact status="no" details="" size="10622" time="0" location="/home/keenon/.ivy2/cache/ch.qos.logback/logback-classic/ivy-1.1.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/ch/qos/logback/logback-classic/1.1.2/logback-classic-1.1.2.pom"/>
@@ -23,7 +23,7 @@
 			</revision>
 		</module>
 		<module organisation="ch.qos.logback" name="logback-core">
-			<revision name="1.1.2" status="release" pubdate="20140402124047" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="49">
+			<revision name="1.1.2" status="release" pubdate="20140402124047" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://logback.qos.ch" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="55">
 				<license name="Eclipse Public License - v 1.0" url="http://www.eclipse.org/legal/epl-v10.html"/>
 				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html"/>
 				<metadata-artifact status="no" details="" size="9800" time="0" location="/home/keenon/.ivy2/cache/ch.qos.logback/logback-core/ivy-1.1.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/ch/qos/logback/logback-core/1.1.2/logback-core-1.1.2.pom"/>
@@ -36,7 +36,7 @@
 			</revision>
 		</module>
 		<module organisation="com.esotericsoftware.kryo" name="kryo">
-			<revision name="2.24.0" status="release" pubdate="20140504060438" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/EsotericSoftware/kryo" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="45">
+			<revision name="2.24.0" status="release" pubdate="20140504060438" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/EsotericSoftware/kryo" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="51">
 				<license name="New BSD License" url="http://www.opensource.org/licenses/bsd-license.php"/>
 				<metadata-artifact status="no" details="" size="3358" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.kryo/kryo/ivy-2.24.0.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/esotericsoftware/kryo/kryo/2.24.0/kryo-2.24.0.pom"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.24.0" rev-constraint-default="2.24.0" rev-constraint-dynamic="2.24.0" callerrev="1.0"/>
@@ -48,7 +48,7 @@
 			</revision>
 		</module>
 		<module organisation="org.objenesis" name="objenesis">
-			<revision name="2.1" status="release" pubdate="20131010142537" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://objenesis.org" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="47">
+			<revision name="2.1" status="release" pubdate="20131010142537" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://objenesis.org" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="53">
 				<metadata-artifact status="no" details="" size="3127" time="0" location="/home/keenon/.ivy2/cache/org.objenesis/objenesis/ivy-2.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/objenesis/objenesis/2.1/objenesis-2.1.pom"/>
 				<caller organisation="com.esotericsoftware.kryo" name="kryo" conf="default, compile, runtime, master" rev="2.1" rev-constraint-default="2.1" rev-constraint-dynamic="2.1" callerrev="2.24.0"/>
 				<artifacts>
@@ -59,7 +59,7 @@
 			</revision>
 		</module>
 		<module organisation="com.esotericsoftware.minlog" name="minlog">
-			<revision name="1.2" status="release" pubdate="20120531052649" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/minlog/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="46">
+			<revision name="1.2" status="release" pubdate="20120531052649" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/minlog/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="52">
 				<license name="New BSD License" url="http://www.opensource.org/licenses/bsd-license.php"/>
 				<metadata-artifact status="no" details="" size="2539" time="0" location="/home/keenon/.ivy2/cache/com.esotericsoftware.minlog/minlog/ivy-1.2.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/esotericsoftware/minlog/minlog/1.2/minlog-1.2.pom"/>
 				<caller organisation="com.esotericsoftware.kryo" name="kryo" conf="default, compile, runtime, master" rev="1.2" rev-constraint-default="1.2" rev-constraint-dynamic="1.2" callerrev="2.24.0"/>
@@ -71,7 +71,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra" name="scalatra-scalate_2.11">
-			<revision name="2.4.0.RC1" status="release" pubdate="20150417191642" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="39">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191642" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="46">
 				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2862" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-scalate_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra-scalate_2.11/2.4.0.RC1/scalatra-scalate_2.11-2.4.0.RC1.pom"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="1.0"/>
@@ -83,7 +83,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra.scalate" name="scalate-core_2.11">
-			<revision name="1.7.1" status="release" pubdate="20150315191912" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="40">
+			<revision name="1.7.1" status="release" pubdate="20150315191912" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="47">
 				<metadata-artifact status="no" details="" size="10971" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-core_2.11/ivy-1.7.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-core_2.11/1.7.1/scalate-core_2.11-1.7.1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-scalate_2.11" conf="default, compile, runtime, master" rev="1.7.1" rev-constraint-default="1.7.1" rev-constraint-dynamic="1.7.1" callerrev="2.4.0.RC1"/>
 				<artifacts>
@@ -94,7 +94,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-compiler">
-			<revision name="2.11.0" status="release" pubdate="20140416021405" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="42">
+			<revision name="2.11.0" status="release" pubdate="20140416021405" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="49">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="3131" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-compiler/ivy-2.11.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.11.0/scala-compiler-2.11.0.pom"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-core_2.11" conf="compile, runtime" rev="2.11.0" rev-constraint-default="2.11.0" rev-constraint-dynamic="2.11.0" callerrev="1.7.1"/>
@@ -106,7 +106,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-reflect">
-			<revision name="2.11.0" status="release" pubdate="20140416021350" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.0/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="43">
+			<revision name="2.11.0" status="release" pubdate="20140416021350" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.0/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="50">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="2825" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-reflect/ivy-2.11.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-reflect/2.11.0/scala-reflect-2.11.0.pom"/>
 				<caller organisation="org.scala-lang" name="scala-compiler" conf="compile, runtime" rev="2.11.0" rev-constraint-default="2.11.0" rev-constraint-dynamic="2.11.0" callerrev="2.11.0"/>
@@ -118,7 +118,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra.scalate" name="scalate-util_2.11">
-			<revision name="1.7.1" status="release" pubdate="20150315191852" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="41">
+			<revision name="1.7.1" status="release" pubdate="20150315191852" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="48">
 				<metadata-artifact status="no" details="" size="10292" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.scalate/scalate-util_2.11/ivy-1.7.1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalate/scalate-util_2.11/1.7.1/scalate-util_2.11-1.7.1.pom"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-core_2.11" conf="compile, runtime" rev="1.7.1" rev-constraint-default="1.7.1" rev-constraint-dynamic="1.7.1" callerrev="1.7.1"/>
 				<artifacts>
@@ -129,7 +129,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra" name="scalatra-atmosphere_2.11">
-			<revision name="2.4.0.RC1" status="release" pubdate="20150417191746" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="28">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191746" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="37">
 				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="3974" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-atmosphere_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scalatra/scalatra-atmosphere_2.11/2.4.0.RC1/scalatra-atmosphere_2.11-2.4.0.RC1.pom"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="1.0"/>
@@ -141,7 +141,7 @@
 			</revision>
 		</module>
 		<module organisation="org.atmosphere" name="atmosphere-redis">
-			<revision name="2.2.1" status="release" pubdate="20141208091939" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="33">
+			<revision name="2.2.1" status="release" pubdate="20141208091939" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="40">
 				<metadata-artifact status="no" details="" size="8672" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-redis/ivy-2.2.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-redis/2.2.1/atmosphere-redis-2.2.1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.2.1" rev-constraint-default="2.2.1" rev-constraint-dynamic="2.2.1" callerrev="2.4.0.RC1"/>
 				<artifacts>
@@ -152,7 +152,7 @@
 			</revision>
 		</module>
 		<module organisation="redis.clients" name="jedis">
-			<revision name="2.0.0" status="release" pubdate="20110530103902" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/jedis/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="34">
+			<revision name="2.0.0" status="release" pubdate="20110530103902" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/jedis/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="41">
 				<license name="Jedis License" url="http://github.com/xetorthio/jedis/raw/master/LICENSE.txt"/>
 				<metadata-artifact status="no" details="" size="3363" time="0" location="/home/keenon/.ivy2/cache/redis.clients/jedis/ivy-2.0.0.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/redis/clients/jedis/2.0.0/jedis-2.0.0.pom"/>
 				<caller organisation="org.atmosphere" name="atmosphere-redis" conf="compile, runtime" rev="2.0.0" rev-constraint-default="2.0.0" rev-constraint-dynamic="2.0.0" callerrev="2.2.1"/>
@@ -164,7 +164,7 @@
 			</revision>
 		</module>
 		<module organisation="commons-pool" name="commons-pool">
-			<revision name="1.5.5" status="release" pubdate="20100905123151" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://commons.apache.org/pool/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="35">
+			<revision name="1.5.5" status="release" pubdate="20100905123151" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://commons.apache.org/pool/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="42">
 				<metadata-artifact status="no" details="" size="5963" time="0" location="/home/keenon/.ivy2/cache/commons-pool/commons-pool/ivy-1.5.5.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/commons-pool/commons-pool/1.5.5/commons-pool-1.5.5.pom"/>
 				<caller organisation="redis.clients" name="jedis" conf="compile, runtime" rev="1.5.5" rev-constraint-default="1.5.5" rev-constraint-dynamic="1.5.5" callerrev="2.0.0"/>
 				<artifacts>
@@ -175,8 +175,9 @@
 			</revision>
 		</module>
 		<module organisation="org.atmosphere" name="atmosphere-runtime">
-			<revision name="2.2.6" status="release" pubdate="20150302144726" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="32">
+			<revision name="2.2.6" status="release" pubdate="20150302144726" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master, default, default(compile)" position="39">
 				<metadata-artifact status="no" details="" size="12545" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-runtime/ivy-2.2.6.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-runtime/2.2.6/atmosphere-runtime-2.2.6.pom"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.2.0" rev-constraint-default="2.2.0" rev-constraint-dynamic="2.2.0" callerrev="1.0"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.2.6" rev-constraint-default="2.2.6" rev-constraint-dynamic="2.2.6" callerrev="2.4.0.RC1"/>
 				<artifacts>
 					<artifact name="atmosphere-runtime" type="bundle" ext="jar" status="no" details="" size="770366" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-runtime/bundles/atmosphere-runtime-2.2.6.jar">
@@ -184,9 +185,35 @@
 					</artifact>
 				</artifacts>
 			</revision>
+			<revision name="2.2.0" status="release" pubdate="20140721205734" resolver="sbt-chain" artresolver="sbt-chain" evicted="latest-revision" evicted-reason="" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="-1">
+				<metadata-artifact status="no" details="" size="12709" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-runtime/ivy-2.2.0.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-runtime/2.2.0/atmosphere-runtime-2.2.0.pom"/>
+				<evicted-by rev="2.2.6"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.2.0" rev-constraint-default="2.2.0" rev-constraint-dynamic="2.2.0" callerrev="1.0"/>
+				<artifacts>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.scalatra" name="scalatra-json_2.11">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191727" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master, default(compile)" position="38">
+				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
+				<metadata-artifact status="no" details="" size="3122" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-json_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scalatra/scalatra-json_2.11/2.4.0.RC1/scalatra-json_2.11-2.4.0.RC1.pom"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.2.0" rev-constraint-default="2.2.0" rev-constraint-dynamic="2.2.0" callerrev="1.0"/>
+				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="2.4.0.RC1"/>
+				<artifacts>
+					<artifact name="scalatra-json_2.11" type="jar" ext="jar" status="no" details="" size="89975" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-json_2.11/jars/scalatra-json_2.11-2.4.0.RC1.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/scalatra/scalatra-json_2.11/2.4.0.RC1/scalatra-json_2.11-2.4.0.RC1.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+			<revision name="2.2.0" evicted="latest-revision" evicted-reason="" downloaded="false" searched="false" conf="default, compile, runtime, default(compile), master" position="-1">
+				<evicted-by rev="2.4.0.RC1"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.2.0" rev-constraint-default="2.2.0" rev-constraint-dynamic="2.2.0" callerrev="1.0"/>
+				<artifacts>
+				</artifacts>
+			</revision>
 		</module>
 		<module organisation="org.atmosphere" name="atmosphere-compat-tomcat7">
-			<revision name="2.0.1" status="release" pubdate="20130917101607" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="38">
+			<revision name="2.0.1" status="release" pubdate="20130917101607" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="45">
 				<metadata-artifact status="no" details="" size="4788" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-compat-tomcat7/ivy-2.0.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-compat-tomcat7/2.0.1/atmosphere-compat-tomcat7-2.0.1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.0.1" rev-constraint-default="2.0.1" rev-constraint-dynamic="2.0.1" callerrev="2.4.0.RC1"/>
 				<artifacts>
@@ -197,7 +224,7 @@
 			</revision>
 		</module>
 		<module organisation="org.atmosphere" name="atmosphere-compat-jbossweb">
-			<revision name="2.0.1" status="release" pubdate="20130917101619" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere-compat" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="36">
+			<revision name="2.0.1" status="release" pubdate="20130917101619" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere-compat" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="43">
 				<metadata-artifact status="no" details="" size="5209" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-compat-jbossweb/ivy-2.0.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-compat-jbossweb/2.0.1/atmosphere-compat-jbossweb-2.0.1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.0.1" rev-constraint-default="2.0.1" rev-constraint-dynamic="2.0.1" callerrev="2.4.0.RC1"/>
 				<artifacts>
@@ -208,7 +235,7 @@
 			</revision>
 		</module>
 		<module organisation="org.atmosphere" name="atmosphere-compat-tomcat">
-			<revision name="2.0.1" status="release" pubdate="20130917101553" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="37">
+			<revision name="2.0.1" status="release" pubdate="20130917101553" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/Atmosphere/atmosphere" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="44">
 				<metadata-artifact status="no" details="" size="4786" time="0" location="/home/keenon/.ivy2/cache/org.atmosphere/atmosphere-compat-tomcat/ivy-2.0.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/atmosphere/atmosphere-compat-tomcat/2.0.1/atmosphere-compat-tomcat-2.0.1.pom"/>
 				<caller organisation="org.atmosphere" name="atmosphere-compat-jbossweb" conf="compile, runtime" rev="2.0.1" rev-constraint-default="2.0.1" rev-constraint-dynamic="2.0.1" callerrev="2.0.1"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.0.1" rev-constraint-default="2.0.1" rev-constraint-dynamic="2.0.1" callerrev="2.4.0.RC1"/>
@@ -219,20 +246,8 @@
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.scalatra" name="scalatra-json_2.11">
-			<revision name="2.4.0.RC1" status="release" pubdate="20150417191727" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="29">
-				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
-				<metadata-artifact status="no" details="" size="3122" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-json_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scalatra/scalatra-json_2.11/2.4.0.RC1/scalatra-json_2.11-2.4.0.RC1.pom"/>
-				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="2.4.0.RC1"/>
-				<artifacts>
-					<artifact name="scalatra-json_2.11" type="jar" ext="jar" status="no" details="" size="89975" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-json_2.11/jars/scalatra-json_2.11-2.4.0.RC1.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/scalatra/scalatra-json_2.11/2.4.0.RC1/scalatra-json_2.11-2.4.0.RC1.jar"/>
-					</artifact>
-				</artifacts>
-			</revision>
-		</module>
 		<module organisation="org.scalatra" name="scalatra_2.11">
-			<revision name="2.4.0.RC1" status="release" pubdate="20150417191608" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, master(*), compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="18">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191608" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="default, master(*), compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="27">
 				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="4891" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra_2.11/2.4.0.RC1/scalatra_2.11-2.4.0.RC1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-json_2.11" conf="compile, runtime" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="2.4.0.RC1"/>
@@ -246,7 +261,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang.modules" name="scala-parser-combinators_2.11">
-			<revision name="1.0.3" status="release" pubdate="20141214162104" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="27">
+			<revision name="1.0.3" status="release" pubdate="20141214162104" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="36">
 				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
 				<metadata-artifact status="no" details="" size="2803" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-parser-combinators_2.11/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-parser-combinators_2.11/1.0.3/scala-parser-combinators_2.11-1.0.3.pom"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-util_2.11" conf="compile, runtime" rev="1.0.1" rev-constraint-default="1.0.1" rev-constraint-dynamic="1.0.1" callerrev="1.7.1"/>
@@ -266,32 +281,8 @@
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="com.typesafe.akka" name="akka-actor_2.11">
-			<revision name="2.3.9" status="release" pubdate="20150119221810" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://akka.io/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="30">
-				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0"/>
-				<metadata-artifact status="no" details="" size="2654" time="0" location="/home/keenon/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/ivy-2.3.9.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.9/akka-actor_2.11-2.3.9.pom"/>
-				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.3.9" rev-constraint-default="2.3.9" rev-constraint-dynamic="2.3.9" callerrev="2.4.0.RC1"/>
-				<artifacts>
-					<artifact name="akka-actor_2.11" type="jar" ext="jar" status="no" details="" size="2571077" time="0" location="/home/keenon/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.9.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.9/akka-actor_2.11-2.3.9.jar"/>
-					</artifact>
-				</artifacts>
-			</revision>
-		</module>
-		<module organisation="com.typesafe" name="config">
-			<revision name="1.2.1" status="release" pubdate="20140502075416" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typesafehub/config" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="31">
-				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0"/>
-				<metadata-artifact status="no" details="" size="2734" time="0" location="/home/keenon/.ivy2/cache/com.typesafe/config/ivy-1.2.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.pom"/>
-				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="compile, runtime" rev="1.2.1" rev-constraint-default="1.2.1" rev-constraint-dynamic="1.2.1" callerrev="2.3.9"/>
-				<artifacts>
-					<artifact name="config" type="bundle" ext="jar" status="no" details="" size="219554" time="0" location="/home/keenon/.ivy2/cache/com.typesafe/config/bundles/config-1.2.1.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.jar"/>
-					</artifact>
-				</artifacts>
-			</revision>
-		</module>
 		<module organisation="org.joda" name="joda-convert">
-			<revision name="1.7" status="release" pubdate="20140804073718" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-convert/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="26">
+			<revision name="1.7" status="release" pubdate="20140804073718" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-convert/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="35">
 				<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 				<metadata-artifact status="no" details="" size="6126" time="0" location="/home/keenon/.ivy2/cache/org.joda/joda-convert/ivy-1.7.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/joda/joda-convert/1.7/joda-convert-1.7.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="1.7" rev-constraint-default="1.7" rev-constraint-dynamic="1.7" callerrev="2.4.0.RC1"/>
@@ -303,7 +294,7 @@
 			</revision>
 		</module>
 		<module organisation="joda-time" name="joda-time">
-			<revision name="2.7" status="release" pubdate="20150111165125" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-time/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="25">
+			<revision name="2.7" status="release" pubdate="20150111165125" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.joda.org/joda-time/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="34">
 				<license name="Apache 2" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 				<metadata-artifact status="no" details="" size="6460" time="0" location="/home/keenon/.ivy2/cache/joda-time/joda-time/ivy-2.7.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/joda-time/joda-time/2.7/joda-time-2.7.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="2.7" rev-constraint-default="2.7" rev-constraint-dynamic="2.7" callerrev="2.4.0.RC1"/>
@@ -315,7 +306,7 @@
 			</revision>
 		</module>
 		<module organisation="eu.medsea.mimeutil" name="mime-util">
-			<revision name="2.1.3" status="release" pubdate="20100105002400" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.medsea.eu/mime-util/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="24">
+			<revision name="2.1.3" status="release" pubdate="20100105002400" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.medsea.eu/mime-util/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="33">
 				<license name="The Apache Software License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0.txt"/>
 				<metadata-artifact status="no" details="" size="3455" time="0" location="/home/keenon/.ivy2/cache/eu.medsea.mimeutil/mime-util/ivy-2.1.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/eu/medsea/mimeutil/mime-util/2.1.3/mime-util-2.1.3.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="2.1.3" rev-constraint-default="2.1.3" rev-constraint-dynamic="2.1.3" callerrev="2.4.0.RC1"/>
@@ -327,7 +318,7 @@
 			</revision>
 		</module>
 		<module organisation="com.googlecode.juniversalchardet" name="juniversalchardet">
-			<revision name="1.0.3" status="release" pubdate="20110919103824" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://juniversalchardet.googlecode.com/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="23">
+			<revision name="1.0.3" status="release" pubdate="20110919103824" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://juniversalchardet.googlecode.com/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="32">
 				<license name="Mozilla Public License 1.1 (MPL 1.1)" url="http://www.mozilla.org/MPL/MPL-1.1.html"/>
 				<metadata-artifact status="no" details="" size="2590" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.juniversalchardet/juniversalchardet/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/com/googlecode/juniversalchardet/juniversalchardet/1.0.3/juniversalchardet-1.0.3.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="1.0.3" rev-constraint-default="1.0.3" rev-constraint-dynamic="1.0.3" callerrev="2.4.0.RC1"/>
@@ -339,7 +330,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra.rl" name="rl_2.11">
-			<revision name="0.4.10" status="release" pubdate="20140421152834" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://backchat.io" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="22">
+			<revision name="0.4.10" status="release" pubdate="20140421152834" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://backchat.io" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="31">
 				<license name="MIT" url="http://github.com/mojolly/rl/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2742" time="0" location="/home/keenon/.ivy2/cache/org.scalatra.rl/rl_2.11/ivy-0.4.10.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/rl/rl_2.11/0.4.10/rl_2.11-0.4.10.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="0.4.10" rev-constraint-default="0.4.10" rev-constraint-dynamic="0.4.10" callerrev="2.4.0.RC1"/>
@@ -351,7 +342,7 @@
 			</revision>
 		</module>
 		<module organisation="org.clapper" name="grizzled-slf4j_2.11">
-			<revision name="1.0.2" status="release" pubdate="20140427072710" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/bmc/grizzled-slf4j/#readme" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="21">
+			<revision name="1.0.2" status="release" pubdate="20140427072710" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/bmc/grizzled-slf4j/#readme" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="30">
 				<license name="BSD" url="http://software.clapper.org/grizzled-slf4j/license.html"/>
 				<metadata-artifact status="no" details="" size="2856" time="0" location="/home/keenon/.ivy2/cache/org.clapper/grizzled-slf4j_2.11/ivy-1.0.2.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/clapper/grizzled-slf4j_2.11/1.0.2/grizzled-slf4j_2.11-1.0.2.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="1.0.2" rev-constraint-default="1.0.2" rev-constraint-dynamic="1.0.2" callerrev="2.4.0.RC1"/>
@@ -363,7 +354,7 @@
 			</revision>
 		</module>
 		<module organisation="org.slf4j" name="slf4j-api">
-			<revision name="1.7.10" status="release" pubdate="20150106121107" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.slf4j.org" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master, master(*)" position="20">
+			<revision name="1.7.10" status="release" pubdate="20150106121107" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.slf4j.org" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master, master(*)" position="29">
 				<metadata-artifact status="no" details="" size="4667" time="0" location="/home/keenon/.ivy2/cache/org.slf4j/slf4j-api/ivy-1.7.10.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10.pom"/>
 				<caller organisation="org.clapper" name="grizzled-slf4j_2.11" conf="compile, runtime" rev="1.7.7" rev-constraint-default="1.7.7" rev-constraint-dynamic="1.7.7" callerrev="1.0.2"/>
 				<caller organisation="org.atmosphere" name="atmosphere-runtime" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.6"/>
@@ -371,6 +362,7 @@
 				<caller organisation="eu.medsea.mimeutil" name="mime-util" conf="compile, runtime" rev="1.5.6" rev-constraint-default="1.5.6" rev-constraint-dynamic="1.5.6" callerrev="2.1.3"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-core_2.11" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="1.7.1"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="1.7.10" rev-constraint-default="1.7.10" rev-constraint-dynamic="1.7.10" callerrev="2.4.0.RC1"/>
+				<caller organisation="org.atmosphere" name="atmosphere-runtime" conf="default, compile, runtime, master" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.0"/>
 				<caller organisation="org.atmosphere" name="atmosphere-redis" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.1"/>
 				<caller organisation="ch.qos.logback" name="logback-classic" conf="default, compile, runtime, master" rev="1.7.6" rev-constraint-default="1.7.6" rev-constraint-dynamic="1.7.6" callerrev="1.1.2"/>
 				<artifacts>
@@ -390,6 +382,7 @@
 				<caller organisation="org.atmosphere" name="atmosphere-runtime" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.6"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-util_2.11" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="1.7.1"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-core_2.11" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="1.7.1"/>
+				<caller organisation="org.atmosphere" name="atmosphere-runtime" conf="default, compile, runtime, master" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.0"/>
 				<caller organisation="org.atmosphere" name="atmosphere-redis" conf="compile, runtime" rev="1.6.1" rev-constraint-default="1.6.1" rev-constraint-dynamic="1.6.1" callerrev="2.2.1"/>
 				<artifacts>
 				</artifacts>
@@ -408,7 +401,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scalatra" name="scalatra-common_2.11">
-			<revision name="2.4.0.RC1" status="release" pubdate="20150417191525" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="19">
+			<revision name="2.4.0.RC1" status="release" pubdate="20150417191525" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scalatra.org/" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="28">
 				<license name="BSD" url="http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2664" time="0" location="/home/keenon/.ivy2/cache/org.scalatra/scalatra-common_2.11/ivy-2.4.0.RC1.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scalatra/scalatra-common_2.11/2.4.0.RC1/scalatra-common_2.11-2.4.0.RC1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="2.4.0.RC1" rev-constraint-default="2.4.0.RC1" rev-constraint-dynamic="2.4.0.RC1" callerrev="2.4.0.RC1"/>
@@ -419,20 +412,8 @@
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="javax.servlet" name="javax.servlet-api">
-			<revision name="3.1.0" status="release" pubdate="20130425165239" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://servlet-spec.java.net" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="44">
-				<license name="CDDL + GPLv2 with classpath exception" url="https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html"/>
-				<metadata-artifact status="no" details="" size="4150" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/ivy-3.1.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.pom"/>
-				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="3.1.0" rev-constraint-default="3.1.0" rev-constraint-dynamic="3.1.0" callerrev="1.0"/>
-				<artifacts>
-					<artifact name="javax.servlet-api" type="jar" ext="jar" status="no" details="" size="95806" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/jars/javax.servlet-api-3.1.0.jar">
-						<origin-location is-local="false" location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar"/>
-					</artifact>
-				</artifacts>
-			</revision>
-		</module>
 		<module organisation="org.json4s" name="json4s-jackson_2.11">
-			<revision name="3.3.0.RC1" status="release" pubdate="20150413075036" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="8">
+			<revision name="3.3.0.RC1" status="release" pubdate="20150413075036" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="17">
 				<license name="ASL" url="http://github.com/json4s/json4s/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2829" time="0" location="/home/keenon/.ivy2/cache/org.json4s/json4s-jackson_2.11/ivy-3.3.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/json4s/json4s-jackson_2.11/3.3.0.RC1/json4s-jackson_2.11-3.3.0.RC1.pom"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="3.3.0.RC1" rev-constraint-default="3.3.0.RC1" rev-constraint-dynamic="3.3.0.RC1" callerrev="1.0"/>
@@ -444,7 +425,7 @@
 			</revision>
 		</module>
 		<module organisation="com.fasterxml.jackson.core" name="jackson-databind">
-			<revision name="2.3.5" status="release" pubdate="20150113222950" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="15">
+			<revision name="2.3.5" status="release" pubdate="20150113222950" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="24">
 				<metadata-artifact status="no" details="" size="7223" time="0" location="/home/keenon/.ivy2/cache/com.fasterxml.jackson.core/jackson-databind/ivy-2.3.5.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.3.5/jackson-databind-2.3.5.pom"/>
 				<caller organisation="org.json4s" name="json4s-jackson_2.11" conf="default, compile, runtime, master" rev="2.3.5" rev-constraint-default="2.3.5" rev-constraint-dynamic="2.3.5" callerrev="3.3.0.RC1"/>
 				<artifacts>
@@ -455,7 +436,7 @@
 			</revision>
 		</module>
 		<module organisation="com.fasterxml.jackson.core" name="jackson-core">
-			<revision name="2.3.5" status="release" pubdate="20150113222340" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="17">
+			<revision name="2.3.5" status="release" pubdate="20150113222340" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="26">
 				<metadata-artifact status="no" details="" size="5473" time="0" location="/home/keenon/.ivy2/cache/com.fasterxml.jackson.core/jackson-core/ivy-2.3.5.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.3.5/jackson-core-2.3.5.pom"/>
 				<caller organisation="com.fasterxml.jackson.core" name="jackson-databind" conf="compile, runtime" rev="2.3.5" rev-constraint-default="2.3.5" rev-constraint-dynamic="2.3.5" callerrev="2.3.5"/>
 				<artifacts>
@@ -466,7 +447,7 @@
 			</revision>
 		</module>
 		<module organisation="com.fasterxml.jackson.core" name="jackson-annotations">
-			<revision name="2.3.0" status="release" pubdate="20131113205645" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="16">
+			<revision name="2.3.0" status="release" pubdate="20131113205645" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://wiki.fasterxml.com/JacksonHome" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="25">
 				<metadata-artifact status="no" details="" size="4805" time="0" location="/home/keenon/.ivy2/cache/com.fasterxml.jackson.core/jackson-annotations/ivy-2.3.0.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.3.0/jackson-annotations-2.3.0.pom"/>
 				<caller organisation="com.fasterxml.jackson.core" name="jackson-databind" conf="compile, runtime" rev="2.3.0" rev-constraint-default="2.3.0" rev-constraint-dynamic="2.3.0" callerrev="2.3.5"/>
 				<artifacts>
@@ -477,7 +458,7 @@
 			</revision>
 		</module>
 		<module organisation="org.json4s" name="json4s-core_2.11">
-			<revision name="3.3.0.RC1" status="release" pubdate="20150413075056" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="10">
+			<revision name="3.3.0.RC1" status="release" pubdate="20150413075056" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="19">
 				<license name="ASL" url="http://github.com/json4s/json4s/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="3104" time="0" location="/home/keenon/.ivy2/cache/org.json4s/json4s-core_2.11/ivy-3.3.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/json4s/json4s-core_2.11/3.3.0.RC1/json4s-core_2.11-3.3.0.RC1.pom"/>
 				<caller organisation="org.scalatra" name="scalatra-json_2.11" conf="compile, runtime" rev="3.3.0.RC1" rev-constraint-default="3.3.0.RC1" rev-constraint-dynamic="3.3.0.RC1" callerrev="2.4.0.RC1"/>
@@ -490,7 +471,7 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang.modules" name="scala-xml_2.11">
-			<revision name="1.0.3" status="release" pubdate="20141204121814" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="14">
+			<revision name="1.0.3" status="release" pubdate="20141204121814" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="23">
 				<license name="BSD 3-clause" url="http://opensource.org/licenses/BSD-3-Clause"/>
 				<metadata-artifact status="no" details="" size="3011" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang.modules/scala-xml_2.11/ivy-1.0.3.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/modules/scala-xml_2.11/1.0.3/scala-xml_2.11-1.0.3.pom"/>
 				<caller organisation="org.scalatra.scalate" name="scalate-util_2.11" conf="compile, runtime" rev="1.0.1" rev-constraint-default="1.0.1" rev-constraint-dynamic="1.0.1" callerrev="1.7.1"/>
@@ -512,7 +493,7 @@
 			</revision>
 		</module>
 		<module organisation="com.thoughtworks.paranamer" name="paranamer">
-			<revision name="2.7" status="release" pubdate="20140816132110" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="13">
+			<revision name="2.7" status="release" pubdate="20140816132110" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="22">
 				<metadata-artifact status="no" details="" size="4181" time="0" location="/home/keenon/.ivy2/cache/com.thoughtworks.paranamer/paranamer/ivy-2.7.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/thoughtworks/paranamer/paranamer/2.7/paranamer-2.7.pom"/>
 				<caller organisation="org.json4s" name="json4s-core_2.11" conf="compile, runtime" rev="2.7" rev-constraint-default="2.7" rev-constraint-dynamic="2.7" callerrev="3.3.0.RC1"/>
 				<artifacts>
@@ -523,7 +504,7 @@
 			</revision>
 		</module>
 		<module organisation="org.json4s" name="json4s-scalap_2.11">
-			<revision name="3.3.0.RC1" status="release" pubdate="20150413074940" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="12">
+			<revision name="3.3.0.RC1" status="release" pubdate="20150413074940" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="21">
 				<license name="ASL" url="http://github.com/json4s/json4s/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2528" time="0" location="/home/keenon/.ivy2/cache/org.json4s/json4s-scalap_2.11/ivy-3.3.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/json4s/json4s-scalap_2.11/3.3.0.RC1/json4s-scalap_2.11-3.3.0.RC1.pom"/>
 				<caller organisation="org.json4s" name="json4s-core_2.11" conf="compile, runtime" rev="3.3.0.RC1" rev-constraint-default="3.3.0.RC1" rev-constraint-dynamic="3.3.0.RC1" callerrev="3.3.0.RC1"/>
@@ -535,7 +516,7 @@
 			</revision>
 		</module>
 		<module organisation="org.json4s" name="json4s-ast_2.11">
-			<revision name="3.3.0.RC1" status="release" pubdate="20150413074927" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="11">
+			<revision name="3.3.0.RC1" status="release" pubdate="20150413074927" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/json4s/json4s" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="20">
 				<license name="ASL" url="http://github.com/json4s/json4s/raw/HEAD/LICENSE"/>
 				<metadata-artifact status="no" details="" size="2519" time="0" location="/home/keenon/.ivy2/cache/org.json4s/json4s-ast_2.11/ivy-3.3.0.RC1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/json4s/json4s-ast_2.11/3.3.0.RC1/json4s-ast_2.11-3.3.0.RC1.pom"/>
 				<caller organisation="org.json4s" name="json4s-core_2.11" conf="compile, runtime" rev="3.3.0.RC1" rev-constraint-default="3.3.0.RC1" rev-constraint-dynamic="3.3.0.RC1" callerrev="3.3.0.RC1"/>
@@ -547,13 +528,14 @@
 			</revision>
 		</module>
 		<module organisation="org.scala-lang" name="scala-library">
-			<revision name="2.11.6" status="release" pubdate="20150225170105" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.6/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master, default, default(compile)" position="9">
+			<revision name="2.11.6" status="release" pubdate="20150225170105" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.6/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master, default, default(compile)" position="18">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.6.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.6/scala-library-2.11.6.pom"/>
 				<caller organisation="org.scala-lang.modules" name="scala-parser-combinators_2.11" conf="compile, runtime" rev="2.11.2" rev-constraint-default="2.11.2" rev-constraint-dynamic="2.11.2" callerrev="1.0.3"/>
 				<caller organisation="org.json4s" name="json4s-scalap_2.11" conf="compile, runtime" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="3.3.0.RC1"/>
 				<caller organisation="org.json4s" name="json4s-jackson_2.11" conf="default, compile, runtime, master" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="3.3.0.RC1"/>
 				<caller organisation="org.scalatra" name="scalatra-scalate_2.11" conf="default, compile, runtime, master" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="2.4.0.RC1"/>
+				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="default, compile, runtime, master" rev="2.11.5" rev-constraint-default="2.11.5" rev-constraint-dynamic="2.11.5" callerrev="2.3.10"/>
 				<caller organisation="org.clapper" name="grizzled-slf4j_2.11" conf="compile, runtime" rev="2.11.0" rev-constraint-default="2.11.0" rev-constraint-dynamic="2.11.0" callerrev="1.0.2"/>
 				<caller organisation="org.scalatra" name="scalatra-json_2.11" conf="compile, runtime" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="2.4.0.RC1"/>
 				<caller organisation="org.json4s" name="json4s-ast_2.11" conf="compile, runtime" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="3.3.0.RC1"/>
@@ -561,7 +543,6 @@
 				<caller organisation="org.json4s" name="json4s-core_2.11" conf="compile, runtime" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="3.3.0.RC1"/>
 				<caller organisation="org.scala-lang.modules" name="scala-xml_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0.3"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0"/>
-				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="compile, runtime" rev="2.11.5" rev-constraint-default="2.11.5" rev-constraint-dynamic="2.11.5" callerrev="2.3.9"/>
 				<caller organisation="org.scalatra" name="scalatra_2.11" conf="default, compile, runtime, master" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="2.4.0.RC1"/>
 				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="2.4.0.RC1"/>
 				<caller organisation="org.scalatra" name="scalatra-common_2.11" conf="compile, runtime" rev="2.11.6" rev-constraint-default="2.11.6" rev-constraint-dynamic="2.11.6" callerrev="2.4.0.RC1"/>
@@ -574,18 +555,21 @@
 					</artifact>
 				</artifacts>
 			</revision>
+			<revision name="2.11.5" status="release" pubdate="20150106163212" resolver="sbt-chain" artresolver="sbt-chain" evicted="latest-revision" evicted-reason="" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.5/" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master, default, default(compile)" position="-1">
+				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
+				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.5.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.5/scala-library-2.11.5.pom"/>
+				<evicted-by rev="2.11.6"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0"/>
+				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="default, compile, runtime, master" rev="2.11.5" rev-constraint-default="2.11.5" rev-constraint-dynamic="2.11.5" callerrev="2.3.10"/>
+				<artifacts>
+				</artifacts>
+			</revision>
 			<revision name="2.11.4" status="release" pubdate="20141023083451" resolver="sbt-chain" artresolver="sbt-chain" evicted="latest-revision" evicted-reason="" homepage="http://www.scala-lang.org/" extra-info.apiURL="http://www.scala-lang.org/api/2.11.4/" downloaded="false" searched="false" default="false" conf="default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="-1">
 				<license name="BSD 3-Clause" url="http://www.scala-lang.org/license.html"/>
 				<metadata-artifact status="no" details="" size="2653" time="0" location="/home/keenon/.ivy2/cache/org.scala-lang/scala-library/ivy-2.11.4.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/scala-lang/scala-library/2.11.4/scala-library-2.11.4.pom"/>
 				<evicted-by rev="2.11.6"/>
 				<caller organisation="org.scala-lang.modules" name="scala-xml_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0.3"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.11.4" rev-constraint-default="2.11.4" rev-constraint-dynamic="2.11.4" callerrev="1.0"/>
-				<artifacts>
-				</artifacts>
-			</revision>
-			<revision name="2.11.5" evicted="latest-revision" evicted-reason="" downloaded="false" searched="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="-1">
-				<evicted-by rev="2.11.6"/>
-				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="compile, runtime" rev="2.11.5" rev-constraint-default="2.11.5" rev-constraint-dynamic="2.11.5" callerrev="2.3.9"/>
 				<artifacts>
 				</artifacts>
 			</revision>
@@ -606,92 +590,213 @@
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.aggregate" name="jetty-websocket">
-			<revision name="8.1.16.v20140903" status="release" pubdate="20140903112801" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="7">
-				<metadata-artifact status="no" details="" size="9623" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-websocket/ivy-8.1.16.v20140903.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-websocket/8.1.16.v20140903/jetty-websocket-8.1.16.v20140903.pom"/>
-				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="8.1.16.v20140903" rev-constraint-default="8.1.16.v20140903" rev-constraint-dynamic="8.1.16.v20140903" callerrev="1.0"/>
+		<module organisation="org.eclipse.jetty.websocket" name="websocket-server">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310064039" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="12">
+				<metadata-artifact status="no" details="" size="13799" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-server/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-server/9.2.10.v20150310/websocket-server-9.2.10.v20150310.pom"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="1.0"/>
 				<artifacts>
-					<artifact name="jetty-websocket" type="jar" ext="jar" status="no" details="" size="611086" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-websocket/jars/jetty-websocket-8.1.16.v20140903.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-websocket/8.1.16.v20140903/jetty-websocket-8.1.16.v20140903.jar"/>
+					<artifact name="websocket-server" type="jar" ext="jar" status="no" details="" size="37436" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-server/jars/websocket-server-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-server/9.2.10.v20150310/websocket-server-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.aggregate" name="jetty-all-server">
-			<revision name="8.1.16.v20140903" status="release" pubdate="20140903112917" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="1">
-				<metadata-artifact status="no" details="" size="12174" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/ivy-8.1.16.v20140903.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903.pom"/>
-				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="8.1.16.v20140903" rev-constraint-default="8.1.16.v20140903" rev-constraint-dynamic="8.1.16.v20140903" callerrev="1.0"/>
+		<module organisation="org.eclipse.jetty.websocket" name="websocket-servlet">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310064006" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="16">
+				<metadata-artifact status="no" details="" size="15492" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-servlet/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-servlet/9.2.10.v20150310/websocket-servlet-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
 				<artifacts>
-					<artifact name="jetty-all-server" type="jar" ext="jar" status="no" details="" size="1882609" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.aggregate/jetty-all-server/jars/jetty-all-server-8.1.16.v20140903.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/aggregate/jetty-all-server/8.1.16.v20140903/jetty-all-server-8.1.16.v20140903.jar"/>
+					<artifact name="websocket-servlet" type="jar" ext="jar" status="no" details="" size="18102" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-servlet/jars/websocket-servlet-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-servlet/9.2.10.v20150310/websocket-servlet-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.orbit" name="javax.annotation">
-			<revision name="1.1.0.v201108011116" status="release" pubdate="20111207120246" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="6">
-				<metadata-artifact status="no" details="" size="3034" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/ivy-1.1.0.v201108011116.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116.pom"/>
-				<caller organisation="org.eclipse.jetty.aggregate" name="jetty-all-server" conf="default, compile, runtime, master" rev="1.1.0.v201108011116" rev-constraint-default="1.1.0.v201108011116" rev-constraint-dynamic="1.1.0.v201108011116" callerrev="8.1.16.v20140903"/>
+		<module organisation="org.eclipse.jetty.websocket" name="websocket-client">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310063952" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="15">
+				<metadata-artifact status="no" details="" size="13259" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-client/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-client/9.2.10.v20150310/websocket-client-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
 				<artifacts>
-					<artifact name="javax.annotation" type="orbit" ext="jar" status="no" details="" size="26455" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.annotation/orbits/javax.annotation-1.1.0.v201108011116.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.annotation/1.1.0.v201108011116/javax.annotation-1.1.0.v201108011116.jar"/>
+					<artifact name="websocket-client" type="jar" ext="jar" status="no" details="" size="35761" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-client/jars/websocket-client-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-client/9.2.10.v20150310/websocket-client-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.orbit" name="javax.mail.glassfish">
-			<revision name="1.4.1.v201005082020" status="release" pubdate="20120120142330" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="4">
-				<metadata-artifact status="no" details="" size="3241" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/ivy-1.4.1.v201005082020.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020.pom"/>
-				<caller organisation="org.eclipse.jetty.aggregate" name="jetty-all-server" conf="default, compile, runtime, master" rev="1.4.1.v201005082020" rev-constraint-default="1.4.1.v201005082020" rev-constraint-dynamic="1.4.1.v201005082020" callerrev="8.1.16.v20140903"/>
+		<module organisation="org.eclipse.jetty.websocket" name="websocket-common">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310063916" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="13">
+				<metadata-artifact status="no" details="" size="15656" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-common/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-common/9.2.10.v20150310/websocket-common-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-client" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
 				<artifacts>
-					<artifact name="javax.mail.glassfish" type="orbit" ext="jar" status="no" details="" size="490811" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.mail.glassfish/orbits/javax.mail.glassfish-1.4.1.v201005082020.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.mail.glassfish/1.4.1.v201005082020/javax.mail.glassfish-1.4.1.v201005082020.jar"/>
+					<artifact name="websocket-common" type="jar" ext="jar" status="no" details="" size="179843" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-common/jars/websocket-common-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-common/9.2.10.v20150310/websocket-common-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.orbit" name="javax.activation">
-			<revision name="1.1.0.v201105071233" status="release" pubdate="20120120142254" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="5">
-				<metadata-artifact status="no" details="" size="3034" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/ivy-1.1.0.v201105071233.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233.pom"/>
-				<caller organisation="org.eclipse.jetty.orbit" name="javax.mail.glassfish" conf="compile, runtime" rev="1.1.0.v201105071233" rev-constraint-default="1.1.0.v201105071233" rev-constraint-dynamic="1.1.0.v201105071233" callerrev="1.4.1.v201005082020"/>
-				<caller organisation="org.eclipse.jetty.aggregate" name="jetty-all-server" conf="default, compile, runtime, master" rev="1.1.0.v201105071233" rev-constraint-default="1.1.0.v201105071233" rev-constraint-dynamic="1.1.0.v201105071233" callerrev="8.1.16.v20140903"/>
+		<module organisation="org.eclipse.jetty.websocket" name="websocket-api">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310063851" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="14">
+				<metadata-artifact status="no" details="" size="15134" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-api/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-api/9.2.10.v20150310/websocket-api-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-common" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-servlet" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
 				<artifacts>
-					<artifact name="javax.activation" type="orbit" ext="jar" status="no" details="" size="54434" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.activation/orbits/javax.activation-1.1.0.v201105071233.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.activation/1.1.0.v201105071233/javax.activation-1.1.0.v201105071233.jar"/>
+					<artifact name="websocket-api" type="jar" ext="jar" status="no" details="" size="43771" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.websocket/websocket-api/jars/websocket-api-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/websocket/websocket-api/9.2.10.v20150310/websocket-api-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.orbit" name="javax.security.auth.message">
-			<revision name="1.0.0.v201108011116" status="release" pubdate="20120124152127" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="3">
-				<metadata-artifact status="no" details="" size="3056" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/ivy-1.0.0.v201108011116.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116.pom"/>
-				<caller organisation="org.eclipse.jetty.aggregate" name="jetty-all-server" conf="default, compile, runtime, master" rev="1.0.0.v201108011116" rev-constraint-default="1.0.0.v201108011116" rev-constraint-dynamic="1.0.0.v201108011116" callerrev="8.1.16.v20140903"/>
+		<module organisation="org.eclipse.jetty" name="jetty-webapp">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062752" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="8">
+				<metadata-artifact status="no" details="" size="14305" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-webapp/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-webapp/9.2.10.v20150310/jetty-webapp-9.2.10.v20150310.pom"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="1.0"/>
 				<artifacts>
-					<artifact name="javax.security.auth.message" type="orbit" ext="jar" status="no" details="" size="40621" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.security.auth.message/orbits/javax.security.auth.message-1.0.0.v201108011116.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.security.auth.message/1.0.0.v201108011116/javax.security.auth.message-1.0.0.v201108011116.jar"/>
+					<artifact name="jetty-webapp" type="jar" ext="jar" status="no" details="" size="107834" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-webapp/jars/jetty-webapp-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-webapp/9.2.10.v20150310/jetty-webapp-9.2.10.v20150310.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
-		<module organisation="org.eclipse.jetty.orbit" name="javax.servlet">
-			<revision name="3.0.0.v201112011016" status="release" pubdate="20111207114915" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="2">
-				<metadata-artifact status="no" details="" size="3028" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/ivy-3.0.0.v201112011016.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.pom"/>
-				<caller organisation="org.eclipse.jetty.aggregate" name="jetty-all-server" conf="default, compile, runtime, master" rev="3.0.0.v201112011016" rev-constraint-default="3.0.0.v201112011016" rev-constraint-dynamic="3.0.0.v201112011016" callerrev="8.1.16.v20140903"/>
+		<module organisation="org.eclipse.jetty" name="jetty-servlet">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062728" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="10">
+				<metadata-artifact status="no" details="" size="14147" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-servlet/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-servlet/9.2.10.v20150310/jetty-servlet-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-webapp" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
 				<artifacts>
-					<artifact name="javax.servlet" type="orbit" ext="jar" status="no" details="" size="200387" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty.orbit/javax.servlet/orbits/javax.servlet-3.0.0.v201112011016.jar">
-						<origin-location is-local="false" location="http://repo1.maven.org/maven2/org/eclipse/jetty/orbit/javax.servlet/3.0.0.v201112011016/javax.servlet-3.0.0.v201112011016.jar"/>
+					<artifact name="jetty-servlet" type="jar" ext="jar" status="no" details="" size="115567" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-servlet/jars/jetty-servlet-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-servlet/9.2.10.v20150310/jetty-servlet-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-security">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062658" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="11">
+				<metadata-artifact status="no" details="" size="14017" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-security/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-security/9.2.10.v20150310/jetty-security-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-servlet" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<artifacts>
+					<artifact name="jetty-security" type="jar" ext="jar" status="no" details="" size="95925" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-security/jars/jetty-security-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-security/9.2.10.v20150310/jetty-security-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-server">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062632" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="3">
+				<metadata-artifact status="no" details="" size="14810" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-server/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/9.2.10.v20150310/jetty-server-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-security" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="jetty-server" type="jar" ext="jar" status="no" details="" size="418917" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-server/jars/jetty-server-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-server/9.2.10.v20150310/jetty-server-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-xml">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062308" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="compile, runtime(*), master(compile), runtime, compile(*), master" position="9">
+				<metadata-artifact status="no" details="" size="13941" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-xml/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-xml/9.2.10.v20150310/jetty-xml-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-webapp" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<artifacts>
+					<artifact name="jetty-xml" type="jar" ext="jar" status="no" details="" size="44318" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-xml/jars/jetty-xml-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-xml/9.2.10.v20150310/jetty-xml-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-io">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062257" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="7">
+				<metadata-artifact status="no" details="" size="14121" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-io/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-io/9.2.10.v20150310/jetty-io-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-common" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-client" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<artifacts>
+					<artifact name="jetty-io" type="jar" ext="jar" status="no" details="" size="108132" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-io/jars/jetty-io-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-io/9.2.10.v20150310/jetty-io-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-http">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062157" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="5">
+				<metadata-artifact status="no" details="" size="13902" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-http/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.2.10.v20150310/jetty-http-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-server" conf="default, compile, runtime, master" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<artifacts>
+					<artifact name="jetty-http" type="jar" ext="jar" status="no" details="" size="105748" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-http/jars/jetty-http-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-http/9.2.10.v20150310/jetty-http-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="org.eclipse.jetty" name="jetty-util">
+			<revision name="9.2.10.v20150310" status="release" pubdate="20150310062137" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://www.eclipse.org/jetty" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), master(compile), runtime, compile(*), master" position="6">
+				<metadata-artifact status="no" details="" size="14252" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-util/ivy-9.2.10.v20150310.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-util/9.2.10.v20150310/jetty-util-9.2.10.v20150310.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-common" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-client" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-io" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-http" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-xml" conf="compile, runtime" rev="9.2.10.v20150310" rev-constraint-default="9.2.10.v20150310" rev-constraint-dynamic="9.2.10.v20150310" callerrev="9.2.10.v20150310"/>
+				<artifacts>
+					<artifact name="jetty-util" type="jar" ext="jar" status="no" details="" size="356253" time="0" location="/home/keenon/.ivy2/cache/org.eclipse.jetty/jetty-util/jars/jetty-util-9.2.10.v20150310.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/org/eclipse/jetty/jetty-util/9.2.10.v20150310/jetty-util-9.2.10.v20150310.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="javax.servlet" name="javax.servlet-api">
+			<revision name="3.1.0" status="release" pubdate="20130425165239" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://servlet-spec.java.net" downloaded="false" searched="false" default="false" conf="master(*), default, compile, runtime(*), master(compile), runtime, default(compile), compile(*), master" position="4">
+				<license name="CDDL + GPLv2 with classpath exception" url="https://glassfish.dev.java.net/nonav/public/CDDL+GPL.html"/>
+				<metadata-artifact status="no" details="" size="4150" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/ivy-3.1.0.xml" searched="false" origin-is-local="false" origin-location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.pom"/>
+				<caller organisation="org.eclipse.jetty.websocket" name="websocket-servlet" conf="compile, runtime" rev="3.1.0" rev-constraint-default="3.1.0" rev-constraint-dynamic="3.1.0" callerrev="9.2.10.v20150310"/>
+				<caller organisation="org.eclipse.jetty" name="jetty-server" conf="default, compile, runtime, master" rev="3.1.0" rev-constraint-default="3.1.0" rev-constraint-dynamic="3.1.0" callerrev="9.2.10.v20150310"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="3.1.0" rev-constraint-default="3.1.0" rev-constraint-dynamic="3.1.0" callerrev="1.0"/>
+				<artifacts>
+					<artifact name="javax.servlet-api" type="jar" ext="jar" status="no" details="" size="95806" time="0" location="/home/keenon/.ivy2/cache/javax.servlet/javax.servlet-api/jars/javax.servlet-api-3.1.0.jar">
+						<origin-location is-local="false" location="https://repo1.maven.org/maven2/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
 		</module>
 		<module organisation="com.googlecode.lanterna" name="lanterna">
-			<revision name="2.1.8" status="release" pubdate="20140609062657" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/lanterna/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="0">
+			<revision name="2.1.8" status="release" pubdate="20140609062657" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://code.google.com/p/lanterna/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="2">
 				<license name="GNU Lesser General Public License" url="http://www.gnu.org/licenses/lgpl-3.0.txt"/>
 				<metadata-artifact status="no" details="" size="3108" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/ivy-2.1.8.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.pom"/>
 				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.1.8" rev-constraint-default="2.1.8" rev-constraint-dynamic="2.1.8" callerrev="1.0"/>
 				<artifacts>
 					<artifact name="lanterna" type="jar" ext="jar" status="no" details="" size="237320" time="0" location="/home/keenon/.ivy2/cache/com.googlecode.lanterna/lanterna/jars/lanterna-2.1.8.jar">
 						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/googlecode/lanterna/lanterna/2.1.8/lanterna-2.1.8.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.typesafe.akka" name="akka-actor_2.11">
+			<revision name="2.3.10" status="release" pubdate="20150422230128" resolver="sbt-chain" artresolver="sbt-chain" homepage="http://akka.io/" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master, master(*), runtime(*), compile(*)" position="0">
+				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="2655" time="0" location="/home/keenon/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/ivy-2.3.10.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.10/akka-actor_2.11-2.3.10.pom"/>
+				<caller organisation="default" name="lense-base_2.11" conf="compile, runtime" rev="2.3.10" rev-constraint-default="2.3.10" rev-constraint-dynamic="2.3.10" callerrev="1.0"/>
+				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.3.9" rev-constraint-default="2.3.9" rev-constraint-dynamic="2.3.9" callerrev="2.4.0.RC1"/>
+				<artifacts>
+					<artifact name="akka-actor_2.11" type="jar" ext="jar" status="no" details="" size="2579565" time="0" location="/home/keenon/.ivy2/cache/com.typesafe.akka/akka-actor_2.11/jars/akka-actor_2.11-2.3.10.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.10/akka-actor_2.11-2.3.10.jar"/>
+					</artifact>
+				</artifacts>
+			</revision>
+			<revision name="2.3.9" evicted="latest-revision" evicted-reason="" downloaded="false" searched="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="-1">
+				<evicted-by rev="2.3.10"/>
+				<caller organisation="org.scalatra" name="scalatra-atmosphere_2.11" conf="default, compile, runtime, master" rev="2.3.9" rev-constraint-default="2.3.9" rev-constraint-dynamic="2.3.9" callerrev="2.4.0.RC1"/>
+				<artifacts>
+				</artifacts>
+			</revision>
+		</module>
+		<module organisation="com.typesafe" name="config">
+			<revision name="1.2.1" status="release" pubdate="20140502075416" resolver="sbt-chain" artresolver="sbt-chain" homepage="https://github.com/typesafehub/config" downloaded="false" searched="false" default="false" conf="master(*), compile, runtime(*), runtime, compile(*), master" position="1">
+				<license name="Apache License, Version 2.0" url="http://www.apache.org/licenses/LICENSE-2.0"/>
+				<metadata-artifact status="no" details="" size="2734" time="0" location="/home/keenon/.ivy2/cache/com.typesafe/config/ivy-1.2.1.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.pom"/>
+				<caller organisation="com.typesafe.akka" name="akka-actor_2.11" conf="default, compile, runtime, master" rev="1.2.1" rev-constraint-default="1.2.1" rev-constraint-dynamic="1.2.1" callerrev="2.3.10"/>
+				<artifacts>
+					<artifact name="config" type="bundle" ext="jar" status="no" details="" size="219554" time="0" location="/home/keenon/.ivy2/cache/com.typesafe/config/bundles/config-1.2.1.jar">
+						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.jar"/>
 					</artifact>
 				</artifacts>
 			</revision>
