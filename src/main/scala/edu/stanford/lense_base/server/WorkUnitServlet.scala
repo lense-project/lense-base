@@ -4,6 +4,7 @@ import java.util.Date
 
 import com.amazonaws.mturk.service.axis.RequesterService
 import com.amazonaws.mturk.util.PropertiesClientConfig
+import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
 import edu.stanford.lense_base.mturk.{MTurkDBState, MTurkDatabase}
@@ -31,6 +32,8 @@ import scala.util.parsing.json.JSONObject
  */
 object WorkUnitServlet {
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
+
+  var engine : LenseEngine = null
 
   val workQueue = mutable.Queue[WebWorkUnit]()
 
@@ -87,7 +90,7 @@ object WorkUnitServlet {
         // Reset all info on this worker
         MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
         // Do the approval
-        WorkUnitServlet.service.approveAssignment(state.workerId, "Good work on real-time tasks")
+        WorkUnitServlet.service.approveAssignment(state.assignmentId, "Good work on real-time tasks")
         WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, state.assignmentId, "Earned while completing real-time tasks")
       }
     }
@@ -248,20 +251,31 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
         }
         // Otherwise, we're good to go, so let's initialize this worker
         else {
-          val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
-          if (state != null) {
-            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true))
+          // Need to check if sufficient budget to pay worker...
+          val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this)
+          if (!haveRetainerBudget) {
+            System.err.println("Not enough budget to retain workerId="+workerId)
+            send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: We don't have "+
+              "enough budget left in our job to pay your retainer. Please return this HIT, and check "+
+              " back later for more jobs.")))))
           }
           else {
-            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true))
-          }
-
-          if (status == "ready") {
-            if (!RealHumanHCUPool.hcuPool.contains(this)) {
-              RealHumanHCUPool.addHCU(this)
+            WorkUnitServlet.engine.spendReservedBudget(retainer, this, RealHumanHCUPool)
+            val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
+            if (state != null) {
+              MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true, assignmentId))
             }
+            else {
+              MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true, assignmentId))
+            }
+
+            if (status == "ready") {
+              if (!RealHumanHCUPool.hcuPool.contains(this)) {
+                RealHumanHCUPool.addHCU(this)
+              }
+            }
+            send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
           }
-          send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
         }
       }
 
@@ -285,6 +299,11 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
     case uncaught =>
       println("Something made it through the match expressions: "+uncaught)
+  }
+
+  def retainer : Double = {
+    // TODO: This needs to be set in a flag someplace
+    0.10
   }
 
   // Gets the estimated required time to perform this task, in milliseconds

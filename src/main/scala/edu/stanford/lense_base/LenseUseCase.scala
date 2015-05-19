@@ -26,6 +26,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
   lazy val ensureWorkServerWithDelay = {
+    WorkUnitServlet.engine = lenseEngine
     System.err.println("Starting server")
     WorkUnitServlet.server
     System.err.println("Waiting 5 seconds for you to connect, because some gameplayers will see an empty worker pool and just rip through the data")
@@ -149,7 +150,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
     // Send home all of our real human labelers when we're done with all of our predictions
 
-    for (hcu <- hcuPool) {
+    for (hcu <- hcuPool.hcuPool) {
       hcu match {
         case client : HCUClient => client.completeAndPay()
         case _ =>

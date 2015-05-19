@@ -27,11 +27,13 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   var reserved = mutable.Map[Any, Double]()
   var spent = 0.0
 
-  def addBudget(amount : Double) = synchronized {
+  val budgetLock = new Object()
+
+  def addBudget(amount : Double) = budgetLock.synchronized {
     budget += amount
   }
 
-  def tryReserveBudget(amount : Double, owner : Any) : Boolean = synchronized {
+  def tryReserveBudget(amount : Double, owner : Any) : Boolean = budgetLock.synchronized {
     if (budget >= amount) {
       budget -= amount
       reserved.put(owner, reserved.getOrElse(owner, 0.0) + amount)
@@ -42,7 +44,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }
 
-  def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = synchronized {
+  def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = budgetLock.synchronized {
     if (amount == 0) {
       if (reserved.contains(owner)) {
         budget += reserved(owner)
@@ -56,8 +58,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
         budget += amountRemaining
         reserved.put(owner, 0.0)
 
-        // If we ever hit a round 0, then send away all our workers, because we have no more money to pay them with...
-        if (budget == 0) {
+        // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
+        if (budget < 0.001) {
           for (hcu <- hcuPool.hcuPool) {
             hcu match {
               case client : HCUClient =>
