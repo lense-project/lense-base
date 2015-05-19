@@ -111,11 +111,12 @@ class NERUseCase extends LenseSequenceUseCase {
 
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
-   * asking humans for help, and revert to simple machine learning, after it has exhausted the budget.
+   * asking humans for help, and revert to simple machine learning, after it has exhausted the budget. This includes
+   * money spent on retainers in order to recruit workers in the first place.
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 0.20
+  override def budget: Double = 1.00
 }
 
 object RunTestCase extends App {

@@ -47,15 +47,26 @@ $(function () {
     };
 
     request.onMessage = function (response) {
-        console.log("on message: "+response)
-
         var message = response.responseBody;
+
+        console.log("on message: "+$.stringifyJSON(message))
         try {
             var json = jQuery.parseJSON(message);
             if (json['status'] !== undefined) {
                 if (json['status'] === 'failure') {
                     content.html(json['display']);
                     socket.unsubscribe();
+                }
+                if (json['status'] === 'waiting') {
+                    var numHere = json['here'];
+                    var numNeeded = json['needed'];
+                    var waitingDiv = $('<div/>', {class: "waiting"});
+                    waitingDiv.html("We're <b>waiting for "+numNeeded+" people</b> to accept this HIT before we start.<br>"+
+                    "So far <b>there are "+numHere+"/"+numNeeded+" here.</b><br>"+
+                    "<b>You'll still get paid</b> your retainer even if we never get "+numNeeded+" people.<br>"+
+                    "Feel free to do something else for a bit, <b>we'll alert you</b> when there are tasks available.");
+                    content.html("");
+                    content.append(waitingDiv);
                 }
             }
             if (json['bonus'] !== undefined) {
@@ -120,6 +131,10 @@ $(function () {
                 }, 3000);
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
+                if (!document.hasFocus()) {
+                    alert("There's a task available for you now");
+                }
+
                 // We need to create a multiclass question here
                 content.css({
                     height: 'auto'

@@ -10,16 +10,14 @@ import com.amazonaws.mturk.util.PropertiesClientConfig
  *
  * This is a super rudimentary example request, seems to work
  */
-object ExternalExample {
+object HITCreator {
   lazy val service : RequesterService = new RequesterService(new PropertiesClientConfig("/home/keenon/.aws/mturk.properties"))
 
-  def createHelloWorld() : Unit = {
-    val title = "Real time BONUS work"
-    val description = "Test test"
-    val reward = 0.03
+  def createHIT(reward : Double = 0.10,
+                numAssignments : Int = 1) : Unit = {
+    val title = "Real time classification with LARGE BONUS"
+    val description = "Receive a retainer for staying for 10 minutes, and a bonus for all the HITs you perform in real time"
     val question = new HITQuestion("src/main/resources/mturk/external.question").getQuestion
-    println(question)
-    val numAssignments = 1
     val hit : HIT = service.createHIT(title,
                                       description,
                                       reward,
@@ -29,17 +27,7 @@ object ExternalExample {
     println("You can see it here: "+service.getWebsiteURL+"/mturk/preview?groupId="+hit.getHITTypeId)
   }
 
-  def retrieveAnswers() : Unit = {
-    val hitDataBuffer = new HITDataBuffer()
-    service.getResults(hitDataBuffer, new BatchItemCallback {
-      override def processItemResult(itemId: scala.Any, succeeded: Boolean, result: scala.Any, itemException: Exception): Unit = {
-        println("Retrieved result!: "+result)
-      }
-    })
-  }
-
   def main(args : Array[String]) : Unit = {
-    createHelloWorld()
-    retrieveAnswers()
+    createHIT()
   }
 }

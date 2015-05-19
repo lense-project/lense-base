@@ -111,3 +111,15 @@ button.hover {
     font-size: 120%;
     margin: 0.5em;
 }
+
+.waiting {
+    text-align: center;
+    margin: 50px;
+    font-size: 1.3em;
+}
+
+.waiting b {
+    font-weight: 900;
+    font-size: 1.4em;
+    color: darkblue;
+}

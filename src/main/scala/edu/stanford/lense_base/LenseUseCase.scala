@@ -6,6 +6,7 @@ import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
+import edu.stanford.lense_base.mturk.HITCreator
 import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
@@ -25,12 +26,18 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   lazy val graphStream : GraphStream = new GraphStream()
   lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
-  lazy val ensureWorkServerWithDelay = {
+  lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
     System.err.println("Starting server")
     WorkUnitServlet.server
-    System.err.println("Waiting 5 seconds for you to connect, because some gameplayers will see an empty worker pool and just rip through the data")
-    Thread.sleep(5000)
+  }
+
+  def makeHITAndWaitFor(numberOfHumans : Int) = {
+    System.err.println("Creating MTurk HITs...")
+    HITCreator.createHIT(0.10, numberOfHumans*2)
+
+    System.err.println("Waiting for "+numberOfHumans+" to connect...")
+    WorkUnitServlet.waitForSimultaneousConnections(numberOfHumans)
   }
 
   def initialize() : Unit = {
@@ -270,7 +277,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
-    ensureWorkServerWithDelay
+    ensureWorkServer
+
+    makeHITAndWaitFor(2)
 
     progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)

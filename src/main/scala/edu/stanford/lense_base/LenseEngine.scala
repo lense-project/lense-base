@@ -48,6 +48,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     if (amount == 0) {
       if (reserved.contains(owner)) {
         budget += reserved(owner)
+        System.err.println("Reclaimed $"+reserved(owner)+" from reserve, budget remaining unclaimed: $"+budget)
         reserved.put(owner, 0.0)
       }
     }
@@ -57,6 +58,8 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
         val amountRemaining = totalReserved - amount
         budget += amountRemaining
         reserved.put(owner, 0.0)
+
+        System.err.println("Spent $"+amount+", budget remaining unclaimed: $"+budget)
 
         // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
         if (budget < 0.001) {
