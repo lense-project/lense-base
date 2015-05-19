@@ -7,17 +7,17 @@
 		revision="1.0"
 		conf="compile-internal"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150518121531"/>
+		date="20150519110226"/>
 	<dependencies>
 		<module organisation="com.h2database" name="h2">
 			<revision name="1.4.187" status="release" pubdate="20150410093333" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="53">
 				<metadata-artifact status="no" details="" size="2181" time="0" location="/home/keenon/.ivy2/cache/com.h2database/h2/ivy-1.4.187.xml" searched="false" origin-is-local="false" origin-location="http://repo1.maven.org/maven2/com/h2database/h2/1.4.187/h2-1.4.187.pom"/>
 				<caller organisation="default" name="lense-base$sources_javadoc_2.11" conf="compile-internal, compile, provided, optional" rev="1.4.187" rev-constraint-default="1.4.187" rev-constraint-dynamic="1.4.187" callerrev="1.0"/>
 				<artifacts>
-					<artifact name="h2" type="doc" ext="jar" extra-classifier="javadoc" status="successful" details="" size="3527582" time="618" location="/home/keenon/.ivy2/cache/com.h2database/h2/docs/h2-1.4.187-javadoc.jar">
+					<artifact name="h2" type="doc" ext="jar" extra-classifier="javadoc" status="no" details="" size="3527582" time="0" location="/home/keenon/.ivy2/cache/com.h2database/h2/docs/h2-1.4.187-javadoc.jar">
 						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/h2database/h2/1.4.187/h2-1.4.187-javadoc.jar"/>
 					</artifact>
-					<artifact name="h2" type="src" ext="jar" extra-classifier="sources" status="successful" details="" size="1194230" time="472" location="/home/keenon/.ivy2/cache/com.h2database/h2/srcs/h2-1.4.187-sources.jar">
+					<artifact name="h2" type="src" ext="jar" extra-classifier="sources" status="no" details="" size="1194230" time="0" location="/home/keenon/.ivy2/cache/com.h2database/h2/srcs/h2-1.4.187-sources.jar">
 						<origin-location is-local="false" location="http://repo1.maven.org/maven2/com/h2database/h2/1.4.187/h2-1.4.187-sources.jar"/>
 					</artifact>
 					<artifact name="h2" type="jar" ext="jar" status="no" details="" size="1695977" time="0" location="/home/keenon/.ivy2/cache/com.h2database/h2/jars/h2-1.4.187.jar">

@@ -113,7 +113,7 @@ $(function () {
                         var hours = Math.floor(totalMinutes / 60);
                         var seconds = totalSeconds % 60;
                         var minutes = totalMinutes % 60;
-                        function to2Tokens(number) {
+                        var to2Tokens = function(number) {
                             if (number < 10) return "0"+number;
                             else return ""+number;
                         }
@@ -166,7 +166,7 @@ $(function () {
 
                     content.append(b);
 
-                    function makeChoice(closureChoice) {
+                    var makeChoice = function(closureChoice) {
                         console.log("Choosing "+closureChoice);
                         subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
                         content.css({
