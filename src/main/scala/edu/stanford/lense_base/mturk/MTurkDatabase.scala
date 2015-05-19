@@ -30,7 +30,7 @@ object MTurkDatabase {
   def updateOrCreateWorker(turkState : MTurkDBState) : Unit = {
     val stmt = conn.prepareStatement("INSERT INTO "+
       "`workers`(`workerId`,`queriesAnswered`,`connectionDuration`,`outstandingBonus`,`currentlyConnected`, `assignmentId`) "+
-      "VALUES (?,?,?,?,?) "+
+      "VALUES (?,?,?,?,?,?) "+
       "ON DUPLICATE KEY UPDATE "+
       "`queriesAnswered`=?,"+
       "`connectionDuration`=?,"+

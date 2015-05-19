@@ -42,11 +42,12 @@ object WorkUnitServlet {
 
   def claimWorkerIdIfPossible(client : HCUClient, workerId : String) : Boolean = workerIdConnectionMap.synchronized {
     if (!workerIdConnectionMap.contains(workerId)) {
+      System.err.println("Claiming "+workerId)
       workerIdConnectionMap.put(workerId, client)
       true
     }
     else {
-      workerIdConnectionMap(workerId) eq client
+      false
     }
   }
 
@@ -232,13 +233,17 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
         startTime = System.currentTimeMillis()
         assignmentId = map.apply("assignmentId").values.asInstanceOf[String]
         workerId = map.apply("workerId").values.asInstanceOf[String]
+        if (workerId == null || workerId == "null") {
+          workerId = "default"
+        }
         hitId = map.apply("hitId").values.asInstanceOf[String]
 
         val canClaim : Boolean = WorkUnitServlet.claimWorkerIdIfPossible(this, workerId)
         // This means that this workerId already has a connection to us... can't allow it
         if (!canClaim) {
+          System.err.println("Attempted double connect for workerId="+workerId)
           send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: It appears that "+
-            "someone with this workerId is already connected and working on a copy of this HIT."+
+            "someone with your workerId is connected and working on a copy of this HIT."+
             " Please close any other copies of this task before trying to create new ones.")))))
         }
         // Otherwise, we're good to go, so let's initialize this worker

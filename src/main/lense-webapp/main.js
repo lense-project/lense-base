@@ -28,12 +28,12 @@ $(function () {
     var socket = $.atmosphere;
 
     // We are now ready to cut the request
-    var request = {
-        url: '/work-socket',
-        contentType : 'application/text',
-        transport : 'websocket',
-        fallbackTransport: 'long-polling'
-    };
+    var request = new $.atmosphere.AtmosphereRequest();
+    request.url = '/work-socket';
+    request.contentType = 'application/text';
+    request.transport = 'websocket';
+    request.fallbackTransport = 'long-polling';
+    request.shared = true; // make sure this is shared across windows / tabs
 
     request.onOpen = function(response) {
         console.log('connected using ' + response.transport);
@@ -55,6 +55,7 @@ $(function () {
             if (json['status'] !== undefined) {
                 if (json['status'] === 'failure') {
                     content.html(json['display']);
+                    socket.unsubscribe();
                 }
             }
             if (json['bonus'] !== undefined) {
@@ -251,4 +252,9 @@ $(function () {
             }, 200);
         });
     }
+
+    $(window).unload(function() {
+        $.cookie.removeCookie("shared", {path: '/'});
+        return null;
+    });
 });
