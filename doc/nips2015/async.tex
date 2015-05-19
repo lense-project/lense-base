@@ -1,0 +1,176 @@
+\section{Asynchronous Active Classification}
+\label{sec:async}
+
+We will allow multiple queries to be simultaneously ``in-flight'' to different workers in $\sP$, to hide the latency associated with getting multiple human opinions.
+ To justify the added complexity of our algorithm and analysis, if $q$ is the number of queries sent to oracles, runtime for a single active MAP estimate will scale as $O(\text{max}(1, \frac{q}{|\sP|}))$.
+ If we restricted ourselves to sequential querying, runtime would scale as $O(q)$.
+ Human classification requests can take \textit{seconds}, so if restricted to sequential querying our $t$ delay term in our loss $\sL$ will often force the algorithm to turn in suboptimal answers, even if there were idle annotators in $\sP$ who could have been contributing.
+
+To model asynchrony, we will use an ``event-driven'' policy to make decisions for our active classifier.
+ At a high level, the algorithm will ``wake-up'' whenever the state is changed, and will see a \textit{snapshot} of the state $s \in \sS$ at that instant, including information about request currently in-flight, and make a decision about the next action $a \in \sA$ to perform immediately according to its \textit{asynchronous policy} $\pi \in \sS \times \sA$.
+ This action is then performed, and the game player gets another chance to move immediately.
+ The game player can choose as one of its moves to go back to sleep until the next event.
+
+We now formalize $\sS$ and $\sA$, and then provide an example run of a classification below to clarify exactly what all this machinery is doing.
+
+
+The state space $\sS = \sG \times \sQ \times \sP$ consists of the query graph $G \in \sG$, and set of queries $Q \in \sQ$, and the current state of the annotator pool.
+ Each individual query $q \in Q$ contains 3 pieces of state: (human $o_i$, variable $X_j$, status $S$).
+ Status can be any of 
+\[S \in [(\text{IN-FLIGHT}, t \in \sR^+), (\text{SUCCESS}, v \in D_j), \text{FAILED}]\]
+
+The action space $\sA$ consists of asking for a query on a given node $X_i$ to a given human $o_i$, waiting until woken up again, or returning the answer immediately, so 
+\[\sA = [\text{QUERY} \times \sP \times \sX , \text{WAIT}, \text{RETURN}]\]
+This action is chosen according to a policy $\pi \in \sA$.
+
+\subsection{Simple Example Run}
+
+\todo{This can be dramatically compressed with proper formatting}
+
+Here we show a simple run for a query with two variables, $X_1$ and $X_2$. The model is uncertain about the value of $X_1$, but relatively confident about $X_2$, so it will ask for two simultaneously requests for $X_1$, wait for them both to return, then turn in an answer.
+
+\begin{enumerate}
+\item Request graph $G = ([X_1, X_2], [f_1])$ received.
+ Our current pool contains two annotators, $\sP = [o_1, o_2]$.
+ We initialize our state $s \in \sS$ as $s = (G, [], [o_1, o_2])$. At this point the markov network diagram for our state looks as follows:
+
+%%% TIKZ
+\begin{center}
+  \begin{tikzpicture}[
+  auto=left,
+  every node/.style={circle, draw=black, outer sep=+0pt, line width=0.5mm},
+  node distance=1cm]
+
+  \node              (n1) {$X_1$};
+  \node[right=of n1] (n2) {$X_2$};
+
+  \path[thick] (n1) edge (n2);
+  
+\end{tikzpicture}
+\end{center}
+%%% TIKZ
+
+\item We then wake up the game player, and pass it $s = (G, [], [o_1, o_2])$.
+ It returns us the action $a = (\text{QUERY}, o_1, X_1)$, the state is updated by adding a query $q_1 = (o_1, X_1, (\text{IN-FLIGHT}, 0ms))$ to $Q$.
+ Our new state is $s = (G, [q_1], [o_1, o_2])$.
+ Now the network looks as follows:
+
+%%% TIKZ
+\begin{center}
+  \begin{tikzpicture}[
+  auto=left,
+  every node/.style={circle, draw=black, outer sep=+0pt, line width=0.5mm},
+  node distance=1cm]
+
+  \node              (n1) {$X_1$};
+  \node[right=of n1] (n2) {$X_2$};
+  \node[below=of n1] (n3) {$q_1=$?};
+
+  \path[thick] (n1) edge (n2);
+  \path[thick] (n1) edge (n3);
+  
+\end{tikzpicture}
+\end{center}
+%%% TIKZ
+
+\item We then \textit{immediately} wake up the game player again, to ask what to do next.
+ We pass it $s = (G, [q_1], [o_1, o_2])$, and it returns $a = (\text{QUERY}, o_2, X_1)$, so we update the state by adding $q_2 = (o_2, X_1, (\text{IN-FLIGHT}, 0ms))$ to $Q$.
+ Our new state is $s = (G, [q_1, q_2], [o_1, o_2])$.
+ Now the network looks as follows:
+
+%%% TIKZ
+\begin{center}
+  \begin{tikzpicture}[
+  auto=left,
+  every node/.style={circle, draw=black, outer sep=+0pt, line width=0.5mm},
+  node distance=1cm]
+
+  \node              (n1) {$X_1$};
+  \node[right=of n1] (n2) {$X_2$};
+  \node[below left=of n1] (n3) {$q_1=$?};
+  \node[below right=of n1] (n4) {$q_2=$?};
+
+  \path[thick] (n1) edge (n2);
+  \path[thick] (n1) edge (n3);
+  \path[thick] (n1) edge (n4);
+  
+\end{tikzpicture}
+\end{center}
+%%% TIKZ
+
+\item We then \textit{immediately} wake up the game player again, to ask what to do next.
+ We pass it $s = (G, [q_1, q_2], [o_1, o_2])$, and it returns $a = (\text{WAIT})$.
+ This means we need to put the game player to sleep until the results of our requests return.
+
+\item $q_2$ returns, so the state of $q_2 = (o_2, X_1, (\text{SUCCESS}, 1))$.
+ We pass the game player $s = (G, [q_1, q_2], [o_1, o_2])$, and it returns $a = (\text{WAIT})$, so we continue to sleep.
+
+\item $q_1$ returns, and updates its state to $q_1 = (o_1, X_1, (\text{SUCCESS}, 1))$.
+ We pass the game player $s = (G, [q_1, q_2], [o_1, o_2])$, and it returns $a = (\text{RETURN})$, so we take the MAP estimate over the current markov network, and return.
+ Our graph looks like this in the final state:
+
+%%% TIKZ
+\begin{center}
+  \begin{tikzpicture}[
+  auto=left,
+  every node/.style={circle, draw=black, outer sep=+0pt, line width=0.5mm},
+  node distance=1cm]
+
+  \node              (n1) {$X_1$};
+  \node[right=of n1] (n2) {$X_2$};
+  \node[below left=of n1] (n3) {$q_1=1$};
+  \node[below right=of n1] (n4) {$q_2=1$};
+
+  \path[thick] (n1) edge (n2);
+  \path[thick] (n1) edge (n3);
+  \path[thick] (n1) edge (n4);
+  
+\end{tikzpicture}
+\end{center}
+%%% TIKZ
+
+\end{enumerate}
+
+The important things to notice in this example are steps 3-5.
+ These are points where the policy needs to look at an incomplete state, where requests have been made but not returned results yet, and decide how to proceed in the face of this potential future value already invested.
+ We now proceed to explore how that is done.
+
+\section{Asynchronous Active Learning}
+
+In addition to the Partial Monitoring Game, our active classification task can be cast as an Active Learning task, which allows us to unlock the rich Active Learning literature.
+ The traditional Active Learning algorithms are meant to operate in a game space where the branching factor is so prohibitively large as to necessitate single-step lookahead approximations.
+ These approximations make an action based on a greedy metric of ``gain'' (defined differently by each algorithm) per unit ``cost'' (defined by the user).
+ Formally, we choose an action $a$ based on observed values $\bx$ (presumed perfect), and cost of actions $c(a)$:
+
+\[a^* = \argmax_{a \in \sA} \Delta_{\text{Alg}}(a | \bx) / c(a)\]
+
+These heuristic solutions will need to be adapted to the asynchronous and Bayesian setting to be able to assign the correct expected value to in-flight requests.
+ We will use a similar trick throughout.
+ We are interested in greedily maximizing our loss, so we set $c(a) = \Delta E_{h \sim p(h)}[\sL(h_{\text{final}}, h, m, t)]$ where $h_{\text{final}}$ is the MAP assignment after turning in our guess.
+ Then we can take an expectation over our beliefs about $\bx$ after all currently in-flight queries have returned.
+
+\[a^* = \argmax_{a \in \sA} E_{\bx}[ \Delta_{\text{Alg}}(a | \bx) / \Delta \sL(a)]\]
+
+\subsection{Uncertainty Sampling}
+
+We pick the variable to query that our model has the \textit{least confidence} in.
+ \todo{details}
+
+\subsection{Value of Information}
+\subsection{Information Gain}
+
+\subsection{Query By Committee}
+
+The idea here is to minimize the number of consistent hypothesis $h \in \sH$ over time by choosing to learn information that maximally reduces the hypothesis space.
+ This is approximated by looking for maximum disagreement amongst a set of learners trained on random subsets of the data.
+ \todo{details}
+
+\subsection{Expected Gradient Length}
+
+Here we choose the items that would impose the greatest update to the model if we knew its label.
+ \todo{details}
+
+\subsection{Information Density}
+
+\todo{details}
+

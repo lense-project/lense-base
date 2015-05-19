@@ -1,0 +1,54 @@
+\section{Related Work}
+\label{sec:related}
+
+In order to properly situate our proposal in prior art there's several key similarities to draw between traditional Active Learning and Active Classification.
+ Active Learning is primarily concerned with generating a (possibly changing) ordering over remaining unlabeled examples, such that if examples are labeled one at a time and the model is retrained at each step, the maximum accuracy is achieved for minimum labeling cost.
+ This is traditionally done over a static pool of unlabeled examples.
+ To the extent that we can think of the nodes of our CRF as (dependent) examples to be labeled, this work is applicable.
+ 
+
+Our log-linear markov networks are arriving in an online streaming setting, and there has been a large body of work investigating the ``streaming'' setting (\cite{chu2011unbiased},~\cite{agarwal2013selective},~\cite{cheng2013feedback},~\cite{vzliobaite2011active},~\cite{helmbold1997some}), where the algorithm visits a data instance once, and can choose to either request a label or discard it.
+ Our labeling decision in the asynchronous delay-sensitive setting will be much more complicated than the decisions made by these algorithms.
+
+
+Active Learning in the context of PGMs has been previously explored from several angles.
+ Active Learning for CRF sequence models was famously explored in the context of batch active learning, where the oracle is able to provide labels for an entire sequence at once, and the objective was to achieve maximum accuracy for minimum cost~\cite{settles2008analysis}.
+ It's also been explored in the context of fully Bayesian networks where the oracle\cite{tong2000active} can draw samples conditioned on certain ``controllable'' values (inspired by applications in experiment design).
+ 
+
+Active Learning has also been explored for specific structure-prediction tasks,~\cite{roth2006active} and~\cite{culotta2005reducing}, where humans perform top-K selection over model predictions.
+ The systems fall back by stages to traditional no-assistance annotation if the top-K doesn't contain the any correct information.
+ While this approach is effective when possible, it relies on the model to consistently produce the correct answer in a top-K for some very small $K$, so for large output spaces it breaks down.
+
+
+Active Learning where partial labels can be elicited has been shown effective in the batch setting with many PGMs for the relation extraction task~\cite{angeli2014combining}.
+ We will follow this work in requesting partial observations of our graphs.
+
+
+There's been a line of work on Active Learning in the context of multiple noisy, expensive oracles (\cite{yan2011active},~\cite{donmez2008proactive},~\cite{golovin2010near}).
+ This work tries to relax the traditional assumptions in Active Learning that the oracle is infallible and has no economic cost.
+ Some of this work is directly motivated by applications to crowd-sourcing platforms that we investigate.
+
+
+Finally Bayesian Active Learning (\cite{golovin2010near},~\cite{tong2000active}) allows us to incorporate a Bayesian prior over our data, and we'll use this as a foundation for our approach to solving the asynchronous behavior problem.
+
+
+\todo{Game playing lit review}
+
+\subsection{Pure crowd classification systems}
+
+Flock~\cite{chengflock} is a system of that attempts to put the entire classifier construction process, including proposing and annotating features, into the crowd.
+
+
+Legion AR~\cite{lasecki2013real} is a system for realtime activity labeling.
+ It provide useful priors for the kind of worker quality and longevity we can expect from the crowd.
+ It also provides an implemented system for generating a real-time pool of workers.
+
+\section{Background}
+\label{sec:background}
+
+In this section, we review some of the building blocks of our framework.
+
+\paragraph{Learning with measurements}
+
+

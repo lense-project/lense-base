@@ -1,0 +1,164 @@
+\section{Setup}
+\label{sec:problem}
+
+We will now formalize how our task is evaluated, modelled and executed. 
+We consider the ``designer'' to be the person who implements our system: she must decide what the model is and define an appropriate cost function.
+A ``user'' of the system is the person providing input that needs to be labeled. 
+Finally, ``labelers'' in the system provide potentially noisy partial labels (or measurements) on inputs from the user. \todo{diagram}
+% Note that the designer, user and labeler can all be the same person.
+
+\paragraph{Measuring progress.}
+
+First, let's look at how answers produced by the system are evaluated.
+In the conventional supervised setting, a natural metric is the accuracy of our predictions relative to the true labels in the training data.
+The system gets to see these true labels and is able to optimize an appropriate loss.
+
+Formally, let $\bx\oft{1}, \dots, \bx\oft{t}, \dots, \bx\oft{T}$ be a sequence of inputs, 
+let $(\by\oft{t})$ be their true labels,
+and let $(\byt\oft{t})$ be the sequence of predictions made by the system.
+We measure the performance of our system using the loss $\ell(\by\oft{t}, \byt\oft{t})$, and our objective is to minimize the loss on the dataset: $\sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t})$.
+
+When constructing datasets from user interactions, the system does not get to observe $\by\oft{t}$ or $\ell(\by\oft{t}, \byt\oft{t})$.
+We are only aware of the true labels if and when we query a human annotator: simply measuring performance incurs a cost for our system.
+Let $\sigma\oft{t}$ be the measurements queried by the system, incurring a cost $C(\sigma\oft{t})$.
+Our goal is to minimize the objective
+\begin{align*}
+  \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(\sigma\oft{t}).
+\end{align*}
+
+\paragraph{Model}
+
+We consider the family of conditional exponential models:
+\begin{align*}
+  p_\theta(y \given x) 
+  &= \exp( \theta^\top \phi(x, y) - A(\theta; x)),
+\end{align*}
+where $A(\theta; x)$ is the conditional log-normalizer.
+We assume the model has low treewidth or otherwise admits efficient marginal computation.
+
+As mentioned earlier, we do not have any labeled examples $y$, but can ask for some measurement $\sigma \in \Sigma$ by asking the crowd. 
+In order to incorporate this information, we assume the distribution of responses to be modeled as an exponential measurement model as in~\cite{liang09measurements}:
+\begin{align*}
+  p(\tau \given x, y, \sigma) 
+  &\propto \exp \left( h_\sigma(\tau - \sigma(x,y)) \right),
+\end{align*}
+where $h_\sigma$ is a convex function.
+Consider a simple model for noisy labeling, where a person returns the true label with a uniform probability of $1- \epsilon$, and guesses at random otherwise. In this case, 
+\begin{align*}
+  h_\sigma(u) &= \alpha \I(\tau \neq \sigma),
+\end{align*}
+where $\alpha$ is equal to the inverse sigmoid:$\alpha = \sigma\inv(1 - \epsilon/2)$.
+
+Typical examples of measurements are partial labels.
+We assume that incorporating these measurements can be done efficiently, i.e.\ marginals can be efficiently computed for the joint model,
+\begin{align*}
+  p_\theta(y \given x, \tau, \sigma) 
+  &\propto \exp(\theta^\top \phi(x, y) + h_\sigma(\tau - \sigma(x,y))).
+\end{align*}
+
+\paragraph{Measurement selection}
+
+The key computation we need to perform is to choose a measurement action.
+Assume that $\Sigma = \{\sigma_0, \sigma_1, \dots, \sigma_n\}$ are the set of valid measurement operations one can perform. 
+Furthermore, let $\sigma_0$ be a special operation that does not ask for any measurement: it returns the most probable  labeling.
+
+Let $\ell(\by, \byt)$ be the loss incurred when labeling $\by$ versus $\byt$.
+Let the utility of a particular measurement operation be:
+\begin{align*}
+U(\sigma)
+&= \E_{p(\tau \given x, \sigma)} \left[
+      \E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))] \right] + C(\sigma),
+\end{align*}
+where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$ is the maximum likelihood labeling $C(\sigma)$ is the cost function.
+
+Intuitively, we will only ever choose to measure something if the expected utility between labellings is more than the cost of executing the measurement.
+
+\paragraph{Asynchronous requests}
+
+For the system to be real-time, we need to dispatch multiple measurement queries at the same time. Thus, we must reason about what portfolio of measurements would be optimal.
+
+Iterated expectations work.
+
+\paragraph{Optimization}
+
+On receiving a label, we optimize to train our loss.
+
+Q: Should we do gradients when we don't see data, basically doing an unsupervised update?
+
+\section{Problem definition}
+
+In summary, we will receive a stream of queries, and a pool of humans.
+ We will be asked to minimized our risk (aka expected loss) in the Bayesian Decision Theoretic sense, over some loss function $\sL(h_{\text{true}}, h, m, t)$ that takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.  
+
+\subsection{The Queries}
+
+We receive a stream of queries.
+ The world, in the context of a query, is composed of vector of $n$ random variables, $[X_1 \ldots X_n] \in \sX$, where $\sX$ is the input domain.
+ Each variable $X_i$ is categorical with domain $D_i = [1 \ldots K_i]$, so the size of domain $|D_i| = K_i$, and $K_i$ need not equal $K_j$ if $i \neq j$.
+
+Each query asks us to distinguish between a number of possible \textit{hypotheses} $h \in \sH$, where $\sH$ is the space of all possible assignments to the $X_i$'s, so $\sH = D_1 \times \ldots \times D_n$.
+ Each hypothesis $h$ corresponds to a unique assignment to a set of query variables $[X_1 = x_1, \ldots, X_n = x_n]$. 
+
+Each query is further given a markov network to describe the features of the data relating the $X_i$'s.
+ The markov net consists of a set of features over the data $f \in \sF$.
+ Here $\sF$ is the space of all possible features extracted over families of variables $X_i$.
+
+The likelihood of a single joint assignment $\bX = \bx$, where $\bx$ corresponds to some $h \in \sH$, is the normalized soft max of the inner product of the weights of our model $w$ (not given in the query, but learned over time) and the feature values at $\bx$.
+
+
+\[P(\bX = \bx) = \frac{1}{Z}exp(\sum_k w_k^Tf_k(\bx_{\{k\}}))\]
+\[Z = \sum_{x\in\sX} exp(\sum_k w_k^Tf_k(\bx_{\{k\}}))\]
+
+To provide compact representation for the rest of the paper, we will say that each query is provided a \textit{graph}, which is a tuple of variables and feature functions $G = ([X_1, \ldots, X_n], [f_1, \ldots, f_m])$.
+
+
+\subsection{The Crowd Workers}
+
+Our learner will be allowed to query humans for additional certainty about individual random variables (nodes) $X_i$.
+ Humans will exist in a pool $\sP$.
+ An individual human $o_i \in \sP$ (for ``oracle'', using the loosest possible definition of oracle) has a model for expected behavior.
+Our learner will be allowed to query humans for additional certainty about individual random variables (nodes) $X_i$.
+ Humans will exist in a pool $\sP$.
+ An individual human $o_i \in \sP$ (for ``oracle'', using the loosest possible definition of oracle) has a model for expected behavior. Specifically, we model the $o_i$ expected delay to respond to a question, and the error function (i.e. response given the true state of the world $h_{\text{true}}$).
+
+For this work we use a simplified model of error, shared uniformly across crowd workers.
+ Previous work \cite{yan2011active} \cite{donmez2008proactive} \cite{golovin2010near} has shown that in an offline setting treating oracles uniformly leads to a loss, but in practice our pool is churning so quickly that we don't have time to learn accurate distinctions between workers.
+ We leave a solution to this problem to future work.
+
+When asked about variable $X_j$, human error is modeled as correct (returns $h_{\text{true}}(X_j)$) with probability $1-\epsilon$, and chosen uniformly at random from $D_j$ with probability $\epsilon$.
+ We use the notation $Q(o_i, X_j)$ to denote the response from asking human $i$ about random variable $j$.
+
+\begin{equation}
+    Q(o_i, X_j) \sim
+    \begin{cases}
+       \text{uniformly drawn from } D_j = \{1 \ldots K_j\}, & \text{with probability}\ \epsilon \\
+      h_{\text{true}}(X_j), & \text{otherwise}
+    \end{cases}
+ \end{equation}
+ 
+This answer arrives after a delay.
+ We model the amount of time the worker takes to answer with a gaussian, parameterized by $\mu$ and $\sigma$.
+ We use the notation $\sD(o_i, X_j)$ to denote the delay in response when asking human $i$ about random variable $j$.
+
+\[\sD(o_i, X_j) \sim \sN(\mu, \sigma^2)\]
+
+This is an imperfect model, since it assigns some mass to a negative response time, which is impossible, but given a large $\mu$ and relatively small $\sigma$ the mass assigned to $\sD(o_i, X_j) < 0$ is negligible, and it otherwise accurately reflects human response times.
+
+\subsection{The Loss Function}
+
+Our goal is to choose our querying strategy to minimize an arbitrary loss function:
+\[\sL(h_{\text{true}}, h, m, t)\]
+$\sL$ takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.
+ By tweaking $\sL$ practitioners applying our framework can move to arbitrary points on the cost-delay-accuracy tradeoff surface.
+ We deliberately make no assumptions about the form of $\sL$ while developing theory, and demonstrate several choices in our experiments.
+
+
+
+
+% Fun story description!
+%Eve has spent some time thinking about her labeling task and has constructed a model $p_{\theta}( \by \given \bx )$, the specifics of which are irrelevant at this point.
+%At some time $t$, a user of her system requests a data point $\bx\oft{t}$ to be labeled. The user expects a particular labeling $\ys$, though Eve and her system are not aware of this.
+%Instead, Eve returns the model's best prediction: $\byt = \argmax_{\by} p_{\theta\oft{t}}(\by \given \bx\oft{t})$. 
+%The user upon seeing this labeling implicitly (or explicitly) penalizes Eve for any inaccuracies using the loss function $\ell(\byt, \bys)$, either by not paying for her service or not using it in the future. 
+%Eve unfortunately never gets to see this feedback.
+

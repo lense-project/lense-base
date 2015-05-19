@@ -1,0 +1,87 @@
+\documentclass{article} % For LaTeX2e
+\usepackage{nips15submit_09,times}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{graphicx}
+\usepackage{bbm}
+\usepackage{mathrsfs}
+\usepackage{times,latexsym,amsfonts,amssymb,amsmath,graphicx,url,bbm,rotating,datetime}
+\usepackage{enumitem,multirow,hhline,stmaryrd,bussproofs,mathtools,siunitx}
+\usepackage{hyperref}
+\usepackage{scabby}
+\usepackage{tikz}
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+\input{macros}
+%\input std-macros.tex
+
+
+\title{Fake it until you make it:\\Asynchronous Bayesian Active Classification\\with Crowds}
+
+\author{%
+Keenon Werling\\
+Department of Computer Science\\
+Stanford University\\
+\texttt{keenon@cs.stanford.edu} \\
+\And
+Arun Chaganty\\
+Department of Computer Science\\
+Stanford University\\
+\texttt{chaganty@cs.stanford.edu} \\
+\And
+Percy Liang\\
+Department of Computer Science\\
+Stanford University\\
+\texttt{liang@cs.stanford.edu} \\
+\And
+Chris Manning\\
+Department of Computer Science\\
+Stanford University\\
+\texttt{manning@cs.stanford.edu} \\
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+
+\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+\usetikzlibrary{positioning}
+
+\maketitle
+
+\input{abstract}
+
+\input{todos}
+
+\input{intro}
+\input{related}
+\input{problem}
+\input{async}
+\input{partial-monitoring}
+\input{experiments}
+\input{conclusion}
+
+% I don't think we need this just yet.
+%\subsubsection*{Acknowledgments}
+%
+%\todo{Arun: fill in your sponsors etc}
+
+\subsubsection*{References}
+
+\bibliographystyle{plain}
+\bibliography{ref,all}
+
+\end{document}
