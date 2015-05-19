@@ -6,7 +6,7 @@ import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
-import edu.stanford.lense_base.server.{RealHumanHCUPool, MulticlassQuestion, WorkUnitServlet, WebWorkUnit}
+import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
 import scala.concurrent.{Await, Promise}
@@ -39,11 +39,21 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         toLabeledGraph(pair._1, pair._2)
       )
     )
+    // Add budget as initial budget
+    lenseEngine.addBudget(budget)
   }
 
   initialize()
 
   def useCaseReportSubpath : String = ""
+
+  /**
+   * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
+   * asking humans for help, and revert to simple machine learning, after it has exhausted the budget.
+   *
+   * @return amount in dollars to use as budget
+   */
+  def budget : Double
 
   /**
    * This function takes an Input
@@ -134,6 +144,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       i += 1
       if (i % 10 == 0) {
         analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+      }
+    }
+
+    // Send home all of our real human labelers when we're done with all of our predictions
+
+    for (hcu <- hcuPool) {
+      hcu match {
+        case client : HCUClient => client.completeAndPay()
+        case _ =>
       }
     }
 

@@ -64,4 +64,12 @@ class ResponseTypeClassification extends LenseMulticlassUseCase[String] {
   override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
     cost
   }
+
+  /**
+   * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
+   * asking humans for help, and revert to simple machine learning, after it has exhausted the budget.
+   *
+   * @return amount in dollars to use as budget
+   */
+  override def budget: Double = 10.0
 }

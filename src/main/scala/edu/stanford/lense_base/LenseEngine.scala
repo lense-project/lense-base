@@ -4,6 +4,7 @@ import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
 import edu.stanford.lense_base.util.CaseClassEq
+import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
 import scala.concurrent.{Promise, Future}
@@ -21,6 +22,58 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
 
+  // This is a safety stop, where runs can be given specific budgets that they are not intended to cross.
+  var budget = 0.0
+  var reserved = mutable.Map[Any, Double]()
+  var spent = 0.0
+
+  def addBudget(amount : Double) = synchronized {
+    budget += amount
+  }
+
+  def tryReserveBudget(amount : Double, owner : Any) : Boolean = synchronized {
+    if (budget >= amount) {
+      budget -= amount
+      reserved.put(owner, reserved.getOrElse(owner, 0.0) + amount)
+      true
+    }
+    else {
+      false
+    }
+  }
+
+  def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = synchronized {
+    if (amount == 0) {
+      if (reserved.contains(owner)) {
+        budget += reserved(owner)
+        reserved.put(owner, 0.0)
+      }
+    }
+    else {
+      if (reserved(owner) >= amount) {
+        val totalReserved = reserved(owner)
+        val amountRemaining = totalReserved - amount
+        budget += amountRemaining
+        reserved.put(owner, 0.0)
+
+        // If we ever hit a round 0, then send away all our workers, because we have no more money to pay them with...
+        if (budget == 0) {
+          for (hcu <- hcuPool.hcuPool) {
+            hcu match {
+              case client : HCUClient =>
+                client.completeAndPay()
+              case _ =>
+            }
+          }
+        }
+      }
+      else {
+        throw new IllegalStateException("Trying to spend budget that was never properly reserved")
+      }
+    }
+  }
+
+  initGamePlayer.engine = this
   var gamePlayer = initGamePlayer
 
   var runLearningThread = true
@@ -186,6 +239,9 @@ case class InFlightPrediction(engine : LenseEngine,
 
     optimalMove match {
       case _ : TurnInGuess =>
+        // Return any money we had reserved when considering options
+        engine.spendReservedBudget(0.0, engine.gamePlayer, hcuPool)
+
         // Make sure no future gameplayerMoves happen
         turnedIn = true
         hcuPool.removeHCUArrivedCallback(this)
@@ -232,6 +288,9 @@ case class InFlightPrediction(engine : LenseEngine,
               engine.pastGuesses.size))
           })
       case obs : MakeHumanObservation =>
+        // Commit the engine to actually spending the money, and return anything we didn't use
+        engine.spendReservedBudget(obs.hcu.cost, engine.gamePlayer, hcuPool)
+
         // Create a new work unit
         val workUnit = askHuman(obs.node, obs.hcu)
 
