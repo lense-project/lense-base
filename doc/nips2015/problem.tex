@@ -80,10 +80,10 @@ Under this assumption, the expected utility of a single measurement operator $\s
 The measurement operator to take is simply $\sigma^* = \argmin_{\sigma \in \Sigma} U(\sigma)$.
 
 \begin{algorithm}
-  \label{algo:expected-utility}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
   \caption{Computing expected utility $U(\sigma)$}
+  \label{algo:expected-utility}
   \begin{algorithmic}[1]
     \REQUIRE Measurement operator $\sigma$, input $\bx$, models $p_\theta(\by \given \bx)$ and $p_\theta(\by \given \bx, \tau, \sigma)$
     \ENSURE Expected utility $U(\sigma)$
