@@ -7,7 +7,7 @@ A ``user'' of the system is the person providing input that needs to be labeled.
 Finally, ``labelers'' in the system provide potentially noisy partial labels (or measurements) on inputs from the user. \todo{diagram}
 % Note that the designer, user and labeler can all be the same person.
 
-\paragraph{Measuring progress.}
+\subsection{Measuring progress.}
 
 First, let's look at how answers produced by the system are evaluated.
 In the conventional supervised setting, a natural metric is the accuracy of our predictions relative to the true labels in the training data.
@@ -26,7 +26,7 @@ Our goal is to minimize the objective
   \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(\sigma\oft{t}).
 \end{align*}
 
-\paragraph{Model}
+\subsection{Model}
 
 We consider the family of conditional exponential models:
 \begin{align*}
@@ -56,7 +56,7 @@ We assume that incorporating these measurements can be done efficiently, i.e.\ m
   &\propto \exp(\theta^\top \phi(x, y) + h_\sigma(\tau - \sigma(x,y))).
 \end{align*}
 
-\paragraph{Measurement selection}
+\subsection{Measurement selection}
 
 The key computation we need to perform is to choose a measurement action.
 Assume that $\Sigma = \{\sigma_0, \sigma_1, \dots, \sigma_n\}$ are the set of valid measurement operations one can perform. 
@@ -70,49 +70,62 @@ U(\sigma)
       \E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))] \right] + C(\sigma),
 \end{align*}
 where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$ is the maximum likelihood labeling $C(\sigma)$ is the cost function.
+Without loss of generality, assume that the null measurement is free: $C(\sigma_0) = 0$.
+Intuitively, this ensures that we will only ever choose to measure something if the expected reduction in risk is more than the cost of executing the measurement.
 
-Intuitively, we will only ever choose to measure something if the expected utility between labellings is more than the cost of executing the measurement.
+Let the label $\by$ have $n$ components: $\by = (y_1, ..., y_n)$.
+Further, let us assume that the loss function $\ell$ decomposes over labels: $\ell(\by, \byt) = \sum_{i=1}^n \ell(y_i, \yt_i)$. 
+Under this assumption, the expected utility of a single measurement operator $\sigma$ can be efficiently computed with $2L$ inference calls\footnote{The marginal inference query in lines 6 and 7 of \algorithmref{expected-utility} can be shared.} to the model using \algorithmref{expected-utility}.
 
-\paragraph{Asynchronous requests}
+The measurement operator to take is simply $\sigma^* = \argmin_{\sigma \in \Sigma} U(\sigma)$.
 
-For the system to be real-time, we need to dispatch multiple measurement queries at the same time. Thus, we must reason about what portfolio of measurements would be optimal.
+\begin{algorithm}
+  \label{algo:expected-utility}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \caption{Computing expected utility $U(\sigma)$}
+  \begin{algorithmic}[1]
+    \REQUIRE Measurement operator $\sigma$, input $\bx$, models $p_\theta(\by \given \bx)$ and $p_\theta(\by \given \bx, \tau, \sigma)$
+    \ENSURE Expected utility $U(\sigma)$
+    \STATE Let $y_\sigma$ be label(s) measured by operator $\sigma$.
+    \STATE Compute $p_\theta(y_\sigma \given \bx)$ using marginal inference.
+    \STATE Set $p_\theta(\tau \given \bx) \gets p_\theta(\tau \given y_\sigma, \bx) p_\theta(y_\sigma \given \bx)$.
+    \STATE Initialize $u \gets (0, \dots, 0)$.
+    \FORALL{$i \in [L]$}
+    \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
+    \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau = i, \sigma)$ for $j \in [n]$ using marginal inference.
+    \STATE Update $u[i] \gets p_\theta(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
+    \ENDFOR
+    \STATE Return the expected utility: $\frac{\sum_{i=1}^L u[i] p_\theta(\tau = i \given x)}{\sum_{i=1}^L p_\theta(\tau = i \given x)}$
+  \end{algorithmic}
+\end{algorithm}
 
-Iterated expectations work.
+\subsection{Asynchronous requests}
 
-\paragraph{Optimization}
+For the system to be real-time, we need to dispatch multiple measurement queries at the same time.
+Thus, we must reason about what portfolio of measurements would be optimal.
+We consider two schemes:
 
-On receiving a label, we optimize to train our loss.
+\paragraph{Next best policy}
+In this scheme we do not reason about the future and choose subsequent measurement operators by going down the list.
 
-Q: Should we do gradients when we don't see data, basically doing an unsupervised update?
+\paragraph{Lookahead policy}
 
-\section{Problem definition}
+In this scheme we lookahead by reasoning about what is the best next measurement operator to apply after we get the measurement for the current measurement operator.
+\algorithmref{expected-utility} can be suitably updated by enumerating
+possible occurrences for $\tau_1, \tau_2, \dots, \tau_d$, for $d$ rounds of measurement.
+This leads $O(L^d)$ inference calls.
+As an approximation, we use a beam of size $k$, leading to $O(dkL)$ inference calls.
 
-In summary, we will receive a stream of queries, and a pool of humans.
- We will be asked to minimized our risk (aka expected loss) in the Bayesian Decision Theoretic sense, over some loss function $\sL(h_{\text{true}}, h, m, t)$ that takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.  
+\subsection{Optimization}
 
-\subsection{The Queries}
+On receiving a label, we would like to optimize to train our loss.
+Because we have only partial labeling, the problem is in fact unsupervised.
+We use the stepwise online EM algorithm \cite{liang09online}.
 
-We receive a stream of queries.
- The world, in the context of a query, is composed of vector of $n$ random variables, $[X_1 \ldots X_n] \in \sX$, where $\sX$ is the input domain.
- Each variable $X_i$ is categorical with domain $D_i = [1 \ldots K_i]$, so the size of domain $|D_i| = K_i$, and $K_i$ need not equal $K_j$ if $i \neq j$.
+\section{Modeling Crowd Workers}
 
-Each query asks us to distinguish between a number of possible \textit{hypotheses} $h \in \sH$, where $\sH$ is the space of all possible assignments to the $X_i$'s, so $\sH = D_1 \times \ldots \times D_n$.
- Each hypothesis $h$ corresponds to a unique assignment to a set of query variables $[X_1 = x_1, \ldots, X_n = x_n]$. 
-
-Each query is further given a markov network to describe the features of the data relating the $X_i$'s.
- The markov net consists of a set of features over the data $f \in \sF$.
- Here $\sF$ is the space of all possible features extracted over families of variables $X_i$.
-
-The likelihood of a single joint assignment $\bX = \bx$, where $\bx$ corresponds to some $h \in \sH$, is the normalized soft max of the inner product of the weights of our model $w$ (not given in the query, but learned over time) and the feature values at $\bx$.
-
-
-\[P(\bX = \bx) = \frac{1}{Z}exp(\sum_k w_k^Tf_k(\bx_{\{k\}}))\]
-\[Z = \sum_{x\in\sX} exp(\sum_k w_k^Tf_k(\bx_{\{k\}}))\]
-
-To provide compact representation for the rest of the paper, we will say that each query is provided a \textit{graph}, which is a tuple of variables and feature functions $G = ([X_1, \ldots, X_n], [f_1, \ldots, f_m])$.
-
-
-\subsection{The Crowd Workers}
+\todo{(arun): rewrite}
 
 Our learner will be allowed to query humans for additional certainty about individual random variables (nodes) $X_i$.
  Humans will exist in a pool $\sP$.
@@ -151,14 +164,4 @@ Our goal is to choose our querying strategy to minimize an arbitrary loss functi
 $\sL$ takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.
  By tweaking $\sL$ practitioners applying our framework can move to arbitrary points on the cost-delay-accuracy tradeoff surface.
  We deliberately make no assumptions about the form of $\sL$ while developing theory, and demonstrate several choices in our experiments.
-
-
-
-
-% Fun story description!
-%Eve has spent some time thinking about her labeling task and has constructed a model $p_{\theta}( \by \given \bx )$, the specifics of which are irrelevant at this point.
-%At some time $t$, a user of her system requests a data point $\bx\oft{t}$ to be labeled. The user expects a particular labeling $\ys$, though Eve and her system are not aware of this.
-%Instead, Eve returns the model's best prediction: $\byt = \argmax_{\by} p_{\theta\oft{t}}(\by \given \bx\oft{t})$. 
-%The user upon seeing this labeling implicitly (or explicitly) penalizes Eve for any inaccuracies using the loss function $\ell(\byt, \bys)$, either by not paying for her service or not using it in the future. 
-%Eve unfortunately never gets to see this feedback.
 
