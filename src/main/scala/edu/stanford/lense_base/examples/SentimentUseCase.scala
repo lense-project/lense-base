@@ -2,6 +2,7 @@ package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
+import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -16,6 +17,18 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train")
   lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
 
+  lazy val word2vec : java.util.Map[String, Array[Double]] = try {
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
+  } catch {
+    case e : Throwable =>
+      // Couldn't load word vectors
+      System.err.println("*** COULDN'T LOAD WORD VECTORS")
+      e.printStackTrace()
+      // return an empty map
+      new java.util.HashMap[String, Array[Double]]()
+  }
+
   override def labelTypes: Set[String] = Set("POS", "NEG")
 
   override def getHumanVersionOfLabel(label: String): String = label match {
@@ -27,8 +40,28 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   override def initialTrainingData : List[(String, String)] = trainSet
 
   override def getFeatures(input: String): Map[String, Double] = {
-    // Stupid bag of words features... this almost certainly needs to get more sophisticated
-    input.split(" ").map(tok => (tok, 1.0)).toMap
+    // Stupid bag of words features...
+    val basicFeatures = input.split(" ").map(tok => (tok, 1.0)).toMap
+
+    // Also normalized word embedding for whole document
+    val embedding = new Array[Double](300)
+    for (tok <- input.split(" ")) {
+      word2vec.get(tok) match {
+        case vec : Array[Double] =>
+          (0 to vec.length-1).foreach(i => embedding(i) += vec(i))
+        case null =>
+      }
+    }
+
+    val squareSum = embedding.map(x => x*x).sum
+    val normalized = embedding.map(_ / squareSum)
+
+    if (squareSum > 0) {
+      (0 to normalized.length-1).map(i => "word2vec" + i -> normalized(i)).toMap ++ basicFeatures
+    }
+    else {
+      basicFeatures
+    }
   }
 
   override def getHumanQuestion(input: String): String = {
@@ -62,7 +95,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
   // and shuffles the order of the results
-  def loadData(path : String, limitSize : Int = 200) : List[(String, String)] = {
+  def loadData(path : String, limitSize : Int = 500) : List[(String, String)] = {
     val examples = ListBuffer[(String, String)]()
 
     var numNeg = 0

@@ -21,8 +21,8 @@ class CraigslistUseCase extends LenseSequenceUseCase {
   lazy val testSet : List[(List[String],List[String])] = loadData("data/craigslist/ads_test.txt")
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
