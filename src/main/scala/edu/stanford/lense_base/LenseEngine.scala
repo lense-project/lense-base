@@ -258,16 +258,19 @@ case class InFlightPrediction(engine : LenseEngine,
           triple._2.revokeWorkUnit(triple._3)
         })
 
-        // Store the original request graph, with our guessed labels, in our pastGuesses stream
-        // Learning from this should be convex, so provide at least a good initialization for later values
-        gameState.originalGraph.nodes.foreach(n => {
-          n.observedValue = mapEstimate(gameState.oldToNew(n))
-        })
-
         engine.pastGuesses.synchronized {
           // If we queried at least 2 humans for this one, hopefully minimizes noise in training data
           if (gameState.graph.nodes.size > gameState.originalGraph.nodes.size + 1) {
-            engine.pastGuesses += gameState.originalGraph
+            // Store the original request graph, with our guessed labels, in our pastGuesses stream
+            // Learning from this should be convex, so provide at least a good initialization for later values
+            val toStoreGraphPair = gameState.originalGraph.clone()
+            val toStoreGraph = toStoreGraphPair._1
+            val toStoreOldToNew = toStoreGraphPair._2
+
+            gameState.originalGraph.nodes.foreach(n => {
+              toStoreOldToNew(n).observedValue = mapEstimate(gameState.oldToNew(n))
+            })
+            engine.pastGuesses += toStoreGraph
           }
           engine.pastQueryStructure += gameState.graph
           // Wake up the parallel weights trainer:

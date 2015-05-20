@@ -79,14 +79,9 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @return
    */
   override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, time: Long): Double = {
-    if (mostLikelyGuesses.size == 0) {
-      lossFunction(List(), List(), cost, time)
-    }
-    else {
-      val sentence = mostLikelyGuesses.head._1.payload.asInstanceOf[(List[String], Int)]._1
-      val translatedGuesses = mostLikelyGuesses.map(triple => (triple._1.payload.asInstanceOf[(List[String], Int)]._2, triple._2, triple._3))
-      lossFunction(sentence, translatedGuesses, cost, time)
-    }
+    val sentence = mostLikelyGuesses.head._1.payload.asInstanceOf[(List[String], Int)]._1
+    val translatedGuesses = mostLikelyGuesses.map(triple => (triple._1.payload.asInstanceOf[(List[String], Int)]._2, triple._2, triple._3))
+    lossFunction(sentence, translatedGuesses, cost, time)
   }
 
   override def getCorrectLabel(node : GraphNode, goldOutput : List[String]) : String = {

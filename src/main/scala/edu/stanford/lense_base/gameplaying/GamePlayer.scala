@@ -201,13 +201,19 @@ case class GameState(graph : Graph,
   var oldToNew : Map[GraphNode,GraphNode] = graph.nodes.map(n => (n,n)).toMap
 
   // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
-  lazy val marginals : Map[GraphNode, Map[String, Double]] = graph.marginalEstimate()
+  lazy val marginals : Map[GraphNode, Map[String, Double]] = {
+    graph.marginalEstimate()
+  }
 
   def loss(hypotheticalExtraDelay : Long = 0) : Double = {
     val bestGuesses = marginals.toList.map(pair => {
       val maxPair = pair._2.maxBy(_._2)
       (pair._1, maxPair._1, maxPair._2)
     })
+
+    if (bestGuesses.size == 0) {
+      throw new IllegalStateException("BUG: Shouldn't have a bestGuesses with size 0")
+    }
     lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 

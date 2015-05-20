@@ -62,7 +62,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
   // and shuffles the order of the results
-  def loadData(path : String, limitSize : Int = 5) : List[(String, String)] = {
+  def loadData(path : String, limitSize : Int = 200) : List[(String, String)] = {
     val examples = ListBuffer[(String, String)]()
 
     var numNeg = 0
