@@ -4,6 +4,7 @@ import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
 import edu.stanford.lense_base.util.CaseClassEq
+import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
 import scala.concurrent.{Promise, Future}
@@ -21,15 +22,97 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   val pastGuesses = mutable.ListBuffer[Graph]()
   val pastQueryStructure = mutable.ListBuffer[Graph]()
 
-  def gamePlayer = initGamePlayer
+  // This is a safety stop, where runs can be given specific budgets that they are not intended to cross.
+  var budget = 0.0
+  var reserved = mutable.Map[Any, Double]()
+  var spent = 0.0
+
+  val budgetLock = new Object()
+
+  def addBudget(amount : Double) = budgetLock.synchronized {
+    budget += amount
+  }
+
+  def tryReserveBudget(amount : Double, owner : Any) : Boolean = budgetLock.synchronized {
+    if (budget >= amount) {
+      budget -= amount
+      reserved.put(owner, reserved.getOrElse(owner, 0.0) + amount)
+      true
+    }
+    else {
+      false
+    }
+  }
+
+  def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = budgetLock.synchronized {
+    if (amount == 0) {
+      if (reserved.contains(owner)) {
+        budget += reserved(owner)
+        System.err.println("Reclaimed $"+reserved(owner)+" from reserve, budget remaining unclaimed: $"+budget)
+        reserved.put(owner, 0.0)
+      }
+    }
+    else {
+      if (reserved(owner) >= amount) {
+        val totalReserved = reserved(owner)
+        val amountRemaining = totalReserved - amount
+        budget += amountRemaining
+        reserved.put(owner, 0.0)
+
+        System.err.println("Spent $"+amount+", budget remaining unclaimed: $"+budget)
+
+        // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
+        if (budget < 0.001) {
+          for (hcu <- hcuPool.hcuPool) {
+            hcu match {
+              case client : HCUClient =>
+                client.completeAndPay()
+              case _ =>
+            }
+          }
+        }
+      }
+      else {
+        throw new IllegalStateException("Trying to spend budget that was never properly reserved")
+      }
+    }
+  }
+
+  initGamePlayer.engine = this
+  var gamePlayer = initGamePlayer
+
+  var runLearningThread = true
+
+  var currentModelLoss = 0.0
+
+  def currentLoss() : Double = {
+    currentModelLoss
+  }
+
+  // You probably don't want to call this.
+  // This turns off the learning thread, and will prevent your model from updating as it gains experience
+  def turnOffLearning() : Unit = {
+    runLearningThread = false
+    // Wake up the thread, so it can die
+    pastGuesses.synchronized {
+      pastGuesses.notify()
+    }
+  }
+
+  var numSwapsSoFar = 0
+  val modelRegularization = 0.5
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
-  new Thread{
+  new Thread {
     override def run() = {
       var trainedOnGuesses = 0
-      while (true) {
+      while (runLearningThread) {
         if (pastGuesses.size > trainedOnGuesses) {
-          learnHoldingPastGuessesConstant(1.0)
+          System.err.println("Retraining model")
+          // Important to think about how to correctly handle removing regularization over time, or not...
+          learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
+          System.err.println("Hot swapping model")
+          numSwapsSoFar += 1
           trainedOnGuesses = pastGuesses.size
         }
         else {
@@ -41,15 +124,19 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     }
   }.start()
 
-  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[Map[GraphNode, String]] = {
-    val promise = Promise[Map[GraphNode,String]]()
+  def getModelRegularization(dataSize : Int) : Double = {
+    modelRegularization / Math.log(dataSize)
+  }
+
+  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
+    val promise = Promise[(Map[GraphNode,String], PredictionSummary)]()
     InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
     promise
   }
 
-  def learnHoldingPastGuessesConstant(regularization : Double = 1.0) = this.synchronized {
+  def learnHoldingPastGuessesConstant(l2regularization : Double = getModelRegularization(pastGuesses.size)) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    stream.learn(pastGuesses, regularization, clearOptimizer = true)
+    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
@@ -100,26 +187,51 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   def addTrainingData(labels : List[Graph]) : Unit = {
     pastGuesses ++= labels
     println("Doing initial learning...")
-    learnHoldingPastGuessesConstant()
+    learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
     println("Finished")
   }
 }
+
+case class PredictionSummary(loss : Double,
+                             numRequests : Int,
+                             numRequestsCompleted : Int,
+                             numRequestsFailed : Int,
+                             requestCost : Double,
+                             timeRequired : Long,
+                             initialMinConfidence : Double,
+                             initialMaxConfidence : Double,
+                             initialAvgConfidence : Double,
+                             numSwapsSoFar : Int,
+                             modelTrainingLoss : Double,
+                             numExamplesSeen : Int)
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
                               askHuman : (GraphNode, HumanComputeUnit) => WorkUnit,
                               hcuPool : HCUPool,
                               lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
-                              returnPromise : Promise[Map[GraphNode, String]]) extends CaseClassEq {
+                              returnPromise : Promise[(Map[GraphNode, String], PredictionSummary)]) extends CaseClassEq {
   // Create an initial game state
   var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
 
   var turnedIn = false
 
+  var numRequests = 0
+  var numRequestsCompleted = 0
+  var numRequestsFailed = 0
+  var totalCost = 0.0
+
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
     gameplayerMove()
   })
+
+  val confidenceSet = originalGraph.marginalEstimate().map(pair => {
+    pair._2.maxBy(_._2)._2
+  })
+  val initialAverageConfidence = confidenceSet.sum / confidenceSet.size
+  val initialMinConfidence = confidenceSet.min
+  val initialMaxConfidence = confidenceSet.max
 
   // Initialize with a move
   gameplayerMove()
@@ -132,6 +244,9 @@ case class InFlightPrediction(engine : LenseEngine,
 
     optimalMove match {
       case _ : TurnInGuess =>
+        // Return any money we had reserved when considering options
+        engine.spendReservedBudget(0.0, engine.gamePlayer, hcuPool)
+
         // Make sure no future gameplayerMoves happen
         turnedIn = true
         hcuPool.removeHCUArrivedCallback(this)
@@ -150,24 +265,43 @@ case class InFlightPrediction(engine : LenseEngine,
         })
 
         engine.pastGuesses.synchronized {
-          engine.pastGuesses += gameState.originalGraph
+          // If we queried at least 2 humans for this one, hopefully minimizes noise in training data
+          if (gameState.graph.nodes.size > gameState.originalGraph.nodes.size + 1) {
+            engine.pastGuesses += gameState.originalGraph
+          }
           engine.pastQueryStructure += gameState.graph
           // Wake up the parallel weights trainer:
           engine.pastGuesses.notifyAll()
         }
 
         returnPromise.complete(Try {
-            mapEstimate.map(pair => {
+            (mapEstimate.map(pair => {
               val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
               if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
               (matches(0), pair._2)
-            })
+            }), PredictionSummary(gameState.loss(),
+              numRequests,
+              numRequestsCompleted,
+              numRequestsFailed,
+              totalCost,
+              System.currentTimeMillis() - gameState.startTime,
+              initialMinConfidence,
+              initialMaxConfidence,
+              initialAverageConfidence,
+              engine.numSwapsSoFar,
+              engine.currentLoss(),
+              engine.pastGuesses.size))
           })
       case obs : MakeHumanObservation =>
+        // Commit the engine to actually spending the money, and return anything we didn't use
+        engine.spendReservedBudget(obs.hcu.cost, engine.gamePlayer, hcuPool)
+
         // Create a new work unit
         val workUnit = askHuman(obs.node, obs.hcu)
 
         println("Asking human about "+obs.node)
+
+        numRequests += 1
 
         // When the work unit returns, do the following
         workUnit.promise.future.onComplete(t => {
@@ -176,11 +310,14 @@ case class InFlightPrediction(engine : LenseEngine,
               // If the workUnit succeeded, move the gamestate
               println("Received response for "+obs.node+": "+t.get)
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
+              numRequestsCompleted += 1
+              totalCost += obs.hcu.cost
             }
             else {
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)
               // If the workUnit failed, then fail appropriately
               gameState = gameState.getNextStateForFailedRequest(obs.node, obs.hcu, workUnit)
+              numRequestsFailed += 1
             }
           }
           // On every change we should recurse

@@ -11,6 +11,11 @@ class HCUPool {
   val hcuPool = mutable.HashSet[HumanComputeUnit]()
   val callbacks = mutable.HashMap[AnyRef, () => Unit]()
 
+  var numWorkUnitsRequested = 0
+  var numWorkUnitsCompleted = 0
+  var numWorkUnitsRevoked = 0
+  var totalMoneySpent = 0.0
+
   def addHCU(hcu : HumanComputeUnit): Unit = {
     hcuPool.synchronized {
       hcuPool.add(hcu)

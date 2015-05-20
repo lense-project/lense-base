@@ -68,15 +68,19 @@ trait HumanComputeUnit {
       throw new IllegalStateException("Shouldn't be finishing something that isn't our current work")
     }
     if (!workUnit.isRevoked) {
+      workUnit.finished(this)
+      if (workUnit.promise.isCompleted) {
+        throw new IllegalStateException("Shouldn't be trying to double-complete a work unit! INVESTIGATE THIS!")
+      }
       workUnit.promise.complete(Try {
         answer
       })
-    }
-
-    workQueue.synchronized {
       if (workUnit == currentWork) {
         currentWork = null
       }
+    }
+
+    workQueue.synchronized {
       // Wake up the work performing code
       workQueue.notify()
     }
@@ -91,7 +95,9 @@ trait HumanComputeUnit {
   }
 
   def estimateTimeToFinishQueue : Long = {
-    estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
+    workQueue.synchronized {
+      estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
+    }
   }
 
   def estimateRequiredTimeIncludingQueue(node : GraphNode) : Long = {

@@ -1,9 +1,13 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, LookaheadOneHeuristic, GamePlayer}
+import java.io.{FileWriter, BufferedWriter, File}
+
+import com.github.keenon.minimalml.GNUPlot
+import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
-import edu.stanford.lense_base.server.{RealHumanHCUPool, MulticlassQuestion, WorkUnitServlet, WebWorkUnit}
+import edu.stanford.lense_base.mturk.HITCreator
+import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
 import scala.concurrent.{Await, Promise}
@@ -17,10 +21,24 @@ import scala.concurrent.ExecutionContext.Implicits.global
  * This holds the abstract guts of a use case for Lense, which should help minimize crufty overhead when generating new
  * use cases. You can of course still use LenseEngine directly, but this might be a time-saver in general
  */
-abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
+abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   lazy val graphStream : GraphStream = new GraphStream()
   lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
+
+  lazy val ensureWorkServer = {
+    WorkUnitServlet.engine = lenseEngine
+    System.err.println("Starting server")
+    WorkUnitServlet.server
+  }
+
+  def makeHITAndWaitFor(numberOfHumans : Int) = {
+    System.err.println("Creating MTurk HITs...")
+    HITCreator.createHIT(0.10, numberOfHumans*2)
+
+    System.err.println("Waiting for "+numberOfHumans+" to connect...")
+    WorkUnitServlet.waitForSimultaneousConnections(numberOfHumans)
+  }
 
   def initialize() : Unit = {
     // Add the training data as a list of labeled graphs
@@ -29,9 +47,21 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
         toLabeledGraph(pair._1, pair._2)
       )
     )
+    // Add budget as initial budget
+    lenseEngine.addBudget(budget)
   }
 
   initialize()
+
+  def useCaseReportSubpath : String = ""
+
+  /**
+   * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
+   * asking humans for help, and revert to simple machine learning, after it has exhausted the budget.
+   *
+   * @return amount in dollars to use as budget
+   */
+  def budget : Double
 
   /**
    * This function takes an Input
@@ -110,6 +140,33 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   //
   ////////////////////////////////////////////////
 
+  def progressivelyAnalyze(goldPairs : List[(Input, Output)],
+                           fn : ((Input, Output)) => (Graph, Map[GraphNode,String], Map[GraphNode,String], PredictionSummary),
+                           hcuPool : HCUPool,
+                           saveTitle : String) = {
+    val mutableAnalysis = mutable.ListBuffer[(Graph, Map[GraphNode,String], Map[GraphNode,String], PredictionSummary)]()
+
+    var i = 0
+    for (pair <- goldPairs) {
+      mutableAnalysis.+=(fn(pair))
+      i += 1
+      if (i % 10 == 0) {
+        analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+      }
+    }
+
+    // Send home all of our real human labelers when we're done with all of our predictions
+
+    for (hcu <- hcuPool.hcuPool) {
+      hcu match {
+        case client : HCUClient => client.completeAndPay()
+        case _ =>
+      }
+    }
+
+    analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+  }
+
   /**
    * This will run a test against artificial humans, with a "probability epsilon choose uniformly at random" error
    * function. It will print results to stdout.
@@ -122,22 +179,95 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                humanDelayMean : Int,
                                humanDelayStd : Int,
                                workUnitCost : Double,
-                               startNumArtificialHumans : Int) : Unit = {
+                               startNumArtificialHumans : Int,
+                               saveTitle : String) : Unit = {
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
 
-    analyzeOutput(goldPairs.map(pair => {
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
-      renderClassification(graph, goldMap, guessMap)
-      (graph, goldMap, guessMap)
-    }))
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
+      renderClassification(graph, goldMap, guessMap._1)
+      (graph, goldMap, guessMap._1, guessMap._2)
+    }, hcuPool, saveTitle)
 
     hcuPool.kill()
+
+    System.exit(0)
+  }
+
+  def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)]) = {
+    var numSwapsSoFar = 0
+
+    progressivelyAnalyze(goldPairs, pair => {
+      val graph = toGraph(pair._1)
+      val goldMap = toGoldGraphLabels(graph, pair._2)
+
+      val confidenceSet = graph.marginalEstimate().map(pair => {
+        pair._2.maxBy(_._2)._2
+      })
+      val initialAverageConfidence = confidenceSet.sum / confidenceSet.size
+      val initialMinConfidence = confidenceSet.min
+      val initialMaxConfidence = confidenceSet.max
+
+      val guessMap = graph.mapEstimate()
+
+      // Retrain after each example
+      val cloneGraphPair = graph.clone()
+      for (n <- graph.nodes) {
+        cloneGraphPair._2(n).observedValue = goldMap(n)
+      }
+      lenseEngine.pastGuesses += cloneGraphPair._1
+
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
+
+      val idx = goldPairs.indexOf(pair)
+      if ((idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
+        lenseEngine.learnHoldingPastGuessesConstant()
+        numSwapsSoFar += 1
+      }
+
+      renderClassification(graph, goldMap, guessMap)
+      val loss = 0
+      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size))
+    }, null, "offline_baseline")
+
+    System.exit(0)
+  }
+
+  def testBaselineForAllHuman(goldPairs : List[(Input, Output)],
+                              humanErrorRate : Double,
+                              humanDelayMean : Int,
+                              humanDelayStd : Int,
+                              workUnitCost : Double,
+                              startNumArtificialHumans : Int,
+                              numQueriesPerNode : Int) : Unit = {
+    val rand = new Random()
+    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
+
+    lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
+    lenseEngine.turnOffLearning()
+
+    progressivelyAnalyze(goldPairs, pair => {
+      val graph = toGraph(pair._1)
+      val goldMap = toGoldGraphLabels(graph, pair._2)
+      for (node <- graph.nodes) {
+        if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
+      }
+      val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
+      renderClassification(graph, goldMap, guessMap._1)
+      (graph, goldMap, guessMap._1, guessMap._2)
+    }, hcuPool, "all_human_"+numQueriesPerNode)
+
+    hcuPool.kill()
+
+    System.exit(0)
   }
 
   /**
@@ -147,21 +277,21 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
-    System.err.println("Starting server")
-    WorkUnitServlet.server
-    System.err.println("Waiting 5 seconds for you to connect")
-    Thread.sleep(5000)
+    ensureWorkServer
 
-    analyzeOutput(goldPairs.map(pair => {
+    makeHITAndWaitFor(2)
+
+    progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
       val goldMap = toGoldGraphLabels(graph, pair._2)
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
       val guessMap = Await.result(classifyWithRealHumans(graph, RealHumanHCUPool).future, 1000 days)
-      renderClassification(graph, goldMap, guessMap)
-      (graph, goldMap, guessMap)
-    }))
+      System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
+      renderClassification(graph, goldMap, guessMap._1)
+      (graph, goldMap, guessMap._1, guessMap._2)
+    }, RealHumanHCUPool, "real_human")
   }
 
   /**
@@ -175,7 +305,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
     val promise = Promise[Output]()
     classifyWithRealHumans(graphAndQuestion, RealHumanHCUPool).future.onComplete(t => {
       if (t.isSuccess) {
-        promise.complete(Try { toOutput(graphAndQuestion, t.get) })
+        promise.complete(Try { toOutput(graphAndQuestion, t.get._1) })
       }
       else {
         promise.complete(Try {
@@ -187,24 +317,174 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
   }
 
   // Prints some outputs to stdout that are the result of analysis
-  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String])]) : Unit = {
-    val confusion : mutable.Map[(String,String), Int] = mutable.Map()
+  private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "default") : Unit = {
     var correct = 0.0
     var incorrect = 0.0
-    for (triple <- l) {
-      for (node <- triple._1.nodes) {
-        val trueValue = triple._2(node)
-        val guessedValue = triple._3(node)
-        if (trueValue == guessedValue) correct += 1
-        else incorrect += 1
-        confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
+    var requested = 0.0
+    var completed = 0.0
+    var time = 0L
+    var tokens = 0
+    for (quad <- l) {
+      try {
+        for (node <- quad._1.nodes) {
+          val trueValue = quad._2(node)
+          val guessedValue = quad._3(node)
+          if (trueValue == guessedValue) correct += 1
+          else incorrect += 1
+          tokens += 1
+        }
+        requested += quad._4.numRequests
+        completed += quad._4.numRequestsCompleted
+        time += quad._4.timeRequired
+      }
+      catch {
+        case e : Throwable => {
+          System.err.println("Had issue while doing analysis")
+          e.printStackTrace()
+        }
       }
     }
     println("Accuracy: "+(correct/(correct+incorrect)))
-    println("Confusion: "+confusion)
+    println("Requested task completion percentage: "+(completed / requested))
+    println("Avg time/token: "+(time / tokens))
+    println("Avg requests/token: "+(requested / tokens))
+    println("Avg completed requests/token: "+(completed / tokens))
+
+    val resultsPrefix = "results/"+useCaseReportSubpath+(if (useCaseReportSubpath.endsWith("/")) "" else "/")
+
+    val f = new File(resultsPrefix+outputPath)
+    if (!f.exists()) f.mkdirs()
+    if (!f.isDirectory) {
+      f.delete()
+      f.mkdir()
+    }
+
+    val summaryResultFile = new File(resultsPrefix+outputPath+"/summary.txt")
+    if (!summaryResultFile.exists()) summaryResultFile.createNewFile()
+    val bw = new BufferedWriter(new FileWriter(summaryResultFile))
+    bw.write("Accuracy: "+(correct/(correct+incorrect))+"\n")
+    bw.write("Requested task completion percentage: "+(completed / requested)+"\n")
+    bw.write("Avg time/token: "+(time / tokens)+"\n")
+    bw.write("Avg requests/token: "+(requested / tokens)+"\n")
+    bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
+    bw.close()
+
+    val nodeTypes = l.flatMap(_._1.nodes).map(_.nodeType).distinct.toList
+    for (nodeType <- nodeTypes) {
+      // Get the confusion matrix
+      val confusion : mutable.Map[(String,String), Int] = mutable.Map()
+      for (quad <- l) {
+        for (node <- quad._1.nodes) {
+          if (node.nodeType eq nodeType) {
+            val trueValue = quad._2(node)
+            val guessedValue = quad._3(node)
+            confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
+          }
+        }
+      }
+      // Write out to the file
+      val confusionResultFile = new File(resultsPrefix+outputPath+"/confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv")
+      if (!confusionResultFile.exists()) confusionResultFile.createNewFile()
+      val cw = new BufferedWriter(new FileWriter(confusionResultFile))
+      // Write out header row
+      cw.write("COL=GUESS;ROW=GOLD")
+      for (guess <- nodeType.possibleValues) {
+        cw.write(",")
+        cw.write(guess)
+      }
+      cw.write("\n")
+
+      for (gold <- nodeType.possibleValues) {
+        cw.write(gold)
+        cw.write(",")
+        var j = 0
+        for (guess <- nodeType.possibleValues) {
+          if (j > 0) {
+            cw.write(",")
+          }
+          j += 1
+          cw.write(""+confusion.getOrElse((gold, guess), 0))
+        }
+        cw.write("\n")
+      }
+      cw.close()
+    }
+
+    def smoothTimeSeries(timeSeriesData : Array[Double], timeToAvg : Int) : Array[Double] = {
+      var sum = 0.0
+      val newData = new Array[Double](timeSeriesData.length)
+      for (i <- 0 to timeSeriesData.length-1) {
+        sum += timeSeriesData(i)
+        if (i < timeToAvg) {
+          newData.update(i, sum / (i+1))
+        }
+        else {
+          sum -= timeSeriesData(i-timeToAvg)
+          newData.update(i, sum / timeToAvg)
+        }
+      }
+      newData
+    }
+
+    val queries = (0 to l.size-1).toArray.map(i => i.asInstanceOf[Double])
+    val hotSwapIndexes : List[Int] = l.zipWithIndex.flatMap(pair => {
+      val idx = pair._2
+      if (idx > 0) {
+        val thisPrediction = pair._1._4
+        val lastPrediction = l(idx-1)._4
+        if (thisPrediction.numSwapsSoFar > lastPrediction.numSwapsSoFar) {
+          List(idx)
+        }
+        else {
+          List[Int]()
+        }
+      }
+      else {
+        List[Int]()
+      }
+    })
+    def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
+      val plot = new GNUPlot
+      plot.addLine(queries, timeSeriesData)
+      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 30))
+      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 100))
+      plot.title = xLabel+" vs time"
+      plot.yLabel = xLabel
+      plot.xLabel = "time"
+      for (idx <- hotSwapIndexes) {
+        plot.addVerticalLine(idx)
+      }
+      plot.saveAnalysis(resultsPrefix+outputPath+"/"+xLabel.replaceAll(" ","_")+"_plot")
+    }
+    plotAgainstQueries("loss per token", l.map(quad => quad._4.loss / quad._1.nodes.size).toArray)
+    plotAgainstQueries("cost per token", l.map(quad => quad._4.requestCost / quad._1.nodes.size).toArray)
+    plotAgainstQueries("queries per token", l.map(quad => quad._4.numRequests.asInstanceOf[Double] / quad._1.nodes.size).toArray)
+    plotAgainstQueries("delay per token", l.map(quad => quad._4.timeRequired.asInstanceOf[Double] / quad._1.nodes.size).toArray)
+    plotAgainstQueries("prior min confidence", l.map(quad => quad._4.initialMinConfidence).toArray)
+    plotAgainstQueries("prior max confidence", l.map(quad => quad._4.initialMaxConfidence).toArray)
+    plotAgainstQueries("prior avg confidence", l.map(quad => quad._4.initialAvgConfidence).toArray)
+    plotAgainstQueries("model training loss", l.map(quad => quad._4.modelTrainingLoss).toArray)
+    plotAgainstQueries("model training loss per example", l.map(quad => quad._4.modelTrainingLoss / quad._4.numExamplesSeen).toArray)
+    plotAgainstQueries("accuracy", l.map(quad => {
+      var localCorrect = 0.0
+      var localIncorrect = 0.0
+      for (node <- quad._1.nodes) {
+        val trueValue = quad._2(node)
+        val guessedValue = quad._3(node)
+        if (trueValue == guessedValue) localCorrect += 1
+        else localIncorrect += 1
+      }
+      localCorrect / (localCorrect + localIncorrect)
+    }).toArray)
+
+
+    println("Detailed charts printed to \""+resultsPrefix+outputPath+"\"")
   }
 
-  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[Map[GraphNode, String]] = {
+  private def classifyWithRealHumans(graph : Graph, hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
+    // Just ensure that we have a server up, this will start it if it isn't running yet
+    WorkUnitServlet.server
+    // Run actual prediction
     lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction)
   }
 
@@ -214,7 +494,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
                                            humanDelayMean : Int,
                                            humanDelayStd : Int,
                                            rand : Random,
-                                           hcuPool : HCUPool) : Promise[Map[GraphNode, String]] = {
+                                           hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
     lenseEngine.predict(graph, (n, hcu) => {
       val correct = getCorrectLabel(n, output)
       // Do the automatic error generation
@@ -227,7 +507,7 @@ abstract class LenseUseCase[Input <: AnyRef, Output <: AnyRef] {
       }
 
       val promise = Promise[String]()
-      val workUnit = ArtificialWorkUnit(promise, guess, n)
+      val workUnit = ArtificialWorkUnit(promise, guess, n, hcuPool)
       hcu.addWorkUnit(workUnit)
       workUnit
     },
@@ -254,29 +534,33 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
     running = false
   }
 
-  // constantly be randomly adding and removing artificial HCU's
-  new Thread {
-    override def run() : Unit = {
-      while (true) {
-        Thread.sleep(Math.max(500, 2000 + Math.round(rand.nextGaussian() * 1000).asInstanceOf[Int]))
-        if (!running) return
+  val churn = false
 
-        // at random, remove a human
-        if (rand.nextBoolean() && hcuPool.size > 0) {
-          System.err.println("** ARTIFICIAL HCU POOL ** Randomly removing an artificial human annotator")
-          removeHCU(hcuPool.toList(rand.nextInt(hcuPool.size)))
-        }
-        // or add a human
-        else {
-          System.err.println("** ARTIFICIAL HCU POOL ** Randomly adding a human annotator")
-          addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
+  // constantly be randomly adding and removing artificial HCU's
+  if (churn) {
+    new Thread {
+      override def run(): Unit = {
+        while (true) {
+          Thread.sleep(Math.max(5000, 20000 + Math.round(rand.nextGaussian() * 10000).asInstanceOf[Int]))
+          if (!running) return
+
+          // at random, remove a human
+          if (rand.nextBoolean() && hcuPool.size > 0) {
+            System.err.println("** ARTIFICIAL HCU POOL ** Randomly removing an artificial human annotator")
+            removeHCU(hcuPool.toList(rand.nextInt(hcuPool.size)))
+          }
+          // or add a human
+          else {
+            System.err.println("** ARTIFICIAL HCU POOL ** Randomly adding a human annotator")
+            addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
+          }
         }
       }
-    }
-  }.start()
+    }.start()
+  }
 }
 
-case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode) extends WorkUnit(resultPromise, node)
+case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode, hcuPool : HCUPool) extends WorkUnit(resultPromise, node, hcuPool)
 
 class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HumanComputeUnit {
   // Gets the estimated required time to perform this task, in milliseconds

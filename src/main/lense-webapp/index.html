@@ -4,15 +4,63 @@
         <title>L.E.N.S.E. Human Compute Unit</title>
         <script type="text/javascript" src="/lib/jquery-2.1.3.min.js"></script>
         <script type="text/javascript" src="/lib/jquery.atmosphere.js"></script>
+        <script type="text/javascript" src="/lib/jquery.cookie.js"></script>
         <script type="text/javascript" src="/main.js"></script>
         <link type="text/css" rel="stylesheet" href="/style.css">
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
     </head>
     <body>
-        <h1>L.E.N.S.E. Human Compute Unit</h1>
-        <h4>(that's you)</h4>
+        <h1>Real-Time HITs</h1>
+
+        <div class="upperright">
+            <div>
+                Your current earnings: <span class="bonus" id="bonus">$0.00</span>
+            </div>
+            <div>
+                Remaining retainer time: <span class="retainer" id="retainer">00:00:00</span>
+            </div>
+        </div>
 
         <div id="content">
-            connecting...
         </div>
+
+        <div class="info" id="instruction">
+            <h3 id="instructions-header">Instructions</h3>
+
+            You will be paid the flat <b>retainer of $0.10</b> at the end of the retainer time of <span class="retainer">10 minutes</span>.
+            <br>
+            <b>You must stay the whole 10 minutes to get paid</b>.
+            <br>
+            <!--
+            Example descriptions from Bernstein:
+            <ol>
+                <li>You will be shown a 5-10 second video with a slider below it.</li>
+                <li>Move the slider to identify <b>the best photo in the video</b>.</li>
+                <li>Click "Good Photo" to choose the photo. Once you have one that you are happy with, click "Submit".</li>
+            </ol>
+            <ol>
+                <li>Work simultaneously with other Turkers by moving your slider to agree on <b>the best photo in the video</b>.</li>
+                <li>If your slider is near other Turkers's sliders, we will narrow down  the video to that clip and keep going. You get a point if your slider was inside the clip when this happens. Continue narrowing down the video until you have agreed on one photo.</li>
+                <li>We will pay anyone who has at least one point. If you had no points, we will ask you a backup question to verify payment.</li>
+            </ol>
+            -->
+            <ol>
+                <li>Simple multiple choice questions will appear below in real time.</li>
+                <li>Click on the <button style="padding: 10px">button</button> that <b>best answers the question</b> (there are also keyboard shortcuts which look like <span class="key">k</span>).</li>
+                <li>Earn a bonus of <span class="bonus">$0.01</span> for each question you answer.</li>
+            </ol>
+
+            <button class="ready" id="ready">I get it. Let's get started!</button>
+        </div>
+
+        <form action="https://workersandbox.mturk.com/mturk/externalSubmit"
+              method="POST" style="display:none" id="successForm">
+            <!-- This field gets populated by JavaScript when the page loads: -->
+            <input type="hidden" name="assignmentId" id="assignmentId" value="" />
+            <input type="hidden" name="hitId" id="hitId" value="" />
+            <input type="hidden" name="completionCode" value="" />
+        </form>
+
     </body>
 </html>

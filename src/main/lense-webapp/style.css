@@ -1,5 +1,125 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
 .choice {
-    width: 200px;
-    height: 100px;
+    margin: 1.0em;
+    padding: 1.0em;
+}
+
+.info {
+    background-color: beige;
+    margin: 0.5em;
+    padding-left: 1.0em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+.upperright {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    font-size: large;
+    text-align: right;
+}
+
+.key {
+    box-shadow: 2px 2px 5px #888888;
+    background-color: white;
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    padding: 5px;
+    margin-left: 5px;
+    text-align: center;
+    font-family: 'Slabo 27px', serif;
+    font-weight: normal;
+}
+
+button {
+    background-color: #eeeeee;
+    border: 2px solid black;
+    border-radius: 2px;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #aaaaaa;
+}
+
+/* Hack to allow JS hovering too */
+button.hover {
+    background-color: #aaaaaa;
+}
+
+.retainer {
+    font-size: larger;
+    background-color: black;
+    color: aqua;
+    padding: 2px;
+    border-radius: 5px;
+}
+
+.bonus {
+    font-size: larger;
+    background-color: black;
+    color: lawngreen;
+    padding: 2px;
+    border-radius: 5px;
+}
+
+.bonus-ping {
+    position: fixed;
+    right: 10px;
+    top: 10px;
+    color: yellow;
+    font-size: 5em;
+}
+
+.ready {
+    padding: 10px 50px;
     margin: 10px;
+    font-size: 1.2em;
+}
+
+.disabled {
+    background-color: #eeeeee;
+    color: #333333;
+}
+
+.disabled:hover {
+    background-color: #eeeeee;
+}
+
+.content {
+    display: inline-block;
+    background-color: black;
+    padding: 4px;
+    margin: 20px;
+    color: white;
+    border-radius: 5px;
+}
+
+.focus {
+    color: yellow;
+    font-weight: bold;
+    font-size: 120%;
+    margin: 0.5em;
+}
+
+.waiting {
+    text-align: center;
+    margin: 50px;
+    font-size: 1.3em;
+}
+
+.waiting b {
+    font-weight: 900;
+    font-size: 1.4em;
+    color: darkblue;
 }

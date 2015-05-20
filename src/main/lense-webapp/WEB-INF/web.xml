@@ -23,6 +23,10 @@ http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
             <param-name>org.atmosphere.servlet</param-name>
             <param-value>com.proinnovate.webfunction.AtmosphereServlet</param-value>
         </init-param>
+        <init-param>
+            <param-name>org.atmosphere.cpr.broadcasterCacheClass</param-name>
+            <param-value>org.atmosphere.cache.UUIDBroadcasterCache</param-value>
+        </init-param>
 
         <async-supported>true</async-supported>
         <load-on-startup>0</load-on-startup>

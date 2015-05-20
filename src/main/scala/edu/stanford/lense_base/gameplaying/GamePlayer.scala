@@ -1,8 +1,10 @@
 package edu.stanford.lense_base.gameplaying
 
+import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
 
+import scala.collection.mutable
 import scala.concurrent.{Await, Promise, Future}
 import scala.concurrent.duration._
 import scala.util.Try
@@ -24,14 +26,38 @@ case class Wait() extends GameMove
 // This is the head of all game playing agents
 
 abstract class GamePlayer {
+
+  var engine : LenseEngine = null
+
   def getOptimalMove(state : GameState) : GameMove
 
   def getAllLegalMoves(state : GameState) : List[GameMove] = {
+    val maxHCUCost = if (state.hcuPool.hcuPool.size > 0) state.hcuPool.hcuPool.map(_.cost).max else 0
+    val minHCUCost = if (state.hcuPool.hcuPool.size > 0) state.hcuPool.hcuPool.map(_.cost).min else 0
+
+    var canAfford = 0.0
+
+    if (engine.tryReserveBudget(maxHCUCost, this)) {
+      // We've successfully reserved all the money we need
+      canAfford = maxHCUCost
+    }
+    else {
+      if (engine.tryReserveBudget(minHCUCost, this)) {
+        // We've successfully reserved some of the money we need
+        canAfford = minHCUCost
+      }
+      else {
+        // We're broke, can't afford another human label
+        canAfford = 0.0
+      }
+    }
+
     List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
       state.hcuPool.synchronized {
         state.hcuPool.hcuPool.
           // Take only HCU's we haven't used before for this node
           filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
+          filter(_.cost <= canAfford).
           // And make an observation on them
           map(hcu => MakeHumanObservation(n, hcu))
       }
@@ -41,32 +67,39 @@ abstract class GamePlayer {
 
 // This is the dumb one question per node baseline, just to make sure that everything is working as expected
 
-object OneQuestionBaseline extends GamePlayer {
+class NQuestionBaseline(n : Int) extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
-    if (state.payload == null) state.payload = (0, state.graph.nodes.size)
-    val i = state.payload.asInstanceOf[(Int,Int)]
-    if (i._1 < i._2) {
-      state.payload = (i._1+1,i._2)
-      MakeHumanObservation(state.originalGraph.nodes(i._1), state.hcuPool.hcuPool.minBy(hcu => hcu.estimateTimeToFinishQueue))
+    for (node <- state.originalGraph.nodes) {
+      val numReqs = state.completedRequests.count(_._1 eq node) + state.inFlightRequests.count(_._1 eq node)
+      if (numReqs < n) {
+        if (state.hcuPool.hcuPool.size > 0) {
+          return MakeHumanObservation(node, state.hcuPool.hcuPool.minBy(hcu => hcu.estimateRequiredTimeIncludingQueue(node)))
+        }
+        else {
+          return Wait()
+        }
+      }
+    }
+
+    if (state.inFlightRequests.size == 0) {
+      TurnInGuess()
     }
     else {
-      if (state.inFlightRequests.size == 0) {
-        TurnInGuess()
-      }
-      else {
-        Wait()
-      }
+      Wait()
     }
   }
 }
+
+object OneQuestionBaseline extends NQuestionBaseline(1)
 
 // This game player is the only one currently able to handle the asynchronous setting. It uses a very simple threshold,
 // where if the uncertainty of a node is above a certain value, we get another query for it. We assume all in flight queries
 // count against the uncertainty of a node already.
 
 object ThresholdHeuristic extends GamePlayer {
-  val threshold = 0.85
-  val humanUncertaintyMultiple = 0.6
+  val threshold = 0.9
+  // One obsevation cuts uncertainty to the human error rate, as a rough heuristic
+  val humanUncertaintyMultiple = 0.3
 
   override def getOptimalMove(state: GameState): GameMove = {
     // We should probably be cacheing this if it's every used in production, but no matter

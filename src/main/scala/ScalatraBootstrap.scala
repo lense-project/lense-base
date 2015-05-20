@@ -10,6 +10,7 @@ class ScalatraBootstrap extends LifeCycle {
   override def init(context : ServletContext) {
     // Mount servlets.
     context.setInitParameter(ApplicationConfig.SCAN_CLASSPATH, "false")
+    context.setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache")
 
     System.out.println("****** Mounting SCALATRA")
   }

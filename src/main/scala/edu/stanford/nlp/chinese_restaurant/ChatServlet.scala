@@ -4,7 +4,7 @@ import java.util.Date
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
-import org.eclipse.jetty.server.nio.SelectChannelConnector
+import edu.stanford.lense_base.server.JettyStandalone
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.webapp.WebAppContext
 
@@ -27,21 +27,7 @@ import scala.util.parsing.json.JSONObject
 
 object ChatServer {
   def main(args : Array[String]) = {
-    val server = new Server()
-    val connector = new SelectChannelConnector()
-    connector.setPort(9000)
-    server.addConnector(connector)
-    val context: WebAppContext = new WebAppContext("src/main/chinese-restaurant-webapp", "/")
-    context.setServer(server)
-    server.setHandler(context)
-
-    try {
-      server.start()
-    } catch {
-      case e: Exception =>
-        e.printStackTrace()
-        System.exit(1)
-    }
+    new JettyStandalone("src/main/chinese-restaurant-webapp")
   }
 }
 
@@ -62,7 +48,26 @@ class ChatServlet extends ScalatraServlet
   implicit protected def jsonFormats: Formats = org.json4s.DefaultFormats
 }
 
+abstract class ChatEngine {
+  def receiveMessage(msg : String, sendReply : (String) => Unit) : Unit
+}
+
+object YourMomChatEngine extends ChatEngine {
+  override def receiveMessage(msg: String, sendReply: (String) => Unit): Unit = {
+    sendReply("Your mom likes \""+msg+"\"")
+  }
+}
+
 class ChatSocket extends AtmosphereClient {
+  val chatEngine = new CentralChatEngine()
+
+  def sendMessage(msg : String): Unit = {
+    System.err.println("Sending message: "+msg)
+    send(new JsonMessage(new JObject(List(
+      "message" -> msg
+    ))))
+  }
+
   def receive = {
     case Connected =>
 
@@ -82,6 +87,11 @@ class ChatSocket extends AtmosphereClient {
         if (status == "ready") {
           System.err.println("Got a new chat customer!")
         }
+      }
+      if (map.contains("message")) {
+        val msg = map.apply("message").values.asInstanceOf[String]
+        System.err.println("Got new message: "+msg)
+        chatEngine.receiveMessage(msg, sendMessage)
       }
 
     case uncaught =>
