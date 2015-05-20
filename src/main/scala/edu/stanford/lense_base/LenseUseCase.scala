@@ -363,8 +363,18 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val predictedPercentage = (0 to numBuckets-1).map(i => {
       i.asInstanceOf[Double] / numBuckets + (0.5 / numBuckets)
     }).toArray
+
     val truePercentage = (0 to numBuckets-1).map(i => {
-      if (buckets(i)._1 + buckets(i)._2 == 0) 0.0
+      if (buckets(i)._1 + buckets(i)._2 == 0) {
+        var bucketVal = 0.0
+        // Look backwards for something we can use, if our buckets aren't granular enough
+        for (j <- i-1 to 0) {
+          if (buckets(j)._1 + buckets(j)._2 > 0 && bucketVal == 0.0) {
+            bucketVal = buckets(j)._1.asInstanceOf[Double] / (buckets(j)._1 + buckets(j)._2)
+          }
+        }
+        bucketVal
+      }
       else buckets(i)._1.asInstanceOf[Double] / (buckets(i)._1 + buckets(i)._2)
     }).toArray
 
