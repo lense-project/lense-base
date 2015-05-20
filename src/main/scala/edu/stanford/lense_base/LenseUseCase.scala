@@ -153,14 +153,20 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       if (i % 10 == 0) {
         analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
       }
+      if (i % 50 == 0) {
+        analyzeConfidence(goldPairs, saveTitle, i)
+      }
     }
 
     // Send home all of our real human labelers when we're done with all of our predictions
+    // for a non-infinite stream.
 
-    for (hcu <- hcuPool.hcuPool) {
-      hcu match {
-        case client : HCUClient => client.completeAndPay()
-        case _ =>
+    if (hcuPool.hcuPool != null) {
+      for (hcu <- hcuPool.hcuPool) {
+        hcu match {
+          case client: HCUClient => client.completeAndPay()
+          case _ =>
+        }
       }
     }
 
@@ -314,6 +320,59 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
     })
     promise
+  }
+
+  private def analyzeConfidence(goldPairs : List[(Input, Output)], outputPath : String = "default", iteration : Int) : Unit = {
+    val resultsPrefix = "results/"+useCaseReportSubpath+(if (useCaseReportSubpath.endsWith("/")) "" else "/")
+    val f = new File(resultsPrefix+outputPath)
+    if (!f.exists()) f.mkdirs()
+
+    val numBuckets = 20
+
+    val buckets = mutable.Map[Int, (Int,Int)]()
+    for (i <- 0 to numBuckets) {
+      buckets.put(i, (0,0))
+    }
+
+    for (i <- 0 to iteration-1) {
+      val pair = goldPairs(i)
+
+      val graph = toGraph(pair._1)
+      val marginals = graph.marginalEstimate()
+      val trueLabels = toGoldGraphLabels(graph, pair._2)
+
+      for (node <- graph.nodes) {
+        val nodeMarginal = marginals(node)
+
+        val label = trueLabels(node)
+        for (nodeProbPair <- nodeMarginal) {
+          val isCorrect = label == nodeProbPair._1
+
+          val bucketNum = Math.floor(nodeProbPair._2 * numBuckets).asInstanceOf[Int]
+          if (isCorrect) {
+            buckets.put(bucketNum, (buckets(bucketNum)._1 + iteration, buckets(bucketNum)._2))
+          }
+          else {
+            buckets.put(bucketNum, (buckets(bucketNum)._1, buckets(bucketNum)._2 + iteration))
+          }
+        }
+      }
+    }
+
+    val plot = new GNUPlot
+    val predictedPercentage = (0 to numBuckets-1).map(i => {
+      i.asInstanceOf[Double] / numBuckets + (0.5 / numBuckets)
+    }).toArray
+    val truePercentage = (0 to numBuckets-1).map(i => {
+      if (buckets(i)._1 + buckets(i)._2 == 0) 0.0
+      else buckets(i)._1.asInstanceOf[Double] / (buckets(i)._1 + buckets(i)._2)
+    }).toArray
+
+    plot.addLine(predictedPercentage, truePercentage)
+    plot.title = "iteration "+iteration+" tuning"
+    plot.yLabel = "true percentage"
+    plot.xLabel = "predicted percentage"
+    plot.saveAnalysis(resultsPrefix+outputPath+"/tuning")
   }
 
   // Prints some outputs to stdout that are the result of analysis
