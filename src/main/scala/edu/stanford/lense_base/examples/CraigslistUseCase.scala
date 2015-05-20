@@ -13,17 +13,16 @@ import scala.io.Source
 /**
  * Created by keenon on 5/3/15.
  *
- * Does NER using sequence use cases
+ * Does Craigslist information extraction using sequence use cases
  */
-class NERUseCase extends LenseSequenceUseCase {
-  lazy val allData : List[(List[String],List[String])] = loadNER
-  lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
-  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
-  // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
+class CraigslistUseCase extends LenseSequenceUseCase {
+  lazy val trainSet : List[(List[String],List[String])] = loadData("data/craigslist/ads_train.txt")
+  lazy val devSet : List[(List[String],List[String])] = loadData("data/craigslist/ads_dev.txt")
+  lazy val testSet : List[(List[String],List[String])] = loadData("data/craigslist/ads_test.txt")
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -35,10 +34,10 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def initialTrainingData : List[(List[String], List[String])] = trainSet
 
-  override def labelTypes: Set[String] = (data ++ trainSet).flatMap(_._2).distinct.toSet
+  override def labelTypes: Set[String] = (trainSet ++ devSet ++ testSet).flatMap(_._2).distinct.toSet
 
   override def getHumanQuestion(sequence: List[String], i: Int): String = {
-    var question = "What type of thing is the bolded word?<br>"
+    var question = "What information is the bolded word saying?<br>"
     question += "<span class='content'>"
     for (j <- 0 to sequence.length-1) {
       if (j > 0) question += " "
@@ -51,8 +50,8 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def getHumanVersionOfLabel(label: String): String = label match {
-    case "ORG" => "Organization"
-    case "MISC" => "Miscellaneous"
+    case "ADDRESS" => "Address of the Ad"
+    case "RENT" => "Rent amount"
     case "LOC" => "Location"
     case "PER" => "Person"
     case "O" => "None of the above"
@@ -82,27 +81,27 @@ class NERUseCase extends LenseSequenceUseCase {
     }
   }
 
-  override def useCaseReportSubpath : String = "ner"
+  override def useCaseReportSubpath : String = "craigslist"
 
-  def loadNER : List[(List[String],List[String])] = {
+  def loadData(path : String) : List[(List[String],List[String])] = {
     val loadedData : ListBuffer[(List[String],List[String])] = ListBuffer()
     val currentSentence : ListBuffer[String] = ListBuffer()
-    val currentNER : ListBuffer[String] = ListBuffer()
+    val currentSemanticSlots : ListBuffer[String] = ListBuffer()
 
-    for (line <- Source.fromFile("data/conll.iob.4class.train").getLines()) {
-      val parts = line.split("\t")
-      if (parts.size == 4) {
+    for (line <- Source.fromFile(path).getLines()) {
+      val parts = line.split(" ")
+      // This is a continuation of the old ad
+      if (parts.size == 2) {
         val word: String = parts(0)
-        val pos: String = parts(1)
-        val ner: String = parts(3)
+        val tag: String = parts(1)
         currentSentence.+=(word)
-        currentNER.+=(ner)
-
-        if (word == ".") {
-          loadedData+=((currentSentence.toList, currentNER.toList))
-          currentSentence.clear()
-          currentNER.clear()
-        }
+        currentSemanticSlots.+=(tag)
+      }
+      // This is a new ad
+      else {
+        loadedData+=((currentSentence.toList, currentSemanticSlots.toList))
+        currentSentence.clear()
+        currentSemanticSlots.clear()
       }
     }
 
@@ -119,14 +118,14 @@ class NERUseCase extends LenseSequenceUseCase {
   override def budget: Double = 100.00
 }
 
-object NERUseCase extends App {
-  val nerUseCase = new NERUseCase()
+object CraigslistUseCase extends App {
+  val craigslistUseCase = new CraigslistUseCase()
 
   def dumpData(data : List[(List[String],List[String])], name : String): Unit = {
-    val folder = new File("results/"+nerUseCase.useCaseReportSubpath)
+    val folder = new File("results/"+craigslistUseCase.useCaseReportSubpath)
     if (!folder.exists()) folder.mkdirs()
 
-    val file = new File("results/"+nerUseCase.useCaseReportSubpath+"/"+name+".txt")
+    val file = new File("results/"+craigslistUseCase.useCaseReportSubpath+"/"+name+".txt")
     if (file.exists()) file.delete()
     if (!file.exists()) file.createNewFile()
     val bw = new BufferedWriter(new FileWriter(file))
@@ -141,13 +140,14 @@ object NERUseCase extends App {
     bw.close()
   }
 
-  dumpData(nerUseCase.data, "test_data")
-  dumpData(nerUseCase.trainSet, "train_data")
+  dumpData(craigslistUseCase.trainSet, "train_data")
+  dumpData(craigslistUseCase.devSet, "dev_data")
+  dumpData(craigslistUseCase.testSet, "test_data")
 
   val poolSize = 10
-  // nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
-  nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data)
+  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
+  // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
+  // craigslistUseCase.testBaselineForOfflineLabeling(craigslistUseCase.devSet)
+  // craigslistUseCase.testWithRealHumans(craigslistUseCase.devSet)
 }

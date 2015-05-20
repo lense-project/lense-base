@@ -171,6 +171,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
 
     analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+    analyzeConfidence(goldPairs, saveTitle, i)
   }
 
   /**

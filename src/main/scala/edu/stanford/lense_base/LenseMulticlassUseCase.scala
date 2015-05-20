@@ -15,7 +15,7 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   def getHumanQuestion(input : Input) : String
   def getHumanVersionOfLabel(label : String) : String
 
-  val nodeType = graphStream.makeNodeType(labelTypes)
+  lazy val nodeType = graphStream.makeNodeType(labelTypes)
 
   /**
    * This function takes an Input
@@ -28,6 +28,7 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   override def toGraph(input: Input): Graph = {
     val graph = graphStream.newGraph()
     val node = graph.makeNode(nodeType, getFeatures(input), payload = input)
+    if (graph.marginalEstimate().size != 1) throw new IllegalStateException("Seems marginals aren't computing correctly")
     graph
   }
 
