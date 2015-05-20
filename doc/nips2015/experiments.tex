@@ -1,0 +1,27 @@
+\section{Experiments}
+\label{sec:experiments}
+
+We run our active classifier on the above policies, and compare against machine-only and human-only baselines, as well as a baseline policy that uses a threshold-version of uncertainty sampling without any effort to minimize loss.
+ We report results on several datasets: CoNLL NER, Stanford sentiment classification, and \todo{more}.
+
+For these results, we use a simulated crowd, using the model that with probability $\epsilon = 0.3$ the humans choose uniformly at random.
+
+\subsection{CoNLL Evaluation}
+
+The CoNLL NER dataset is composed of \todo{details}.\\
+\todo{I realize that the ``token accuracy'' metric is \textbf{not} how NER is measured, in process of fixing}
+
+\begin{tabular}{ | l | r | r | r | }
+    \hline
+    System & Avg classification time/token & Avg requests/token & Accuracy \\ \hline
+    Human 1-query baseline & 345 ms & 1.0 & 75.67 \\ \hline
+    Human 3-query baseline & 791 ms & 3.0 & 84.98 \\ \hline
+    Offline baseline & n/a & n/a & 94.43 \\ \hline
+    \textbf{Uncertainty threshold} & \textbf{326 ms} & \textbf{0.353} & \textbf{97.03} \\
+    \hline
+\end{tabular}
+
+\subsection{Stanford Sentiment Dataset Evaluation}
+
+\todo{write}
+

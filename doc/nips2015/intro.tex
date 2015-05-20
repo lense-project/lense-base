@@ -1,48 +1,32 @@
 \section{Introduction}
-\label{sec:intro}
 
-A limited version of this setting has been independently proposed
-several times under different names over the past two decades. It's been
-called ``Active Learning in a streaming setting'', ``Online Active
-Learning'' or ``Label Efficient Learning,'' to name a few. This is
-generally proposed under two limitations: the ``problem instances'' must
-be multi-class classification problems, and the learning algorithm
-optimizes a Frequentist objective that does not provide a way for you to
-specify the complicated trade-off between expense, time delay, and
-expected number of errors.
+Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
+These purely crowd-based solutions are prohibitively expensive at scale.
+Powering the crowd-based email client \textit{EmailValet}~\cite{kokkalis2013emailvalet} for a single end user for a year costs over \$400.
 
-This project proposes two improvements on the historical work:
+These systems typically work by ``pooling'' on-demand workers from high latency job-posting platforms like Amazon Mechanical Turk or CrowdFlower on a website designed by the system architect~\cite{lasecki2011real}.
+ The ``pooling'' process can take several minutes, but once in place the workers can be queried at very low latencies by pushing requests to their web-browsers.
+ This pool of workers can demonstrate high rates of turnover, and unreliability amongst individual annotators.
 
-\begin{itemize}
-  \item We propose a way to do structured instance prediction in the general case, by which we mean we can handle arbitrary multi-variable problem instances, with factor-graph structure. We also allow collection of human opinions about one variable at a time. (We stress arbitrary factor graphs, because there have been domain specific online structured prediction systems in the past, e.g. dependency parsing by Dan Roth)
-  \item We also provide a novel fully Bayesian approach to Online Active Learning, which can optimize arbitrary loss functions.
+Existing systems query this pool directly, allowing for annotator noise by incorporating consensus building systems like voting and chat.
 
-\end{itemize}
 
-\subsection{Related Work}
+Active classification~\cite{greiner2002learning}, a close sibling of active learning, is a setting in which a classifier is allowed to query for more information, at some cost, before turning in classifications.
+ This active classifier is intended to reduce its need for costly, slow human labels over time by learning from past observations.
+ We propose to adapt the active classification framework to the pooled-worker setting to query this pool more cheaply, accurately, and quickly, without sacrificing the advantages live of crowd-powered interfaces.
 
-\paragraph{Flock} \cite{cheng2015flock}
-\begin{itemize}
-  \item Ask crowd for features and classifications.
-  \item People are apparently bad at providing reasons.
-  \item Have people propose reasons for difference between positive, negative classes, and then cluster those reasons.
-  \item At the end of the day, use machine learning to evaluate those features.
-  \item [9,24] might be relevant.
-  \item Fantastic for "latent features"?
-  \item First ask people to generate features that distinguish 2 images (i.e. using contrast). 
-  \item Then cluster responses with k-means and have people pose question given the text blah.
-  \item Then gets labels via turk task.
-\end{itemize}
+Previous work in online active learning (which is closely related to what we're proposing) has focused on multi-class classification (\cite{chu2011unbiased},~\cite{agarwal2013selective},~\cite{cheng2013feedback},~\cite{vzliobaite2011active},~\cite{helmbold1997some}).
+ Multi-class classification is an insufficiently rich primitive to handle many of the tasks that crowd-workers are enabling in existing systems, like information extraction or object detection.
+ Instead, we will build our platform around arbitrary log-linear markov network classification, where we assume it is possible to query workers for opinions on individual nodes.
+ Thus each ``active classification'' in our proposed setting is instantiate with a markov network and involves using model priors trained on previously seen data to choose to query the worker-pool for opinions about nodes, and then returning a classification informed by those opinions.
 
-\paragraph{Legion:AR} \cite{lasecki2013realtime}
-\begin{itemize}
-  \item Online activity recognition
-  \item Real-time using quickTurkit / Legion system
-  \item Hide some visual details (for privacy concerns)
-  \item Show crowd better than single person.
-  \item Using model results in faster labelling.
-  \item Extensive study of user interface.
-  \item Very simple HMM model.
-\end{itemize}
+
+This setting poses several distinct challenges that have not been sufficiently addressed in previous literature.
+ We need to be sensitive to time delays, returning results at least as quickly as the pure-crowd baseline we intend to improve upon.
+ We also need to be sensitive to inaccurate oracles.
+ These two criteria, in the pooled-worker setting, means that we need an active classifier who is able to hide latencies of redundant queries by launching them \textit{asynchronously}.
+ This leads to the two challenges we will address in this paper, which can both be clustered under \textit{optimal asynchronous behavior}: we need to be able to handle the decision to ask for another query or turn in existing results in the presence of ``in-flight requests,'' which can fail due to worker turnover, where our loss term is sensitive to time delay.
+ We draw inspiration from work in Bayesian Active Learning to tackle these problems.
+
 
 

@@ -1,0 +1,30 @@
+# Temporary Files
+*.swp
+*.swo
+*.pyc
+*.pyo
+*.o
+cscope.out
+tags
+*.lprof
+
+# Java
+*.class
+java/junit
+java/bin
+java/out
+.idea
+target/
+
+# TeX
+*.log
+*.aux
+*.out
+*.nav
+*.toc
+*.bbl
+*.blg
+*.snm
+*.pdf
+*.dvi
+*_tmp.*

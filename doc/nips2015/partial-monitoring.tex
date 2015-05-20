@@ -1,0 +1,29 @@
+\section{Partial Monitoring Game}
+\label{sec:partial}
+
+To cast this problem as a Partial Monitoring Game, we must first make sure the outcome space $\sS$ is finite, which requires that we discretize time into epochs of length $t_{\text{epoch}}$, and impose a time limit on the game, $t_{\text{max}}$, resulting in a finite game space $\sS_{\text{discrete}}$.
+
+\todo{details on how Partial Monitoring Games work}
+
+We can define the entries of our loss matrix $L$ with respect to our loss function $\sL(h_{\text{final}}, h, m, t)$.
+ The language $\Sigma$ used to populate our observability matrix $H$ is defined as the state space of the game $\sS_{\text{discrete}}$.
+
+\todo{do math... borrow bounds from Bartok et. al, show Pareto optimal policy}
+
+Our goal is to pick a policy $\pi^*$ to minimize the loss in the terminal state of the algorithm $s_{\text{final}}$.
+ Since our loss term depends on the true state of the world $\theta^* = (h_{\text{true}}, t, m)$, of which only $t$ and $m$ are ever known, we can't do this directly.
+ However, we have a distribution over our beliefs $p(h_{\text{true}})$ at every step (and consequently the state of the true state of the world $\theta^*$, since $t$ and $m$ are known), so we instead minimize \textit{risk}, which is defined with respect to a particular state of the world $\tilde{\theta}$ as
+\[E_{\Theta \sim p(\theta)}[Loss(\Theta || \tilde{\theta})] = \int_{\theta} Loss(\theta || \tilde{\theta})p(\theta)d\theta\]
+
+We can formulate our goal in concrete terms as follows:
+\begin{equation*}
+\begin{aligned}
+& \underset{\pi}{\text{minimize}}
+& & E_{\pi}[E_{h \sim p(h)}[\sL(h_{\text{final}}, h, m, t)]] \\
+%& \text{subject to}
+%& & a \in \sA
+\end{aligned}
+\end{equation*}
+
+This reduces to the Optimal Decision Tree problem, which is NP-hard.
+

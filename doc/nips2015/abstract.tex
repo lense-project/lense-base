@@ -1,10 +1,14 @@
 \begin{abstract}
-  \label{sec:abstract}
-We explore making time-sensitive predictions on an infinite stream of
-``problem instances'' by selectively querying humans for noisy partial
-information, and exploiting previous observations to train a classifier
-that can incrementally take over from the humans. This stream is assumed
-to be too large to be kept in memory, so querying backwards over
-previously seen examples is considered impractical.
-
+% V1
+% Recent work in real-time crowd-powered products has demonstrated the possibility of using human ``crowd workers'' to power live, low latency products that accomplish AI complete tasks. Human-only solutions remain expensive, and do not scale into production. We propose a \textit{active classification} approach to dramatically reduce the scaling cost of such systems, backed by a pool of unreliable crowd-workers. In order to achieve this, we investigate \textit{asynchronous active classification}, where multiple requests can be simultaneously ``in-flight.'' This paper analyzes the \textit{asynchronous requests problem} of how to behave optimally in the presence of asynchronous oracle queries that have not yet returned, and the \textit{optimal stopping problem} of when a classification is ``good enough'' in such a setting. Our solutions to these problems enable a system that shows dramatic improvement over the human-only, machine-only, and baseline human-machine hybrid alternatives in the cost-delay-accuracy tradeoff surface.
+Recent work in crowd-powered products has demonstrated the potential of using ``crowd workers'' to power live, low latency systems that accomplish AI complete tasks. 
+These systems suffer from high scaling cost, and the unreliability of workers.
+We propose an \textit{active classification} approach to dramatically reduce the scaling cost and improve the accuracy of such systems.
+In order to also achieve low latency, we investigate \textit{asynchronous} active classification, where multiple requests can be simultaneously ``in-flight.''
+This leads to the twin challenges of how to behave optimally in the presence of asynchronous noisy oracle queries that have not yet returned, and when to return a classification that is ``good enough'' in such a setting.
+We first reduce the problem of optimal asynchronous active classification to a Partial Monitoring game, by making use of Bayesian decision theory.
+We show a bound on achievable regret in this setting, and demonstrate practical heuristics that approach this bound.
+We also show adaptations for traditional Active Learning algorithms to our setting.
+We show empirical demonstration of our proposed algorithms, which demonstrate dramatic improvement over the human-only, machine-only, and baseline human-machine hybrid alternatives in the cost-delay-accuracy tradeoff surface.
 \end{abstract}
+
