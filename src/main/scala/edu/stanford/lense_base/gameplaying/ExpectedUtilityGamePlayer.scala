@@ -11,7 +11,7 @@ class ExpectedUtilityGamePlayer extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
     val moves = getAllLegalMoves(state)
     val nodes = moves.filter(_.isInstanceOf[MakeHumanObservation]).map{
-      case MakeHumanObservation(node) => node
+      case MakeHumanObservation(node, hcu) => node
     }
     val bestExpectedUtilityObservation = nodes.map(n => (n,getExpectedUtility(state, n))).maxBy(_._2)
     val turnInNowLoss = state.loss()
