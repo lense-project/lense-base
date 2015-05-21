@@ -167,7 +167,8 @@ To write a new `GamePlayer` object, there are several useful utilities to be awa
 you get out of the box by subclassing `GamePlayer`. **Use it** when determining what you can and can't do. It handles 
 **nasty sychronization issues with budget constraints that you shouldn't touch**. It returns a list of all possible `GameMove`
 objects that you could legally return. It will reserve enough budget to allow you to perform any of the moves without going over
-budget, and will make sure that you don't query the same person twice.
+budget, and will make sure that you don't query the same person twice. Once you turn in a move, if the amount spent is
+less than amount reserved, the balance is returned to the global budget and can be used elsewhere.
 
 Also, `state.getNextStates(move)` will return the list of `GameState`s that could result from you taking move `move`. It
 will return a list of how humans could respond and **not asynchronous intermediate states**. Use it at your peril.
