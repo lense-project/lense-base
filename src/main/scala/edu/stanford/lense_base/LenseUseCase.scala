@@ -296,7 +296,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
     ensureWorkServer
 
-    makeHITAndWaitFor(2)
+    makeHITAndWaitFor(1)
 
     progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
