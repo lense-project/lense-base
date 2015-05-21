@@ -190,6 +190,8 @@ $(function () {
     // This will run through examples in a non-blocking way
 
     function runThroughExamples(examples, i, lastAnswer) {
+        var header = $("<div/>");
+        header.html("INSTRUCTIONS:<br>");
 
         // Display a welcome banner
 
@@ -197,17 +199,18 @@ $(function () {
             content.html("");
             trainingComments.addClass("comments");
             trainingComments.html("<b>Welcome</b>. We're going to run through "+examples.length+" examples to warm up.<br>"+
-            "Press any key to get started, or click ");
+            "<b>Press any key</b> to get started, or click ");
             var b = $('<button/>', {class: 'choice'});
             b.html("get started");
             trainingComments.append(b);
+            trainingComments.prepend(header);
 
-            $(document).keypress(function() {
-                $(document).unbind("keypress");
+            $(document).keyup(function() {
+                $(document).unbind("keyup");
                 runThroughExamples(examples, i+1, null);
             });
             b.click(function() {
-                $(document).unbind("keypress");
+                $(document).unbind("keyup");
                 runThroughExamples(examples, i+1, null);
             });
         }
@@ -220,6 +223,7 @@ $(function () {
                 displayComments = "The answer \""+lastAnswer+"\" is incorrect. Please try again. The hint was: <br>"+displayComments;
             }
             trainingComments.html(displayComments);
+            trainingComments.prepend(header);
 
             renderMulticlassQuery(examples[i], function(closureChoice) {
                 if (closureChoice == examples[i].answer) {
@@ -237,20 +241,21 @@ $(function () {
         else {
             content.html("");
             trainingComments.html("<b>Congratulations!</b>. You're done with the warm-up!<br>"+
-            "Press any key to get started earning <b>real money</b>, or click ");
+            "<b>Press any key</b> to get started earning <b>real money</b>, or click ");
             trainingComments.addClass("comments");
             var b = $('<button/>', {class: 'choice'});
             b.html("get started");
             trainingComments.append(b);
+            trainingComments.prepend(header);
 
             var start = function() {
-                $(document).unbind("keypress");
+                $(document).unbind("keyup");
                 trainingComments.removeClass("comments");
                 trainingComments.html("");
                 subSocket.push(jQuery.stringifyJSON({ status: "completed-training"}));
             }
 
-            $(document).keypress(function() {
+            $(document).keyup(function() {
                 start();
             });
             b.click(function() {
