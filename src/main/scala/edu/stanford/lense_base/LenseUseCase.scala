@@ -123,6 +123,16 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def initialTrainingData : List[(Input, Output)] = List()
 
   /**
+   * An opportunity to provide some examples for humans to learn with. The first element in the Tuple is the GraphNode
+   * to ask the question about, the second is the correct answer (String), and the third is any explanation to the user
+   * during the question (HTML)
+   *
+   * @return
+   */
+  def humanTrainingExamples : List[TrainingQuestion] = List()
+  RealHumanHCUPool.trainingQuestions = humanTrainingExamples
+
+  /**
    * An opportunity to provide a new game player, besides the default
    *
    * @return a game player

@@ -130,6 +130,10 @@ $(function () {
                     workComplete(code);
                 }, 3000);
             }
+            if (json['type'] !== undefined && json.type === "training") {
+                var examples = json.examples;
+                console.log($.stringifyJSON(examples));
+            }
             if (json['type'] !== undefined && json.type === "multiclass") {
                 if (!document.hasFocus()) {
                     alert("There's a task available for you now");

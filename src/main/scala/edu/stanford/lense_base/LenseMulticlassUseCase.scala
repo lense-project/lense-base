@@ -2,6 +2,7 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.graph.{Graph, GraphNode}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQuestion, TrainingQuestion}
 
 /**
  * Created by keenon on 5/7/15.
@@ -15,7 +16,19 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   def getHumanQuestion(input : Input) : String
   def getHumanVersionOfLabel(label : String) : String
 
+  /**
+   * This gets the initial training examples to show to humans. Provide an input, the correct answer, and
+   * any comments in HTML that you want displayed while the user is doing this example.
+   *
+   * @return
+   */
+  def getHumanTrainingExamples : List[(Input, String, String)] = List()
+
   lazy val nodeType = graphStream.makeNodeType(labelTypes)
+
+  override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(triple => {
+    MulticlassTrainingQuestion(getHumanQuestion(triple._1), labelTypes.toList.map(getHumanVersionOfLabel), getHumanVersionOfLabel(triple._2), triple._3)
+  })
 
   /**
    * This function takes an Input

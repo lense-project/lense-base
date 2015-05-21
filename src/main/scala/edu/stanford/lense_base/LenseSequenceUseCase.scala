@@ -2,6 +2,7 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.server.{TrainingQuestion, MulticlassTrainingQuestion}
 
 import scala.collection.mutable
 
@@ -22,8 +23,20 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
   def getHumanVersionOfLabel(label : String) : String
   def lossFunction(sequence : List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double) : Double
 
+  /**
+   * This gets the initial training examples to show to humans. Provide a sequence, an index, the correct answer, and
+   * any comments in HTML that you want displayed while the user is doing this example.
+   *
+   * @return
+   */
+  def getHumanTrainingExamples : List[(List[String], Int, String, String)] = List()
+
   lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
   lazy val factorType : FactorType = graphStream.makeFactorType(List(nodeType, nodeType))
+
+  override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(quad => {
+    MulticlassTrainingQuestion(getHumanQuestion(quad._1, quad._2), labelTypes.toList.map(l => getHumanVersionOfLabel(l)), getHumanVersionOfLabel(quad._3), quad._4)
+  })
 
   /**
    * This function takes an Input

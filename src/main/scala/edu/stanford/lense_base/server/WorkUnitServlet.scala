@@ -28,7 +28,7 @@ import scala.util.parsing.json.JSONObject
 /**
  * Created by keenon on 4/30/15.
  *
- * A dummy little Websocket implementation
+ * A Websocket implementation for asking questions and receiving answers.
  */
 object WorkUnitServlet {
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
@@ -203,11 +203,28 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
   }
 }
 
-object RealHumanHCUPool extends HCUPool {
-  override def addHCU(hcu : HumanComputeUnit): Unit = {
-    WorkUnitServlet.server
-    super.addHCU(hcu)
+abstract class TrainingQuestion {
+  def getEncodedQuestion : JObject
+}
+case class MulticlassTrainingQuestion(questionHTML : String, choices : List[String], correctAnswer : String, comments : String) extends TrainingQuestion {
+  override def getEncodedQuestion: JObject = {
+    new JObject(List(
+      "type" -> new JString("multiclass"),
+      "html" -> new JString(questionHTML),
+      "choices" -> new JArray(choices.map(a => new JString(a))),
+      "answer" -> new JString(correctAnswer),
+      "comments" -> new JString(comments)
+    ))
   }
+}
+
+object RealHumanHCUPool extends HCUPool {
+  var trainingQuestions : List[TrainingQuestion] = List()
+
+  def getTrainingMessage : JObject = new JObject(List(
+    "type" -> new JString("training"),
+    "examples" -> new JArray(trainingQuestions.map(_.getEncodedQuestion))
+  ))
 }
 
 // The Human Compute Unit client
@@ -278,58 +295,63 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
       if (map.contains("status")) {
         val status = map.apply("status").values.asInstanceOf[String]
-        startTime = System.currentTimeMillis()
-        assignmentId = map.apply("assignmentId").values.asInstanceOf[String]
-        workerId = map.apply("workerId").values.asInstanceOf[String]
-        if (workerId == null || workerId == "null") {
-          workerId = "default"
-        }
-        hitId = map.apply("hitId").values.asInstanceOf[String]
 
-        // Here we need to run through two possible reasons the worker can't be added to the pool
-        // 1 - this is a double connection
-        // 2 - we're out of cash
-
-        val canClaim : Boolean = WorkUnitServlet.claimWorkerIdIfPossible(this, workerId)
-
-        // This means that this workerId already has a connection to us... we need to send them away
-        if (!canClaim) {
-          System.err.println("Attempted double connect for workerId="+workerId)
-          send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: It appears that "+
-            "someone with your workerId is connected and working on a copy of this HIT."+
-            " Please close any other copies of this task before trying to create new ones.")))))
-        }
-        // Otherwise, we're good to go, so let's initialize this worker
-        else {
-          // Need to check if sufficient budget to pay worker...
-          val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this)
-          // This means we can't reserve enough budget to pay the retainer, so send away the worker
-          if (!haveRetainerBudget) {
-            System.err.println("Not enough budget to retain workerId="+workerId)
-            send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: We don't have "+
-              "enough budget left in our job to pay your retainer. Please return this HIT, and check "+
-              " back later for more jobs.")))))
+        if (status == "ready") {
+          startTime = System.currentTimeMillis()
+          assignmentId = map.apply("assignmentId").values.asInstanceOf[String]
+          workerId = map.apply("workerId").values.asInstanceOf[String]
+          if (workerId == null || workerId == "null") {
+            workerId = "default"
           }
-          // Finally, we have a clean worker, add them to the pool
+          hitId = map.apply("hitId").values.asInstanceOf[String]
+
+          // Here we need to run through two possible reasons the worker can't be added to the pool
+          // 1 - this is a double connection
+          // 2 - we're out of cash
+
+          val canClaim : Boolean = WorkUnitServlet.claimWorkerIdIfPossible(this, workerId)
+
+          // This means that this workerId already has a connection to us... we need to send them away
+          if (!canClaim) {
+            System.err.println("Attempted double connect for workerId="+workerId)
+            send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: It appears that "+
+              "someone with your workerId is connected and working on a copy of this HIT."+
+              " Please close any other copies of this task before trying to create new ones.")))))
+          }
+          // Otherwise, we're good to go, so let's initialize this worker
           else {
-            val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
-            if (state != null) {
-              MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true, assignmentId))
+            // Need to check if sufficient budget to pay worker...
+            val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this)
+            // This means we can't reserve enough budget to pay the retainer, so send away the worker
+            if (!haveRetainerBudget) {
+              System.err.println("Not enough budget to retain workerId="+workerId)
+              send(new JsonMessage(new JObject(List("status" -> JString("failure"), "display" -> JString("ERROR: We don't have "+
+                "enough budget left in our job to pay your retainer. Please return this HIT, and check "+
+                " back later for more jobs.")))))
             }
+            // Finally, we have a clean worker, send them the example set
             else {
-              MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true, assignmentId))
+              send(new JsonMessage(RealHumanHCUPool.getTrainingMessage))
             }
+          }
+        }
+        // TODO: The is majorly NOT hack-proof, someone can easily just send this message to us, and bypass all checks.
+        else if (status == "completed-training") {
+          val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
+          if (state != null) {
+            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true, assignmentId))
+          }
+          else {
+            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true, assignmentId))
+          }
+          if (!RealHumanHCUPool.hcuPool.contains(this)) {
+            RealHumanHCUPool.addHCU(this)
+          }
 
-            if (status == "ready") {
-              if (!RealHumanHCUPool.hcuPool.contains(this)) {
-                RealHumanHCUPool.addHCU(this)
-              }
-            }
-            send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+          send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
 
-            if (WorkUnitServlet.waiting) {
-              updateWaiting()
-            }
+          if (WorkUnitServlet.waiting) {
+            updateWaiting()
           }
         }
       }
