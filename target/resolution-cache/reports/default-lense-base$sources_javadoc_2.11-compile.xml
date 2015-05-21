@@ -7,7 +7,7 @@
 		revision="1.0"
 		conf="compile"
 		confs="compile, runtime, test, provided, optional, compile-internal, runtime-internal, test-internal, plugin, sources, docs, pom, scala-tool"
-		date="20150520140825"/>
+		date="20150521103046"/>
 	<dependencies>
 		<module organisation="com.h2database" name="h2">
 			<revision name="1.4.187" status="release" pubdate="20150410093333" resolver="sbt-chain" artresolver="sbt-chain" homepage="" downloaded="false" searched="false" default="false" conf="default, compile, runtime, default(compile), master" position="53">

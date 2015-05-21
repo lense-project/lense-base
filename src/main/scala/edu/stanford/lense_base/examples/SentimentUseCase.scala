@@ -18,8 +18,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -41,7 +41,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def getFeatures(input: String): Map[String, Double] = {
     // Stupid bag of words features...
-    val basicFeatures = input.split(" ").map(tok => (tok, 1.0)).toMap
+    val tokens = input.split(" ")
+    val unigrams = tokens.map(tok => (tok, 1.0)).toMap
+    val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
+    val basicFeatures = unigrams ++ bigrams
 
     // Also normalized word embedding for whole document
     val embedding = new Array[Double](300)
@@ -95,7 +98,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
   // and shuffles the order of the results
-  def loadData(path : String, limitSize : Int = 500) : List[(String, String)] = {
+  def loadData(path : String, limitSize : Int = 1000) : List[(String, String)] = {
     val examples = ListBuffer[(String, String)]()
 
     var numNeg = 0
@@ -129,9 +132,9 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 10
-  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
-  // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
+  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet)
 }

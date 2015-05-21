@@ -4,7 +4,7 @@
 		module="lense-base$sources_javadoc_2.11"
 		revision="1.0"
 		status="integration"
-		publication="20150520140825"
+		publication="20150521103046"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>
