@@ -273,6 +273,25 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
     grantBonusInNSeconds()
   }
 
+  def acceptWorker() = {
+    val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
+    if (state != null) {
+      MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true, assignmentId))
+    }
+    else {
+      MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true, assignmentId))
+    }
+    if (!RealHumanHCUPool.hcuPool.contains(this)) {
+      RealHumanHCUPool.addHCU(this)
+    }
+
+    send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+
+    if (WorkUnitServlet.waiting) {
+      updateWaiting()
+    }
+  }
+
   def receive = {
     case Connected =>
       println("Connected on Atmosphere socket")
@@ -329,30 +348,20 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
                 "enough budget left in our job to pay your retainer. Please return this HIT, and check "+
                 " back later for more jobs.")))))
             }
-            // Finally, we have a clean worker, send them the example set
+            // Finally, we have a clean worker, send them the training set, or accept them immediately if we don't have one
             else {
-              send(new JsonMessage(RealHumanHCUPool.getTrainingMessage))
+              if (RealHumanHCUPool.trainingQuestions.size > 0) {
+                send(new JsonMessage(RealHumanHCUPool.getTrainingMessage))
+              }
+              else {
+                acceptWorker()
+              }
             }
           }
         }
         // TODO: The is majorly NOT hack-proof, someone can easily just send this message to us, and bypass all checks.
         else if (status == "completed-training") {
-          val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
-          if (state != null) {
-            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, state.queriesAnswered, state.connectionDuration, state.outstandingBonus, currentlyConnected = true, assignmentId))
-          }
-          else {
-            MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = true, assignmentId))
-          }
-          if (!RealHumanHCUPool.hcuPool.contains(this)) {
-            RealHumanHCUPool.addHCU(this)
-          }
-
-          send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
-
-          if (WorkUnitServlet.waiting) {
-            updateWaiting()
-          }
+          acceptWorker()
         }
       }
 

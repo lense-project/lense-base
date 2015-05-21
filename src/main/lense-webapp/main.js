@@ -114,7 +114,7 @@ $(function () {
                     var remainingMillis = onCallDuration - elapsedMillis;
                     if (remainingMillis < 0) {
                         retainer.html('');
-                        var input = $('<button>Collect your earnings!</button>');
+                        var input = $('<button class="collect">Collect your earnings!</button>');
                         input.click(function() {
                             console.log("Turning in results");
                             subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
@@ -191,7 +191,7 @@ $(function () {
 
     function runThroughExamples(examples, i, lastAnswer) {
         var header = $("<div/>");
-        header.html("INSTRUCTIONS:<br>");
+        header.html("<b>TUTORIAL "+(i+1)+"/"+(examples.length+1)+":</b><br>");
 
         // Display a welcome banner
 
@@ -220,7 +220,7 @@ $(function () {
         else if (i < examples.length) {
             var displayComments = examples[i].comments;
             if (lastAnswer != null) {
-                displayComments = "The answer \""+lastAnswer+"\" is incorrect. Please try again. The hint was: <br>"+displayComments;
+                displayComments = "<span class='incorrect'>The answer \""+lastAnswer+"\" is incorrect.</span> Please try again. The hint was: <br>"+displayComments;
             }
             trainingComments.html(displayComments);
             trainingComments.prepend(header);
@@ -230,7 +230,6 @@ $(function () {
                     runThroughExamples(examples, i+1, null);
                 }
                 else {
-                    console.log("That answer is incorrect! Try again");
                     runThroughExamples(examples, i, closureChoice);
                 }
             });
@@ -240,7 +239,7 @@ $(function () {
 
         else {
             content.html("");
-            trainingComments.html("<b>Congratulations!</b>. You're done with the warm-up!<br>"+
+            trainingComments.html("<b>Congratulations!</b>. You're done with the tutorial!<br>"+
             "<b>Press any key</b> to get started earning <b>real money</b>, or click ");
             trainingComments.addClass("comments");
             var b = $('<button/>', {class: 'choice'});

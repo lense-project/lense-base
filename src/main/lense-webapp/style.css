@@ -96,6 +96,16 @@ button.hover {
     background-color: #eeeeee;
 }
 
+#content {
+    margin-left: 2.5em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+#content:empty {
+    margin: 0;
+    padding: 0;
+}
+
 .content {
     display: inline-block;
     background-color: black;
@@ -135,4 +145,14 @@ button.hover {
 
 .comments button {
     font-size: 1.0em;
+}
+
+.incorrect {
+    color: red;
+}
+
+.collect {
+    font-size: 2.0em;
+    color: green;
+    padding: 20px;
 }
