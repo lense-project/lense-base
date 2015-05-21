@@ -123,3 +123,15 @@ button.hover {
     font-size: 1.4em;
     color: darkblue;
 }
+
+.comments {
+    background-color: beige;
+    font-size: 1.5em;
+    border-radius: 5px;
+    margin: 1em;
+    padding: 1em;
+}
+
+.comments button {
+    font-size: 1.0em;
+}

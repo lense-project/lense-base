@@ -87,7 +87,7 @@ class NERUseCase extends LenseSequenceUseCase {
   override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = List(
     (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 5, "ORG", "Label all countries that are doing things as Organizations"),
     (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 7, "ORG", "Try that again..."),
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 2, "NONE", "Label everything else as nothing")
+    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 2, "O", "Label everything else as nothing")
   )
 
   def loadNER : List[(List[String],List[String])] = {

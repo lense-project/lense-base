@@ -11,29 +11,42 @@ $.urlParam = function(name){
 $(function () {
     "use strict";
 
+    // Get Worker information
+
     var assignmentId = $.urlParam("assignmentId");
     var hitId = $.urlParam("hitId");
     var turkSubmitTo = $.urlParam("turkSubmitTo");
     var workerId = $.urlParam("workerId");
+
+    // Get DOM elements
 
     var content = $('#content');
     var bonus = $('#bonus');
     var ready = $('#ready');
     var retainer = $('#retainer');
     var form = $("#successForm")
+    var trainingComments = $("#training-comments")
+
+    // Setup submit form
+
     form.attr("action", turkSubmitTo+"/mturk/externalSubmit");
     $("#assignmentId").val(assignmentId);
     $("#hitId").val(hitId);
 
+    // Build socket
+
     var socket = $.atmosphere;
 
-    // We are now ready to cut the request
+    // Build atmosphere request
+
     var request = new $.atmosphere.AtmosphereRequest();
     request.url = '/work-socket';
     request.contentType = 'application/text';
     request.transport = 'websocket';
     request.fallbackTransport = 'long-polling';
     request.shared = true; // make sure this is shared across windows / tabs
+
+    // Setup on-open callback
 
     request.onOpen = function(response) {
         console.log('connected using ' + response.transport);
@@ -45,6 +58,8 @@ $(function () {
             workerId: workerId
         }));
     };
+
+    // Setup on-message callback
 
     request.onMessage = function (response) {
         var message = response.responseBody;
@@ -132,87 +147,18 @@ $(function () {
             }
             if (json['type'] !== undefined && json.type === "training") {
                 var examples = json.examples;
-                console.log($.stringifyJSON(examples));
+                runThroughExamples(examples, -1, null);
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
-                if (!document.hasFocus()) {
-                    alert("There's a task available for you now");
-                }
+                renderMulticlassQuery(json, function(closureChoice) {
+                    console.log("Choosing "+closureChoice);
+                    subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
+                    content.css({
+                        height: content.height()
+                    });
 
-                // We need to create a multiclass question here
-                content.css({
-                    height: 'auto'
+                    content.html("Waiting for next question from the server...");
                 });
-
-                content.html(json.html+"<br>");
-
-                var keys = [];
-                var refKeys = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
-
-                for (var choiceID in json.choices) {
-                    var choice = json.choices[choiceID];
-                    var b = $('<button/>', {class: 'choice'});
-                    b.html(choice);
-
-                    var shortcut = $('<span/>', {class: 'key'});
-
-                    var key = choice.toLowerCase().charAt(0);
-                    if (!$.inArray(key, keys)) {
-                        for (var i in refKeys) {
-                            key = refKeys[i];
-                            if (!$.inArray(key, keys)) break;
-                        }
-                    }
-                    keys.push(key);
-
-                    b.append(shortcut);
-                    shortcut.html(key);
-
-                    content.append(b);
-
-                    var makeChoice = function(closureChoice) {
-                        console.log("Choosing "+closureChoice);
-                        subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
-                        content.css({
-                            height: content.height()
-                        });
-
-                        content.html("Waiting for next question from the server...");
-
-
-                        $(document).unbind("keypress");
-                        $(document).unbind("keyup");
-                    }
-
-                    // I hate Javascript so much. I just can't even describe it.
-                    var handler = $(document).keyup((function(closureChoice, closureKey) {
-                        return function(e) {
-                            console.log("Released "+e.which);
-                            var index = 65+refKeys.indexOf(closureKey)
-                            if (e.which == index) {
-                                makeChoice(closureChoice);
-                            }
-                        }
-                    })(choice, key));
-
-                    // I hate Javascript so much. I just can't even describe it.
-                    b.click((function(closureChoice) {
-                        return function() {
-                            makeChoice(closureChoice);
-                        }
-                    })(choice));
-
-                    var handler = $(document).keydown((function(closureChoice, closureKey, closureButton) {
-                        return function(e) {
-                            console.log("Pressed "+e.which);
-                            var index = 65+refKeys.indexOf(closureKey)
-                            if (e.which == index) {
-                                closureButton.addClass("hover");
-                                $(document).unbind("keypress");
-                            }
-                        }
-                    })(choice, key, b));
-                }
             }
         } catch (e) {
             console.log(e);
@@ -222,6 +168,9 @@ $(function () {
 
     request.onClose = function(response) {
         console.log("closed connection: "+response)
+
+        trainingComments.removeClass("comments");
+        trainingComments.html("");
     };
 
     request.onError = function(response) {
@@ -230,10 +179,159 @@ $(function () {
         content.html($('<p>', { text: 'Sorry, but there\'s some problem with your '
             + 'socket or the server is down. We\'re going to pay you for the work you did so far, minus the retainer. Turning in HIT in 6 seconds.' }));
 
+        trainingComments.removeClass("comments");
+        trainingComments.html("");
+
         setTimeout(function() {
             workComplete('timeout');
         }, 6000);
     };
+
+    // This will run through examples in a non-blocking way
+
+    function runThroughExamples(examples, i, lastAnswer) {
+
+        // Display a welcome banner
+
+        if (i == -1) {
+            content.html("");
+            trainingComments.addClass("comments");
+            trainingComments.html("<b>Welcome</b>. We're going to run through "+examples.length+" examples to warm up.<br>"+
+            "Press any key to get started, or click ");
+            var b = $('<button/>', {class: 'choice'});
+            b.html("get started");
+            trainingComments.append(b);
+
+            $(document).keypress(function() {
+                $(document).unbind("keypress");
+                runThroughExamples(examples, i+1, null);
+            });
+            b.click(function() {
+                $(document).unbind("keypress");
+                runThroughExamples(examples, i+1, null);
+            });
+        }
+
+        // Display actual examples
+
+        else if (i < examples.length) {
+            var displayComments = examples[i].comments;
+            if (lastAnswer != null) {
+                displayComments = "The answer \""+lastAnswer+"\" is incorrect. Please try again. The hint was: <br>"+displayComments;
+            }
+            trainingComments.html(displayComments);
+
+            renderMulticlassQuery(examples[i], function(closureChoice) {
+                if (closureChoice == examples[i].answer) {
+                    runThroughExamples(examples, i+1, null);
+                }
+                else {
+                    console.log("That answer is incorrect! Try again");
+                    runThroughExamples(examples, i, closureChoice);
+                }
+            });
+        }
+
+        // We're finished with examples, do the real thing!
+
+        else {
+            content.html("");
+            trainingComments.html("<b>Congratulations!</b>. You're done with the warm-up!<br>"+
+            "Press any key to get started earning <b>real money</b>, or click ");
+            trainingComments.addClass("comments");
+            var b = $('<button/>', {class: 'choice'});
+            b.html("get started");
+            trainingComments.append(b);
+
+            var start = function() {
+                $(document).unbind("keypress");
+                trainingComments.removeClass("comments");
+                trainingComments.html("");
+                subSocket.push(jQuery.stringifyJSON({ status: "completed-training"}));
+            }
+
+            $(document).keypress(function() {
+                start();
+            });
+            b.click(function() {
+                start();
+            });
+        }
+    }
+
+    // This will handle creating, rendering, and setting up input-hooks for multiclass questions
+
+    function renderMulticlassQuery(json, callback) {
+        if (!document.hasFocus()) {
+            alert("There's a task available for you now");
+        }
+
+        // We need to create a multiclass question here
+        content.css({
+            height: 'auto'
+        });
+
+        content.html(json.html+"<br>");
+
+        var keys = [];
+        var refKeys = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+
+        for (var choiceID in json.choices) {
+            var choice = json.choices[choiceID];
+            var b = $('<button/>', {class: 'choice'});
+            b.html(choice);
+
+            var shortcut = $('<span/>', {class: 'key'});
+
+            var key = choice.toLowerCase().charAt(0);
+            if (!$.inArray(key, keys)) {
+                for (var i in refKeys) {
+                    key = refKeys[i];
+                    if (!$.inArray(key, keys)) break;
+                }
+            }
+            keys.push(key);
+
+            b.append(shortcut);
+            shortcut.html(key);
+
+            content.append(b);
+
+            var makeChoice = function(closureChoice) {
+                $(document).unbind("keydown");
+                $(document).unbind("keyup");
+
+                callback(closureChoice);
+            }
+
+            // I hate Javascript so much. I just can't even describe it.
+            var handler = $(document).keyup((function(closureChoice, closureKey) {
+                return function(e) {
+                    var index = 65+refKeys.indexOf(closureKey)
+                    if (e.which == index) {
+                        makeChoice(closureChoice);
+                    }
+                }
+            })(choice, key));
+
+            b.click((function(closureChoice) {
+                return function() {
+                    makeChoice(closureChoice);
+                }
+            })(choice));
+
+            var handler = $(document).keydown((function(closureChoice, closureKey, closureButton) {
+                return function(e) {
+                    console.log("Pressed "+e.which);
+                    var index = 65+refKeys.indexOf(closureKey)
+                    if (e.which == index) {
+                        closureButton.addClass("hover");
+                        $(document).unbind("keypress");
+                    }
+                }
+            })(choice, key, b));
+        }
+    }
 
     function workComplete(code) {
         content.html($('<p>', { text: 'Received a completion code from the server! Thanks for all your hard work. Turning in HIT in 3 seconds.' }));
@@ -271,9 +369,4 @@ $(function () {
             }, 200);
         });
     }
-
-    $(window).unload(function() {
-        $.cookie.removeCookie("shared", {path: '/'});
-        return null;
-    });
 });
