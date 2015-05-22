@@ -11,6 +11,8 @@ import scala.concurrent.{Promise, Future}
 import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import java.util.IdentityHashMap
+
 /**
  * Created by keenon on 4/27/15.
  *
@@ -24,7 +26,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
 
   // This is a safety stop, where runs can be given specific budgets that they are not intended to cross.
   var budget = 0.0
-  var reserved = mutable.Map[Any, Double]()
+  var reserved = new IdentityHashMap[Any, Double]()
   var spent = 0.0
 
   val budgetLock = new Object()
@@ -34,9 +36,12 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
   }
 
   def tryReserveBudget(amount : Double, owner : Any) : Boolean = budgetLock.synchronized {
+    if (reserved.getOrDefault(owner, 0.0) > 0.0) throw new IllegalStateException("The same reserver shouldn't take more than one reservation at a time")
     if (budget >= amount) {
       budget -= amount
-      reserved.put(owner, reserved.getOrElse(owner, 0.0) + amount)
+      reserved.put(owner, amount)
+      System.err.println("Reserving amount $"+amount)
+      System.err.println("Left-over budget: "+budget)
       true
     }
     else {
@@ -46,20 +51,20 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
 
   def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = budgetLock.synchronized {
     if (amount == 0) {
-      if (reserved.contains(owner)) {
-        budget += reserved(owner)
-        System.err.println("Reclaimed $"+reserved(owner)+" from reserve, budget remaining unclaimed: $"+budget)
+      if (reserved.containsKey(owner)) {
+        budget += reserved.get(owner)
+        System.err.println("Reclaimed reserve $"+reserved.get(owner)+", budget remaining unclaimed: $"+budget)
         reserved.put(owner, 0.0)
       }
     }
     else {
-      if (reserved(owner) >= amount) {
-        val totalReserved = reserved(owner)
+      if (reserved.get(owner) >= amount) {
+        val totalReserved = reserved.get(owner)
         val amountRemaining = totalReserved - amount
         budget += amountRemaining
         reserved.put(owner, 0.0)
 
-        System.err.println("Spent $"+amount+", budget remaining unclaimed: $"+budget)
+        System.err.println("Spent $"+amount+", reclaimed $"+amountRemaining+", budget remaining unclaimed: $"+budget)
 
         // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
         if (budget < 0.001) {
@@ -240,12 +245,15 @@ case class InFlightPrediction(engine : LenseEngine,
     // We already turned in this set, this request is being called from some stray delayed call
     if (turnedIn) return
 
+    System.err.println("Reserved by gameplayer on start of move: $"+engine.reserved.getOrDefault(engine.gamePlayer, 0.0))
+
     val optimalMove = engine.gamePlayer.getOptimalMove(gameState)
 
     optimalMove match {
       case _ : TurnInGuess =>
         // Return any money we had reserved when considering options
-        engine.spendReservedBudget(0.0, engine.gamePlayer, hcuPool)
+        System.err.println("Turning in guess - returning budget")
+        engine.spendReservedBudget(0.0, gameState, hcuPool)
 
         // Make sure no future gameplayerMoves happen
         turnedIn = true
@@ -297,7 +305,8 @@ case class InFlightPrediction(engine : LenseEngine,
           })
       case obs : MakeHumanObservation =>
         // Commit the engine to actually spending the money, and return anything we didn't use
-        engine.spendReservedBudget(obs.hcu.cost, engine.gamePlayer, hcuPool)
+        System.err.println("Making human observation budget spend")
+        engine.spendReservedBudget(obs.hcu.cost, gameState, hcuPool)
 
         // Create a new work unit
         val workUnit = askHuman(obs.node, obs.hcu)
@@ -330,7 +339,23 @@ case class InFlightPrediction(engine : LenseEngine,
         // Move again immediately
         gameplayerMove()
 
+      case WaitForTime(delay) =>
+        System.err.println("Waiting for "+delay+" - returning budget")
+        engine.spendReservedBudget(0.0, gameState, hcuPool)
+        val closureGameState = gameState
+        new Thread(new Runnable {
+          override def run(): Unit = {
+            Thread.sleep(delay)
+            // Only wake up if we weren't woken up before our deadline
+            if (gameState eq closureGameState) {
+              gameplayerMove()
+            }
+          }
+        }).start()
+
       case wait : Wait =>
+        System.err.println("Waiting - returning budget")
+        engine.spendReservedBudget(0.0, gameState, hcuPool)
         // Do nothing, for now. Wait for stimulus
     }
   }

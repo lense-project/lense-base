@@ -7,7 +7,7 @@ import edu.stanford.lense_base.graph.GraphNode
  *
  * This game player is the only one currently able to handle the asynchronous setting. It uses a very simple threshold,
  * where if the uncertainty of a node is above a certain value, we get another query for it. We assume all in flight queries
- * count against the uncertainty of a node already.
+ * count against the uncertainty of a node already
  */
 
 object ThresholdHeuristic extends GamePlayer {
@@ -16,6 +16,11 @@ object ThresholdHeuristic extends GamePlayer {
   val humanUncertaintyMultiple = 0.3
 
   override def getOptimalMove(state: GameState): GameMove = {
+    // If it's been more than 10s, just cancel the current task
+    if (System.currentTimeMillis() - state.startTime > 10000) {
+      return TurnInGuess()
+    }
+
     // We should probably be cacheing this if it's every used in production, but no matter
     val marginals = state.graph.marginalEstimate()
     val moveOnNodes = state.originalGraph.nodes.filter(node => {

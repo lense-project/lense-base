@@ -400,7 +400,14 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Cancel the current job
   override def cancelCurrentWork(): Unit = {
-    // TODO: send some message to client
+    send(new JsonMessage(new JObject(List(
+      "cancelled" -> new JBool(true)
+    ))))
+    currentWork = null
+    workQueue.synchronized {
+      // Wake up the work performing code
+      workQueue.notify()
+    }
   }
 
   // Get the cost
@@ -421,6 +428,18 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       val msg = new JsonMessage(workUnit.asInstanceOf[WebWorkUnit].getOutboundMessage)
       println("Sending message: "+msg)
       send(msg)
+
+      new Thread(new Runnable {
+        override def run(): Unit = {
+          // 10s timeout
+          Thread.sleep(10000)
+          if (!workUnit.promise.isCompleted) {
+            // Timeout the work
+            workUnit.revoke()
+            cancelCurrentWork()
+          }
+        }
+      }).start()
     }
   }
 

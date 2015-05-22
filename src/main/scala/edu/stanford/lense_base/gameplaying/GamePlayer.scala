@@ -22,6 +22,7 @@ abstract class GameMove
 case class TurnInGuess() extends GameMove
 case class MakeHumanObservation(node : GraphNode, hcu : HumanComputeUnit) extends GameMove
 case class Wait() extends GameMove
+case class WaitForTime(delay : Long) extends GameMove
 
 // This is the head of all game playing agents
 
@@ -37,12 +38,12 @@ abstract class GamePlayer {
 
     var canAfford = 0.0
 
-    if (engine.tryReserveBudget(maxHCUCost, this)) {
+    if (engine.tryReserveBudget(maxHCUCost, state)) {
       // We've successfully reserved all the money we need
       canAfford = maxHCUCost
     }
     else {
-      if (engine.tryReserveBudget(minHCUCost, this)) {
+      if (engine.tryReserveBudget(minHCUCost, state)) {
         // We've successfully reserved some of the money we need
         canAfford = minHCUCost
       }

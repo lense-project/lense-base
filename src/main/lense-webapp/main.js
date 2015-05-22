@@ -84,6 +84,12 @@ $(function () {
                     content.append(waitingDiv);
                 }
             }
+            // The current query was cancelled
+            if (json['cancelled'] !== undefined) {
+                $(document).unbind("keyup");
+                $(document).unbind("keydown");
+                content.html("Took too long answering query. Server revoked. Waiting for next question to answer.");
+            }
             if (json['bonus'] !== undefined) {
                 var roundedBonus = Math.round((json.bonus+0.1) * 100) / 100;
                 if (roundedBonus % 0.1 == 0) {
