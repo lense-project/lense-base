@@ -10,6 +10,7 @@ import edu.stanford.lense_base.mturk.HITCreator
 import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{Await, Promise}
 import scala.util.{Random, Try}
 import scala.concurrent.duration._
@@ -100,6 +101,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @return an Output version of this graph
    */
   def toOutput(graph : Graph, values : Map[GraphNode, String]) : Output
+
+  def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String
 
   /**
    * A way to define the loss function for you system. mostLikelyGuesses is a list of all the nodes being chosen on,
@@ -396,6 +399,40 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     plot.saveAnalysis(resultsPrefix+outputPath+"/tuning")
   }
 
+  private def dumpRawNumbers(path : String, values : List[Double]) : Unit = {
+    val cw = new BufferedWriter(new FileWriter(path))
+    for (v <- values) {
+      cw.write(v+"\n")
+    }
+    cw.close()
+  }
+
+  private def frequencyLinePlot(path : String, quantity : String, values : List[Double]) : Unit = {
+    val buckets = Math.max(5, values.size / 50)
+    val plot = new GNUPlot
+
+    val max = values.max
+    val min = values.min
+
+    val indexes = (0 to buckets).map(i => {
+      (i.asInstanceOf[Double] * (max - min) / buckets) + min
+    }).toArray
+    val bucketArray = mutable.Map[Int,Int]()
+
+    for (v <- values) {
+      val normalized = (v - min) / (max - min)
+      val b = Math.round(normalized*buckets).asInstanceOf[Int]
+      bucketArray.put(b, bucketArray.getOrElse(b, 0) + 1)
+    }
+
+    plot.addLine(indexes, (0 to buckets).map(i => bucketArray.getOrElse(i, 0).asInstanceOf[Double]).toArray)
+
+    plot.title = quantity+" frequency"
+    plot.yLabel = "frequency"
+    plot.xLabel = quantity
+    plot.saveAnalysis(path)
+  }
+
   private def printAccuracy(path : String, guesses : List[(String,String)]) : Unit = {
     val correct = guesses.count(pair => pair._1 == pair._2).asInstanceOf[Double]
     val percentage = correct / guesses.size
@@ -491,6 +528,26 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
     bw.close()
 
+    // Print the actual output guess and gold
+
+    val gw = new BufferedWriter(new FileWriter(resultsPrefix+outputPath+"/gold.tsv"))
+    val aw = new BufferedWriter(new FileWriter(resultsPrefix+outputPath+"/guess.tsv"))
+    for (quad <- l) {
+      val goldEncoded = encodeGraphWithValuesAsTSV(quad._1, quad._2)
+      gw.write(goldEncoded)
+      if (!goldEncoded.endsWith("\n")) gw.write("\n")
+      gw.write("\n")
+
+      val guessEncoded = encodeGraphWithValuesAsTSV(quad._1, quad._3)
+      aw.write(guessEncoded)
+      if (!guessEncoded.endsWith("\n")) aw.write("\n")
+      aw.write("\n")
+    }
+    gw.close()
+    aw.close()
+
+    // Print the confusion matrix for the output classes
+
     val nodeTypes = l.flatMap(_._1.nodes).map(_.nodeType).distinct.toList
     for (nodeType <- nodeTypes) {
       printConfusion(resultsPrefix+outputPath+"/confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
@@ -514,6 +571,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val hcuPrefix = resultsPrefix+outputPath+"/hcu_report/"
     val hcuReportFolder = new File(hcuPrefix)
     if (!hcuReportFolder.exists()) hcuReportFolder.mkdirs()
+    frequencyLinePlot(hcuPrefix+"overall_latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
+    dumpRawNumbers(hcuPrefix+"overall_latency_data.txt", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
     for (nodeType <- nodeTypes) {
       val pairs = humanPredictionsVsCorrect.filter(_._3.nodeType eq nodeType).map(quad => (quad._1, quad._2))
       printConfusion(hcuPrefix+"overall_confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
@@ -528,12 +587,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
 
       for (nodeType <- nodeTypes) {
-        val pairs = humanPredictionsVsCorrect.filter(_._3.nodeType eq nodeType).map(quad => (quad._1, quad._2))
+        val pairs = humanPredictionsVsCorrect.filter(_._3.nodeType eq nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))
         printConfusion(thisHcuPrefix+"confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
           nodeType.possibleValues.toList,
           pairs)
         printAccuracy(thisHcuPrefix+"accuracy_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", pairs)
       }
+
+      frequencyLinePlot(thisHcuPrefix+"latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
+      dumpRawNumbers(thisHcuPrefix+"latency_data.txt", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
     }
 
     // First we print an overall HCU confusion matrix and accuracy etc

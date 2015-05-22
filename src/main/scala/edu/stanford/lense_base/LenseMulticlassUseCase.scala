@@ -26,6 +26,10 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
 
   lazy val nodeType = graphStream.makeNodeType(labelTypes)
 
+  override def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String = {
+    graph.nodes.head.payload.toString+"\t"+values(graph.nodes.head)
+  }
+
   override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(triple => {
     MulticlassTrainingQuestion(getHumanQuestion(triple._1), labelTypes.toList.map(getHumanVersionOfLabel), getHumanVersionOfLabel(triple._2), triple._3)
   })

@@ -34,6 +34,13 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
   lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
   lazy val factorType : FactorType = graphStream.makeFactorType(List(nodeType, nodeType))
 
+  override def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String = {
+    graph.nodes.toList.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => {
+      val payload = n.payload.asInstanceOf[(List[String],Int)]
+      payload._1(payload._2) + "\t" + values(n)
+    }).mkString("\n")
+  }
+
   override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(quad => {
     MulticlassTrainingQuestion(getHumanQuestion(quad._1, quad._2), labelTypes.toList.map(l => getHumanVersionOfLabel(l)), getHumanVersionOfLabel(quad._3), quad._4)
   })

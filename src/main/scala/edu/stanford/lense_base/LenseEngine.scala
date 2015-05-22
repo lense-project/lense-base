@@ -211,7 +211,7 @@ case class PredictionSummary(loss : Double,
                              modelTrainingLoss : Double,
                              numExamplesSeen : Int,
                              humanQueryResponses : List[(GraphNode, HumanComputeUnit, String)],
-                             humanQueryDelays : List[Long])
+                             humanQueryDelays : List[(HumanComputeUnit, Long)])
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -230,7 +230,7 @@ case class InFlightPrediction(engine : LenseEngine,
   var totalCost = 0.0
 
   var humanResponses = ListBuffer[(GraphNode, HumanComputeUnit, String)]()
-  var humanQueryDelays = ListBuffer[Long]()
+  var humanQueryDelays = ListBuffer[(HumanComputeUnit, Long)]()
 
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
@@ -336,7 +336,7 @@ case class InFlightPrediction(engine : LenseEngine,
               totalCost += obs.hcu.cost
 
               humanResponses.+=((obs.node, obs.hcu, t.get))
-              humanQueryDelays.+=(System.currentTimeMillis() - launchedObservation)
+              humanQueryDelays.+=((obs.hcu, System.currentTimeMillis() - launchedObservation))
             }
             else {
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)
