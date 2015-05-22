@@ -42,7 +42,7 @@ In order to incorporate this information, we assume the distribution of response
   p(\tau \given x, y, \sigma) 
   &\propto \exp \left( h_\sigma(\tau - \sigma(x,y)) \right),
 \end{align*}
-where $h_\sigma$ is a convex function.
+where $h_\sigma$ is a convex function \todo{(arun): This is currently stupid. Motivate $h_\sigma$}.
 Consider a simple model for noisy labeling, where a person returns the true label with a uniform probability of $1- \epsilon$, and guesses at random otherwise. In this case, 
 \begin{align*}
   h_\sigma(u) &= \alpha \I(\tau \neq \sigma),
@@ -56,20 +56,35 @@ We assume that incorporating these measurements can be done efficiently, i.e.\ m
   &\propto \exp(\theta^\top \phi(x, y) + h_\sigma(\tau - \sigma(x,y))).
 \end{align*}
 
-\subsection{Measurement selection}
+\section{Measurement Selection}
+\label{sec:measurement}
 
 The key computation we need to perform is to choose a measurement action.
 Assume that $\Sigma = \{\sigma_0, \sigma_1, \dots, \sigma_n\}$ are the set of valid measurement operations one can perform. 
 Furthermore, let $\sigma_0$ be a special operation that does not ask for any measurement: it returns the most probable  labeling.
 
-Let $\ell(\by, \byt)$ be the loss incurred when labeling $\by$ versus $\byt$.
-Let the utility of a particular measurement operation be:
+\subsection{Simple model}
+\label{sec:simple}
+
+Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
+When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmax_{\by} \p(\by \given \bx)$.
+If we performed the measurement operator $\sigma$ and received a measurement $\tau$,
+then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$.
+Intuitively, if we had perfect feedback, observing $\tau$ would provide use more information, reducing our risk.
+However, taking measurements has an associated cost, $C(\sigma)$, a function of time and money that the designer must choose.
+There is also a possibility that the measurement does not return a value (because of a timeout).
+
+Let the CDF be $F_\sigma(t)$.
+We model the utility of a particular measurement operation, given a time window $t_0$ to be:
 \begin{align*}
 U(\sigma)
-&= \E_{p(\tau \given x, \sigma)} \left[
-      \E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))] \right] + C(\sigma),
+&= F_\sigma(t_0) 
+  \E_{p(\tau \given x, \sigma)} \left[\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))] \right]
+  + (1 - F_\sigma(t_0)) 
+    \left[\E_{p(\by \given \bx)}[\ell(\by, \byt)] \right]
+  + C(\sigma).
 \end{align*}
-where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$ is the maximum likelihood labeling $C(\sigma)$ is the cost function.
+
 Without loss of generality, assume that the null measurement is free: $C(\sigma_0) = 0$.
 Intuitively, this ensures that we will only ever choose to measure something if the expected reduction in risk is more than the cost of executing the measurement.
 
@@ -85,7 +100,7 @@ The measurement operator to take is simply $\sigma^* = \argmin_{\sigma \in \Sigm
   \caption{Computing expected utility $U(\sigma)$}
   \label{algo:expected-utility}
   \begin{algorithmic}[1]
-    \REQUIRE Measurement operator $\sigma$, input $\bx$, models $p_\theta(\by \given \bx)$ and $p_\theta(\by \given \bx, \tau, \sigma)$
+    \REQUIRE Measurement operator $\sigma$, input $\bx$, models $p_\theta(\by \given \bx)$ and $p_\theta(\by \given \bx, \tau, \sigma)$, $F_\sigma$ and $t_0$.
     \ENSURE Expected utility $U(\sigma)$
     \STATE Let $y_\sigma$ be label(s) measured by operator $\sigma$.
     \STATE Compute $p_\theta(y_\sigma \given \bx)$ using marginal inference.
@@ -94,28 +109,69 @@ The measurement operator to take is simply $\sigma^* = \argmin_{\sigma \in \Sigm
     \FORALL{$i \in [L]$}
     \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
     \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau = i, \sigma)$ for $j \in [n]$ using marginal inference.
-    \STATE Update $u[i] \gets p_\theta(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
+    \STATE Update $u[i] \gets \p(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
     \ENDFOR
     \STATE Return the expected utility: $\frac{\sum_{i=1}^L u[i] p_\theta(\tau = i \given x)}{\sum_{i=1}^L p_\theta(\tau = i \given x)}$
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Asynchronous requests}
+\subsection{Multiple asynchronous requests}
+\label{sec:async}
 
 For the system to be real-time, we need to dispatch multiple measurement queries at the same time.
-Thus, we must reason about what portfolio of measurements would be optimal.
-We consider two schemes:
+Let $\sigma_1, \sigma_2, \dots, \sigma_n$ be the set of queries we can dispatch.
 
-\paragraph{Next best policy}
-In this scheme we do not reason about the future and choose subsequent measurement operators by going down the list.
+\begin{note}[Baseline: Next best policy]
+\noteb{(arun): We should probably move this to experiments as a baseline or ignore all together.}
+In this scheme we do not reason about the future and choose subsequent measurement operators by going down the ordered list of measurement utilities.
+This approach, while simple, does not allow us to query the same node multiple times, which is often optimal if there is high uncertainty on a single important node.
+\end{note}
 
-\paragraph{Lookahead policy}
+We need to reason about the possible responses that might be returned.
+For the sake of simplicity, we will choose (sequentially) the best set of $n$ measurements to make at the very beginning of our time window, not taking into account responses.
 
-In this scheme we lookahead by reasoning about what is the best next measurement operator to apply after we get the measurement for the current measurement operator.
-\algorithmref{expected-utility} can be suitably updated by enumerating
-possible occurrences for $\tau_1, \tau_2, \dots, \tau_d$, for $d$ rounds of measurement.
-This leads $O(L^d)$ inference calls.
-As an approximation, we use a beam of size $k$, leading to $O(dkL)$ inference calls.
+\algorithmref{expected-utility} can be trivially updated by incorporating previous measurement operators, say $\tau_1, \dots, \tau_{n-1}$.
+Naively, this would require us to enumerate over $L^d$ possible values of $\tau_1, \dots, \tau_n$ in line 5 of \algorithmref{expected-utility}.
+Instead, we propose using a particle filter to estimate utilities (\algorithmref{filtered-utility}).
+
+\begin{algorithm}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\caption{Computing expected utility $U(\sigma_n \given \sigma_{1:n-1})$ with a particle filter}
+  \label{algo:expected-utility}
+  \begin{algorithmic}[1]
+    \REQUIRE Measurement operators $\sigma_1, \dots, \sigma_n$, input $\bx$, models $p_\theta(\by \given \bx), \dots, p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$
+    \ENSURE Expected utility $U(\sigma_n \given \sigma_{1:n-1})$
+    \STATE Let $y_{\sigma_n}$ be label(s) measured by operator $\sigma_n$.
+    \STATE Initialize $u \gets (0, \dots, 0)$.
+    \FORALL{particles $t \in [T]$}
+      \FORALL{$i \in [n-1]$}
+      \STATE Sample $\tau_i\oft{t} \sim \p(\by \given \bx, \tau_{1:i-1}\oft{t}, \sigma_{1:i})$
+      \ENDFOR
+      \STATE Set $\pi(\tau_n) \gets \p(\tau_n \given \bx, \tau_{1:n-1}\oft{t}, \sigma_{1:n})$.
+      \STATE Initialize $u\oft{t} \gets (0, \dots, 0)$.
+      \FORALL{$\tau_n \in [L]$}
+      \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$ using MAP inference.
+      \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau_{1:n}, \sigma_{1:n})$ for $j \in [n]$ using marginal inference.
+      \STATE Update $u\oft{t}[\tau_n] \gets \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
+      \ENDFOR
+      \STATE Update the expected utility: $u \gets u + \frac{1}{T} \frac{\sum_{i=1}^L u[i] \pi(i)}{\sum_{i=1}^L \pi(i)}$.
+    \ENDFOR
+    \STATE Return the expected utility: $u$.
+  \end{algorithmic}
+\end{algorithm}
+
+For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmax U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
+\todo{(arun): BAD NOTATION! The subscripts refer to members of $\Sigma$, but also the sequence of measurements.}
+
+\subsection{Modeling time}
+\label{sec:time}
+
+When asking for multiple requests, we must decide between sending a request for information right now versus when we receive the measurement.
+In the latter case, we have more information and can make a better informed decision.
+Provided unlimited time, the latter is always optimal, but realistically, we have a finite time window in which to make decisions.
+
+We model this.
 
 \subsection{Optimization}
 
