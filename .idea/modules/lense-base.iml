@@ -338,5 +338,6 @@
     <orderEntry type="library" scope="TEST" name="SBT: org.typelevel:scodec-bits_2.11:1.0.2:jar" level="project" />
     <orderEntry type="library" name="SBT: redis.clients:jedis:2.0.0:jar" level="project" />
     <orderEntry type="library" name="scala-sdk-2.11.5 (2)" level="application" />
+    <orderEntry type="library" name="scala-sdk-2.11.4" level="application" />
   </component>
 </module>
