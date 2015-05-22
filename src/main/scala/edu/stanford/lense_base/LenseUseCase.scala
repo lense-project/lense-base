@@ -254,7 +254,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       renderClassification(graph, goldMap, guessMap)
       val loss = 0
-      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List()))
+      (graph, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List(), "turn-in-guess"))
     }, null, "offline_baseline")
 
     System.exit(0)

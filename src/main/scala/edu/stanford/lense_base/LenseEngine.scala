@@ -211,7 +211,8 @@ case class PredictionSummary(loss : Double,
                              modelTrainingLoss : Double,
                              numExamplesSeen : Int,
                              humanQueryResponses : List[(GraphNode, HumanComputeUnit, String)],
-                             humanQueryDelays : List[(HumanComputeUnit, Long)])
+                             humanQueryDelays : List[(HumanComputeUnit, Long)],
+                             behaviorLog : String)
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -231,6 +232,8 @@ case class InFlightPrediction(engine : LenseEngine,
 
   var humanResponses = ListBuffer[(GraphNode, HumanComputeUnit, String)]()
   var humanQueryDelays = ListBuffer[(HumanComputeUnit, Long)]()
+
+  var behaviorLog = ""
 
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
@@ -309,7 +312,8 @@ case class InFlightPrediction(engine : LenseEngine,
               engine.currentLoss(),
               engine.pastGuesses.size,
               humanResponses.toList,
-              humanQueryDelays.toList))
+              humanQueryDelays.toList,
+              behaviorLog))
           })
       case obs : MakeHumanObservation =>
         // Commit the engine to actually spending the money, and return anything we didn't use
