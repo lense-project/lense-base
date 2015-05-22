@@ -1,0 +1,57 @@
+<component name="libraryTable">
+  <library name="all-libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/aws-mturk-dataschema.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aws-mturk-wsdl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/axis.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/axis-ant.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-beanutils.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-collections-3.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-collections-testframework-3.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-dbcp-1.2.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-digester-1.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-discovery-0.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-httpclient-3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-httpclient-contrib-3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-lang-2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-logging.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-logging-1.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-logging-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-pool-1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/dom4j-1.6.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/factorie_2.11-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/geronimo-activation_1.0.2_spec-1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/geronimo-javamail_1.3.1_spec-1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpclient-4.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpclient-cache-4.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcore-4.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpmime-4.1.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-aws-mturk.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxme2-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxme2-rt-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxmeapi-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxmejs-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxmepm-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxmexs-0.5.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jaxrpc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opencsv-1.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/resolver.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/saaj.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/velocity-1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/velocity-tools-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/wsdl4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/wstx-asl-3.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xalan.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xercesImpl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/xml-apis.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/aws-mturk-dataschema.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/aws-mturk-wsdl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/java-aws-mturk.jar!/" />
+    </SOURCES>
+  </library>
+</component>

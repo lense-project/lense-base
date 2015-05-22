@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="lense-base:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/lense_base_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="lense-base/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="lense-base" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
