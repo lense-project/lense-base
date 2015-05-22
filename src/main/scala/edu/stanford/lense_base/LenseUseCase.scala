@@ -396,6 +396,48 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     plot.saveAnalysis(resultsPrefix+outputPath+"/tuning")
   }
 
+  private def printAccuracy(path : String, guesses : List[(String,String)]) : Unit = {
+    val correct = guesses.count(pair => pair._1 == pair._2).asInstanceOf[Double]
+    val percentage = correct / guesses.size
+    val cw = new BufferedWriter(new FileWriter(path))
+    cw.write("Accuracy: "+percentage)
+    cw.close()
+  }
+
+  private def printConfusion(path : String, values : List[String], guesses : List[(String,String)]) : Unit = {
+    // Get the confusion matrix
+    val confusion : mutable.Map[(String,String), Int] = mutable.Map()
+    for (pair <- guesses) {
+      confusion.put(pair, confusion.getOrElse(pair, 0) + 1)
+    }
+    // Write out to the file
+    val confusionResultFile = new File(path)
+    if (!confusionResultFile.exists()) confusionResultFile.createNewFile()
+    val cw = new BufferedWriter(new FileWriter(confusionResultFile))
+    // Write out header row
+    cw.write("COL=GUESS;ROW=GOLD")
+    for (guess <- values) {
+      cw.write(",")
+      cw.write(guess)
+    }
+    cw.write("\n")
+
+    for (gold <- values) {
+      cw.write(gold)
+      cw.write(",")
+      var j = 0
+      for (guess <- values) {
+        if (j > 0) {
+          cw.write(",")
+        }
+        j += 1
+        cw.write(""+confusion.getOrElse((gold, guess), 0))
+      }
+      cw.write("\n")
+    }
+    cw.close()
+  }
+
   // Prints some outputs to stdout that are the result of analysis
   private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "default") : Unit = {
     var correct = 0.0
@@ -451,44 +493,50 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
     val nodeTypes = l.flatMap(_._1.nodes).map(_.nodeType).distinct.toList
     for (nodeType <- nodeTypes) {
-      // Get the confusion matrix
-      val confusion : mutable.Map[(String,String), Int] = mutable.Map()
-      for (quad <- l) {
-        for (node <- quad._1.nodes) {
-          if (node.nodeType eq nodeType) {
-            val trueValue = quad._2(node)
-            val guessedValue = quad._3(node)
-            confusion.put((trueValue, guessedValue), confusion.getOrElse((trueValue, guessedValue), 0) + 1)
-          }
-        }
-      }
-      // Write out to the file
-      val confusionResultFile = new File(resultsPrefix+outputPath+"/confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv")
-      if (!confusionResultFile.exists()) confusionResultFile.createNewFile()
-      val cw = new BufferedWriter(new FileWriter(confusionResultFile))
-      // Write out header row
-      cw.write("COL=GUESS;ROW=GOLD")
-      for (guess <- nodeType.possibleValues) {
-        cw.write(",")
-        cw.write(guess)
-      }
-      cw.write("\n")
-
-      for (gold <- nodeType.possibleValues) {
-        cw.write(gold)
-        cw.write(",")
-        var j = 0
-        for (guess <- nodeType.possibleValues) {
-          if (j > 0) {
-            cw.write(",")
-          }
-          j += 1
-          cw.write(""+confusion.getOrElse((gold, guess), 0))
-        }
-        cw.write("\n")
-      }
-      cw.close()
+      printConfusion(resultsPrefix+outputPath+"/confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
+        nodeType.possibleValues.toList,
+        l.flatMap(quad => {
+          quad._1.nodes.filter(_.nodeType eq nodeType).map(node => (quad._2(node), quad._3(node)))
+        }))
     }
+
+    // Gold, guess, HCU responsible
+    val humanPredictionsVsCorrect : List[(String,String,GraphNode,HumanComputeUnit)] = l.flatMap(quad => {
+      val graph = quad._1
+      val goldMap = quad._2
+      quad._4.humanQueryResponses.map(triple => {
+        (goldMap(triple._1), triple._3, triple._1, triple._2)
+      })
+    })
+    val hcusInvolved = humanPredictionsVsCorrect.map(_._4).distinct
+
+    // Do overall HCU collective analysis
+    val hcuPrefix = resultsPrefix+outputPath+"/hcu_report/"
+    val hcuReportFolder = new File(hcuPrefix)
+    if (!hcuReportFolder.exists()) hcuReportFolder.mkdirs()
+    for (nodeType <- nodeTypes) {
+      val pairs = humanPredictionsVsCorrect.filter(_._3.nodeType eq nodeType).map(quad => (quad._1, quad._2))
+      printConfusion(hcuPrefix+"overall_confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
+        nodeType.possibleValues.toList,
+        pairs)
+      printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", pairs)
+    }
+    // Do individual HCU level analysis
+    for (hcu <- hcusInvolved) {
+      val thisHcuPrefix = hcuPrefix+"/"+hcu.getName+"/"
+      val thisHcuReportFolder = new File(thisHcuPrefix)
+      if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
+
+      for (nodeType <- nodeTypes) {
+        val pairs = humanPredictionsVsCorrect.filter(_._3.nodeType eq nodeType).map(quad => (quad._1, quad._2))
+        printConfusion(thisHcuPrefix+"confusion_nodetype_"+nodeTypes.indexOf(nodeType)+".csv",
+          nodeType.possibleValues.toList,
+          pairs)
+        printAccuracy(thisHcuPrefix+"accuracy_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", pairs)
+      }
+    }
+
+    // First we print an overall HCU confusion matrix and accuracy etc
 
     def smoothTimeSeries(timeSeriesData : Array[Double], timeToAvg : Int) : Array[Double] = {
       var sum = 0.0
@@ -606,7 +654,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 }
 
 case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HCUPool {
-  for (i <- 1 to startNumHumans) addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
+  var hcuIndex = 0
+
+  for (i <- 1 to startNumHumans) {
+    addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand, hcuIndex))
+    hcuIndex += 1
+  }
 
   var running = true
 
@@ -632,7 +685,8 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
           // or add a human
           else {
             System.err.println("** ARTIFICIAL HCU POOL ** Randomly adding a human annotator")
-            addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand))
+            addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand, hcuIndex))
+            hcuIndex += 1
           }
         }
       }
@@ -642,7 +696,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
 
 case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode, hcuPool : HCUPool) extends WorkUnit(resultPromise, node, hcuPool)
 
-class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HumanComputeUnit {
+class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random, index : Int) extends HumanComputeUnit {
   // Gets the estimated required time to perform this task, in milliseconds
   override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = humanDelayMean
 
@@ -670,6 +724,8 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
       }
     }
   }
+
+  override def getName: String = "artificial_human_"+index
 }
 
 case class GraphNodeAnswer(displayText : String, internalClassName : String)

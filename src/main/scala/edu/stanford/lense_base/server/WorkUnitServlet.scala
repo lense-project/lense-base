@@ -452,4 +452,6 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       }
     }).start()
   }
+
+  override def getName: String = workerId
 }

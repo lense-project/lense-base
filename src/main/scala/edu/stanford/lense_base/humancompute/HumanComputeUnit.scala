@@ -104,6 +104,8 @@ trait HumanComputeUnit {
     estimateRequiredTimeToFinishItem(node) + estimateTimeToFinishQueue
   }
 
+  def getName : String
+
   // Gets the estimated required time to perform this task, in milliseconds
   def estimateRequiredTimeToFinishItem(node : GraphNode) : Long
   // Kick off a job
