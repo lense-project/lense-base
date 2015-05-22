@@ -7,6 +7,7 @@ import edu.stanford.lense_base.util.CaseClassEq
 import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.{Promise, Future}
 import scala.util.Try
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -208,7 +209,9 @@ case class PredictionSummary(loss : Double,
                              initialAvgConfidence : Double,
                              numSwapsSoFar : Int,
                              modelTrainingLoss : Double,
-                             numExamplesSeen : Int)
+                             numExamplesSeen : Int,
+                             humanQueryResponses : List[(GraphNode, HumanComputeUnit, String)],
+                             humanQueryDelays : List[Long])
 
 case class InFlightPrediction(engine : LenseEngine,
                               originalGraph : Graph,
@@ -225,6 +228,9 @@ case class InFlightPrediction(engine : LenseEngine,
   var numRequestsCompleted = 0
   var numRequestsFailed = 0
   var totalCost = 0.0
+
+  var humanResponses = ListBuffer[(GraphNode, HumanComputeUnit, String)]()
+  var humanQueryDelays = ListBuffer[Long]()
 
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
@@ -301,7 +307,9 @@ case class InFlightPrediction(engine : LenseEngine,
               initialAverageConfidence,
               engine.numSwapsSoFar,
               engine.currentLoss(),
-              engine.pastGuesses.size))
+              engine.pastGuesses.size,
+              humanResponses.toList,
+              humanQueryDelays.toList))
           })
       case obs : MakeHumanObservation =>
         // Commit the engine to actually spending the money, and return anything we didn't use
@@ -315,6 +323,8 @@ case class InFlightPrediction(engine : LenseEngine,
 
         numRequests += 1
 
+        val launchedObservation : Long = System.currentTimeMillis()
+
         // When the work unit returns, do the following
         workUnit.promise.future.onComplete(t => {
           this.synchronized {
@@ -324,6 +334,9 @@ case class InFlightPrediction(engine : LenseEngine,
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
               numRequestsCompleted += 1
               totalCost += obs.hcu.cost
+
+              humanResponses.+=((obs.node, obs.hcu, t.get))
+              humanQueryDelays.+=(System.currentTimeMillis() - launchedObservation)
             }
             else {
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)
