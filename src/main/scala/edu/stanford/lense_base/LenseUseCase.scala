@@ -24,8 +24,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
  */
 abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
-  lazy val graphStream : GraphStream = new GraphStream()
-  lazy val lenseEngine : LenseEngine = new LenseEngine(graphStream, gamePlayer)
+  lazy val graphStream: GraphStream = new GraphStream()
+  lazy val lenseEngine: LenseEngine = new LenseEngine(graphStream, gamePlayer)
 
   lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
@@ -33,15 +33,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     WorkUnitServlet.server
   }
 
-  def makeHITAndWaitFor(numberOfHumans : Int) = {
+  def makeHITAndWaitFor(numberOfHumans: Int) = {
     System.err.println("Creating MTurk HITs...")
-    HITCreator.createHIT(0.10, numberOfHumans*2)
+    HITCreator.createHIT(0.10, numberOfHumans * 2)
 
-    System.err.println("Waiting for "+numberOfHumans+" to connect...")
+    System.err.println("Waiting for " + numberOfHumans + " to connect...")
     WorkUnitServlet.waitForSimultaneousConnections(numberOfHumans)
   }
 
-  def initialize() : Unit = {
+  def initialize(): Unit = {
     // Add the training data as a list of labeled graphs
     lenseEngine.addTrainingData(
       initialTrainingData.map(pair =>
@@ -54,7 +54,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   initialize()
 
-  def useCaseReportSubpath : String = ""
+  def useCaseReportSubpath: String = ""
 
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
@@ -62,7 +62,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @return amount in dollars to use as budget
    */
-  def budget : Double
+  def budget: Double
 
   /**
    * This function takes an Input
@@ -72,7 +72,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param input the input that the graph will represent
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  def toGraph(input : Input) : Graph
+  def toGraph(input: Input): Graph
 
   /**
    * Returns the correct labels for all the nodes in the graph, given a graph and the corresponding gold output. This
@@ -82,14 +82,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param goldOutput the output we expect from the graph labellings
    * @return
    */
-  def toGoldGraphLabels(graph : Graph, goldOutput : Output) : Map[GraphNode, String] = {
+  def toGoldGraphLabels(graph: Graph, goldOutput: Output): Map[GraphNode, String] = {
     graph.nodes.map(n => {
       (n, getCorrectLabel(n, goldOutput))
     }).toMap
   }
 
-  def getCorrectLabel(node : GraphNode, goldOutput : Output) : String
-  def getQuestion(node : GraphNode, hcu : HumanComputeUnit) : GraphNodeQuestion
+  def getCorrectLabel(node: GraphNode, goldOutput: Output): String
+
+  def getQuestion(node: GraphNode, hcu: HumanComputeUnit): GraphNodeQuestion
 
   /**
    * Reads the MAP assignment out of the values object, and returns an Output corresponding to this graph having these
@@ -100,9 +101,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param values a map corresponding the nodes of the graph with their String labels
    * @return an Output version of this graph
    */
-  def toOutput(graph : Graph, values : Map[GraphNode, String]) : Output
+  def toOutput(graph: Graph, values: Map[GraphNode, String]): Output
 
-  def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String
+  def encodeGraphWithValuesAsTSV(graph: Graph, values: Map[GraphNode, String]): String
 
   /**
    * A way to define the loss function for you system. mostLikelyGuesses is a list of all the nodes being chosen on,
@@ -115,7 +116,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param ms
    * @return
    */
-  def lossFunction(mostLikelyGuesses : List[(GraphNode,String,Double)], cost : Double, ms : Long) : Double
+  def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double
 
   /**
    * An opportunity to provide some seed data for training the model before the online task begins. This data will
@@ -123,7 +124,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @return model seed training data
    */
-  def initialTrainingData : List[(Input, Output)] = List()
+  def initialTrainingData: List[(Input, Output)] = List()
 
   /**
    * An opportunity to provide some examples for humans to learn with. The first element in the Tuple is the GraphNode
@@ -132,8 +133,31 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @return
    */
-  def humanTrainingExamples : List[TrainingQuestion] = List()
-  RealHumanHCUPool.trainingQuestions = humanTrainingExamples
+  def humanTrainingExamples: List[TrainingQuestion] = List()
+
+  /**
+   * Get a text introduction to explain the task to Turkers
+   * @return
+   */
+  def humanTrainingIntroduction: String = ""
+
+  /**
+   * Get a cheat sheet to display continuously throughout the task
+   * @return
+   */
+  def humanCheatSheet: String = ""
+
+  RealHumanHCUPool.trainingQuestions = {
+    if (humanTrainingIntroduction.length > 0) {
+      List(IntroductionTrainingQuestion(humanTrainingIntroduction))
+    }
+    else List()
+  } ++ {
+    if (humanCheatSheet.length > 0) {
+      List(TrainingCheatSheet(humanCheatSheet))
+    }
+    else List()
+  } ++ humanTrainingExamples
 
   /**
    * An opportunity to provide a new game player, besides the default

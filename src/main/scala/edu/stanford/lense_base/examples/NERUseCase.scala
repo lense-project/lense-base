@@ -84,11 +84,10 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = List(
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 5, "ORG", "Label all countries that are doing things as Organizations"),
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 7, "ORG", "All countries that are part of an action are Organizations"),
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 2, "O", "Label everything else as nothing")
-  )
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner.yaml")
+  override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
+  override def humanTrainingIntroduction : String = yaml._1
+  override def humanCheatSheet : String = yaml._2
 
   def loadNER : List[(List[String],List[String])] = {
     val loadedData : ListBuffer[(List[String],List[String])] = ListBuffer()
@@ -122,7 +121,7 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 100.00
+  override def budget: Double = 20.00
 }
 
 object NERUseCase extends App {
@@ -150,10 +149,10 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 10
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  val poolSize = 2
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data)
+  nerUseCase.testWithRealHumans(nerUseCase.data)
 }

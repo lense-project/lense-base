@@ -7,6 +7,7 @@
         <script type="text/javascript" src="/lib/jquery.cookie.js"></script>
         <script type="text/javascript" src="/main.js"></script>
         <link type="text/css" rel="stylesheet" href="/style.css">
+        <link type="text/css" rel="stylesheet" href="/grid12.css">
         <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
     </head>
@@ -22,10 +23,15 @@
             </div>
         </div>
 
-        <div id="training-comments">
+        <div class="row">
+            <div class="col-md-9">
+                <div id="training-comments"></div>
+                <div id="content"></div>
+            </div>
+            <div class="col-md-3">
+                <div id="cheat-sheet" class="info"></div>
+            </div>
         </div>
-
-        <div id="content"></div>
 
         <div class="info" id="instruction">
             <h3 id="instructions-header">Instructions</h3>
@@ -53,7 +59,6 @@
                 <li>Click on the <button style="padding: 10px">button</button> that <b>best answers the question</b> (there are also keyboard shortcuts which look like <span class="key">k</span>).</li>
                 <li>Earn a bonus of <span class="bonus">$0.01</span> for each question you answer.</li>
             </ol>
-            (If you don't answer a question within <b>10 seconds</b> it will time out and be replaced by another one. No pressure though. There are lots of questions to answer.)
 
             <button class="ready" id="ready">I get it. Let's get started!</button>
         </div>

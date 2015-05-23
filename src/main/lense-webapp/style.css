@@ -17,6 +17,10 @@ body {
     border-radius: 5px;
 }
 
+.info:empty {
+    display: none;
+}
+
 .upperright {
     position: absolute;
     top: 0.5em;
@@ -33,7 +37,8 @@ body {
     width: 20px;
     height: 20px;
     display: inline-block;
-    padding: 5px;
+    padding: 2px;
+    box-sizing: initial;
     margin-left: 5px;
     text-align: center;
     font-family: 'Slabo 27px', serif;
@@ -97,7 +102,7 @@ button.hover {
 }
 
 #content {
-    margin-left: 2.5em;
+    /*margin-left: 2.5em;*/
     margin-top: 1em;
     margin-bottom: 1em;
 }

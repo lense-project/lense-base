@@ -26,6 +26,7 @@ $(function () {
     var retainer = $('#retainer');
     var form = $("#successForm")
     var trainingComments = $("#training-comments")
+    var cheatSheet = $("#cheat-sheet")
 
     // Setup submit form
 
@@ -153,7 +154,16 @@ $(function () {
             }
             if (json['type'] !== undefined && json.type === "training") {
                 var examples = json.examples;
-                runThroughExamples(examples, -1, null);
+                var filteredExamples = [];
+                for (var j in examples) {
+                    if (examples[j].type == "cheat-sheet") {
+                        cheatSheet.html("<h3>Cheat Sheet:</h3>"+examples[j].html);
+                    }
+                    else {
+                        filteredExamples.push(examples[j]);
+                    }
+                }
+                runThroughExamples(filteredExamples, 0, null);
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
                 renderMulticlassQuery(json, function(closureChoice) {
@@ -201,10 +211,10 @@ $(function () {
 
         // Display a welcome banner
 
-        if (i == -1) {
+        if (i < examples.length && examples[i].type === "introduction") {
             content.html("");
             trainingComments.addClass("comments");
-            trainingComments.html("<b>Welcome</b>. We're going to run through "+examples.length+" examples to warm up.<br>"+
+            trainingComments.html("<br><b>Task Description:</b><div>"+examples[i].html+"</div><br>We're going to run through "+examples.length+" examples to warm up.<br>"+
             "<b>Press any key</b> to get started, or click ");
             var b = $('<button/>', {class: 'choice'});
             b.html("get started");
@@ -223,7 +233,7 @@ $(function () {
 
         // Display actual examples
 
-        else if (i < examples.length) {
+        else if (i < examples.length && examples[i].type === "multiclass") {
             var displayComments = examples[i].comments;
             if (lastAnswer != null) {
                 displayComments = "<span class='incorrect'>The answer \""+lastAnswer+"\" is incorrect.</span> Please try again. The hint was: <br>"+displayComments;

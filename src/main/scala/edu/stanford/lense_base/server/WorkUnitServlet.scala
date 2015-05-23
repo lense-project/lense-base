@@ -206,6 +206,25 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
 abstract class TrainingQuestion {
   def getEncodedQuestion : JObject
 }
+
+case class IntroductionTrainingQuestion(questionHTML : String) extends TrainingQuestion {
+  override def getEncodedQuestion: JObject = {
+    new JObject(List(
+      "type" -> new JString("introduction"),
+      "html" -> new JString(questionHTML)
+    ))
+  }
+}
+
+case class TrainingCheatSheet(questionHTML : String) extends TrainingQuestion {
+  override def getEncodedQuestion: JObject = {
+    new JObject(List(
+      "type" -> new JString("cheat-sheet"),
+      "html" -> new JString(questionHTML)
+    ))
+  }
+}
+
 case class MulticlassTrainingQuestion(questionHTML : String, choices : List[String], correctAnswer : String, comments : String) extends TrainingQuestion {
   override def getEncodedQuestion: JObject = {
     new JObject(List(

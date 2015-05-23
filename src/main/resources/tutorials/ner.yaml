@@ -1,0 +1,39 @@
+%The CoNLL user tutorial
+%The idea here is to encode as many nasty little details of the spec as possible, so Turkers are prepared to
+%give us reasonably high quality results.
+---
+introduction: "Today we'll be labeling words as one of 4 kinds of entity: person, place, organization, miscellaneous.
+               We also respect none."
+cheat-sheet: "Fictional characters"
+examples:
+  - sequence: "[Bob] Woodworth stubbed his toe on his way to the car."
+    correctTag: "PER"
+    comment: "Label all people as Person."
+
+  - sequence: "Micky [Mouse] ran across the piano."
+    correctTag: "PER"
+    comment: "Label fictional characters as Person."
+
+  - sequence: "This week in the news [Germany] invades Poland."
+    correctTag: "ORG"
+    comment: "Label all countries as organizations."
+
+  - sequence: "[Cookie] Monster from Sesame Street is popular with kids."
+    correctTag: "PER"
+    comment: "How are you supposed to label fictional characters?"
+
+  - sequence: "This week in the news Germany invades [Poland.]"
+    correctTag: "ORG"
+    comment: "How are you supposed to label countries?"
+
+  - sequence: "Competition takes place at the Olympic [Birdsnest] in Beijing."
+    correctTag: "LOC"
+    comment: "Places are always labeled as locations."
+
+  - sequence: "The [English] men sang and drank wine."
+    correctTag: "MISC"
+    comment: "Names used as adjectives are labeled as miscellaneous."
+
+  - sequence: "I speak a little [French.]"
+    correctTag: "MISC"
+    comment: "Languages are labeled as miscellaneous."
