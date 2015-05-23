@@ -35,7 +35,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   def makeHITAndWaitFor(numberOfHumans: Int) = {
     System.err.println("Creating MTurk HITs...")
-    HITCreator.createHIT(0.10, numberOfHumans * 2)
+    HITCreator.createHIT(1.00, numberOfHumans)
 
     System.err.println("Waiting for " + numberOfHumans + " to connect...")
     WorkUnitServlet.waitForSimultaneousConnections(numberOfHumans)
@@ -320,10 +320,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
-  def testWithRealHumans(goldPairs : List[(Input, Output)]) : Unit = {
+  def testWithRealHumans(goldPairs : List[(Input, Output)], poolSize : Int) : Unit = {
     ensureWorkServer
 
-    makeHITAndWaitFor(1)
+    makeHITAndWaitFor(poolSize)
 
     progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)

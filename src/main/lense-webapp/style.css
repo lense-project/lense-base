@@ -2,6 +2,11 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 .choice {
     margin: 1.0em;
     padding: 1.0em;
@@ -23,8 +28,8 @@ body {
 
 .upperright {
     position: absolute;
-    top: 0.5em;
-    right: 0.5em;
+    top: 0.75em;
+    right: 0.75em;
     font-size: large;
     text-align: right;
 }
@@ -80,8 +85,8 @@ button.hover {
 
 .bonus-ping {
     position: fixed;
-    right: 10px;
-    top: 10px;
+    right: 20px;
+    top: 20px;
     color: yellow;
     font-size: 5em;
 }
@@ -160,4 +165,8 @@ button.hover {
     font-size: 2.0em;
     color: green;
     padding: 20px;
+}
+
+#cheat-sheet {
+    font-size: 0.8em;
 }

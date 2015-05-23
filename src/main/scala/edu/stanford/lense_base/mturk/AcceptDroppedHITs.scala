@@ -12,7 +12,7 @@ object AcceptDroppedHITs {
   def main(args : Array[String]) : Unit = {
     for (worker <- MTurkDatabase.getAllWorkers) {
       if (!worker.currentlyConnected) {
-        WorkUnitServlet.attemptGrantBonus(worker.workerId)
+        WorkUnitServlet.attemptGrantBonus(worker.workerId, worker.assignmentId)
       }
     }
   }

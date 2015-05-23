@@ -100,7 +100,7 @@ object WorkUnitServlet {
     }
   })
 
-  def attemptGrantBonus(workerId : String, client : HCUClient = null) = {
+  def attemptGrantBonus(workerId : String, assignmentId : String, client : HCUClient = null) = {
     // We want to be careful never to double-pay
     MTurkDatabase.synchronized {
       val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
@@ -112,8 +112,7 @@ object WorkUnitServlet {
         }
         try {
           // Do the approval
-          WorkUnitServlet.service.approveAssignment(state.assignmentId, "Good work on real-time tasks")
-          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, state.assignmentId, "Earned while completing real-time tasks")
+          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing "+state.queriesAnswered+" real-time tasks")
           // Reset all info on this worker
           MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
         }
@@ -269,27 +268,25 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       WorkUnitServlet.releaseWorkerId(this, workerId)
       val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
       if (state == null) {
-        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
-          0,
-          0L,
-          0.0,
-          currentlyConnected = false))
+        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId))
       }
       else {
         MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
           state.queriesAnswered,
           state.connectionDuration,
           state.outstandingBonus,
-          currentlyConnected = false))
-        WorkUnitServlet.attemptGrantBonus(workerId)
+          currentlyConnected = false,
+          state.assignmentId))
       }
     }
   }
 
   def completeAndPay() = {
+    noteDisconnection()
+    RealHumanHCUPool.removeHCU(this)
     send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
     // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
-    grantBonusInNSeconds()
+    grantBonusInNSeconds(this)
   }
 
   def acceptWorker() = {
@@ -396,9 +393,9 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       else if (currentWork != null) {
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
         val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
-        val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost)
+        val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost, currentlyConnected = true, assignmentId)
         MTurkDatabase.updateOrCreateWorker(newState)
-        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(newState.outstandingBonus)))))
+        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(newState.outstandingBonus + retainer)))))
         finishWork(currentWork, replyValue)
       }
 
@@ -408,7 +405,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   def retainer : Double = {
     // TODO: This needs to be set in a flag someplace
-    0.10
+    1.00
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
@@ -437,8 +434,8 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Milliseconds that this worker is expected to remain on call before being paid
   def retainerDuration(): Long = {
-    // 10 minutes retainer
-    10 * 60 * 1000L
+    // 1 minutes retainer
+    1 * 60 * 1000L
   }
 
   // Kick off a job
@@ -462,12 +459,13 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
     }
   }
 
-  def grantBonusInNSeconds() : Unit = {
+  def grantBonusInNSeconds(hcuClient : HCUClient) : Unit = {
     println("Waiting 15 seconds to grant bonus")
     new Thread(new Runnable {
       override def run(): Unit = {
         Thread.sleep(15000)
-        WorkUnitServlet.attemptGrantBonus(workerId)
+        WorkUnitServlet.service.approveAssignment(assignmentId, "Good work on real-time tasks")
+        WorkUnitServlet.attemptGrantBonus(workerId, assignmentId, hcuClient)
       }
     }).start()
   }
