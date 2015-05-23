@@ -124,13 +124,18 @@ $(function () {
                     var elapsedMillis = currentTimeMillis - startTimeMillis;
                     var remainingMillis = onCallDuration - elapsedMillis;
                     if (remainingMillis < 0) {
-                        retainer.html('');
+                        var retainerContainer = $("#retainer-container");
+                        retainerContainer.html('');
                         var input = $('<button class="collect">Collect your earnings!</button>');
+                        input.css({
+                            "z-index": 100,
+                            "position": "relative"
+                        });
                         input.click(function() {
                             console.log("Turning in results");
                             subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
                         });
-                        input.appendTo(retainer);
+                        input.appendTo(retainerContainer);
                         window.clearInterval(interval);
                     }
                     else {
@@ -149,12 +154,9 @@ $(function () {
             }
             if (json['completion-code'] !== undefined) {
                 retainer.html('');
-                content.html("Thanks for participating! Your bonus will be approved within 30 seconds. This page will refresh in 3 seconds. DO NOT NAVIGATE AWAY FROM THIS PAGE BEFORE IT REFRESHES, OR YOU WILL NOT GET PAID.");
-                setTimeout(function() {
-                    var code = json['completion-code'];
-                    console.log("Turning in final work! Using code "+code);
-                    workComplete(code);
-                }, 3000);
+                var code = json['completion-code'];
+                console.log("Turning in final work! Using code "+code);
+                workComplete(code);
             }
             if (json['type'] !== undefined && json.type === "training") {
                 var examples = json.examples;

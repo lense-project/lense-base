@@ -434,8 +434,10 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Milliseconds that this worker is expected to remain on call before being paid
   def retainerDuration(): Long = {
-    // 1 minutes retainer
-    1 * 60 * 1000L
+    // 30 minutes retainer
+    30 * 60 * 1000L
+    // 10 second retainer
+    // 10 * 1000L
   }
 
   // Kick off a job
