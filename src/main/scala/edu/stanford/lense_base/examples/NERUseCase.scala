@@ -115,6 +115,9 @@ class NERUseCase extends LenseSequenceUseCase {
     loadedData.toList
   }
 
+  // The null class for during analysis
+  override def defaultClass : String = "O"
+
   lazy val random = new Random(42)
   override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)

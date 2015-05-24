@@ -174,6 +174,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def gamePlayer : GamePlayer = ThresholdHeuristic
 
   /**
+   * This is used when calculating recall and F1, if non-null. Useful for cases like NER where there's a dominant NULL class.
+   * @return
+   */
+  def defaultClass : String = null
+
+  /**
    * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
    */
   def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {}
@@ -194,7 +200,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     for (pair <- goldPairs) {
       mutableAnalysis.+=(fn(pair))
       i += 1
-      if (i % 10 == 0) {
+      if (i % 2 == 0) {
         analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
       }
       if (i % 50 == 0) {
@@ -513,6 +519,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   private def analyzeOutput(l : List[(Graph, Map[GraphNode, String], Map[GraphNode, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "default") : Unit = {
     var correct = 0.0
     var incorrect = 0.0
+
+    val nonDefaultCorrect = mutable.Map[String, Double]()
+    val foundNonDefault = mutable.Map[String, Double]()
+    val guessedNonDefault = mutable.Map[String, Double]()
+
     var requested = 0.0
     var completed = 0.0
     var time = 0L
@@ -525,6 +536,18 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
           if (trueValue == guessedValue) correct += 1
           else incorrect += 1
           tokens += 1
+
+          if (defaultClass != null) {
+            if (trueValue != defaultClass) {
+              foundNonDefault.put(trueValue, foundNonDefault.getOrElse(trueValue, 0.0) + 1)
+            }
+            if (guessedValue != defaultClass) {
+              guessedNonDefault.put(guessedValue, guessedNonDefault.getOrElse(guessedValue, 0.0) + 1)
+            }
+            if (trueValue == guessedValue && trueValue != defaultClass) {
+              nonDefaultCorrect.put(trueValue, nonDefaultCorrect.getOrElse(trueValue, 0.0) + 1)
+            }
+          }
         }
         requested += quad._4.numRequests
         completed += quad._4.numRequestsCompleted
@@ -560,6 +583,33 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     bw.write("Avg time/token: "+(time / tokens)+"\n")
     bw.write("Avg requests/token: "+(requested / tokens)+"\n")
     bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
+    if (defaultClass != null) {
+      val nonDefaultCorrectSum = nonDefaultCorrect.map(_._2).sum
+      val foundNonDefaultSum = foundNonDefault.map(_._2).sum
+      val guessedNonDefaultSum = guessedNonDefault.map(_._2).sum
+
+      val precision = nonDefaultCorrectSum / guessedNonDefaultSum
+      val recall = nonDefaultCorrectSum / foundNonDefaultSum
+      val f1 = 2*precision*recall / (precision + recall)
+
+      bw.write("\nOverall performance:\n")
+
+      bw.write("\tPrecision: "+precision+"\n")
+      bw.write("\tRecall: "+recall+"\n")
+      bw.write("\tF1: "+f1+"\n")
+
+      // For every observed class, do the same thing locally
+      for (cl <- foundNonDefault.map(_._1)) {
+        bw.write("\n"+cl+":\n")
+
+        val localPrecision = nonDefaultCorrect(cl) / guessedNonDefault(cl)
+        val localRecall = nonDefaultCorrect(cl) / foundNonDefault(cl)
+        val localF1 = 2*localPrecision*localRecall / (localPrecision + localRecall)
+        bw.write("\tPrecision: "+localPrecision+"\n")
+        bw.write("\tRecall: "+localRecall+"\n")
+        bw.write("\tF1: "+localF1+"\n")
+      }
+    }
     bw.close()
 
     // Print the actual output guess and gold
