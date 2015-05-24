@@ -12,6 +12,7 @@ import edu.stanford.lense_base.server._
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{Await, Promise}
+import scala.io.Source
 import scala.util.{Random, Try}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -218,17 +219,16 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * function. It will print results to stdout.
    *
    * @param goldPairs pairs of Input and the corresponding correct Output objects
-   * @param humanErrorRate the error rate epsilon, so if 0.3, then with P=0.3 artificial humans will choose uniformly at random
+   * @param humanErrorDistribution the error distribution for artificial humans
    */
   def testWithArtificialHumans(goldPairs : List[(Input, Output)],
-                               humanErrorRate : Double,
-                               humanDelayMean : Int,
-                               humanDelayStd : Int,
+                               humanErrorDistribution : HumanErrorDistribution,
+                               humanDelayDistribution : HumanDelayDistribution,
                                workUnitCost : Double,
                                startNumArtificialHumans : Int,
                                saveTitle : String) : Unit = {
     val rand = new Random()
-    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
+    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
 
     progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
@@ -236,7 +236,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
-      val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
+      val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
@@ -287,14 +287,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   def testBaselineForAllHuman(goldPairs : List[(Input, Output)],
-                              humanErrorRate : Double,
-                              humanDelayMean : Int,
-                              humanDelayStd : Int,
+                              humanErrorDistribution : HumanErrorDistribution,
+                              humanDelayDistribution : HumanDelayDistribution,
                               workUnitCost : Double,
                               startNumArtificialHumans : Int,
                               numQueriesPerNode : Int) : Unit = {
     val rand = new Random()
-    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand)
+    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
 
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
     lenseEngine.turnOffLearning()
@@ -305,7 +304,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       for (node <- graph.nodes) {
         if (!goldMap.contains(node)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
-      val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorRate, humanDelayMean, humanDelayStd, rand, hcuPool).future, 1000 days)
+      val guessMap = Await.result(classifyWithArtificialHumans(graph, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
@@ -711,24 +710,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   private def classifyWithArtificialHumans(graph : Graph,
                                            output : Output,
-                                           humanErrorRate : Double,
-                                           humanDelayMean : Int,
-                                           humanDelayStd : Int,
+                                           humanErrorDistribution : HumanErrorDistribution,
+                                           humanDelayDistribution : HumanDelayDistribution,
                                            rand : Random,
                                            hcuPool : HCUPool) : Promise[(Map[GraphNode, String],PredictionSummary)] = {
     lenseEngine.predict(graph, (n, hcu) => {
       val correct = getCorrectLabel(n, output)
-      // Do the automatic error generation
-      val guess = if (rand.nextDouble() > humanErrorRate) {
-        correct
-      }
-      else {
-        // Pick uniformly at random
-        n.nodeType.possibleValues.toList(rand.nextInt(n.nodeType.possibleValues.size))
-      }
 
       val promise = Promise[String]()
-      val workUnit = ArtificialWorkUnit(promise, guess, n, hcuPool)
+      val workUnit = ArtificialWorkUnit(promise, humanErrorDistribution.guess(correct, n.nodeType.possibleValues), n, hcuPool)
       hcu.addWorkUnit(workUnit)
       workUnit
     },
@@ -746,11 +736,82 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 }
 
-case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random) extends HCUPool {
+abstract class HumanErrorDistribution {
+  def guess(correct : String, possibleValues : Set[String]) : String
+}
+
+case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) extends HumanErrorDistribution {
+  override def guess(correct : String, possibleValues : Set[String]) : String = {
+    // Do the automatic error generation
+    if (rand.nextDouble() > epsilon) {
+      correct
+    }
+    else {
+      // Pick uniformly at random
+      possibleValues.toList(rand.nextInt(possibleValues.size))
+    }
+  }
+}
+
+case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution {
+  lazy val confusionMatrix : Map[String, List[(String,Double)]] = {
+    val lines = Source.fromFile(path).getLines().toList
+    val tags = lines(0).split(",")
+    val map = lines.slice(1,lines.size).map(line => {
+      val parts = line.split(",")
+      val header = parts(0)
+      val sections = parts.slice(1, parts.size).zipWithIndex.map(pair => {
+        val num = Integer.parseInt(pair._1).toDouble
+        val correspondsTo = tags(pair._2+1)
+        (correspondsTo, num)
+      })
+      val sectionSum = sections.map(_._2).sum
+      (header, sections.map(pair => (pair._1, pair._2 / sectionSum)).toList)
+    }).toMap
+    println("Retrieved confusion map: "+map)
+    map
+  }
+
+  override def guess(correct: String, possibleValues: Set[String]): String = {
+    val observedDistribution : List[(String,Double)] = confusionMatrix(correct)
+    var draw = rand.nextDouble()
+    for (pair <- observedDistribution) {
+      if (draw <= pair._2) {
+        return pair._1
+      }
+      else {
+        draw -= pair._2
+      }
+    }
+    observedDistribution(observedDistribution.size - 1)._1
+  }
+}
+
+abstract class HumanDelayDistribution {
+  def sampleDelay() : Int
+}
+
+case class ConstantHumanDelayDistribution(delay : Int) extends HumanDelayDistribution {
+  override def sampleDelay(): Int = delay
+}
+
+case class ObservedHumanDelayDistribution(path : String, rand : Random) extends HumanDelayDistribution {
+  lazy val list : List[Int] = {
+    Source.fromFile(path).getLines().map(line => java.lang.Double.parseDouble(line).asInstanceOf[Int]).toList
+  }
+  // Just sample at random from a list of observed human delays
+  override def sampleDelay(): Int = list(rand.nextInt(list.size))
+}
+
+case class ClippedGaussianHumanDelayDistribution(mean : Int, std : Int, rand : Random) extends HumanDelayDistribution {
+  override def sampleDelay(): Int = mean + Math.round(rand.nextGaussian() * std).asInstanceOf[Int]
+}
+
+case class ArtificialHCUPool(startNumHumans : Int, humanErrorDistribution : HumanErrorDistribution, humanDelayDistribution : HumanDelayDistribution, workUnitCost : Double, rand : Random) extends HCUPool {
   var hcuIndex = 0
 
   for (i <- 1 to startNumHumans) {
-    addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand, hcuIndex))
+    addHCU(new ArtificialComputeUnit(humanErrorDistribution, humanDelayDistribution, workUnitCost, rand, hcuIndex))
     hcuIndex += 1
   }
 
@@ -778,7 +839,7 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
           // or add a human
           else {
             System.err.println("** ARTIFICIAL HCU POOL ** Randomly adding a human annotator")
-            addHCU(new ArtificialComputeUnit(humanErrorRate, humanDelayMean, humanDelayStd, workUnitCost, rand, hcuIndex))
+            addHCU(new ArtificialComputeUnit(humanErrorDistribution, humanDelayDistribution, workUnitCost, rand, hcuIndex))
             hcuIndex += 1
           }
         }
@@ -789,9 +850,9 @@ case class ArtificialHCUPool(startNumHumans : Int, humanErrorRate : Double, huma
 
 case class ArtificialWorkUnit(resultPromise : Promise[String], guess : String, node : GraphNode, hcuPool : HCUPool) extends WorkUnit(resultPromise, node, hcuPool)
 
-class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, humanDelayStd : Int, workUnitCost : Double, rand : Random, index : Int) extends HumanComputeUnit {
+class ArtificialComputeUnit(humanErrorDistribution : HumanErrorDistribution, humanDelayDistribution : HumanDelayDistribution, workUnitCost : Double, rand : Random, index : Int) extends HumanComputeUnit {
   // Gets the estimated required time to perform this task, in milliseconds
-  override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = humanDelayMean
+  override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = 1000
 
   // Cancel the current job
   override def cancelCurrentWork(): Unit = {}
@@ -807,7 +868,7 @@ class ArtificialComputeUnit(humanErrorRate : Double, humanDelayMean : Int, human
         new Thread {
           override def run() = {
             // Humans can never take less than 1s to make a classification
-            val msDelay = Math.max(1000, Math.round(humanDelayMean + (rand.nextGaussian()*humanDelayStd)).asInstanceOf[Int])
+            val msDelay = humanDelayDistribution.sampleDelay()
             Thread.sleep(msDelay)
             if (workUnit eq currentWork) {
               finishWork(workUnit, artificial.guess)

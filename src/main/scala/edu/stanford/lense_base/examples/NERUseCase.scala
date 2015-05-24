@@ -4,11 +4,12 @@ import java.io.{FileWriter, BufferedWriter, File}
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
+import edu.stanford.lense_base._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import scala.util.Random
 
 /**
  * Created by keenon on 5/3/15.
@@ -121,7 +122,7 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 1.10
+  override def budget: Double = 20.00
 }
 
 object NERUseCase extends App {
@@ -149,10 +150,15 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 2
-  // nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  val random = new Random()
+
+  val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
+  val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
+
+  val poolSize = 4
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, humanErrorDistribution, humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }

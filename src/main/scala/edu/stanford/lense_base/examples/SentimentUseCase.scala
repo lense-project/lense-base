@@ -1,6 +1,6 @@
 package edu.stanford.lense_base.examples
 
-import edu.stanford.lense_base.LenseMulticlassUseCase
+import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
@@ -130,6 +130,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
+
+  val random = new Random()
+  val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
 
   val poolSize = 10
   // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")

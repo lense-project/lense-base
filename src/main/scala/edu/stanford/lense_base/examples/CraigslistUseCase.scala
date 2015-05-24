@@ -4,11 +4,12 @@ import java.io.{FileWriter, BufferedWriter, File}
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
+import edu.stanford.lense_base._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import scala.util.Random
 
 /**
  * Created by keenon on 5/3/15.
@@ -144,8 +145,12 @@ object CraigslistUseCase extends App {
   dumpData(craigslistUseCase.devSet, "dev_data")
   dumpData(craigslistUseCase.testSet, "test_data")
 
+  val random = new Random()
+  val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
+
   val poolSize = 10
-  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, humanErrorDistribution, humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // craigslistUseCase.testBaselineForOfflineLabeling(craigslistUseCase.devSet)
