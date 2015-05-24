@@ -33,12 +33,14 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     WorkUnitServlet.server
   }
 
-  def makeHITAndWaitFor(numberOfHumans: Int) = {
-    System.err.println("Creating MTurk HITs...")
-    HITCreator.createHIT(1.00, numberOfHumans)
+  def makeHITAndWaitFor(numberOfHumans: Int) : String = {
+    System.err.println("Creating "+numberOfHumans+" MTurk HITs...")
+    val hitId = HITCreator.createHIT(1.00, numberOfHumans)
 
-    System.err.println("Waiting for " + numberOfHumans + " to connect...")
-    WorkUnitServlet.waitForSimultaneousConnections(numberOfHumans)
+    // Disable waiting for additional connections, just seems to piss off workers...
+    System.err.println("Waiting for " + 1 + " to connect...")
+    WorkUnitServlet.waitForSimultaneousConnections(1)
+    hitId
   }
 
   def initialize(): Unit = {
@@ -323,7 +325,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def testWithRealHumans(goldPairs : List[(Input, Output)], poolSize : Int) : Unit = {
     ensureWorkServer
 
-    makeHITAndWaitFor(poolSize)
+    val hitId = makeHITAndWaitFor(poolSize)
 
     progressivelyAnalyze(goldPairs, pair => {
       val graph = toGraph(pair._1)
@@ -336,6 +338,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       renderClassification(graph, goldMap, guessMap._1)
       (graph, goldMap, guessMap._1, guessMap._2)
     }, RealHumanHCUPool, "real_human")
+
+    // We're now done with the run, so we need to expire the HIT, if we haven't already
+    HITCreator.expireHIT(hitId)
   }
 
   /**
@@ -432,6 +437,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   private def frequencyLinePlot(path : String, quantity : String, values : List[Double]) : Unit = {
+    if (values.length == 0) return
+
     val buckets = Math.max(5, values.size / 50)
     val plot = new GNUPlot
 

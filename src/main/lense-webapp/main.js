@@ -124,6 +124,7 @@ $(function () {
                     var elapsedMillis = currentTimeMillis - startTimeMillis;
                     var remainingMillis = onCallDuration - elapsedMillis;
                     if (remainingMillis < 0) {
+                        /*
                         var retainerContainer = $("#retainer-container");
                         retainerContainer.html('');
                         var input = $('<button class="collect">Collect your earnings!</button>');
@@ -135,6 +136,11 @@ $(function () {
                             console.log("Turning in results");
                             subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
                         });
+                        */
+
+                        console.log("Turning in results");
+                        subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
+
                         input.appendTo(retainerContainer);
                         window.clearInterval(interval);
                     }

@@ -42,5 +42,7 @@ libraryDependencies += "com.h2database" % "h2" % "1.4.187"
 
 libraryDependencies += "org.yaml" % "snakeyaml" % "1.15"
 
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

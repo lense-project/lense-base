@@ -121,7 +121,7 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 20.00
+  override def budget: Double = 1.10
 }
 
 object NERUseCase extends App {

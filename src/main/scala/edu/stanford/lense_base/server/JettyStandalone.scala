@@ -1,5 +1,8 @@
 package edu.stanford.lense_base.server
 
+import org.apache.commons.logging.impl.NoOpLog
+import org.apache.log4j.Level
+import org.apache.log4j.spi.NOPLogger
 import org.eclipse.jetty.server._
 import org.eclipse.jetty.webapp.WebAppContext
 
@@ -37,6 +40,9 @@ import org.eclipse.jetty.server.handler.StatisticsHandler
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler
+
+import org.eclipse.jetty.util.log.Logger
+import org.eclipse.jetty.util.log.StdErrLog
 
 /**
  * Created by keenon on 5/15/15.
@@ -93,37 +99,62 @@ class JettyStandalone(webapp : String) {
   http_config.setSendDateHeader(false)
 
   val http = new ServerConnector(server,
-    new HttpConnectionFactory(http_config));
-  http.setPort(8080);
-  http.setIdleTimeout(30000);
-  server.addConnector(http);
+    new HttpConnectionFactory(http_config))
+  http.setPort(8080)
+  http.setIdleTimeout(30000)
+  server.addConnector(http)
 
-  val sslContextFactory = new SslContextFactory();
-  sslContextFactory.setKeyStorePath(KEYSTORE_LOCATION);
-  sslContextFactory.setKeyStorePassword(KEYSTORE_PASS);
+  val sslContextFactory = new SslContextFactory()
+  sslContextFactory.setKeyStorePath(KEYSTORE_LOCATION)
+  sslContextFactory.setKeyStorePassword(KEYSTORE_PASS)
   sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA",
     "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
     "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
     "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
     "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA");
+    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA")
 
   // SSL HTTP Configuration
-  val https_config = new HttpConfiguration(http_config);
-  https_config.addCustomizer(new SecureRequestCustomizer());
+  val https_config = new HttpConfiguration(http_config)
+  https_config.addCustomizer(new SecureRequestCustomizer())
 
   // SSL Connector
   val sslConnector = new ServerConnector(server,
     new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-    new HttpConnectionFactory(https_config));
-  sslConnector.setPort(8443);
-  server.addConnector(sslConnector);
+    new HttpConnectionFactory(https_config))
+  sslConnector.setPort(8443)
+  server.addConnector(sslConnector)
 
   val context: WebAppContext = new WebAppContext(webapp, "/")
   context.setServer(server)
   context.setInitParameter("cacheControl", "max-age=0,public")
   context.setInitParameter("org.atmosphere.cpr.broadcasterCacheClass", "org.atmosphere.cache.UUIDBroadcasterCache")
   server.setHandler(context)
+
+  org.eclipse.jetty.util.log.Log.setLog(new StdErrLog())
+  /*
+  // Disable Jetty logging
+  org.eclipse.jetty.util.log.Log.setLog(new Logger {
+    override def getName: String = "No logs"
+    override def warn(msg: String, args: AnyRef*): Unit = System.err.println("WARN: "+msg)
+    override def warn(thrown: Throwable): Unit = thrown.printStackTrace()
+    override def warn(msg: String, thrown: Throwable): Unit = {
+      System.err.println("WARN: "+msg)
+      thrown.printStackTrace()
+    }
+    override def isDebugEnabled: Boolean = false
+    override def getLogger(name: String): Logger = this
+    override def ignore(ignored: Throwable): Unit = {}
+    override def debug(msg: String, args: AnyRef*): Unit = {}
+    override def debug(msg: String, value: Long): Unit = {}
+    override def debug(thrown: Throwable): Unit = {}
+    override def debug(msg: String, thrown: Throwable): Unit = {}
+    override def setDebugEnabled(enabled: Boolean): Unit = {}
+    override def info(msg: String, args: AnyRef*): Unit = {}
+    override def info(thrown: Throwable): Unit = {}
+    override def info(msg: String, thrown: Throwable): Unit = {}
+  })
+  */
 
   try {
     server.start()

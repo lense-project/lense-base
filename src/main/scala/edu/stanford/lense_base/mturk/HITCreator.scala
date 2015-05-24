@@ -14,7 +14,7 @@ object HITCreator {
   lazy val service : RequesterService = new RequesterService(new PropertiesClientConfig("/home/keenon/.aws/mturk.properties"))
 
   def createHIT(reward : Double = 0.10,
-                numAssignments : Int = 1) : Unit = {
+                numAssignments : Int = 1) : String = {
     val title = "30 minutes of real time classification with LARGE BONUS"
     val description = "Receive a retainer for staying for 30 minutes, and a bonus for all the HITs you perform in real time"
     val question = new HITQuestion("src/main/resources/mturk/external.question").getQuestion
@@ -25,9 +25,25 @@ object HITCreator {
                                       numAssignments)
     println("Created HIT: "+hit.getHITId)
     println("You can see it here: "+service.getWebsiteURL+"/mturk/preview?groupId="+hit.getHITTypeId)
+    hit.getHITId
   }
 
+  def expireHIT(id : String): Unit = {
+    System.err.println("Expiring any remaining HITs, now that analysis is complete.")
+    service.forceExpireHIT(id)
+  }
+
+  // This will let me post HITs that I can accept to give bonuses when things get broken
   def main(args : Array[String]) : Unit = {
-    createHIT()
+    val title = "Private HIT"
+    val description = "DO NOT ACCEPT THIS if I did not contact you personally."
+    val question = RequesterService.getBasicFreeTextQuestion("Thanks again for your patients. You can leave this box empty and submit the HIT")
+    val hit : HIT = service.createHIT(title,
+      description,
+      0.00,
+      question,
+      1)
+    println("Created HIT: "+hit.getHITId)
+    println("You can see it here: "+service.getWebsiteURL+"/mturk/preview?groupId="+hit.getHITTypeId)
   }
 }

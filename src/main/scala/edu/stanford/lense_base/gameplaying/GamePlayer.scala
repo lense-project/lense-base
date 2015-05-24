@@ -38,12 +38,12 @@ abstract class GamePlayer {
 
     var canAfford = 0.0
 
-    if (engine.tryReserveBudget(maxHCUCost, state)) {
+    if (engine.tryReserveBudget(maxHCUCost, state, state.hcuPool)) {
       // We've successfully reserved all the money we need
       canAfford = maxHCUCost
     }
     else {
-      if (engine.tryReserveBudget(minHCUCost, state)) {
+      if (engine.tryReserveBudget(minHCUCost, state, state.hcuPool)) {
         // We've successfully reserved some of the money we need
         canAfford = minHCUCost
       }

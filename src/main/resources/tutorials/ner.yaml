@@ -51,6 +51,7 @@ examples:
     correctTag: "PER"
     comment: "Label all people as Person."
 
+dummy:
   - sequence: "Micky [Mouse] ran across the piano."
     correctTag: "PER"
     comment: "Label fictional characters as Person."
