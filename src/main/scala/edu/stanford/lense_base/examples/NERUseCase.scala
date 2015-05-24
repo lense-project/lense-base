@@ -17,14 +17,14 @@ import scala.util.Random
  * Does NER using sequence use cases
  */
 class NERUseCase extends LenseSequenceUseCase {
-  lazy val allData : List[(List[String],List[String])] = loadNER
+  lazy val allData : List[(List[String],List[String])] = random.shuffle(loadNER)
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -63,7 +63,7 @@ class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*5.0
+      case (_,"0",p) => (1.0 - p)*1.0
       case t => 1.0 - t._3
     }.sum
     // This will trade 10 human labels for fully correct token
@@ -157,8 +157,8 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 4
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  val poolSize = 20
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.005, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
