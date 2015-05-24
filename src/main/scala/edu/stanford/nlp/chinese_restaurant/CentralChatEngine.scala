@@ -1,12 +1,13 @@
 package edu.stanford.nlp.chinese_restaurant
 
-import edu.stanford.lense_base.LenseMulticlassUseCase
+import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, OneQuestionBaseline, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.Random
 
 /**
  * Created by keenon on 5/7/15.
@@ -72,4 +73,8 @@ class ResponseTypeClassification extends LenseMulticlassUseCase[String] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 10.0
+
+  lazy val random = new Random(42)
+  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  override lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
 }

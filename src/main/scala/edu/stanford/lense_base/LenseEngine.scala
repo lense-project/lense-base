@@ -19,7 +19,10 @@ import java.util.IdentityHashMap
  *
  * This is the central static dispatcher to handle requests to the API
  */
-class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
+class LenseEngine(stream : GraphStream,
+                  initGamePlayer : GamePlayer,
+                  humanErrorDistribution : HumanErrorDistribution,
+                  humanDelayDistribution : HumanDelayDistribution) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
@@ -161,7 +164,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     classes.flatMap(cl1 => {
       classes.map(cl2 => {
         (List(cl1, cl2),
-          Map[String,Double]("BIAS" -> (if (cl1 == cl2) Math.log((1-defaultHumanErrorEpsilon)/(classes.size*classes.size)) else Math.log(defaultHumanErrorEpsilon/(classes.size*classes.size*classes.size))))
+          Map[String,Double]("BIAS" -> Math.log(humanErrorDistribution.jointProbability(cl1, cl2)))
         )
       })
     }).toMap
@@ -388,3 +391,4 @@ case class InFlightPrediction(engine : LenseEngine,
     }
   }
 }
+

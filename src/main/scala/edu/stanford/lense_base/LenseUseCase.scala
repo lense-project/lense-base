@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   lazy val graphStream: GraphStream = new GraphStream()
-  lazy val lenseEngine: LenseEngine = new LenseEngine(graphStream, gamePlayer)
+  lazy val lenseEngine: LenseEngine = new LenseEngine(graphStream, gamePlayer, humanErrorDistribution, humanDelayDistribution)
 
   lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
@@ -56,6 +56,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   initialize()
+
+  def humanErrorDistribution : HumanErrorDistribution
+
+  def humanDelayDistribution : HumanDelayDistribution
 
   def useCaseReportSubpath: String = ""
 
@@ -734,77 +738,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
     graph
   }
-}
-
-abstract class HumanErrorDistribution {
-  def guess(correct : String, possibleValues : Set[String]) : String
-}
-
-case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) extends HumanErrorDistribution {
-  override def guess(correct : String, possibleValues : Set[String]) : String = {
-    // Do the automatic error generation
-    if (rand.nextDouble() > epsilon) {
-      correct
-    }
-    else {
-      // Pick uniformly at random
-      possibleValues.toList(rand.nextInt(possibleValues.size))
-    }
-  }
-}
-
-case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution {
-  lazy val confusionMatrix : Map[String, List[(String,Double)]] = {
-    val lines = Source.fromFile(path).getLines().toList
-    val tags = lines(0).split(",")
-    val map = lines.slice(1,lines.size).map(line => {
-      val parts = line.split(",")
-      val header = parts(0)
-      val sections = parts.slice(1, parts.size).zipWithIndex.map(pair => {
-        val num = Integer.parseInt(pair._1).toDouble
-        val correspondsTo = tags(pair._2+1)
-        (correspondsTo, num)
-      })
-      val sectionSum = sections.map(_._2).sum
-      (header, sections.map(pair => (pair._1, pair._2 / sectionSum)).toList)
-    }).toMap
-    println("Retrieved confusion map: "+map)
-    map
-  }
-
-  override def guess(correct: String, possibleValues: Set[String]): String = {
-    val observedDistribution : List[(String,Double)] = confusionMatrix(correct)
-    var draw = rand.nextDouble()
-    for (pair <- observedDistribution) {
-      if (draw <= pair._2) {
-        return pair._1
-      }
-      else {
-        draw -= pair._2
-      }
-    }
-    observedDistribution(observedDistribution.size - 1)._1
-  }
-}
-
-abstract class HumanDelayDistribution {
-  def sampleDelay() : Int
-}
-
-case class ConstantHumanDelayDistribution(delay : Int) extends HumanDelayDistribution {
-  override def sampleDelay(): Int = delay
-}
-
-case class ObservedHumanDelayDistribution(path : String, rand : Random) extends HumanDelayDistribution {
-  lazy val list : List[Int] = {
-    Source.fromFile(path).getLines().map(line => java.lang.Double.parseDouble(line).asInstanceOf[Int]).toList
-  }
-  // Just sample at random from a list of observed human delays
-  override def sampleDelay(): Int = list(rand.nextInt(list.size))
-}
-
-case class ClippedGaussianHumanDelayDistribution(mean : Int, std : Int, rand : Random) extends HumanDelayDistribution {
-  override def sampleDelay(): Int = mean + Math.round(rand.nextGaussian() * std).asInstanceOf[Int]
 }
 
 case class ArtificialHCUPool(startNumHumans : Int, humanErrorDistribution : HumanErrorDistribution, humanDelayDistribution : HumanDelayDistribution, workUnitCost : Double, rand : Random) extends HCUPool {

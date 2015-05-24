@@ -96,6 +96,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def budget: Double = 100.0
 
+  lazy val random = new Random()
+  lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
+
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
   // and shuffles the order of the results
   def loadData(path : String, limitSize : Int = 1000) : List[(String, String)] = {
@@ -131,14 +135,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
-  val random = new Random()
-  val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
-  val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
-
   val poolSize = 10
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
-  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
+  // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet)
 }

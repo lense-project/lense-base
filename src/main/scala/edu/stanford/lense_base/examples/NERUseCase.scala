@@ -115,6 +115,10 @@ class NERUseCase extends LenseSequenceUseCase {
     loadedData.toList
   }
 
+  lazy val random = new Random(42)
+  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
+  override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
+
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
    * asking humans for help, and revert to simple machine learning, after it has exhausted the budget. This includes
@@ -150,13 +154,8 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val random = new Random()
-
-  val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
-  val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
-
   val poolSize = 4
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, humanErrorDistribution, humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
