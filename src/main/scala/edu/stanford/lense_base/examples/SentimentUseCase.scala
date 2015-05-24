@@ -37,6 +37,9 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     case a => a
   }
 
+  // The null class for during analysis
+  override def defaultClass : String = "NEG"
+
   override def initialTrainingData : List[(String, String)] = trainSet
 
   override def getFeatures(input: String): Map[String, Double] = {
@@ -136,9 +139,9 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 10
-  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
-  // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
-  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet)
+  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
+  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, poolSize)
 }

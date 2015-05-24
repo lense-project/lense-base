@@ -120,7 +120,7 @@ class CraigslistUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 100.00
+  override def budget: Double = 20.00
 }
 
 object CraigslistUseCase extends App {
@@ -155,5 +155,5 @@ object CraigslistUseCase extends App {
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // craigslistUseCase.testBaselineForOfflineLabeling(craigslistUseCase.devSet)
-  // craigslistUseCase.testWithRealHumans(craigslistUseCase.devSet)
+  // craigslistUseCase.testWithRealHumans(craigslistUseCase.devSet, poolSize)
 }
