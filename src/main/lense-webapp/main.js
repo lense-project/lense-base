@@ -26,6 +26,7 @@ $(function () {
     var retainer = $('#retainer');
     var form = $("#successForm")
     var trainingComments = $("#training-comments")
+    var cheatSheet = $("#cheat-sheet")
 
     // Setup submit form
 
@@ -91,12 +92,16 @@ $(function () {
                 content.html("Took too long answering query. Server revoked. Waiting for next question to answer.");
             }
             if (json['bonus'] !== undefined) {
-                var roundedBonus = Math.round((json.bonus+0.1) * 100) / 100;
-                if (roundedBonus % 0.1 == 0) {
-                    bonus.html("$"+roundedBonus+"0");
+                var roundedBonus = Math.round(json.bonus * 100) / 100;
+                var bonusString = "$"+roundedBonus;
+                if (bonusString.length === 3) {
+                    bonus.html(bonusString+"00");
+                }
+                if (bonusString.length === 4) {
+                    bonus.html(bonusString+"0");
                 }
                 else {
-                    bonus.html("$"+roundedBonus);
+                    bonus.html(bonusString);
                 }
 
                 // Create animating bonus
@@ -119,13 +124,24 @@ $(function () {
                     var elapsedMillis = currentTimeMillis - startTimeMillis;
                     var remainingMillis = onCallDuration - elapsedMillis;
                     if (remainingMillis < 0) {
-                        retainer.html('');
+                        /*
+                        var retainerContainer = $("#retainer-container");
+                        retainerContainer.html('');
                         var input = $('<button class="collect">Collect your earnings!</button>');
+                        input.css({
+                            "z-index": 100,
+                            "position": "relative"
+                        });
                         input.click(function() {
                             console.log("Turning in results");
                             subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
                         });
-                        input.appendTo(retainer);
+                        */
+
+                        console.log("Turning in results");
+                        subSocket.push(jQuery.stringifyJSON({ request: 'turn-in' }));
+
+                        input.appendTo(retainerContainer);
                         window.clearInterval(interval);
                     }
                     else {
@@ -144,16 +160,22 @@ $(function () {
             }
             if (json['completion-code'] !== undefined) {
                 retainer.html('');
-                content.html("Thanks for participating! Your bonus will be approved within 30 seconds. This page will refresh in 3 seconds. DO NOT NAVIGATE AWAY FROM THIS PAGE BEFORE IT REFRESHES, OR YOU WILL NOT GET PAID.");
-                setTimeout(function() {
-                    var code = json['completion-code'];
-                    console.log("Turning in final work! Using code "+code);
-                    workComplete(code);
-                }, 3000);
+                var code = json['completion-code'];
+                console.log("Turning in final work! Using code "+code);
+                workComplete(code);
             }
             if (json['type'] !== undefined && json.type === "training") {
                 var examples = json.examples;
-                runThroughExamples(examples, -1, null);
+                var filteredExamples = [];
+                for (var j in examples) {
+                    if (examples[j].type == "cheat-sheet") {
+                        cheatSheet.html("<h3>Cheat Sheet:</h3>"+examples[j].html);
+                    }
+                    else {
+                        filteredExamples.push(examples[j]);
+                    }
+                }
+                runThroughExamples(filteredExamples, 0, null);
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
                 renderMulticlassQuery(json, function(closureChoice) {
@@ -201,10 +223,10 @@ $(function () {
 
         // Display a welcome banner
 
-        if (i == -1) {
+        if (i < examples.length && examples[i].type === "introduction") {
             content.html("");
             trainingComments.addClass("comments");
-            trainingComments.html("<b>Welcome</b>. We're going to run through "+examples.length+" examples to warm up.<br>"+
+            trainingComments.html("<br><b>Task Description:</b><div>"+examples[i].html+"</div><br>We're going to run through "+examples.length+" examples to warm up.<br>"+
             "<b>Press any key</b> to get started, or click ");
             var b = $('<button/>', {class: 'choice'});
             b.html("get started");
@@ -223,7 +245,7 @@ $(function () {
 
         // Display actual examples
 
-        else if (i < examples.length) {
+        else if (i < examples.length && examples[i].type === "multiclass") {
             var displayComments = examples[i].comments;
             if (lastAnswer != null) {
                 displayComments = "<span class='incorrect'>The answer \""+lastAnswer+"\" is incorrect.</span> Please try again. The hint was: <br>"+displayComments;
@@ -359,7 +381,7 @@ $(function () {
     }
     else {
         ready.click(function() {
-            bonus.html("$0.10");
+            bonus.html("$1.00");
 
             var instructions = $("#instructions");
             var instructionsHeader = $("#instructions-header");

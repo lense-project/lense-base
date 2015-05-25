@@ -40,5 +40,11 @@ libraryDependencies += "com.esotericsoftware.kryo" % "kryo" % "2.24.0"
 
 libraryDependencies += "com.h2database" % "h2" % "1.4.187"
 
+libraryDependencies += "org.yaml" % "snakeyaml" % "1.15"
+
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime"
+
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

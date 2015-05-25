@@ -28,9 +28,11 @@ class WorkUnit(resultPromise : Promise[String], initNode : GraphNode, hcuPool : 
   }
 
   def taskFailed(e : Throwable = new WorkNotCompletedException()) : Unit = {
-    resultPromise.complete(Try {
-      throw e
-    })
+    if (!resultPromise.isCompleted) {
+      resultPromise.complete(Try {
+        throw e
+      })
+    }
   }
 
   def promise = resultPromise

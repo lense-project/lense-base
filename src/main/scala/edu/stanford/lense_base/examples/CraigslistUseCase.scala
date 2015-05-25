@@ -4,11 +4,12 @@ import java.io.{FileWriter, BufferedWriter, File}
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
+import edu.stanford.lense_base._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import scala.util.Random
 
 /**
  * Created by keenon on 5/3/15.
@@ -108,6 +109,10 @@ class CraigslistUseCase extends LenseSequenceUseCase {
     loadedData.toList
   }
 
+  lazy val random = new Random(42)
+  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  override lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
+
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
    * asking humans for help, and revert to simple machine learning, after it has exhausted the budget. This includes
@@ -115,7 +120,7 @@ class CraigslistUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 100.00
+  override def budget: Double = 20.00
 }
 
 object CraigslistUseCase extends App {
@@ -144,10 +149,11 @@ object CraigslistUseCase extends App {
   dumpData(craigslistUseCase.devSet, "dev_data")
   dumpData(craigslistUseCase.testSet, "test_data")
 
+
   val poolSize = 10
-  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, craigslistUseCase.humanErrorDistribution, craigslistUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // craigslistUseCase.testBaselineForOfflineLabeling(craigslistUseCase.devSet)
-  // craigslistUseCase.testWithRealHumans(craigslistUseCase.devSet)
+  // craigslistUseCase.testWithRealHumans(craigslistUseCase.devSet, poolSize)
 }

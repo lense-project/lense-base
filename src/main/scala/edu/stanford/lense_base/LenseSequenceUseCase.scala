@@ -1,10 +1,16 @@
 package edu.stanford.lense_base
 
+import java.io.{FileInputStream, FileReader}
+import java.nio.charset.MalformedInputException
+
 import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base.server.{TrainingQuestion, MulticlassTrainingQuestion}
+import org.yaml.snakeyaml.Yaml
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
+import scala.reflect.io.File
 
 /**
  * Created by keenon on 5/3/15.
@@ -30,6 +36,47 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @return
    */
   def getHumanTrainingExamples : List[(List[String], Int, String, String)] = List()
+
+  /**
+   * If there's a YAML formatted tutorial someplace, then this is the key.
+   *
+   * @param path
+   * @return
+   */
+  def loadTutorialYAML(path : String) : (String,String,List[(List[String], Int, String, String)]) = {
+    if (!File(path).exists) return ("","",List())
+    val yaml = new Yaml()
+
+    val doc : java.util.Map[String, Any] = yaml.load(new FileInputStream(path)).asInstanceOf[java.util.Map[String, Any]]
+
+    val introText = doc.get("introduction").asInstanceOf[String]
+    val cheatSheet = doc.get("cheat-sheet").asInstanceOf[String]
+
+    val list = ListBuffer[(List[String], Int, String, String)]()
+
+    val exampleList : java.util.ArrayList[java.util.Map[String,String]] = doc.get("examples").asInstanceOf[java.util.ArrayList[java.util.Map[String,String]]]
+    for (i <- 0 to exampleList.size()-1) {
+      val example = exampleList.get(i)
+
+      val sequence = example.get("sequence")
+      val seqParts = sequence.split(" ")
+      val selectedTokens = seqParts.zipWithIndex.filter(tokIndex => tokIndex._1.startsWith("[") && tokIndex._1.endsWith("]"))
+      if (selectedTokens.size != 1) {
+        throw new IllegalStateException("Input sequence must have *exactly one* token selected with []: Instead we got "+selectedTokens.size+": "+selectedTokens.map(_._1).toString)
+      }
+      val index = selectedTokens.head._2
+      val finalTokens = seqParts.zipWithIndex.map(pair => {
+        if (pair._2 == index) pair._1.substring(1, pair._1.size-1)
+        else pair._1
+      }).toList
+      val correctTag = example.get("correctTag")
+      val comment = example.get("comment")
+
+      list.+=((finalTokens, index, correctTag, comment))
+    }
+
+    (introText, cheatSheet, list.toList)
+  }
 
   lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
   lazy val factorType : FactorType = graphStream.makeFactorType(List(nodeType, nodeType))

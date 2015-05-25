@@ -2,13 +2,15 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
+import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.{GraphNodeAnswer, GraphNodeQuestion, LenseSequenceUseCase}
+import edu.stanford.lense_base._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import scala.util.Random
 
 /**
  * Created by keenon on 5/3/15.
@@ -16,7 +18,7 @@ import scala.io.Source
  * Does NER using sequence use cases
  */
 class NERUseCase extends LenseSequenceUseCase {
-  lazy val allData : List[(List[String],List[String])] = loadNER
+  lazy val allData : List[(List[String],List[String])] = random.shuffle(loadNER)
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
@@ -84,11 +86,10 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = List(
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 5, "ORG", "Label all countries that are doing things as Organizations"),
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 7, "ORG", "All countries that are part of an action are Organizations"),
-    (List("This", "week", "in", "the", "news:", "Germany", "invades", "Poland."), 2, "O", "Label everything else as nothing")
-  )
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner.yaml")
+  override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
+  override def humanTrainingIntroduction : String = yaml._1
+  override def humanCheatSheet : String = yaml._2
 
   def loadNER : List[(List[String],List[String])] = {
     val loadedData : ListBuffer[(List[String],List[String])] = ListBuffer()
@@ -115,6 +116,13 @@ class NERUseCase extends LenseSequenceUseCase {
     loadedData.toList
   }
 
+  // The null class for during analysis
+  override def defaultClass : String = "O"
+
+  lazy val random = new Random(42)
+  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
+  override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
+
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
    * asking humans for help, and revert to simple machine learning, after it has exhausted the budget. This includes
@@ -122,7 +130,15 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return amount in dollars to use as budget
    */
-  override def budget: Double = 100.00
+  override def budget: Double = 20.00
+
+
+  /**
+   * Override this to test with different game players
+   *
+   * @return a game player
+   */
+  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
 }
 
 object NERUseCase extends App {
@@ -150,10 +166,10 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 10
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  val poolSize = 20
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.005, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data)
+  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }

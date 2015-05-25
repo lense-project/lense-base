@@ -32,25 +32,31 @@ abstract class GamePlayer {
 
   def getOptimalMove(state : GameState) : GameMove
 
-  def getAllLegalMoves(state : GameState) : List[GameMove] = {
+  def getAllLegalMoves(state : GameState, reserveRealBudget : Boolean = true) : List[GameMove] = {
     val maxHCUCost = if (state.hcuPool.hcuPool.size > 0) state.hcuPool.hcuPool.map(_.cost).max else 0
     val minHCUCost = if (state.hcuPool.hcuPool.size > 0) state.hcuPool.hcuPool.map(_.cost).min else 0
 
     var canAfford = 0.0
 
-    if (engine.tryReserveBudget(maxHCUCost, state)) {
-      // We've successfully reserved all the money we need
-      canAfford = maxHCUCost
-    }
-    else {
-      if (engine.tryReserveBudget(minHCUCost, state)) {
-        // We've successfully reserved some of the money we need
-        canAfford = minHCUCost
+    if (reserveRealBudget) {
+      if (engine.tryReserveBudget(maxHCUCost, state, state.hcuPool)) {
+        // We've successfully reserved all the money we need
+        canAfford = maxHCUCost
       }
       else {
-        // We're broke, can't afford another human label
-        canAfford = 0.0
+        if (engine.tryReserveBudget(minHCUCost, state, state.hcuPool)) {
+          // We've successfully reserved some of the money we need
+          canAfford = minHCUCost
+        }
+        else {
+          // We're broke, can't afford another human label
+          canAfford = 0.0
+        }
       }
+    }
+    else {
+      // Don't limit on cost for hypothetical explorations
+      canAfford = maxHCUCost
     }
 
     List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
@@ -77,26 +83,49 @@ case class GameState(graph : Graph,
                      lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
                      inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
                      completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
-                     startTime : Long = System.currentTimeMillis()) {
+                     startTime : Long = System.currentTimeMillis(),
+                     marginalMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
+                     mapMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
+                     observedNodes : Map[GraphNode,Map[String, Int]] = Map()) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
   var originalGraph : Graph = graph
   var oldToNew : Map[GraphNode,GraphNode] = graph.nodes.map(n => (n,n)).toMap
 
   // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
+  // We do some cacheing, but this shouldn't help very often, since the search space is very large.
   lazy val marginals : Map[GraphNode, Map[String, Double]] = {
-    graph.marginalEstimate()
+    if (!marginalMemos.contains(observedNodes)) {
+      marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
+        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
+      }))
+    }
+    marginalMemos(observedNodes)
+  }
+
+  lazy val map : Map[GraphNode, String] = {
+    if (!mapMemos.contains(observedNodes)) {
+      mapMemos.put(observedNodes, graph.mapEstimate().map(pair => {
+        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
+      }))
+    }
+    mapMemos(observedNodes)
   }
 
   def loss(hypotheticalExtraDelay : Long = 0) : Double = {
+    val mapAssignments = map
+
     val bestGuesses = marginals.toList.map(pair => {
-      val maxPair = pair._2.maxBy(_._2)
-      (pair._1, maxPair._1, maxPair._2)
+      val mapAssignmentProb = pair._2(mapAssignments(pair._1))
+      val mapAssignment = mapAssignments(pair._1)
+      val node = pair._1
+      (node, mapAssignment, mapAssignmentProb)
     })
 
     if (bestGuesses.size == 0) {
       throw new IllegalStateException("BUG: Shouldn't have a bestGuesses with size 0")
     }
+
     lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 
@@ -115,7 +144,10 @@ case class GameState(graph : Graph,
       lossFunction,
       inFlightRequests ++ Set((node, hcu, workUnit)),
       completedRequests,
-      startTime)
+      startTime,
+      marginalMemos,
+      mapMemos,
+      observedNodes)
     copyMutableState(nextState, clonePair._2)
     nextState
   }
@@ -129,7 +161,10 @@ case class GameState(graph : Graph,
       lossFunction,
       inFlightRequests -- Set((node, hcu, workUnit)),
       completedRequests,
-      startTime)
+      startTime,
+      marginalMemos,
+      mapMemos,
+      observedNodes)
     copyMutableState(nextState, clonePair._2)
     nextState
   }
@@ -137,6 +172,29 @@ case class GameState(graph : Graph,
   // Gets a GameState that corresponds to seeing observation "obs" on node "node"
   def getNextStateForNodeObservation(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
     val clonePair = graph.clone()
+
+    // Figure out the observed nodes set for the next state
+    val nextObservedNodes : Map[GraphNode, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
+      observedNodes.map(pair => {
+        if (pair._1 eq node) {
+          if (pair._2.map(_._1).toSet.contains(obs)) {
+            (pair._1, pair._2.map(obsCount => {
+              if (obsCount._1 == obs) {
+                (obsCount._1, obsCount._2 + 1)
+              }
+              else obsCount
+            }))
+          }
+          else (pair._1, pair._2 ++ Map(obs -> 1))
+        }
+        else {
+          pair
+        }
+      })
+    } else {
+      observedNodes ++ Map(node -> Map(obs -> 1))
+    }
+
     val nextState : GameState = GameState(clonePair._1,
       cost + hcu.cost,
       hcuPool,
@@ -144,7 +202,10 @@ case class GameState(graph : Graph,
       lossFunction,
       inFlightRequests -- Set((node, hcu, workUnit)),
       completedRequests ++ Set((node, hcu, workUnit)),
-      startTime)
+      startTime,
+      marginalMemos,
+      mapMemos,
+      nextObservedNodes)
     copyMutableState(nextState, clonePair._2)
     addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)
     nextState

@@ -49,15 +49,29 @@ object WorkUnitServlet {
   def waitForSimultaneousConnections(n : Int) : Unit = {
     waiting = true
     waitingForNum = n
-    while (workerIdConnectionMap.size < n) {
-      System.err.println("Waiting for "+n+" people, so far "+workerIdConnectionMap.size)
+    while (true) {
+      try {
+        val workersConnected = workerIdConnectionMap.count(_._2.workerAccepted)
+        if (workersConnected >= n) {
+          waiting = false
+          return
+        }
+      }
+      catch {
+        case e : Throwable => e.printStackTrace()
+      }
+      System.err.println("Waiting for "+n+" people, so far "+workerIdConnectionMap.count(_._2.workerAccepted))
       for (hcu <- workerPool) {
         hcu.updateWaiting()
       }
       workerIdConnectionMap.synchronized {
+        System.err.println("Waiting on workerIdConnectionMap")
         workerIdConnectionMap.wait()
+        System.err.println("Received wakeup for workerIdConnectionMap")
       }
     }
+    System.err.println("Done waiting for "+n+", starting...")
+    waiting = false
   }
 
   def claimWorkerIdIfPossible(client : HCUClient, workerId : String) : Boolean = workerIdConnectionMap.synchronized {
@@ -100,31 +114,20 @@ object WorkUnitServlet {
     }
   })
 
-  def attemptGrantBonus(workerId : String, client : HCUClient = null) = {
+  def attemptGrantBonus(workerId : String, assignmentId : String, client : HCUClient = null) = {
     // We want to be careful never to double-pay
     MTurkDatabase.synchronized {
       val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
-      if (state.queriesAnswered > 0) {
-        println("Granting bonus of: " + state.outstandingBonus)
-        // Commit our expense
-        if (client != null) {
-          WorkUnitServlet.engine.spendReservedBudget(client.retainer, client, RealHumanHCUPool)
-        }
+      println("Granting bonus of: " + state.outstandingBonus)
+      if (state.outstandingBonus > 0) {
         try {
           // Do the approval
-          WorkUnitServlet.service.approveAssignment(state.assignmentId, "Good work on real-time tasks")
-          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, state.assignmentId, "Earned while completing real-time tasks")
+          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing " + state.queriesAnswered + " real-time tasks")
           // Reset all info on this worker
           MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
         }
         catch {
-          case t : Throwable => t.printStackTrace()
-        }
-      }
-      else {
-        // This worker doesn't qualify for payment, so let's reclaim the lost money, if there is any
-        if (client != null) {
-          WorkUnitServlet.engine.spendReservedBudget(0.0, client, RealHumanHCUPool)
+          case t: Throwable => t.printStackTrace()
         }
       }
     }
@@ -206,6 +209,25 @@ case class MulticlassQuestion(questionHTML : String, choices : List[(String,Stri
 abstract class TrainingQuestion {
   def getEncodedQuestion : JObject
 }
+
+case class IntroductionTrainingQuestion(questionHTML : String) extends TrainingQuestion {
+  override def getEncodedQuestion: JObject = {
+    new JObject(List(
+      "type" -> new JString("introduction"),
+      "html" -> new JString(questionHTML)
+    ))
+  }
+}
+
+case class TrainingCheatSheet(questionHTML : String) extends TrainingQuestion {
+  override def getEncodedQuestion: JObject = {
+    new JObject(List(
+      "type" -> new JString("cheat-sheet"),
+      "html" -> new JString(questionHTML)
+    ))
+  }
+}
+
 case class MulticlassTrainingQuestion(questionHTML : String, choices : List[String], correctAnswer : String, comments : String) extends TrainingQuestion {
   override def getEncodedQuestion: JObject = {
     new JObject(List(
@@ -235,13 +257,23 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   var hitId : String = null
   var startTime : Long = 0
 
-  def updateWaiting() = {
-    val currentNum = WorkUnitServlet.workerIdConnectionMap.size
+  var completed = false
+  var bonusGranted = false
 
-    if (currentNum < WorkUnitServlet.waitingForNum && WorkUnitServlet.waiting) {
-      send(new JsonMessage(new JObject(List("status" -> JString("waiting"),
-        "here" -> JInt(currentNum),
-        "needed" -> JInt(WorkUnitServlet.waitingForNum)))))
+  var workerAccepted = false
+
+  def updateWaiting() = {
+    val currentNum = WorkUnitServlet.workerIdConnectionMap.count(_._2.workerAccepted)
+
+    if (workerAccepted && currentNum < WorkUnitServlet.waitingForNum && WorkUnitServlet.waiting) {
+      try {
+        send(new JsonMessage(new JObject(List("status" -> JString("waiting"),
+          "here" -> JInt(currentNum),
+          "needed" -> JInt(WorkUnitServlet.waitingForNum)))))
+      }
+      catch {
+        case e : Throwable => e.printStackTrace()
+      }
     }
   }
 
@@ -250,27 +282,28 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       WorkUnitServlet.releaseWorkerId(this, workerId)
       val state : MTurkDBState = MTurkDatabase.getWorker(workerId)
       if (state == null) {
-        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
-          0,
-          0L,
-          0.0,
-          currentlyConnected = false))
+        MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId))
       }
       else {
         MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId,
           state.queriesAnswered,
           state.connectionDuration,
           state.outstandingBonus,
-          currentlyConnected = false))
-        WorkUnitServlet.attemptGrantBonus(workerId)
+          currentlyConnected = false,
+          state.assignmentId))
       }
     }
   }
 
-  def completeAndPay() = {
-    send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
-    // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
-    grantBonusInNSeconds()
+  def completeAndPay() = this.synchronized {
+    if (!completed) {
+      completed = true
+      noteDisconnection()
+      RealHumanHCUPool.removeHCU(this)
+      send(new JsonMessage(new JObject(List("completion-code" -> JString(this.hashCode().toString)))))
+      // Wait until well after the user has turned in the HIT, then validate automatically, and pay bonus
+      grantBonusInNSeconds()
+    }
   }
 
   def acceptWorker() = {
@@ -285,11 +318,21 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       RealHumanHCUPool.addHCU(this)
     }
 
-    send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
+    System.err.println("Accepted worker "+workerId)
 
-    if (WorkUnitServlet.waiting) {
-      updateWaiting()
+    workerAccepted = true
+
+    System.err.println("Notifying workerIdConnectionMap...")
+    try {
+      WorkUnitServlet.workerIdConnectionMap.synchronized {
+        WorkUnitServlet.workerIdConnectionMap.notifyAll()
+      }
     }
+    catch {
+      case e : Throwable => e.printStackTrace()
+    }
+
+    send(new JsonMessage(new JObject(List("status" -> JString("success"), "on-call-duration" -> JInt(retainerDuration())))))
   }
 
   def receive = {
@@ -340,7 +383,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
           // Otherwise, we're good to go, so let's initialize this worker
           else {
             // Need to check if sufficient budget to pay worker...
-            val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this)
+            val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this, RealHumanHCUPool)
             // This means we can't reserve enough budget to pay the retainer, so send away the worker
             if (!haveRetainerBudget) {
               System.err.println("Not enough budget to retain workerId="+workerId)
@@ -377,9 +420,9 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       else if (currentWork != null) {
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
         val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
-        val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost)
+        val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost, currentlyConnected = true, assignmentId)
         MTurkDatabase.updateOrCreateWorker(newState)
-        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(newState.outstandingBonus)))))
+        send(new JsonMessage(new JObject(List("status" -> JString("success"), "bonus" -> JDouble(newState.outstandingBonus + retainer)))))
         finishWork(currentWork, replyValue)
       }
 
@@ -389,7 +432,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   def retainer : Double = {
     // TODO: This needs to be set in a flag someplace
-    0.10
+    1.00
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
@@ -418,8 +461,10 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Milliseconds that this worker is expected to remain on call before being paid
   def retainerDuration(): Long = {
-    // 10 minutes retainer
-    10 * 60 * 1000L
+    // 30 minutes retainer
+    30 * 60 * 1000L
+    // 10 second retainer
+    // 10 * 1000L
   }
 
   // Kick off a job
@@ -445,12 +490,26 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   def grantBonusInNSeconds() : Unit = {
     println("Waiting 15 seconds to grant bonus")
-    new Thread(new Runnable {
-      override def run(): Unit = {
-        Thread.sleep(15000)
-        WorkUnitServlet.attemptGrantBonus(workerId)
+    this.synchronized {
+      if (!bonusGranted) {
+        bonusGranted = true
+        new Thread(new Runnable {
+          override def run(): Unit = {
+            Thread.sleep(15000)
+            if (assignmentId != null) {
+              System.err.println("Attempting to approve assignment")
+              WorkUnitServlet.engine.spendReservedBudget(retainer, HCUClient.this, RealHumanHCUPool)
+              WorkUnitServlet.service.approveAssignment(assignmentId, "Good work on real-time tasks")
+              System.err.println("Attempting to grant bonus")
+              WorkUnitServlet.attemptGrantBonus(workerId, assignmentId, HCUClient.this)
+            }
+            else {
+              System.err.println("Can't grant bonus, no assignmentId")
+            }
+          }
+        }).start()
       }
-    }).start()
+    }
   }
 
   override def getName: String = workerId

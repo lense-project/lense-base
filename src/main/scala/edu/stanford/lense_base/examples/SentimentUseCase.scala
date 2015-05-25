@@ -1,6 +1,6 @@
 package edu.stanford.lense_base.examples
 
-import edu.stanford.lense_base.LenseMulticlassUseCase
+import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
@@ -36,6 +36,9 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     case "NEG" => "Negative"
     case a => a
   }
+
+  // The null class for during analysis
+  override def defaultClass : String = "NEG"
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
@@ -96,6 +99,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def budget: Double = 100.0
 
+  lazy val random = new Random()
+  lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
+
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
   // and shuffles the order of the results
   def loadData(path : String, limitSize : Int = 1000) : List[(String, String)] = {
@@ -132,9 +139,9 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 10
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, "artificial_human")
+  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
-  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet)
+  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, poolSize)
 }

@@ -19,7 +19,10 @@ import java.util.IdentityHashMap
  *
  * This is the central static dispatcher to handle requests to the API
  */
-class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
+class LenseEngine(stream : GraphStream,
+                  initGamePlayer : GamePlayer,
+                  humanErrorDistribution : HumanErrorDistribution,
+                  humanDelayDistribution : HumanDelayDistribution) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
@@ -36,7 +39,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     budget += amount
   }
 
-  def tryReserveBudget(amount : Double, owner : Any) : Boolean = budgetLock.synchronized {
+  def tryReserveBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Boolean = budgetLock.synchronized {
     if (reserved.getOrDefault(owner, 0.0) > 0.0) throw new IllegalStateException("The same reserver shouldn't take more than one reservation at a time")
     if (budget >= amount) {
       budget -= amount
@@ -46,6 +49,16 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
       true
     }
     else {
+      // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
+      if (budget < 0.001) {
+        for (hcu <- hcuPool.hcuPool) {
+          hcu match {
+            case client : HCUClient =>
+              client.completeAndPay()
+            case _ =>
+          }
+        }
+      }
       false
     }
   }
@@ -66,17 +79,6 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
         reserved.put(owner, 0.0)
 
         System.err.println("Spent $"+amount+", reclaimed $"+amountRemaining+", budget remaining unclaimed: $"+budget)
-
-        // If we ever hit around 0, then send away all our workers, because we have no more money to pay them with...
-        if (budget < 0.001) {
-          for (hcu <- hcuPool.hcuPool) {
-            hcu match {
-              case client : HCUClient =>
-                client.completeAndPay()
-              case _ =>
-            }
-          }
-        }
       }
       else {
         throw new IllegalStateException("Trying to spend budget that was never properly reserved")
@@ -162,7 +164,7 @@ class LenseEngine(stream : GraphStream, initGamePlayer : GamePlayer) {
     classes.flatMap(cl1 => {
       classes.map(cl2 => {
         (List(cl1, cl2),
-          Map[String,Double]("BIAS" -> (if (cl1 == cl2) Math.log((1-defaultHumanErrorEpsilon)/(classes.size*classes.size)) else Math.log(defaultHumanErrorEpsilon/(classes.size*classes.size*classes.size))))
+          Map[String,Double]("BIAS" -> Math.log(humanErrorDistribution.jointProbability(cl1, cl2)))
         )
       })
     }).toMap
@@ -256,7 +258,19 @@ case class InFlightPrediction(engine : LenseEngine,
 
     System.err.println("Reserved by gameplayer on start of move: $"+engine.reserved.getOrDefault(engine.gamePlayer, 0.0))
 
-    val optimalMove = engine.gamePlayer.getOptimalMove(gameState)
+    // Force the system to turn in all guesses after it's run out of budget or workers
+    val optimalMove = if (engine.budget < 0.001 || hcuPool.hcuPool.size == 0) {
+      for (hcu <- hcuPool.hcuPool) {
+        hcu match {
+          case client : HCUClient =>
+            client.completeAndPay()
+          case _ =>
+        }
+      }
+      TurnInGuess()
+    }
+    // If it still has budget and workers, then get an optimal move
+    else engine.gamePlayer.getOptimalMove(gameState)
 
     optimalMove match {
       case _ : TurnInGuess =>
@@ -377,3 +391,4 @@ case class InFlightPrediction(engine : LenseEngine,
     }
   }
 }
+

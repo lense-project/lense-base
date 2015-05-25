@@ -69,12 +69,16 @@ trait HumanComputeUnit {
     }
     if (!workUnit.isRevoked) {
       workUnit.finished(this)
+      /* For live use, we don't poop out on investigations
       if (workUnit.promise.isCompleted) {
         throw new IllegalStateException("Shouldn't be trying to double-complete a work unit! INVESTIGATE THIS!")
       }
-      workUnit.promise.complete(Try {
-        answer
-      })
+      */
+      if (!workUnit.promise.isCompleted) {
+        workUnit.promise.complete(Try {
+          answer
+        })
+      }
       if (workUnit == currentWork) {
         currentWork = null
       }
