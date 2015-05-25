@@ -18,7 +18,13 @@ import scala.util.Random
  * Does NER using sequence use cases
  */
 class NERUseCase extends LenseSequenceUseCase {
-  lazy val allData : List[(List[String],List[String])] = random.shuffle(loadNER)
+
+  // Exclude ORG, cause it's poorly specified with LOC
+  lazy val legalTokens = Set("O","PER","LOC","MISC")
+
+  lazy val allData : List[(List[String],List[String])] = {
+    random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
+  }
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
@@ -64,17 +70,16 @@ class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*5.0
+      case (_,"0",p) => (1.0 - p)*50.0
       case t => 1.0 - t._3
     }.sum
-    // This will trade 10 human labels for fully correct token
-    expectedErrors*4 + cost
+    expectedErrors + cost*5
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
-      "capitalized:" + (sequence(i)(0).isUpper && sequence(i).exists(_.isLower)) -> 1.0,
+      "capitalized:" + (if (sequence(i).length() > 0) sequence(i)(0).isUpper && sequence(i).exists(_.isLower) else false) -> 1.0,
       "BIAS" -> 0.0
     )
     word2vec.get(sequence(i)) match {
@@ -86,7 +91,8 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner.yaml")
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner-no-org.yaml")
+
   override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
   override def humanTrainingIntroduction : String = yaml._1
   override def humanCheatSheet : String = yaml._2
@@ -120,7 +126,7 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
+  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**

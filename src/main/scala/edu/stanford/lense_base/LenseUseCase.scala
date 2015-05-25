@@ -602,8 +602,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       for (cl <- foundNonDefault.map(_._1)) {
         bw.write("\n"+cl+":\n")
 
-        val localPrecision = nonDefaultCorrect(cl) / guessedNonDefault(cl)
-        val localRecall = nonDefaultCorrect(cl) / foundNonDefault(cl)
+        val localPrecision = nonDefaultCorrect.getOrElse(cl, 0.0) / guessedNonDefault.getOrElse(cl, 0.0)
+        val localRecall = nonDefaultCorrect.getOrElse(cl, 0.0) / foundNonDefault.getOrElse(cl, 0.0)
         val localF1 = 2*localPrecision*localRecall / (localPrecision + localRecall)
         bw.write("\tPrecision: "+localPrecision+"\n")
         bw.write("\tRecall: "+localRecall+"\n")

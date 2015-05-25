@@ -59,16 +59,25 @@ abstract class GamePlayer {
       canAfford = maxHCUCost
     }
 
-    List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
+    state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
       state.hcuPool.synchronized {
-        state.hcuPool.hcuPool.
+        val list = state.hcuPool.hcuPool.
           // Take only HCU's we haven't used before for this node
           filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
-          filter(_.cost <= canAfford).
-          // And make an observation on them
-          map(hcu => MakeHumanObservation(n, hcu))
+          filter(_.cost <= canAfford)
+
+        // If there are HCUs available for this node, pick the one with the shortest queue
+        if (list.size > 0) {
+          List(MakeHumanObservation(n, list.minBy(_.estimateTimeToFinishQueue)))
+        }
+        // If there are no HCUs available for this node, then return no moves on this node
+        else List()
       }
-    }).toList
+    }).toList ++ {
+      if (state.inFlightRequests.size > 0) List(Wait()) else List()
+    } ++ {
+      if (state.inFlightRequests.size == 0) List(TurnInGuess()) else List()
+    }
   }
 }
 
@@ -209,17 +218,5 @@ case class GameState(graph : Graph,
     copyMutableState(nextState, clonePair._2)
     addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)
     nextState
-  }
-
-  def getNextStates(move : GameMove) : List[(Double,GameState)] = {
-    // could perform some cacheing here, to help prevent the need for explicit Dynamic Programming elsewhere
-    move match {
-      case obs : MakeHumanObservation => {
-        obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
-        })
-      }.toList
-      case _ : TurnInGuess => List()
-    }
   }
 }

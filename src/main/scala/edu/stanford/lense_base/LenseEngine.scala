@@ -35,6 +35,9 @@ class LenseEngine(stream : GraphStream,
 
   val budgetLock = new Object()
 
+  def getHumanErrorDistribution = humanErrorDistribution
+  def getHumanDelayDistribution = humanDelayDistribution
+
   def addBudget(amount : Double) = budgetLock.synchronized {
     budget += amount
   }
