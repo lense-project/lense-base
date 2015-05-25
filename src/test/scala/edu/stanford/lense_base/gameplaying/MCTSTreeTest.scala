@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.gameplaying
 
 import org.scalatest.FunSuite
+import org.scalactic.Tolerance.convertNumericToPlusOrMinusWrapper
 
 import scala.util.Random
 

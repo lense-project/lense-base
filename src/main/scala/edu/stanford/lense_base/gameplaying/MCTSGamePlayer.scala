@@ -10,6 +10,21 @@ import scala.collection.mutable
  */
 class MCTSGamePlayer extends GamePlayer {
 
+  def constructMCTSTree(graph: Graph, state:GameState, labels : List[String]) = {
+    val t = MCTSTree[GameState, GraphNode, String]()
+    import t._
+    // Currently assuming that there is no game state
+    // Do a one step lookahead
+    val leaf = Leaf(_.loss(0))
+    def expectNode(node : GraphNode) : Expect =
+      // TODO: Update the state by saying that the measurement node was observed to be label
+      Expect(labels.map(l => (l,leaf)).toMap, s => s.marginals.get(node).get, (s,l) => s)
+    // Create a max node over possible actions to take == nodes in the graph
+    Max(graph.nodes.map(node => (node, expectNode(node))).toMap,
+      // TODO: Update state by adding a measurement node to the graph state.
+      (s, node) => s)
+  }
+
   override def getOptimalMove(state: GameState): GameMove = {
     // Get all the legal moves
     val legalTopLevelMoves = getAllLegalMoves(state, reserveRealBudget = true)
