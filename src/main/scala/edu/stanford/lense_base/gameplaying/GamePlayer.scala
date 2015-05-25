@@ -84,7 +84,8 @@ case class GameState(graph : Graph,
                      inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
                      completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
                      startTime : Long = System.currentTimeMillis(),
-                     observationMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
+                     marginalMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
+                     mapMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
                      observedNodes : Map[GraphNode,Map[String, Int]] = Map()) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
@@ -94,21 +95,37 @@ case class GameState(graph : Graph,
   // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
   // We do some cacheing, but this shouldn't help very often, since the search space is very large.
   lazy val marginals : Map[GraphNode, Map[String, Double]] = {
-    if (!observationMemos.contains(observedNodes)) {
-      observationMemos.put(observedNodes, graph.marginalEstimate())
+    if (!marginalMemos.contains(observedNodes)) {
+      marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
+        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
+      }))
     }
-    observationMemos(observedNodes)
+    marginalMemos(observedNodes)
+  }
+
+  lazy val map : Map[GraphNode, String] = {
+    if (!mapMemos.contains(observedNodes)) {
+      mapMemos.put(observedNodes, graph.mapEstimate().map(pair => {
+        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
+      }))
+    }
+    mapMemos(observedNodes)
   }
 
   def loss(hypotheticalExtraDelay : Long = 0) : Double = {
+    val mapAssignments = map
+
     val bestGuesses = marginals.toList.map(pair => {
-      val maxPair = pair._2.maxBy(_._2)
-      (pair._1, maxPair._1, maxPair._2)
+      val mapAssignmentProb = pair._2(mapAssignments(pair._1))
+      val mapAssignment = mapAssignments(pair._1)
+      val node = pair._1
+      (node, mapAssignment, mapAssignmentProb)
     })
 
     if (bestGuesses.size == 0) {
       throw new IllegalStateException("BUG: Shouldn't have a bestGuesses with size 0")
     }
+
     lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 
@@ -128,7 +145,8 @@ case class GameState(graph : Graph,
       inFlightRequests ++ Set((node, hcu, workUnit)),
       completedRequests,
       startTime,
-      observationMemos,
+      marginalMemos,
+      mapMemos,
       observedNodes)
     copyMutableState(nextState, clonePair._2)
     nextState
@@ -144,7 +162,8 @@ case class GameState(graph : Graph,
       inFlightRequests -- Set((node, hcu, workUnit)),
       completedRequests,
       startTime,
-      observationMemos,
+      marginalMemos,
+      mapMemos,
       observedNodes)
     copyMutableState(nextState, clonePair._2)
     nextState
@@ -184,7 +203,8 @@ case class GameState(graph : Graph,
       inFlightRequests -- Set((node, hcu, workUnit)),
       completedRequests ++ Set((node, hcu, workUnit)),
       startTime,
-      observationMemos,
+      marginalMemos,
+      mapMemos,
       nextObservedNodes)
     copyMutableState(nextState, clonePair._2)
     addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)

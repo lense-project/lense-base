@@ -2,6 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
+import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
@@ -23,8 +24,8 @@ class NERUseCase extends LenseSequenceUseCase {
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -63,7 +64,7 @@ class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*1.0
+      case (_,"0",p) => (1.0 - p)*5.0
       case t => 1.0 - t._3
     }.sum
     // This will trade 10 human labels for fully correct token
@@ -130,6 +131,14 @@ class NERUseCase extends LenseSequenceUseCase {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 20.00
+
+
+  /**
+   * Override this to test with different game players
+   *
+   * @return a game player
+   */
+  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
 }
 
 object NERUseCase extends App {
