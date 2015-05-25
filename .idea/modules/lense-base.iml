@@ -429,5 +429,6 @@
     <orderEntry type="library" name="SBT: org.yaml:snakeyaml:1.15" level="project" />
     <orderEntry type="library" name="SBT: redis.clients:jedis:2.0.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="SBT: ch.qos.logback:logback-core:1.1.3" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.11.6" level="application" />
   </component>
 </module>

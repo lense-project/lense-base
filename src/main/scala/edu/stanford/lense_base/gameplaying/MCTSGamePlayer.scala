@@ -43,6 +43,18 @@ class MCTSGamePlayer extends GamePlayer {
   def defaultPolicy(node : TreeNode) : Double = {
     0.0
   }
+
+  def getNextStates(move : GameMove) : List[(Double,GameState)] = {
+    // could perform some cacheing here, to help prevent the need for explicit Dynamic Programming elsewhere
+    move match {
+      case obs : MakeHumanObservation => {
+        obs.node.nodeType.possibleValues.map(randomHumanResponse => {
+          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
+        })
+      }.toList
+      case _ : TurnInGuess => List()
+    }
+  }
 }
 
 case class TreeNode(gameState : GameState, legalMoves : List[GameMove]) {
