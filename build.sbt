@@ -44,5 +44,7 @@ libraryDependencies += "org.yaml" % "snakeyaml" % "1.15"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime"
 
+libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"

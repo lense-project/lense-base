@@ -9,10 +9,33 @@ import scala.collection.mutable
  * Implements fast, tree-parallel UCT MCTS with Double Progressive Widening to do state space search
  */
 class MCTSGamePlayer extends GamePlayer {
+
   override def getOptimalMove(state: GameState): GameMove = {
+    // Get all the legal moves
     val legalTopLevelMoves = getAllLegalMoves(state, reserveRealBudget = true)
-    val rootNode = TreeNode(state, legalTopLevelMoves)
-    TurnInGuess()
+    // Turns out we don't really care about them though.
+    // Instead, we find the best node to query (could be none of them).
+    getOptimalNodeToQuery(state) match {
+      case Some(node) => (legalTopLevelMoves find {
+        case MakeHumanObservation(node_, _) => node_ == node
+        case _ => false
+      }).getOrElse(TurnInGuess())
+      case None => TurnInGuess()
+    }
+  }
+
+  // Find the optimal node to query; this is
+  def getOptimalNodeToQuery(state: GameState) : Option[GraphNode] = {
+    val null_utility = utility(state, None)
+    val (query_utility, node) = state.originalGraph.nodes
+      .map(node => (utility(state, Some(node)), node))
+      .maxBy(_._1)
+    if (null_utility > query_utility) None else Some(node)
+  }
+
+  // Gets the utility for querying a particular node.
+  def utility(state:GameState, node: Option[GraphNode]) : Double = {
+    0.0
   }
 
   // Find the next node to explore
@@ -44,17 +67,17 @@ class MCTSGamePlayer extends GamePlayer {
     0.0
   }
 
-  def getNextStates(move : GameMove) : List[(Double,GameState)] = {
-    // could perform some cacheing here, to help prevent the need for explicit Dynamic Programming elsewhere
-    move match {
-      case obs : MakeHumanObservation => {
-        obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
-        })
-      }.toList
-      case _ : TurnInGuess => List()
-    }
-  }
+//  def getNextStates(move : GameMove) : List[(Double,GameState)] = {
+//    // could perform some cacheing here, to help prevent the need for explicit Dynamic Programming elsewhere
+//    move match {
+//      case obs : MakeHumanObservation => {
+//        obs.node.nodeType.possibleValues.map(randomHumanResponse => {
+//          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
+//        })
+//      }.toList
+//      case _ : TurnInGuess => List()
+//    }
+//  }
 }
 
 case class TreeNode(gameState : GameState, legalMoves : List[GameMove]) {
