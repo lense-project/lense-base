@@ -94,9 +94,9 @@ case class GameState(graph : Graph,
                      inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit, Long)] = Set(),
                      completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
                      startTime : Long = System.currentTimeMillis(),
-                     marginalMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
-                     mapMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
-                     observedNodes : Map[GraphNode,Map[String, Int]] = Map()) {
+                     marginalMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
+                     mapMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
+                     observedNodes : Map[Int,Map[String, Int]] = Map()) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
   var originalGraph : Graph = graph
@@ -185,10 +185,12 @@ case class GameState(graph : Graph,
   def getNextStateForNodeObservation(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
     val clonePair = graph.clone()
 
+    if (!originalGraph.nodes.contains(node)) throw new IllegalStateException("Cannot get next state for node not in originalGraph")
+
     // Figure out the observed nodes set for the next state
-    val nextObservedNodes : Map[GraphNode, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
+    val nextObservedNodes : Map[Int, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
       observedNodes.map(pair => {
-        if (pair._1 eq node) {
+        if (pair._1 == originalGraph.nodes.indexOf(node)) {
           if (pair._2.map(_._1).toSet.contains(obs)) {
             (pair._1, pair._2.map(obsCount => {
               if (obsCount._1 == obs) {
@@ -204,7 +206,7 @@ case class GameState(graph : Graph,
         }
       })
     } else {
-      observedNodes ++ Map(node -> Map(obs -> 1))
+      observedNodes ++ Map(originalGraph.nodes.indexOf(node) -> Map(obs -> 1))
     }
 
     val nextState : GameState = GameState(clonePair._1,

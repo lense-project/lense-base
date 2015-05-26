@@ -134,8 +134,8 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  // override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
-  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.2, random)
+  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
+  // override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.2, random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**
@@ -153,7 +153,8 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = ThresholdHeuristic
+  override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
 object NERUseCase extends App {

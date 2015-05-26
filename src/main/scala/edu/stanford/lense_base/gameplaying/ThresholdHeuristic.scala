@@ -12,11 +12,11 @@ import edu.stanford.lense_base.graph.GraphNode
 
 object ThresholdHeuristic extends GamePlayer {
   // There are a lot more of these, we must be very certain every time, or we will make mistakes
-  val defaultClassThreshold = 0.97
+  val defaultClassThreshold = 0.99
 
   val otherThreshold = 0.8
   // One obsevation cuts uncertainty to the human error rate, as a rough heuristic
-  val humanUncertaintyMultiple = 0.2
+  val humanUncertaintyMultiple = 0.4
 
   override def getOptimalMove(state: GameState): GameMove = {
     // If it's been more than 30s, just force a TurnInGuess()

@@ -263,6 +263,13 @@ case class InFlightPrediction(engine : LenseEngine,
   // Initialize with a move
   gameplayerMove()
 
+  def logMarginals(): Unit = {
+    for (node <- originalGraph.nodes) {
+      writeToLog("\t"+node+":")
+      writeToLog("\t\t"+gameState.marginals(node))
+    }
+  }
+
   def gameplayerMove() : Unit = this.synchronized {
     // We already turned in this set, this request is being called from some stray delayed call
     if (turnedIn) return
@@ -273,10 +280,7 @@ case class InFlightPrediction(engine : LenseEngine,
       writeToLog("GRAPH:")
       writeToLog(originalGraph.toString())
       writeToLog("ORIGINAL MARGINALS:")
-      for (node <- originalGraph.nodes) {
-        writeToLog("\t"+node+":")
-        writeToLog("\t"+gameState.marginals(node))
-      }
+      logMarginals()
       initialMove = false
     }
 
@@ -329,7 +333,7 @@ case class InFlightPrediction(engine : LenseEngine,
             val toStoreOldToNew = toStoreGraphPair._2
 
             gameState.originalGraph.nodes.foreach(n => {
-              toStoreOldToNew(n).observedValue = mapEstimate(gameState.oldToNew(n))
+              toStoreOldToNew(n).observedValue = mapEstimate(n)
             })
             engine.pastGuesses += toStoreGraph
           }
@@ -339,11 +343,7 @@ case class InFlightPrediction(engine : LenseEngine,
         }
 
         returnPromise.complete(Try {
-            (mapEstimate.map(pair => {
-              val matches = gameState.originalGraph.nodes.filter(n => gameState.oldToNew(n) eq pair._1)
-              if (matches.size != 1) throw new IllegalStateException("Bad oldToNew mapping")
-              (matches(0), pair._2)
-            }), PredictionSummary(gameState.loss(),
+            (mapEstimate, PredictionSummary(gameState.loss(),
               numRequests,
               numRequestsCompleted,
               numRequestsFailed,
@@ -360,7 +360,7 @@ case class InFlightPrediction(engine : LenseEngine,
               behaviorLog))
           })
       case obs : MakeHumanObservation =>
-        writeToLog(">> MAKE HUMAN OBSERVATION ("+(System.currentTimeMillis() - gameState.startTime)+")")
+        writeToLog(">> MAKE HUMAN OBSERVATION "+obs.node+" (time "+(System.currentTimeMillis() - gameState.startTime)+")")
         writeToLog("\tAsking "+obs.hcu+" about "+obs.node)
 
         // Commit the engine to actually spending the money, and return anything we didn't use
@@ -382,17 +382,19 @@ case class InFlightPrediction(engine : LenseEngine,
             if (t.isSuccess) {
               // If the workUnit succeeded, move the gamestate
               println("Received response for "+obs.node+": "+t.get)
-              writeToLog(">> RECEIVED HUMAN RESPONSE ("+(System.currentTimeMillis() - gameState.startTime)+")")
+              writeToLog(">> RECEIVED HUMAN RESPONSE "+obs.node+"="+t.get+" (time "+(System.currentTimeMillis() - gameState.startTime)+")")
               writeToLog("\tFrom "+obs.hcu+": got "+obs.node+"="+t.get)
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
               numRequestsCompleted += 1
               totalCost += obs.hcu.cost
+              writeToLog("UPDATED MARGINALS:")
+              logMarginals()
 
               humanResponses.+=((obs.node, obs.hcu, t.get))
               humanQueryDelays.+=((obs.hcu, System.currentTimeMillis() - launchedObservation))
             }
             else {
-              writeToLog(">> HUMAN RESPONSE FAILED ("+(System.currentTimeMillis() - gameState.startTime)+")")
+              writeToLog(">> HUMAN RESPONSE FAILED (time "+(System.currentTimeMillis() - gameState.startTime)+")")
               writeToLog("\tTime: "+(System.currentTimeMillis() - gameState.startTime))
               writeToLog("\tFrom "+obs.hcu)
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)

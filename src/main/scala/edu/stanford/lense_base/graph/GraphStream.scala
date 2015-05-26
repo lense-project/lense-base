@@ -157,7 +157,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }.toMap
   }
 
-  def marginalEstimate(smoothEstimatesWithKNN : Boolean = true): Map[GraphNode, Map[String,Double]] = {
+  def marginalEstimate(smoothEstimatesWithKNN : Boolean = false): Map[GraphNode, Map[String,Double]] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
