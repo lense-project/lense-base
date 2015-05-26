@@ -111,7 +111,7 @@ class LenseEngine(stream : GraphStream,
   }
 
   var numSwapsSoFar = 0
-  val modelRegularization = 0.5
+  val modelRegularization = 2.0
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
@@ -136,7 +136,7 @@ class LenseEngine(stream : GraphStream,
   }.start()
 
   def getModelRegularization(dataSize : Int) : Double = {
-    modelRegularization / Math.log(dataSize)
+    modelRegularization
   }
 
   def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)],  Double, Long) => Double, maxLossPerNode : Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {

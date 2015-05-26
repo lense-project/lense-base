@@ -26,7 +26,7 @@ class NERUseCase extends LenseSequenceUseCase {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
   }
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
-  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
+  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(200)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
@@ -86,6 +86,8 @@ class NERUseCase extends LenseSequenceUseCase {
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
       "capitalized:" + (if (sequence(i).length() > 0) sequence(i)(0).isUpper && sequence(i).exists(_.isLower) else false) -> 1.0,
+      "left-word:" + (if (i > 0) sequence(i-1) else "#") -> 1.0,
+      "right-word:" + (if (i < sequence.size-1) sequence(i+1) else "$") -> 1.0,
       "BIAS" -> 0.0
     )
     word2vec.get(sequence(i)) match {
