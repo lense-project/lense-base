@@ -1,0 +1,82 @@
+%The CoNLL user tutorial
+%The idea here is to encode as many nasty little details of the spec as possible, so Turkers are prepared to
+%give us reasonably high quality results.
+---
+introduction: "Labeling words as one of 3 kinds of thing: <b>person, place, and none</b>."
+cheat-sheet: "<b>Locations:</b>
+              <ul>
+                <li>
+                  Cities, states, etc
+                </li>
+                <li>
+                  Mountains, rivers, etc
+                </li>
+              </ul>
+              <b>Person:</b>
+              <ul>
+                <li>
+                  Fictional characters
+                </li>
+                <li>
+                  People
+                </li>
+              </ul>
+              <b>None:</b>
+              <ul>
+                <li>
+                  Dates,
+                </li>
+              </ul>
+              "
+examples:
+  - sequence: "[Bob] Woodworth stubbed his toe on his way to the car."
+    correctTag: "PER"
+    comment: "Label all people as Person."
+
+  - sequence: "Micky [Mouse] ran across the piano."
+    correctTag: "PER"
+    comment: "Label fictional characters as Person."
+
+  - sequence: "I [am] here now."
+    correctTag: "O"
+    comment: "Label random words as none."
+
+  - sequence: "Don't forget to use the hot [keys!]"
+    correctTag: "O"
+    comment: "Label random words as none. It can be faster if you use the keyboard."
+
+  - sequence: "[Cookie] Monster from Sesame Street is popular with kids."
+    correctTag: "PER"
+    comment: "How are you supposed to label fictional characters?"
+
+  - sequence: "I lost [my] keys on my way to my building."
+    correctTag: "O"
+    comment: "How do you label random words?"
+
+  - sequence: "I went to [Germany] on vacation."
+    correctTag: "LOC"
+    comment: "Places are always labeled as locations."
+
+  - sequence: "Competition takes place at the Olympic [Birdsnest] in Beijing."
+    correctTag: "LOC"
+    comment: "Places are always labeled as locations."
+
+  - sequence: "[January] 1, I woke early and dressed to kill."
+    correctTag: "O"
+    comment: "Dates don't count as a named entity"
+
+  - sequence: "I visited [New] York on Friday."
+    correctTag: "LOC"
+    comment: "How are you supposed to label places?"
+
+  - sequence: "I went to [Paris] to visit the Eifel Tower."
+    correctTag: "LOC"
+    comment: "How are you supposed to label places?"
+
+  - sequence: "I consider [Fridays] unlucky."
+    correctTag: "O"
+    comment: "How are you supposed to label dates?"
+
+  - sequence: "That's [all] folks!"
+    correctTag: "O"
+    comment: "You last one before we get started..."

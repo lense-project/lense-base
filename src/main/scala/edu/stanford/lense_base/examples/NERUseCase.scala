@@ -19,8 +19,8 @@ import scala.util.Random
  */
 class NERUseCase extends LenseSequenceUseCase {
 
-  // Exclude ORG, cause it's poorly specified with LOC
-  lazy val legalTokens = Set("O","PER","LOC","MISC")
+  // Exclude ORG & MISC, cause they're confusing to Turkers
+  lazy val legalTokens = Set("O","PER","LOC")
 
   lazy val allData : List[(List[String],List[String])] = {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
@@ -99,7 +99,7 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner-no-org.yaml")
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner-2-class.yaml")
 
   override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
   override def humanTrainingIntroduction : String = yaml._1
@@ -134,8 +134,8 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
-  // override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.2, random)
+  // override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
+  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**
@@ -153,8 +153,8 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  // override def gamePlayer : GamePlayer = ThresholdHeuristic
-  override def gamePlayer : GamePlayer = MCTSGamePlayer
+  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
 object NERUseCase extends App {
@@ -182,7 +182,7 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 20
+  val poolSize = 3
   nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline

@@ -488,6 +488,17 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     cw.close()
   }
 
+  private def printExamples(path : String, guessesWithContext : List[(String,String,GraphNode)]) : Unit = {
+    val cw = new BufferedWriter(new FileWriter(path))
+    for (triple <- guessesWithContext) {
+      cw.write(triple._3.graph.toString()+"\n")
+      cw.write("\t"+triple._3.toString()+"\n")
+      cw.write("\tGOLD:"+triple._1+"\n")
+      cw.write("\tGUESS:"+triple._2+"\n")
+    }
+    cw.close()
+  }
+
   private def printConfusion(path : String, values : List[String], guesses : List[(String,String)]) : Unit = {
     // Get the confusion matrix
     val confusion : mutable.Map[(String,String), Int] = mutable.Map()
@@ -689,6 +700,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         nodeType.possibleValues.toList,
         pairs)
       printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", pairs)
+      printExamples(hcuPrefix+"overall_examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.map(quad => (quad._1, quad._2, quad._3)))
+      printExamples(hcuPrefix+"overall_correct_examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
+      printExamples(hcuPrefix+"overall_incorrect_examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
     }
     // Do individual HCU level analysis
     for (hcu <- hcusInvolved) {
@@ -702,6 +716,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
           nodeType.possibleValues.toList,
           pairs)
         printAccuracy(thisHcuPrefix+"accuracy_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", pairs)
+        printExamples(thisHcuPrefix+"examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).map(quad => (quad._1, quad._2, quad._3)))
+        printExamples(thisHcuPrefix+"correct_examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
+        printExamples(thisHcuPrefix+"incorrect_examples_nodetype_"+nodeTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
       }
 
       frequencyLinePlot(thisHcuPrefix+"latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
