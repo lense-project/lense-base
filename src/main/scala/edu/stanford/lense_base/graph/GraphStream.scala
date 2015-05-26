@@ -163,7 +163,6 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
       stream.model.warmUpIndexes(this)
     }
 
-
     ////////////////////////////
     // SYNCHRONIZED SECTION
     stream.weightsReadWriteLock.readLock().lock()

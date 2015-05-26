@@ -22,7 +22,7 @@ object MCTSGamePlayer extends GamePlayer {
 
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
-    for (i <- 0 to 40) {
+    for (i <- 0 to 1000*state.originalGraph.nodes.size) {
       runSample(rootNode, r)
     }
 
@@ -48,7 +48,6 @@ object MCTSGamePlayer extends GamePlayer {
 
 case class StateSample(gameState : GameState,
                        extraHypotheticalTime : Long = 0,
-                       inFlightLandingTimes : Map[(GraphNode, HumanComputeUnit), Long] = Map(),
                        terminal : Boolean = false) {
 
   def calculateReward() : Double = {
@@ -67,26 +66,27 @@ case class StateSample(gameState : GameState,
     gameMove match {
       case obs : MakeHumanObservation =>
         // This adds another request in flight, samples a time for the request to take, and adds it to the pile
-        val nextState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, null)
+        val nextState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, null, System.currentTimeMillis() + extraHypotheticalTime)
         val requestDelay = humanDelayDistribution.sampleDelay()
-        val newInFlightLandingTimes = inFlightLandingTimes + ((obs.node, obs.hcu) -> (extraHypotheticalTime + requestDelay))
-        StateSample(nextState, extraHypotheticalTime, newInFlightLandingTimes)
+        StateSample(nextState, extraHypotheticalTime)
 
       case wait : Wait =>
+        val inFlightLandingTimes = gameState.inFlightRequests.map(quad => {
+          (quad._1, quad._2) -> (quad._4 + humanDelayDistribution.sampleDelay())
+        })
+
         // This waits for the next request to return, pops it off, and registers the observation
-        if (inFlightLandingTimes.size == 0) throw new IllegalStateException("Should never be Waiting if no requests in flight. Just turn in the guess.")
         val nextRequestToReturn = inFlightLandingTimes.minBy(_._2)
-        val newInFlightLandingTimes = inFlightLandingTimes - nextRequestToReturn._1
 
         val beliefMarginals = gameState.marginals(nextRequestToReturn._1._1)
         val obs : String = humanErrorDistribution.sampleGivenMarginals(beliefMarginals)
 
         val nextState = gameState.getNextStateForNodeObservation(nextRequestToReturn._1._1, nextRequestToReturn._1._2, null, obs)
-        StateSample(nextState, nextRequestToReturn._2, newInFlightLandingTimes)
+        StateSample(nextState, nextRequestToReturn._2)
 
       case turnIn : TurnInGuess =>
         // This returns a terminal state, which we can get loss from
-        StateSample(gameState, extraHypotheticalTime, inFlightLandingTimes, terminal = true)
+        StateSample(gameState, extraHypotheticalTime, terminal = true)
     }
   }
 }
@@ -94,7 +94,8 @@ case class StateSample(gameState : GameState,
 case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], gamePlayer : GamePlayer, parent : TreeNode) {
   // Mysterious constant for DPW
   // Basically when C > \sqrt{numChildrenForBestMove}, we explore at random, otherwise we sample from existing paths
-  val C = 5.0
+  val exploreChildren = 100
+  val C = Math.sqrt(exploreChildren)
 
   val children = mutable.Map[GameMove, List[TreeNode]]()
   var visits = 0
@@ -104,6 +105,7 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
     "\t"*level+"{Node ["+
     "visits:"+visits+","+
     "delay:"+stateSample.extraHypotheticalTime+","+
+    "cost:$"+stateSample.gameState.cost+","+
     "totalObservedReward:"+totalObservedReward+","+
     "averageObservedReward:"+(totalObservedReward/visits)+"]"+
     children.map(pair => {
@@ -117,7 +119,7 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
   def isNonTerminal : Boolean = !stateSample.terminal
 
   def mostVisitedAction() : GameMove = {
-    println(children.map(pair => pair._1+": "+pair._2.map(_.visits).sum).mkString("\n"))
+    println(children.map(pair => pair._1+": "+pair._2.map(_.visits).sum+", reward "+(pair._2.map(_.totalObservedReward).sum / pair._2.map(_.visits).sum)).mkString("\n"))
 
     children.maxBy(_._2.map(_.visits).sum)._1
   }
@@ -164,8 +166,8 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
         val sumVisitsThisMove = observedOutcomes.map(_.visits).sum
 
         // Calculate score according to UCB1 formula
-        val score = (sumRewardThisMove / (sumVisitsThisMove + 1)) + Math.sqrt(2 * Math.log(visits) / (sumVisitsThisMove + 1))
-        println("Score for "+move+" with this node visits "+visits+", move size:"+observedOutcomes.size+", moveVisits "+sumVisitsThisMove+", moveReward "+sumRewardThisMove+": "+score)
+        val score = (sumRewardThisMove / (sumVisitsThisMove + 1)) + Math.sqrt(2.0 * Math.log(visits) / (sumVisitsThisMove + 1))
+        // println("Score for "+move+" with this node visits "+visits+", move size:"+observedOutcomes.size+", moveVisits "+sumVisitsThisMove+", moveReward "+sumRewardThisMove+": "+score)
         score
       })
     }
@@ -180,8 +182,14 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
       0
     }
 
-    // TurnInGuess() and Wait() are both deterministic, no need for branching
-    if (numChildrenForBestMove == 0 || (C > Math.sqrt(numChildrenForBestMove) && !List(TurnInGuess(),Wait()).contains(bestMove))) {
+    // TurnInGuess() is deterministic, so we don't need to handle infinite branching, cause all branches are the same
+    val moveSupportsBranching : Boolean = bestMove match {
+      case _ : TurnInGuess => false
+      case _ : MakeHumanObservation => true
+      case _ : Wait => true
+    }
+
+    if (numChildrenForBestMove == 0 || (C > Math.sqrt(numChildrenForBestMove) && moveSupportsBranching)) {
       // This means we get a new state
       val nextStateSample = stateSample.sampleNextState(bestMove, r, humanErrorDistribution, humanDelayDistribution)
       val nextTreeNode = TreeNode(nextStateSample, gamePlayer.getAllLegalMoves(nextStateSample.gameState, reserveRealBudget = false), gamePlayer, this)

@@ -370,7 +370,7 @@ case class InFlightPrediction(engine : LenseEngine,
           // On every change we should recurse
           gameplayerMove()
         })
-        gameState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, workUnit)
+        gameState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, workUnit, System.currentTimeMillis())
         // Move again immediately
         gameplayerMove()
 

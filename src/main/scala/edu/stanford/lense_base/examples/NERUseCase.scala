@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
-import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
@@ -70,14 +70,16 @@ class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*50.0
+      case (_,"0",p) => 1.0 - p
       case t => 1.0 - t._3
     }.sum
-    expectedErrors + cost*5
+
+    // A reduction in error of at least 1% for each cent spent
+    expectedErrors + cost*1
   }
 
   override val maxLossPerNode : Double = {
-    1.0
+    1.5
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
@@ -148,7 +150,7 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
+  override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
 object NERUseCase extends App {
@@ -177,7 +179,7 @@ object NERUseCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 20
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.005, poolSize, "artificial_human")
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)

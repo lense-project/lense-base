@@ -11,7 +11,7 @@ import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit}
  */
 
 object LookaheadOneHeuristic extends GamePlayer {
-  def inFlightCombinatorial(originalState : GameState, state : GameState, inFlightList : List[(GraphNode, HumanComputeUnit, WorkUnit)], i : Int, prob : Double): Set[(GameState,Double)] = {
+  def inFlightCombinatorial(originalState : GameState, state : GameState, inFlightList : List[(GraphNode, HumanComputeUnit, WorkUnit, Long)], i : Int, prob : Double): Set[(GameState,Double)] = {
     if (inFlightList.size == 0) return Set((originalState, 1.0))
     val query = inFlightList(i)
 
