@@ -21,10 +21,16 @@ cheat-sheet: "<b>Locations:</b>
                   People
                 </li>
               </ul>
-              <b>None:</b>
+              <b>None of the above:</b>
               <ul>
                 <li>
-                  Dates,
+                  Dates
+                </li>
+                <li>
+                  Nonsense
+                </li>
+                <li>
+                  Words like \"he\", \"she\", and \"they\"
                 </li>
               </ul>
               "
@@ -53,17 +59,29 @@ examples:
     correctTag: "O"
     comment: "How do you label random words?"
 
+  - sequence: "[He] wasn't much of a soldier."
+    correctTag: "O"
+    comment: "Words like \"he\", \"she\", and \"they\" don't get labeled as Person. Label it as None."
+
   - sequence: "I went to [Germany] on vacation."
     correctTag: "LOC"
     comment: "Places are always labeled as locations."
+
+  - sequence: "0-11: [25.]"
+    correctTag: "O"
+    comment: "When it looks like nonsense, just label with None"
 
   - sequence: "Competition takes place at the Olympic [Birdsnest] in Beijing."
     correctTag: "LOC"
     comment: "Places are always labeled as locations."
 
+  - sequence: "[She] loved to dance."
+    correctTag: "O"
+    comment: "How do you label words like \"he\", \"she\", and \"they\"?"
+
   - sequence: "[January] 1, I woke early and dressed to kill."
     correctTag: "O"
-    comment: "Dates don't count as a named entity"
+    comment: "Dates count as none."
 
   - sequence: "I visited [New] York on Friday."
     correctTag: "LOC"

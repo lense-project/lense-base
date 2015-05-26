@@ -30,8 +30,8 @@ class NERUseCase extends LenseSequenceUseCase {
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -183,9 +183,9 @@ object NERUseCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 3
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }
