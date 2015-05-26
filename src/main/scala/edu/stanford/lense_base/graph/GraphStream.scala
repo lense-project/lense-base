@@ -215,6 +215,8 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
         val node = estimatePair._1
         val estimateDistribution = estimatePair._2
 
+        // TODO: There are several ways this could be optimized
+
         def twoNormSquared(map1 : Map[String,Double], map2 : Map[String,Double]) : Double = {
           var squareSum = 0.0
           for (keyVal <- map1) {
