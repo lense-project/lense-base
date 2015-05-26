@@ -111,7 +111,7 @@ class LenseEngine(stream : GraphStream,
   }
 
   var numSwapsSoFar = 0
-  val modelRegularization = 2.0
+  val modelRegularization = 1.0
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
   new Thread {
@@ -239,19 +239,26 @@ case class InFlightPrediction(engine : LenseEngine,
   var humanResponses = ListBuffer[(GraphNode, HumanComputeUnit, String)]()
   var humanQueryDelays = ListBuffer[(HumanComputeUnit, Long)]()
 
+  val behaviorLogLock = new Object()
   var behaviorLog = ""
+
+  def writeToLog(note : String): Unit = behaviorLogLock.synchronized {
+    behaviorLog += note + "\n"
+  }
 
   // Make sure that when new humans appear we reasses our gameplaying options
   hcuPool.registerHCUArrivedCallback(this, () => {
     gameplayerMove()
   })
 
-  val confidenceSet = originalGraph.marginalEstimate().map(pair => {
+  val confidenceSet = gameState.marginals.map(pair => {
     pair._2.maxBy(_._2)._2
   })
   val initialAverageConfidence = confidenceSet.sum / confidenceSet.size
   val initialMinConfidence = confidenceSet.min
   val initialMaxConfidence = confidenceSet.max
+
+  var initialMove = true
 
   // Initialize with a move
   gameplayerMove()
@@ -259,6 +266,19 @@ case class InFlightPrediction(engine : LenseEngine,
   def gameplayerMove() : Unit = this.synchronized {
     // We already turned in this set, this request is being called from some stray delayed call
     if (turnedIn) return
+
+    // Move this inside gameplayerMove() to ensure proper initialization
+    if (initialMove) {
+      writeToLog("**** BEGIN ****")
+      writeToLog("GRAPH:")
+      writeToLog(originalGraph.toString())
+      writeToLog("ORIGINAL MARGINALS:")
+      for (node <- originalGraph.nodes) {
+        writeToLog("\t"+node+":")
+        writeToLog("\t"+gameState.marginals(node))
+      }
+      initialMove = false
+    }
 
     System.err.println("Reserved by gameplayer on start of move: $"+engine.reserved.getOrDefault(engine.gamePlayer, 0.0))
 
@@ -278,6 +298,12 @@ case class InFlightPrediction(engine : LenseEngine,
 
     optimalMove match {
       case _ : TurnInGuess =>
+        writeToLog(">> TURNING IN GUESS ("+(System.currentTimeMillis() - gameState.startTime)+")")
+        for (node <- originalGraph.nodes) {
+          writeToLog("\t"+node+": "+gameState.map(node))
+        }
+        writeToLog("**** END ****")
+
         // Return any money we had reserved when considering options
         System.err.println("Turning in guess - returning budget")
         engine.spendReservedBudget(0.0, gameState, hcuPool)
@@ -286,7 +312,7 @@ case class InFlightPrediction(engine : LenseEngine,
         turnedIn = true
         hcuPool.removeHCUArrivedCallback(this)
 
-        val mapEstimate = gameState.graph.mapEstimate()
+        val mapEstimate = gameState.map
 
         // Cancel all outstanding requests
         gameState.inFlightRequests.foreach(triple => {
@@ -334,6 +360,9 @@ case class InFlightPrediction(engine : LenseEngine,
               behaviorLog))
           })
       case obs : MakeHumanObservation =>
+        writeToLog(">> MAKE HUMAN OBSERVATION ("+(System.currentTimeMillis() - gameState.startTime)+")")
+        writeToLog("\tAsking "+obs.hcu+" about "+obs.node)
+
         // Commit the engine to actually spending the money, and return anything we didn't use
         System.err.println("Making human observation budget spend")
         engine.spendReservedBudget(obs.hcu.cost, gameState, hcuPool)
@@ -353,6 +382,8 @@ case class InFlightPrediction(engine : LenseEngine,
             if (t.isSuccess) {
               // If the workUnit succeeded, move the gamestate
               println("Received response for "+obs.node+": "+t.get)
+              writeToLog(">> RECEIVED HUMAN RESPONSE ("+(System.currentTimeMillis() - gameState.startTime)+")")
+              writeToLog("\tFrom "+obs.hcu+": got "+obs.node+"="+t.get)
               gameState = gameState.getNextStateForNodeObservation(obs.node, obs.hcu, workUnit, t.get)
               numRequestsCompleted += 1
               totalCost += obs.hcu.cost
@@ -361,6 +392,9 @@ case class InFlightPrediction(engine : LenseEngine,
               humanQueryDelays.+=((obs.hcu, System.currentTimeMillis() - launchedObservation))
             }
             else {
+              writeToLog(">> HUMAN RESPONSE FAILED ("+(System.currentTimeMillis() - gameState.startTime)+")")
+              writeToLog("\tTime: "+(System.currentTimeMillis() - gameState.startTime))
+              writeToLog("\tFrom "+obs.hcu)
               System.err.println("Workunit Failed! "+t.failed.get.getMessage)
               // If the workUnit failed, then fail appropriately
               gameState = gameState.getNextStateForFailedRequest(obs.node, obs.hcu, workUnit)
@@ -375,6 +409,8 @@ case class InFlightPrediction(engine : LenseEngine,
         gameplayerMove()
 
       case WaitForTime(delay) =>
+        writeToLog(">> WAIT ("+(System.currentTimeMillis() - gameState.startTime)+")")
+
         System.err.println("Waiting for "+delay+" - returning budget")
         engine.spendReservedBudget(0.0, gameState, hcuPool)
         val closureGameState = gameState
@@ -389,6 +425,8 @@ case class InFlightPrediction(engine : LenseEngine,
         }).start()
 
       case wait : Wait =>
+        writeToLog(">> WAIT ("+(System.currentTimeMillis() - gameState.startTime)+")")
+
         System.err.println("Waiting - returning budget")
         engine.spendReservedBudget(0.0, gameState, hcuPool)
         // Do nothing, for now. Wait for stimulus

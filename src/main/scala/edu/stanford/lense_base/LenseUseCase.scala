@@ -637,6 +637,25 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     gw.close()
     aw.close()
 
+    // Print the logs of behavior, separated by perfect runs and mistakes for convenience
+
+    val perfectRuns = l.filter(quad => quad._2 == quad._3)
+    val imperfectRuns = l.filter(!perfectRuns.contains(_))
+
+    val pw = new BufferedWriter(new FileWriter(resultsPrefix+outputPath+"/perfect-run-logs.txt"))
+    for (quad <- perfectRuns) {
+      pw.write(quad._4.behaviorLog)
+      pw.write("\n\n\n")
+    }
+    pw.close()
+
+    val iw = new BufferedWriter(new FileWriter(resultsPrefix+outputPath+"/imperfect-run-logs.txt"))
+    for (quad <- imperfectRuns) {
+      iw.write(quad._4.behaviorLog)
+      iw.write("\n\n\n")
+    }
+    iw.close()
+
     // Print the confusion matrix for the output classes
 
     val nodeTypes = l.flatMap(_._1.nodes).map(_.nodeType).distinct.toList

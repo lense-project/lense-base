@@ -80,9 +80,11 @@ case class GraphFactor(graph : Graph,
   override def toString : String = if (stringName != null) "GraphFactor("+stringName+")" else super.toString
 }
 
-case class Graph(stream : GraphStream) extends CaseClassEq {
+case class Graph(stream : GraphStream, overrideToString : String = null) extends CaseClassEq {
   val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
   val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
+
+  override def toString() : String = if (overrideToString != null) overrideToString else super.toString()
 
   override def clone() : (Graph, Map[GraphNode, GraphNode]) = {
     val g = stream.newGraph()
@@ -364,7 +366,7 @@ class GraphStream {
     FactorType(this, neighborTypes, weights)
   }
 
-  def newGraph() : Graph = Graph(this)
+  def newGraph(toString : String = null) : Graph = Graph(this, toString)
 
   def onlineUpdate(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
@@ -382,8 +384,10 @@ class GraphStream {
   def learn(graphs : Iterable[Graph], l2regularization: Double = 0.1, clearOptimizer : Boolean = true) : Double = {
     if (graphs.size == 0) return 0.0
 
-    val trainingGraphs = graphs.take(Math.round(graphs.size * 0.7).asInstanceOf[Int]).toList
+    val trainingGraphs = graphs.take(Math.round(graphs.size.asInstanceOf[Double] * 0.7).asInstanceOf[Int]).toList
     val validationGraphs = graphs.filter(g => !trainingGraphs.contains(g)).toList
+
+    System.err.println("Split data into "+trainingGraphs.size+" training graphs and "+validationGraphs.size+" validation graphs")
 
     val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
@@ -616,6 +620,7 @@ class GraphStream {
 
 
       // Don't want to be doing this part in parallel, things get broken
+
       val likelihoodExamples = model.synchronized {
         for (graph <- graphs) {
           model.warmUpIndexes(graph)
