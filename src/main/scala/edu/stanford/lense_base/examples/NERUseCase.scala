@@ -76,6 +76,10 @@ class NERUseCase extends LenseSequenceUseCase {
     expectedErrors + cost*5
   }
 
+  override val maxLossPerNode : Double = {
+    1.0
+  }
+
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,

@@ -139,9 +139,9 @@ class LenseEngine(stream : GraphStream,
     modelRegularization / Math.log(dataSize)
   }
 
-  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
+  def predict(graph : Graph, askHuman : (GraphNode, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(GraphNode, String, Double)],  Double, Long) => Double, maxLossPerNode : Double) : Promise[(Map[GraphNode, String], PredictionSummary)] = {
     val promise = Promise[(Map[GraphNode,String], PredictionSummary)]()
-    InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, promise)
+    InFlightPrediction(this, graph, askHuman, hcuPool, lossFunction, maxLossPerNode, promise)
     promise
   }
 
@@ -224,9 +224,10 @@ case class InFlightPrediction(engine : LenseEngine,
                               askHuman : (GraphNode, HumanComputeUnit) => WorkUnit,
                               hcuPool : HCUPool,
                               lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
+                              maxLossPerNode : Double,
                               returnPromise : Promise[(Map[GraphNode, String], PredictionSummary)]) extends CaseClassEq {
   // Create an initial game state
-  var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
+  var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, maxLossPerNode)
 
   var turnedIn = false
 

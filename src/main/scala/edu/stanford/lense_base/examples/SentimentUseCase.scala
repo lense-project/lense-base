@@ -89,6 +89,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
   }
 
+  override val maxLossPerNode : Double = {
+    1.0
+  }
+
   override def useCaseReportSubpath : String = "sentiment"
 
   /**

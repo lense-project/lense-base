@@ -28,12 +28,15 @@ object MCTSTest extends App {
     List("GREEN","RED") -> Map("BIAS" -> -1.0)
   ))
 
+  // This is to help MCTS, by both clipping search and normalizing reward functions
+  val maxLossPerNode = 2.0
+
   def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, time: Long): Double = {
     val expectedErrors = mostLikelyGuesses.map{
-      // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*50.0
-      case t => 1.0 - t._3
+      case (_,"0",p) => 1.0 - p
+      case (_, _, p) => 1.0 - p
     }.sum
+
     expectedErrors + cost*5
   }
 
@@ -47,7 +50,7 @@ object MCTSTest extends App {
 
   val hcuPool = ArtificialHCUPool(10, humanErrorDistribution, humanDelayDistribution, 0.01, rand)
 
-  var gameState = GameState(graph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction)
+  var gameState = GameState(graph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, 1.0)
 
   val optimalMove = MCTSGamePlayer.getOptimalMove(gameState)
 

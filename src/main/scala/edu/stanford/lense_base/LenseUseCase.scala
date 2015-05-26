@@ -126,6 +126,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double
 
   /**
+   * Some gameplayers care about losses being expressed as reward (negative loss) in the [0,1] range. To accomplish this,
+   * we need to know a max loss per node
+   * @return
+   */
+  def maxLossPerNode: Double
+
+  /**
    * An opportunity to provide some seed data for training the model before the online task begins. This data will
    * be used to train the classifier prior to any testing or online activity
    *
@@ -759,7 +766,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     // Just ensure that we have a server up, this will start it if it isn't running yet
     WorkUnitServlet.server
     // Run actual prediction
-    lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction)
+    lenseEngine.predict(graph, (n, hcu) => getQuestion(n, hcu).getHumanOpinion, hcuPool, lossFunction, maxLossPerNode)
   }
 
   private def classifyWithArtificialHumans(graph : Graph,
@@ -777,7 +784,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       workUnit
     },
     hcuPool,
-    lossFunction)
+    lossFunction,
+    maxLossPerNode)
   }
 
   private def toLabeledGraph(input : Input, output : Output) : Graph = {
