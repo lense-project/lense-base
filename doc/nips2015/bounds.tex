@@ -33,9 +33,9 @@ Let the set of ``true confidence'' distributions $\Delta$ be defined as
 
 Assume we are given a vector $\by$, and we want to predict $\bx = \argmax_{\bx} P(\bx | \by)$, and we have access to an infinite number of human labelers, as explained above.
 We are tasked with, regardless of cost, ensuring that when given an infinite number of $\by_i$, we achieve an error rate of $e_{\text{acceptable}}$
-\[\lim_{i\to\infty} \frac{\sum_i ||\bx_{i,\text{true}} - \bx_{i,\text{guess}}||_{\infty} / |\bx|}{i} \leq e_{\text{acceptable}}\]
+\[\lim_{i\to\infty} \frac{\sum_i \frac{||\bx_{i,\text{true}} - \bx_{i,\text{guess}}||_{\infty}}{|\bx|}}{i} \leq e_{\text{acceptable}}\]
 In practice, this implies the policy of turning in a vector of guesses $x$ only when
-\[\min_{i} \max_{k} \argmax{\bx} P(\bx_i = k | \by) > 1 - e_{\text{acceptable}}\]
+\[\min_{i} \max_{k} P(\bx_i = k | \by) > 1 - e_{\text{acceptable}}\]
 Until that condition is met, we must continue asking queries of humans.
 For simplicity of analysis, to derive a lower bound on value of information, let's assume that we're confined to treating each variable in $\bx$ independently.
 As we arrive at a variable $i$, any previous human queries asked of nodes $j < i$ are already incorporated in our observed marginals for $\bx_i$.
