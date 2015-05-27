@@ -14,8 +14,8 @@ import scala.util.Random
  * Using the Stanford sentiment dataset for a simple turk-able question set
  */
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
-  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train")
-  lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
+  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(100)
+  lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test").take(1000)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
     // Word2VecLoader.loadData("data/google-300.ser.gz")
@@ -87,6 +87,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
     (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
+  }
+
+  override val maxLossPerNode : Double = {
+    1.0
   }
 
   override def useCaseReportSubpath : String = "sentiment"

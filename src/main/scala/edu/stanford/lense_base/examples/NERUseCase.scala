@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
-import edu.stanford.lense_base.gameplaying.{LookaheadOneHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, MCTSGamePlayer, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
@@ -18,14 +18,20 @@ import scala.util.Random
  * Does NER using sequence use cases
  */
 class NERUseCase extends LenseSequenceUseCase {
-  lazy val allData : List[(List[String],List[String])] = random.shuffle(loadNER)
+
+  // Exclude ORG & MISC, cause they're confusing to Turkers
+  lazy val legalTokens = Set("O","PER","LOC")
+
+  lazy val allData : List[(List[String],List[String])] = {
+    random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
+  }
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
-  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(100)
+  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(200)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -64,17 +70,24 @@ class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // we much prefer to not tag 0s incorrectly
-      case (_,"0",p) => (1.0 - p)*5.0
+      case (_,"0",p) => 1.0 - p
       case t => 1.0 - t._3
     }.sum
-    // This will trade 10 human labels for fully correct token
-    expectedErrors*4 + cost
+
+    // A reduction in error of at least 1% for each cent spent
+    expectedErrors + cost*1
+  }
+
+  override val maxLossPerNode : Double = {
+    1.5
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
-      "capitalized:" + (sequence(i)(0).isUpper && sequence(i).exists(_.isLower)) -> 1.0,
+      "capitalized:" + (if (sequence(i).length() > 0) sequence(i)(0).isUpper && sequence(i).exists(_.isLower) else false) -> 1.0,
+      "left-word:" + (if (i > 0) sequence(i-1) else "#") -> 1.0,
+      "right-word:" + (if (i < sequence.size-1) sequence(i+1) else "$") -> 1.0,
       "BIAS" -> 0.0
     )
     word2vec.get(sequence(i)) match {
@@ -86,7 +99,8 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner.yaml")
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner-2-class.yaml")
+
   override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
   override def humanTrainingIntroduction : String = yaml._1
   override def humanCheatSheet : String = yaml._2
@@ -120,7 +134,8 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data.csv", random)
+  // override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
+  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**
@@ -138,7 +153,8 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
+  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
 object NERUseCase extends App {
@@ -166,10 +182,10 @@ object NERUseCase extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 20
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.005, poolSize, "artificial_human")
+  val poolSize = 3
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }

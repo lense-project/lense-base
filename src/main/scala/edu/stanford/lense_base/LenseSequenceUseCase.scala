@@ -101,7 +101,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
   override def toGraph(input: List[String]): Graph = {
-    val graph = graphStream.newGraph()
+    val graph = graphStream.newGraph(input.mkString(" "))
     val questionMap = mutable.Map[GraphNode, GraphNodeQuestion]()
 
     var lastNode : GraphNode = null

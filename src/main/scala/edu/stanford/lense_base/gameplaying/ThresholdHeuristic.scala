@@ -11,13 +11,16 @@ import edu.stanford.lense_base.graph.GraphNode
  */
 
 object ThresholdHeuristic extends GamePlayer {
-  val threshold = 0.99
+  // There are a lot more of these, we must be very certain every time, or we will make mistakes
+  val defaultClassThreshold = 0.97
+  val otherThreshold = 0.8
+
   // One obsevation cuts uncertainty to the human error rate, as a rough heuristic
-  val humanUncertaintyMultiple = 0.65
+  val humanUncertaintyMultiple = 0.4
 
   override def getOptimalMove(state: GameState): GameMove = {
-    // If it's been more than 30s, just force a TurnInGuess()
-    if (System.currentTimeMillis() - state.startTime > 30000) {
+    // If it's been more than 10s, just force a TurnInGuess()
+    if (System.currentTimeMillis() - state.startTime > 10000) {
       return TurnInGuess()
     }
 
@@ -32,7 +35,12 @@ object ThresholdHeuristic extends GamePlayer {
         certainty = 1 - ((1 - certainty)*humanUncertaintyMultiple)
       }
       // println(node+": (in flight "+inFlightRequestsForNode+") - "+certainty)
-      certainty < threshold
+      if (maxProb._1 == "O") {
+        certainty < defaultClassThreshold
+      }
+      else {
+        certainty < otherThreshold
+      }
     }).toSet
 
     if (moveOnNodes.size > 0) {

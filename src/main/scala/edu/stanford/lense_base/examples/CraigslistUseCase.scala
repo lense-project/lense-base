@@ -69,6 +69,10 @@ class CraigslistUseCase extends LenseSequenceUseCase {
     expectedErrors*4 + cost
   }
 
+  override val maxLossPerNode : Double = {
+    1.0
+  }
+
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,

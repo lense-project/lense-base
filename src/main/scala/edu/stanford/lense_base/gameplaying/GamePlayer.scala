@@ -59,16 +59,25 @@ abstract class GamePlayer {
       canAfford = maxHCUCost
     }
 
-    List(TurnInGuess()) ++ state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
+    state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
       state.hcuPool.synchronized {
-        state.hcuPool.hcuPool.
+        val list = state.hcuPool.hcuPool.
           // Take only HCU's we haven't used before for this node
           filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
-          filter(_.cost <= canAfford).
-          // And make an observation on them
-          map(hcu => MakeHumanObservation(n, hcu))
+          filter(_.cost <= canAfford)
+
+        // If there are HCUs available for this node, pick the one with the shortest queue
+        if (list.size > 0) {
+          List(MakeHumanObservation(n, list.minBy(_.estimateTimeToFinishQueue)))
+        }
+        // If there are no HCUs available for this node, then return no moves on this node
+        else List()
       }
-    }).toList
+    }).toList ++ {
+      if (state.inFlightRequests.size > 0) List(Wait()) else List()
+    } ++ {
+      if (state.inFlightRequests.size == 0) List(TurnInGuess()) else List()
+    }
   }
 }
 
@@ -81,12 +90,13 @@ case class GameState(graph : Graph,
                      hcuPool : HCUPool,
                      addHumanObservation : (Graph, GraphNode, String) => Unit,
                      lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
-                     inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
+                     maxLossPerNode : Double,
+                     inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit, Long)] = Set(),
                      completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
                      startTime : Long = System.currentTimeMillis(),
-                     marginalMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
-                     mapMemos : mutable.Map[Map[GraphNode,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
-                     observedNodes : Map[GraphNode,Map[String, Int]] = Map()) {
+                     marginalMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
+                     mapMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
+                     observedNodes : Map[Int,Map[String, Int]] = Map()) {
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
   var originalGraph : Graph = graph
@@ -94,7 +104,7 @@ case class GameState(graph : Graph,
 
   // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
   // We do some cacheing, but this shouldn't help very often, since the search space is very large.
-  lazy val marginals : Map[GraphNode, Map[String, Double]] = {
+  lazy val marginals : Map[GraphNode, Map[String, Double]] = synchronized {
     if (!marginalMemos.contains(observedNodes)) {
       marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
         (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
@@ -103,7 +113,7 @@ case class GameState(graph : Graph,
     marginalMemos(observedNodes)
   }
 
-  lazy val map : Map[GraphNode, String] = {
+  lazy val map : Map[GraphNode, String] = synchronized {
     if (!mapMemos.contains(observedNodes)) {
       mapMemos.put(observedNodes, graph.mapEstimate().map(pair => {
         (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
@@ -135,14 +145,15 @@ case class GameState(graph : Graph,
     nextState.oldToNew = oldToNew.map(pair => (pair._1, copyOldToNew(pair._2)))
   }
 
-  def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
+  def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, launchTime : Long) : GameState = {
     val clonePair = graph.clone()
     val nextState : GameState = GameState(clonePair._1,
-      cost,
+      cost + hcu.cost,
       hcuPool,
       addHumanObservation,
       lossFunction,
-      inFlightRequests ++ Set((node, hcu, workUnit)),
+      maxLossPerNode,
+      inFlightRequests ++ Set((node, hcu, workUnit, launchTime)),
       completedRequests,
       startTime,
       marginalMemos,
@@ -159,7 +170,8 @@ case class GameState(graph : Graph,
       hcuPool,
       addHumanObservation,
       lossFunction,
-      inFlightRequests -- Set((node, hcu, workUnit)),
+      maxLossPerNode,
+      inFlightRequests.filter(quad => quad._1 != node || quad._2 != hcu),
       completedRequests,
       startTime,
       marginalMemos,
@@ -173,10 +185,12 @@ case class GameState(graph : Graph,
   def getNextStateForNodeObservation(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
     val clonePair = graph.clone()
 
+    if (!originalGraph.nodes.contains(node)) throw new IllegalStateException("Cannot get next state for node not in originalGraph")
+
     // Figure out the observed nodes set for the next state
-    val nextObservedNodes : Map[GraphNode, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
+    val nextObservedNodes : Map[Int, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
       observedNodes.map(pair => {
-        if (pair._1 eq node) {
+        if (pair._1 == originalGraph.nodes.indexOf(node)) {
           if (pair._2.map(_._1).toSet.contains(obs)) {
             (pair._1, pair._2.map(obsCount => {
               if (obsCount._1 == obs) {
@@ -192,15 +206,16 @@ case class GameState(graph : Graph,
         }
       })
     } else {
-      observedNodes ++ Map(node -> Map(obs -> 1))
+      observedNodes ++ Map(originalGraph.nodes.indexOf(node) -> Map(obs -> 1))
     }
 
     val nextState : GameState = GameState(clonePair._1,
-      cost + hcu.cost,
+      cost,
       hcuPool,
       addHumanObservation,
       lossFunction,
-      inFlightRequests -- Set((node, hcu, workUnit)),
+      maxLossPerNode,
+      inFlightRequests.filter(quad => quad._1 != node || quad._2 != hcu),
       completedRequests ++ Set((node, hcu, workUnit)),
       startTime,
       marginalMemos,
@@ -209,17 +224,5 @@ case class GameState(graph : Graph,
     copyMutableState(nextState, clonePair._2)
     addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)
     nextState
-  }
-
-  def getNextStates(move : GameMove) : List[(Double,GameState)] = {
-    // could perform some cacheing here, to help prevent the need for explicit Dynamic Programming elsewhere
-    move match {
-      case obs : MakeHumanObservation => {
-        obs.node.nodeType.possibleValues.map(randomHumanResponse => {
-          (marginals(oldToNew(obs.node))(randomHumanResponse),getNextStateForNodeObservation(obs.node, obs.hcu, null, randomHumanResponse))
-        })
-      }.toList
-      case _ : TurnInGuess => List()
-    }
   }
 }
