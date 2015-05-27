@@ -908,9 +908,11 @@ class ArtificialComputeUnit(humanErrorDistribution : HumanErrorDistribution, hum
           override def run() = {
             // Humans can never take less than 1s to make a classification
             val msDelay = humanDelayDistribution.sampleDelay()
-            Thread.sleep(msDelay)
-            if (workUnit eq currentWork) {
-              finishWork(workUnit, artificial.guess)
+            if (msDelay > 0) {
+              Thread.sleep(msDelay)
+              if (workUnit eq currentWork) {
+                finishWork(workUnit, artificial.guess)
+              }
             }
           }
         }.start()

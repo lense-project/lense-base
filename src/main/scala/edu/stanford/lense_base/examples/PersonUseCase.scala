@@ -18,17 +18,18 @@ import scala.util.Random
 class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   val celebrities = List("Daniel Craig", "Anderson Cooper", "Scarlett Johansson", "Miley Cyrus")
 
-  lazy val dataSet = getCelebritiesSet(celebrities)
+  lazy val dataSet = rand.shuffle(getCelebritiesSet(celebrities).map(p => (p, p.name)))
 
-  lazy val trainSet : List[(PersonImage,String)] = List() // no training data
-  lazy val testSet : List[(PersonImage,String)] = dataSet.map(p => (p, p.name))
+  lazy val trainSet : List[(PersonImage,String)] = List()
+  lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d))
 
   override def labelTypes: Set[String] = celebrities.toSet
 
   override def getFeatures(input: PersonImage): Map[String, Double] = {
-    input.embedding.zipWithIndex.map(pair => {
+    val features = input.embedding.zipWithIndex.map(pair => {
       "nn:"+pair._2 -> pair._1
     }).toMap
+    features
   }
 
   def loadDatabase() : List[PersonImage] = {
@@ -46,7 +47,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
     if (f.exists()) {
       val lines = Source.fromFile(path).getLines().toList
       imagesOfThisPerson.foreach(img =>
-        if (lines(img.index-1) != "err")
+        if (img.index < lines.size && lines(img.index-1) != "err")
           img.embedding = lines(img.index-1).split(" ").map(d => java.lang.Double.parseDouble(d)).toList
       )
     }
@@ -82,13 +83,13 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
     allImages.filter(p => names.contains(p.name) && p.embedding != null)
   }
 
-  override def getHumanQuestion(input: PersonImage): String = "Who is this celebrity?<div><img src=\""+input.url+"\"></div>"
+  override def getHumanQuestion(input: PersonImage): String = "Who is this celebrity?<div style='width: 200px; height: 200px; background-color: black'><img src=\""+input.url+"\" style='width: 100%'></div>"
 
   override def getHumanVersionOfLabel(label: String): String = label
 
   lazy val rand = new Random()
-  override def humanDelayDistribution: HumanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 1000, rand)
-  override def humanErrorDistribution: HumanErrorDistribution = EpsilonRandomErrorDistribution(0.2, rand)
+  override def humanDelayDistribution: HumanDelayDistribution = ClippedGaussianHumanDelayDistribution(4000, 2000, rand)
+  override def humanErrorDistribution: HumanErrorDistribution = EpsilonRandomErrorDistribution(0.1, rand)
 
   override def useCaseReportSubpath : String = "celebrity"
 
