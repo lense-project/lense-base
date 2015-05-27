@@ -22,7 +22,8 @@ import java.util.IdentityHashMap
 class LenseEngine(stream : GraphStream,
                   initGamePlayer : GamePlayer,
                   humanErrorDistribution : HumanErrorDistribution,
-                  humanDelayDistribution : HumanDelayDistribution) {
+                  humanDelayDistribution : HumanDelayDistribution,
+                  useKNNTuningDuringTest : Boolean = false) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()

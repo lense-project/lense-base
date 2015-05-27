@@ -26,7 +26,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   lazy val graphStream: GraphStream = new GraphStream()
-  lazy val lenseEngine: LenseEngine = new LenseEngine(graphStream, gamePlayer, humanErrorDistribution, humanDelayDistribution)
+  lazy val lenseEngine: LenseEngine = new LenseEngine(graphStream,
+    gamePlayer,
+    humanErrorDistribution,
+    humanDelayDistribution,
+    useKNNSmoothingDuringTest)
 
   lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
@@ -191,6 +195,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    */
   def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {}
 
+  /**
+   *
+   * @return
+   */
+  def useKNNSmoothingDuringTest : Boolean = false
+
   ////////////////////////////////////////////////
   //
   //  These are functions that LenseUseCase provides, assuming the above are correct
@@ -218,7 +228,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     // Send home all of our real human labelers when we're done with all of our predictions
     // for a non-infinite stream.
 
-    if (hcuPool.hcuPool != null) {
+    if (hcuPool != null && hcuPool.hcuPool != null) {
       for (hcu <- hcuPool.hcuPool) {
         hcu match {
           case client: HCUClient => client.completeAndPay()
@@ -428,8 +438,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         var bucketVal = 0.0
         // Look backwards for something we can use, if our buckets aren't granular enough
         for (j <- i-1 to 0) {
-          if (buckets(j)._1 + buckets(j)._2 > 0 && bucketVal == 0.0) {
-            bucketVal = buckets(j)._1.asInstanceOf[Double] / (buckets(j)._1 + buckets(j)._2)
+          if (j >= 0) {
+            if (buckets(j)._1 + buckets(j)._2 > 0 && bucketVal == 0.0) {
+              bucketVal = buckets(j)._1.asInstanceOf[Double] / (buckets(j)._1 + buckets(j)._2)
+            }
           }
         }
         bucketVal
@@ -896,9 +908,11 @@ class ArtificialComputeUnit(humanErrorDistribution : HumanErrorDistribution, hum
           override def run() = {
             // Humans can never take less than 1s to make a classification
             val msDelay = humanDelayDistribution.sampleDelay()
-            Thread.sleep(msDelay)
-            if (workUnit eq currentWork) {
-              finishWork(workUnit, artificial.guess)
+            if (msDelay > 0) {
+              Thread.sleep(msDelay)
+              if (workUnit eq currentWork) {
+                finishWork(workUnit, artificial.guess)
+              }
             }
           }
         }.start()
