@@ -40,7 +40,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   }
 
   def produceOrReadEmbeddingsForPerson(person : String, images : List[PersonImage]) = {
-    val path = "data/person_recognition/"+person+"-embeddings.txt"
+    val path = "data/person_recognition/"+person+" Embeddings.txt"
     val f = new File(path)
     val imagesOfThisPerson = images.filter(_.name == person)
     if (f.exists()) {
@@ -63,8 +63,12 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
       for (i <- 1 to imagesOfThisPerson.size) {
         if (i > 1) bw.write("\n")
         bw.write({
-          val img = imagesOfThisPerson.filter(_.index == i).head
-          if (img.embedding != null) img.embedding.mkString(" ")
+          val images = imagesOfThisPerson.filter(_.index == i)
+          if (images.size > 0) {
+            val img = images.head
+            if (img.embedding != null) img.embedding.mkString(" ")
+            else "err"
+          }
           else "err"
         })
       }
