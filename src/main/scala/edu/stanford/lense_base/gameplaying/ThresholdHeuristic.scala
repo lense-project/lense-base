@@ -19,12 +19,10 @@ object ThresholdHeuristic extends GamePlayer {
   val humanUncertaintyMultiple = 0.4
 
   override def getOptimalMove(state: GameState): GameMove = {
-    // If it's been more than 30s, just force a TurnInGuess()
-    /*
-    if (System.currentTimeMillis() - state.startTime > 30000) {
+    // If it's been more than 10s, just force a TurnInGuess()
+    if (System.currentTimeMillis() - state.startTime > 10000) {
       return TurnInGuess()
     }
-    */
 
     // We should probably be cacheing this if it's every used in production, but no matter
     val marginals = state.graph.marginalEstimate()
