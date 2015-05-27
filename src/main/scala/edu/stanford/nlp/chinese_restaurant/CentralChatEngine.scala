@@ -77,4 +77,11 @@ class ResponseTypeClassification extends LenseMulticlassUseCase[String] {
   lazy val random = new Random(42)
   override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
   override lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
+
+  /**
+   * Some gameplayers care about losses being expressed as reward (negative loss) in the [0,1] range. To accomplish this,
+   * we need to know a max loss per node
+   * @return
+   */
+  override def maxLossPerNode: Double = 1.0
 }

@@ -1,0 +1,109 @@
+\section{Theoretical Bounds on Active Classification Performance}
+\label{sec:bounds}
+
+We're interested in providing extreme limits of classifier performance under an unrealistic set of assumptions, as a way to gain intuition about the setting and the limitations of our approach.
+It's trivially easy to see that it is possible to spend no money, and no time, during classifications. Simply return null on every request.
+It's more interesting to evaluate if it's possible to return a perfect classification every time, and how much we have to give up in average cost to achieve perfection.
+Let's assume that our temporal and financial budgets are infinite, we have an infinite number of humans on call, and we have an accurate model of the confusion matrix of humans $C$.
+If all of these conditions are met, are there any guarantees we can make about our classifier?
+Trivially, if our classifier always returns a uniform distribution over all possible output labels, and we query an infinite number of humans, it is possible to achieve arbitrary accuracy.
+More interestingly, are there non-trivial bounds we can set on the cost-guarantee tradeoffs?
+
+As an overview, our analysis will first define the value of valid priors on the data in terms of number of human queries required, under some simplifying assumptions about human error.
+We will then focus on the challenge of not being able to absolutely trust model confidence estimates.
+We define a rigorous way of conceptualizing ``trust'' in our confidence values, which requires defining the set of ``true confidence'' estimates allowable by the data for a given input.
+Then we define bounds of expected classification performance given a choice for this ``trust,'' and demonstrate that more trust leads to higher error rates and lower costs.
+
+\subsection{True Confidence Values}
+
+First we must define the set of ``true confidence'' distributions $\Delta$.
+Let data arrive in the form of $(\bx_i,\by_i)$ pairs, where $\by_i$ is the always observed set of variables we condition on, and $\bx_i$ is the true observed outcome.
+Given a set $\Gamma$ of IID pairs, a norm $N$, and a feature mapping $f(\by) = \bz \in \sR^m$,
+ let the ``$\epsilon$-neighborhood'' of $\by_t$ (notation $\Gamma(\epsilon, \by_t)$) be defined as all pairs in $\Gamma$ within the norm ball under $N$ of size $\epsilon$:
+\[\Gamma(\epsilon, \by_t) = \{\bx_i \in \Gamma | ||f(\by_i) - f(\by_t)||_N \leq \epsilon\}\]
+Every $\epsilon$-neighborhood, for $\epsilon \in \sR^+$, defines a natural frequentist estimate for $P(\bx_t | \by_t)$:
+\[P(\bx_t | \by_t; \epsilon) \approx \sum \frac{\Gamma(\epsilon, \by_t)}{|\Gamma(\epsilon, \by_t)|}\]
+Intuitively, $\epsilon$ has two limit conditions:
+\[\lim_{\epsilon\to\infty} P(\bx | \by; \epsilon) = \sum \frac{\bx_i}{|\Gamma|}\]
+\[\lim_{\epsilon\to0} P(\bx | \by; \epsilon) = \sum \frac{\bx_i | \by_i = \by_t}{\sum \mathbbm{1}\{\by_i = \by_t\}}\]
+Let the set of ``true confidence'' distributions $\Delta$ be defined as
+\[\Delta = \{P(\bx | \by; \epsilon) | \epsilon \in \sR^+\}\]
+
+\subsection{The Value of Valid Priors}
+
+Assume we are given a vector $\by$, and we want to predict $\bx = \argmax_{\bx} P(\bx | \by)$, and we have access to an infinite number of human labelers, as explained above.
+We are tasked with, regardless of cost, ensuring that when given an infinite number of $\by_i$, we achieve an error rate of $e_{\text{acceptable}}$
+\[\lim_{i\to\infty} \frac{\sum_i \frac{||\bx_{i,\text{true}} - \bx_{i,\text{guess}}||_{\infty}}{|\bx|}}{i} \leq e_{\text{acceptable}}\]
+In practice, this implies the policy of turning in a vector of guesses $x$ only when
+\[\min_{i} \max_{k} P(\bx_i = k | \by) > 1 - e_{\text{acceptable}}\]
+Until that condition is met, we must continue asking queries of humans.
+For simplicity of analysis, to derive a lower bound on value of information, let's assume that we're confined to treating each variable in $\bx$ independently.
+As we arrive at a variable $i$, any previous human queries asked of nodes $j < i$ are already incorporated in our observed marginals for $\bx_i$.
+
+Let's assume that our model delivers perfectly accurate marginals $m_i$ for the classes $\bx_i$.
+Formally, all marginals $m_i \in \Delta$.
+How does a setting of $m_i$ effect expected number of queries to achieve $\min_{i} \max_{k} P(\bx_i = k | \by) > 1 - e_{\text{acceptable}}$?
+
+Let's assume a simplified model of human error for this analysis, where humans are defined as follows:
+\begin{equation}
+    Q(o_i, X_j) \sim
+    \begin{cases}
+       \text{uniformly drawn from } D_j = \{1 \ldots K_j\}, & \text{with probability}\ \epsilon \\
+      h_{\text{true}}(X_j), & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+Then we can easily derive that a human query is worth a \todo{math} reduction in expected $E[\min_{i} \max_{k} 1-P(\bx_i = k | \by)]$.
+This then leads to the recurrence for expected number of queries remaining given $c$.
+
+\[E[\text{\# queries}] = \text{\todo{recurrance}}\]
+
+\subsection{The Worst-case Cost of Invalid Priors}
+\label{sec:worst-case}
+
+Let's assume that our model's prior is not valid ($m_i \not\in \Delta$), but is ``close,'' as in $\min (||M(\by_i, j) - \delta||_N | \delta \in \Delta) < \gamma$, for some $\gamma \in \sR^+$, and norm $N$.
+What's the worst that could happen to our accuracy, assuming we're still running the algorithm in the last section (turn in when $\min_{i} \max_{k} P(\bx_i = k | \by) > 1 - e_{\text{acceptable}}$, otherwise query).
+We have $m_i \not\in \Delta$ and $m_{i,\text{true}} \in \Delta$ where $m_{i,\text{true}} = argmin_{\delta} (||m_i - \delta||_N, \delta \in \Delta)$.
+
+Given that our humans are drawn from \todo{$H = $humans cross $m_{i,\text{true}}$}, we have that our algorithm will terminate when
+\[\max_{k} (m_i \times H^{\text{\# queries}})_k > 1 - e_{\text{acceptable}}\]
+This will produce more errors than $e_{\text{acceptable}}$, as described by:
+\[g(\gamma) = \text{\todo{math}}\]
+
+\subsection{Trust Guarantees for Model Confidence Estimates}
+
+Given a model $M$ which is capable of providing confidence estimates, we would like to quantify how much trust we can place in these estimates.
+Let $M(\by_i, j) = c_j \in R^k$, where $c_j$ is the vector of marginal class probabilities for node $j$ predicted by the model.
+Let $\gamma \in R^+$ be constants $\beta \in R^+$, and $N$ be a norm, then we define a trust guarantee for our model to be a statement of $(\gamma, \beta, N)$ where
+\[P(\min (||M(\by_i, j) - \delta||_N | \delta \in \Delta) > \gamma) \leq \beta\]
+A set of approximate trust guarantees $(\gamma, \beta, N)$ can be estimated in practical contexts by observing $\Delta$ for a finite set of $\epsilon$ on a held out dataset, and calculating directly.
+Note that it is possible to produce guarantees that set $\beta = 0$, by simply setting $\gamma = \infty$.
+Likewise $\gamma = 0$ is easily achieved with $\beta = \infty$.
+These are not useful bounds.
+
+\subsection{Model Under-Confidence}
+
+In practice, $\Delta$ is never observed, so we have to perform some approximations if we want to provide real guarantees.
+We know, however, a good estimate of one member of $\Delta$: the underlying class distribution $\delta_{\text{class}} \in \Delta$.
+It's intuitive that model underconfidence, in the extreme case always predicting $\delta_{\text{class}}$, yields both $\gamma \approx 0$ and $\beta \approx 0$.
+By Chebyshev, assuming some underlying data variance $\sigma$, we have the following guarantees for our massively underconfidence model:
+\[\gamma = k\sigma, \beta = \frac{1}{k^2}, \text{for all} k \in \sR\]
+In this way we can achieve a tight guarantee, but the information provided by our model is worth very little.
+
+\subsection{$\gamma$-$\beta$ Query-Bound Tradeoffs}
+
+Given a choice of a $(\gamma, \beta, N)$ trust guarantee, how can we describe model performance?
+
+For argument, assume that for now our $\beta = 0$ and $\gamma < \infty$.
+Then we can say with certainty that all our $M(\by_i, j) = c_j$ are within $\gamma$ of some true $\delta \in \Delta$.
+Assume our target is some $e_{\text{acceptable}}$ error rate, then we can use the formula from \ref{sec:worst-case} to solve for a new $e_{\text{acceptable $\gamma$-adjusted}}$ given $e_{\text{acceptable}}$, given our $\gamma$ guarantee:
+\[\text{todo{math}}\]
+This results in an expected number of queries, as a function of $e_{\text{acceptable}}$ and $\gamma$.
+\[\text{todo{math}}\]
+
+Now consider $\beta > 0$. In the worst case all the instances where our model prediction is worse than $\gamma$, $\min (||M(\by_i, j) - \delta||_N | \delta \in \Delta) > \gamma$, we just get wrong.
+That means that our new expected error rate is $e_{\text{acceptable $\gamma$-adjusted}} + \beta$.
+We do not attempt any guarantees that get below $\beta$ in expected error rate.
+
+This means that for larger $\gamma$, we can provide an arbitrary expected error rate, at much greater cost in queries, since we know how to compensate correctly for a $\gamma$ error rate.
+Larger $\beta$ will allow smaller $\gamma$, and consequently a smaller number of queries, but the floor on our minimum expected error rate is increased.

@@ -6,12 +6,33 @@ import scala.util.Random
 /**
  * Created by keenon on 5/23/15.
  */
-abstract class HumanErrorDistribution {
+abstract class HumanErrorDistribution(rand : Random) {
   def guess(correct : String, possibleValues : Set[String]) : String
   def jointProbability(correct : String, guess : String) : Double
+
+  def sampleGivenMarginals(marginals : Map[String,Double]) : String = {
+    val possibleValues = marginals.map(_._1).toList
+
+    val multipliedMarginals = possibleValues.map(guessedValue => {
+      (guessedValue, marginals.map(pair => {
+        val possibleTrueValue = pair._1
+        val trueValueWithProb = pair._2
+        jointProbability(possibleTrueValue, guessedValue) * trueValueWithProb
+      }).sum)
+    })
+
+    var sample = rand.nextDouble()
+
+    for (pair <- multipliedMarginals) {
+      if (sample < pair._2) return pair._1
+      sample -= pair._2
+    }
+
+    multipliedMarginals.last._1
+  }
 }
 
-case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) extends HumanErrorDistribution {
+case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) extends HumanErrorDistribution(rand) {
   override def guess(correct : String, possibleValues : Set[String]) : String = {
     // Do the automatic error generation
     if (rand.nextDouble() > epsilon) {
@@ -31,7 +52,7 @@ case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) exten
   }
 }
 
-case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution {
+case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution(rand) {
   lazy val unnormalizedConfusionMatrix : Map[String, List[(String,Double)]] = {
     val lines = Source.fromFile(path).getLines().toList
     val tags = lines(0).split(",")

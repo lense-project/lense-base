@@ -80,9 +80,11 @@ case class GraphFactor(graph : Graph,
   override def toString : String = if (stringName != null) "GraphFactor("+stringName+")" else super.toString
 }
 
-case class Graph(stream : GraphStream) extends CaseClassEq {
+case class Graph(stream : GraphStream, overrideToString : String = null) extends CaseClassEq {
   val nodes: mutable.MutableList[GraphNode] = new mutable.MutableList[GraphNode]()
   val factors: mutable.MutableList[GraphFactor] = new mutable.MutableList[GraphFactor]()
+
+  override def toString() : String = if (overrideToString != null) overrideToString else super.toString()
 
   override def clone() : (Graph, Map[GraphNode, GraphNode]) = {
     val g = stream.newGraph()
@@ -155,14 +157,13 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     }.toMap
   }
 
-  def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
+  def marginalEstimate(smoothEstimatesWithKNN : Boolean = false): Map[GraphNode, Map[String,Double]] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
     stream.model.synchronized {
       stream.model.warmUpIndexes(this)
     }
-
 
     ////////////////////////////
     // SYNCHRONIZED SECTION
@@ -193,7 +194,7 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
     // END SYNCHRONIZED SECTION
     ////////////////////////////
 
-    variables.filter(_.node.observedValue == null).map{
+    val rawMarginals = variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
         // Create node -> [value,score] pair for map
         nodeVar.node -> {
@@ -203,6 +204,83 @@ case class Graph(stream : GraphStream) extends CaseClassEq {
           }).toMap
         }
     }.toMap
+
+    if (smoothEstimatesWithKNN) {
+      // Now we re-tune by looking for the K nearest neighbors in the training set, by dot product, and taking the average
+      // of the true classes, plus smoothing. This should yield an accurate, and probably under-estimate, of the true
+      // probabilities implied by the model outputs
+
+      val K = 100 // neighbors to avg
+      val M = 1.0 // smoothing to add
+
+      rawMarginals.map(estimatePair => {
+        val node = estimatePair._1
+        val estimateDistribution = estimatePair._2
+
+        // TODO: There are several ways this could be optimized
+
+        def twoNormSquared(map1 : Map[String,Double], map2 : Map[String,Double]) : Double = {
+          var squareSum = 0.0
+          for (keyVal <- map1) {
+            val dif = keyVal._2 - map2(keyVal._1)
+            squareSum += dif*dif
+          }
+          squareSum
+        }
+
+        // Just do a linear scan through the data, and keep a top-K list as we go
+        val topKList = ListBuffer[(Double,String)]()
+        var maxEntry : (Double,String) = null
+
+        for (pair <- stream.confidenceVCorrectnessCache) {
+          val dist = twoNormSquared(pair._1, estimateDistribution)
+
+          // Handle updating the list as we go
+
+          if (topKList.size < K) {
+            var i = 0
+            while (i < topKList.size && topKList(i)._1 < dist) {
+              i += 1
+            }
+            if (i == topKList.size) maxEntry = (dist, pair._2)
+            topKList.insert(i, (dist, pair._2))
+          }
+          else {
+            if (dist < maxEntry._1) {
+              var i = 0
+              while (i < topKList.size && topKList(i)._1 < dist) {
+                i += 1
+              }
+              if (i == topKList.size) maxEntry = (dist, pair._2)
+              topKList.insert(i, (dist, pair._2))
+              topKList.remove(topKList.size-1)
+            }
+          }
+        }
+
+        val unnormalizedTopKEstimate = mutable.Map[String,Double]()
+        for (v <- node.nodeType.possibleValues) {
+          unnormalizedTopKEstimate.put(v, M)
+        }
+        for (pair <- topKList) {
+          unnormalizedTopKEstimate.put(pair._2, unnormalizedTopKEstimate(pair._2)+1)
+        }
+
+        val normalizationConstant = unnormalizedTopKEstimate.map(_._2).sum
+        val normalizedMarginals = unnormalizedTopKEstimate.map(estimatePair => {
+          (estimatePair._1, estimatePair._2 / normalizationConstant)
+        }).toMap
+
+        /*
+        println("Pre-normalized marginals for " + node + ": " + estimateDistribution)
+        println("Marginals for " + node + ": " + normalizedMarginals)
+        */
+        (node, normalizedMarginals)
+      })
+    }
+    else {
+      rawMarginals
+    }
   }
 
   def unobservedVariablesForFactorie(): Seq[NodeVariable] = {
@@ -288,7 +366,7 @@ class GraphStream {
     FactorType(this, neighborTypes, weights)
   }
 
-  def newGraph() : Graph = Graph(this)
+  def newGraph(toString : String = null) : Graph = Graph(this, toString)
 
   def onlineUpdate(graphs : Iterable[Graph], regularization: Double = 0.1, clearOptimizer : Boolean = true) = {
     if (graphs.exists(graph => graph.nodes.exists(node => {
@@ -297,16 +375,24 @@ class GraphStream {
     else onlineUpdateFullyObserved(graphs, regularization, clearOptimizer)
   }
 
+  var confidenceVCorrectnessCache : List[(Map[String,Double],String)] = List()
+
   // learns the appropriate bits, which means any weight factors, and EM if there are any
   // nodes with unobserved values. This is called for its byproducts, and will just go in and update the existing
   // weights on the NodeTypes and FactorTypes that are involved in the graphs that were passed in.
 
   def learn(graphs : Iterable[Graph], l2regularization: Double = 0.1, clearOptimizer : Boolean = true) : Double = {
     if (graphs.size == 0) return 0.0
+
+    val trainingGraphs = graphs.take(Math.round(graphs.size.asInstanceOf[Double] * 0.7).asInstanceOf[Int]).toList
+    val validationGraphs = graphs.filter(g => !trainingGraphs.contains(g)).toList
+
+    System.err.println("Split data into "+trainingGraphs.size+" training graphs and "+validationGraphs.size+" validation graphs")
+
     val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
-    }))) learnEM(graphs, clearOptimizer)
-    else learnFullyObserved(graphs, l2regularization, clearOptimizer)
+    }))) learnEM(trainingGraphs, clearOptimizer)
+    else learnFullyObserved(trainingGraphs, l2regularization, clearOptimizer)
 
     // Now we need to decode the weights
 
@@ -420,6 +506,28 @@ class GraphStream {
         }
       }
     }
+
+    // Now we need to go through our training data and set our confidenceVCorrectnessCache correctly
+    // We cache everything against both guess type and guess confidence, in case we decide to care later
+
+    val confidenceVCorrect = ListBuffer[(Map[String,Double],String)]()
+
+    for (graph <- validationGraphs) {
+      // Cache and clear observed values
+      val observedValueCache = graph.nodes.filter(_.observedValue != null).map(n => (n, n.observedValue)).toMap
+      graph.nodes.foreach(_.observedValue = null)
+
+      val rawMarginalsAfterTraining = graph.marginalEstimate(smoothEstimatesWithKNN = false)
+      for (nodeValue <- observedValueCache) {
+        confidenceVCorrect.+=((rawMarginalsAfterTraining(nodeValue._1), nodeValue._2))
+      }
+
+      // Recover observed values
+      graph.nodes.foreach(n => if (observedValueCache.contains(n)) n.observedValue = observedValueCache(n))
+    }
+
+    confidenceVCorrectnessCache = confidenceVCorrect.toList
+
     finalLoss
   }
 
@@ -512,6 +620,7 @@ class GraphStream {
 
 
       // Don't want to be doing this part in parallel, things get broken
+
       val likelihoodExamples = model.synchronized {
         for (graph <- graphs) {
           model.warmUpIndexes(graph)
