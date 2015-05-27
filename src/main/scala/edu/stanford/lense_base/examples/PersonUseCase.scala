@@ -5,7 +5,6 @@ import java.net.URL
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
-import edu.stanford.lense_base.util.ImageEmbeddingsFromURL
 
 import scala.io.Source
 import scala.util.Random

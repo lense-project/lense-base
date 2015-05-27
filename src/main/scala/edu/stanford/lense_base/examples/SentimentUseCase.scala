@@ -14,8 +14,8 @@ import scala.util.Random
  * Using the Stanford sentiment dataset for a simple turk-able question set
  */
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
-  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train")
-  lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
+  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(100)
+  lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test").take(1000)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
     // Word2VecLoader.loadData("data/google-300.ser.gz")
