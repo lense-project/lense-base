@@ -3,14 +3,15 @@ package edu.stanford.lense_base.examples
 import java.io.{FileWriter, BufferedWriter, File}
 import java.util.Properties
 
+import cc.factorie.app.nlp.lemma.WordNetLemmatizer
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, MCTSGamePlayer, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
 import edu.stanford.nlp.ie.NERFeatureFactory
-import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation
+import edu.stanford.nlp.ling.CoreAnnotations.{PartOfSpeechAnnotation, TokensAnnotation}
 import edu.stanford.nlp.ling.{CoreAnnotations, CoreLabel}
-import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
+import edu.stanford.nlp.pipeline.{MorphaAnnotator, Annotation, StanfordCoreNLP}
 import edu.stanford.nlp.process.{WordShapeClassifier, CoreLabelTokenFactory}
 import edu.stanford.nlp.sequences.{SeqClassifierFlags, Clique}
 import edu.stanford.nlp.util.PaddedList
@@ -97,10 +98,10 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
-    /*
     val annotation = new Annotation(sequence.mkString(" "))
     coreNLP.annotate(annotation)
 
+    /*
     val flags = new SeqClassifierFlags()
     val featureFactory = new NERFeatureFactory[CoreLabel]()
 
@@ -121,6 +122,7 @@ class NERUseCase extends LenseSequenceUseCase {
     */
 
     val word = sequence(i)
+    val tokens = annotation.get(classOf[TokensAnnotation])
     def prefix(len : Int) = {
       word.substring(0, Math.min(word.length-1, len))
     }
@@ -134,6 +136,7 @@ class NERUseCase extends LenseSequenceUseCase {
       "left-word:" + (if (i > 0) sequence(i-1) else "#") -> 1.0,
       "right-word:" + (if (i < sequence.size-1) sequence(i+1) else "$") -> 1.0,
       "shape:" + WordShapeClassifier.wordShape(sequence(i), WordShapeClassifier.WORDSHAPECHRIS4) -> 1.0,
+      "pos:" + tokens.get(i).get(classOf[PartOfSpeechAnnotation]) -> 1.0,
       "prefix1:" + prefix(1) -> 1.0,
       "prefix2:" + prefix(2) -> 1.0,
       "prefix3:" + prefix(3) -> 1.0,
@@ -205,8 +208,8 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  // override def gamePlayer : GamePlayer = ThresholdHeuristic
-  override def gamePlayer : GamePlayer = MCTSGamePlayer
+  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
 object NERUseCase extends App {
