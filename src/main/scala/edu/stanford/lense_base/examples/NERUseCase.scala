@@ -1,11 +1,20 @@
 package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
+import java.util.Properties
 
+import cc.factorie.app.nlp.lemma.WordNetLemmatizer
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, MCTSGamePlayer, LookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
+import edu.stanford.nlp.ie.NERFeatureFactory
+import edu.stanford.nlp.ling.CoreAnnotations.{PartOfSpeechAnnotation, TokensAnnotation}
+import edu.stanford.nlp.ling.{CoreAnnotations, CoreLabel}
+import edu.stanford.nlp.pipeline.{MorphaAnnotator, Annotation, StanfordCoreNLP}
+import edu.stanford.nlp.process.{WordShapeClassifier, CoreLabelTokenFactory}
+import edu.stanford.nlp.sequences.{SeqClassifierFlags, Clique}
+import edu.stanford.nlp.util.PaddedList
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
@@ -29,9 +38,15 @@ class NERUseCase extends LenseSequenceUseCase {
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(200)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
+  lazy val coreNLP : StanfordCoreNLP = {
+    val props = new Properties()
+    props.setProperty("annotators", "tokenize, ssplit, pos, lemma")
+    new StanfordCoreNLP(props)
+  }
+
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -83,11 +98,51 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
+    val annotation = new Annotation(sequence.mkString(" "))
+    coreNLP.annotate(annotation)
+
+    /*
+    val flags = new SeqClassifierFlags()
+    val featureFactory = new NERFeatureFactory[CoreLabel]()
+
+    featureFactory.init(flags)
+
+    val pad = new CoreLabelTokenFactory().makeToken()
+    pad.setWord("OOB")
+    pad.set(classOf[CoreAnnotations.AnswerAnnotation], "O")
+
+    val tokens = annotation.get(classOf[TokensAnnotation])
+
+    val paddedList = new PaddedList[CoreLabel](tokens, pad)
+    val cliqueMe = Clique.valueOf(Array[Int](0))
+    val cliqueMeLeft = Clique.valueOf(Array[Int](-1, 0))
+    val features = featureFactory.getCliqueFeatures(paddedList, i, cliqueMe)
+
+    println("Extracted features: "+features)
+    */
+
+    val word = sequence(i)
+    val tokens = annotation.get(classOf[TokensAnnotation])
+    def prefix(len : Int) = {
+      word.substring(0, Math.min(word.length-1, len))
+    }
+
+    def suffix(len : Int) = {
+      word.substring(Math.max(0, word.length-len), word.length-1)
+    }
+
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
-      "capitalized:" + (if (sequence(i).length() > 0) sequence(i)(0).isUpper && sequence(i).exists(_.isLower) else false) -> 1.0,
       "left-word:" + (if (i > 0) sequence(i-1) else "#") -> 1.0,
       "right-word:" + (if (i < sequence.size-1) sequence(i+1) else "$") -> 1.0,
+      "shape:" + WordShapeClassifier.wordShape(sequence(i), WordShapeClassifier.WORDSHAPECHRIS4) -> 1.0,
+      "pos:" + tokens.get(i).get(classOf[PartOfSpeechAnnotation]) -> 1.0,
+      "prefix1:" + prefix(1) -> 1.0,
+      "prefix2:" + prefix(2) -> 1.0,
+      "prefix3:" + prefix(3) -> 1.0,
+      "suffix1:" + suffix(1) -> 1.0,
+      "suffix2:" + suffix(2) -> 1.0,
+      "suffix3:" + suffix(3) -> 1.0,
       "BIAS" -> 0.0
     )
     word2vec.get(sequence(i)) match {
@@ -183,9 +238,9 @@ object NERUseCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 3
-  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }

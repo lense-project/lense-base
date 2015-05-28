@@ -1,32 +1,59 @@
 \section{Introduction}
 
-Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
-These purely crowd-based solutions are prohibitively expensive at scale.
-Powering the crowd-based email client \textit{EmailValet}~\cite{kokkalis2013emailvalet} for a single end user for a year costs over \$400.
+For the practitioner, supervised learning is largely a solved problem and software to efficiently train classifiers in a variety of domains is readily available.
+Yet, adoption remains limited because the deployment of a learning system requires extremely accurate classifiers: mistakes cost business.
+The typical solution to this problem is to use more labeled data, which recent crowdsourcing platforms such as Amazon Mechanical Turk or CrowdFlower have made relatively affordable to obtain\findcite{citefest!}.
+However, this not only presupposes the ready availability of large amounts of unlabeled data, but also advocates a long, expensive data collection process for uncertain improvements in accuracy.
+% This two-stage process fundamentally limits the accuracy we can obtain.
+An alternate approach is to use cut out the middle man altogether and use the crowd to label all examples in real-time\cite{cheng2015flock}. 
+While this allows us to ensure accurate responses, it quickly becomes prohibitively expensive in the long run. 
 
-These systems typically work by ``pooling'' on-demand workers from high latency job-posting platforms like Amazon Mechanical Turk or CrowdFlower on a website designed by the system architect~\cite{lasecki2011real}.
- The ``pooling'' process can take several minutes, but once in place the workers can be queried at very low latencies by pushing requests to their web-browsers.
- This pool of workers can demonstrate high rates of turnover, and unreliability amongst individual annotators.
+Our approach interpolates between these two regimes: we use query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
+This results in a system that provides users high quality responses in real-time while starting {\em with no training data}.
+In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
 
-Existing systems query this pool directly, allowing for annotator noise by incorporating consensus building systems like voting and chat.
+% Cost and Low-latency
+We focus on structured classification problems using conditional exponential families, a general model class that has been used on \todo{citefest}.
+Given an input, $\bx$, we must predict a number of labels $\by = y_1, \ldots y_n$.
+Under time and budget constraints, we optimize over which labels to query when: observing a label from one worker let's us decide which label to query next, but we might not have to time to wait for the response.
+The problem is modeled using Bayesian decision theory; the intractable optimization problem is approximated using a Monte Carlo tree search.
 
+Finally, labels from crowd workers are often inaccurate. We use the measurements framework of\cite{liang09measurements} to model incorporate noisy measurements in our model. Using the model, we estimate the error rates of crowd workers in an unsupervised fashion. We also incorporate unlabeled data.
 
-Active classification~\cite{greiner2002learning}, a close sibling of active learning, is a setting in which a classifier is allowed to query for more information, at some cost, before turning in classifications.
- This active classifier is intended to reduce its need for costly, slow human labels over time by learning from past observations.
- We propose to adapt the active classification framework to the pooled-worker setting to query this pool more cheaply, accurately, and quickly, without sacrificing the advantages live of crowd-powered interfaces.
+We have implemented our system (source code will be made available).
+In experiments, we show magic!
 
-Previous work in online active learning (which is closely related to what we're proposing) has focused on multi-class classification (\cite{chu2011unbiased},~\cite{agarwal2013selective},~\cite{cheng2013feedback},~\cite{vzliobaite2011active},~\cite{helmbold1997some}).
- Multi-class classification is an insufficiently rich primitive to handle many of the tasks that crowd-workers are enabling in existing systems, like information extraction or object detection.
- Instead, we will build our platform around arbitrary log-linear markov network classification, where we assume it is possible to query workers for opinions on individual nodes.
- Thus each ``active classification'' in our proposed setting is instantiate with a markov network and involves using model priors trained on previously seen data to choose to query the worker-pool for opinions about nodes, and then returning a classification informed by those opinions.
+% Experiments
+We evaluate our system on four different tasks, named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
+We beat state of the art-ish.
 
-
-This setting poses several distinct challenges that have not been sufficiently addressed in previous literature.
- We need to be sensitive to time delays, returning results at least as quickly as the pure-crowd baseline we intend to improve upon.
- We also need to be sensitive to inaccurate oracles.
- These two criteria, in the pooled-worker setting, means that we need an active classifier who is able to hide latencies of redundant queries by launching them \textit{asynchronously}.
- This leads to the two challenges we will address in this paper, which can both be clustered under \textit{optimal asynchronous behavior}: we need to be able to handle the decision to ask for another query or turn in existing results in the presence of ``in-flight requests,'' which can fail due to worker turnover, where our loss term is sensitive to time delay.
- We draw inspiration from work in Bayesian Active Learning to tackle these problems.
+% Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
+% These purely crowd-based solutions are prohibitively expensive at scale.
+% Powering the crowd-based email client \textit{EmailValet}~\cite{kokkalis2013emailvalet} for a single end user for a year costs over \$400.
+% 
+% These systems typically work by ``pooling'' on-demand workers from high latency job-posting platforms like Amazon Mechanical Turk or CrowdFlower on a website designed by the system architect~\cite{lasecki2011real}.
+%  The ``pooling'' process can take several minutes, but once in place the workers can be queried at very low latencies by pushing requests to their web-browsers.
+%  This pool of workers can demonstrate high rates of turnover, and unreliability amongst individual annotators.
+% 
+% Existing systems query this pool directly, allowing for annotator noise by incorporating consensus building systems like voting and chat.
+% 
+% 
+% Active classification~\cite{greiner2002learning}, a close sibling of active learning, is a setting in which a classifier is allowed to query for more information, at some cost, before turning in classifications.
+%  This active classifier is intended to reduce its need for costly, slow human labels over time by learning from past observations.
+%  We propose to adapt the active classification framework to the pooled-worker setting to query this pool more cheaply, accurately, and quickly, without sacrificing the advantages live of crowd-powered interfaces.
+% 
+% Previous work in online active learning (which is closely related to what we're proposing) has focused on multi-class classification (\cite{chu2011unbiased},~\cite{agarwal2013selective},~\cite{cheng2013feedback},~\cite{vzliobaite2011active},~\cite{helmbold1997some}).
+%  Multi-class classification is an insufficiently rich primitive to handle many of the tasks that crowd-workers are enabling in existing systems, like information extraction or object detection.
+%  Instead, we will build our platform around arbitrary log-linear markov network classification, where we assume it is possible to query workers for opinions on individual nodes.
+%  Thus each ``active classification'' in our proposed setting is instantiate with a markov network and involves using model priors trained on previously seen data to choose to query the worker-pool for opinions about nodes, and then returning a classification informed by those opinions.
+% 
+% 
+% This setting poses several distinct challenges that have not been sufficiently addressed in previous literature.
+%  We need to be sensitive to time delays, returning results at least as quickly as the pure-crowd baseline we intend to improve upon.
+%  We also need to be sensitive to inaccurate oracles.
+%  These two criteria, in the pooled-worker setting, means that we need an active classifier who is able to hide latencies of redundant queries by launching them \textit{asynchronously}.
+%  This leads to the two challenges we will address in this paper, which can both be clustered under \textit{optimal asynchronous behavior}: we need to be able to handle the decision to ask for another query or turn in existing results in the presence of ``in-flight requests,'' which can fail due to worker turnover, where our loss term is sensitive to time delay.
+%  We draw inspiration from work in Bayesian Active Learning to tackle these problems.
 
 
 

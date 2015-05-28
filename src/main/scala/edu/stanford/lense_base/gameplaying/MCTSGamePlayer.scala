@@ -25,7 +25,7 @@ object MCTSGamePlayer extends GamePlayer {
 
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
-    val samplesToTake = 1000*legalTopLevelMoves.size
+    val samplesToTake = 20*legalTopLevelMoves.size
     val threadCount = Runtime.getRuntime.availableProcessors()
 
     val threads = (1 to threadCount).map(i => {

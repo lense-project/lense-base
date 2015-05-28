@@ -55,7 +55,7 @@ object MCTSTest extends App {
 
   val hcuPool = ArtificialHCUPool(10, humanErrorDistribution, humanDelayDistribution, 0.01, rand)
 
-  var gameState = GameState(graph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, 1.0)
+  var gameState = GameState(engine, graph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, 1.0)
 
   val optimalMove = MCTSGamePlayer.getOptimalMove(gameState)
 

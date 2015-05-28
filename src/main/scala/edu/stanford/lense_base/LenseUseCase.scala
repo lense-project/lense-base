@@ -30,7 +30,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     gamePlayer,
     humanErrorDistribution,
     humanDelayDistribution,
-    useKNNSmoothingDuringTest)
+    useKNNTuning)
 
   lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
@@ -199,7 +199,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @return
    */
-  def useKNNSmoothingDuringTest : Boolean = false
+  def useKNNTuning : Boolean = false
 
   ////////////////////////////////////////////////
   //

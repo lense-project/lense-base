@@ -46,5 +46,11 @@ libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime
 
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
 
+// Pull down CoreNLP to get useful features for the NER system
+
+libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2"
+
+libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models"
+
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
