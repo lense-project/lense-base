@@ -13,19 +13,29 @@ This results in a system that provides users high quality responses in real-time
 In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
 
 % Cost and Low-latency
-We focus on structured classification problems using conditional exponential families, a general model class that has been used on \todo{citefest}.
+We focus on structured classification problems using conditional exponential families, a general model class that has been used to \todo{citefest}.
 Given an input, $\bx$, we must predict a number of labels $\by = y_1, \ldots y_n$.
-Under time and budget constraints, we optimize over which labels to query when: observing a label from one worker let's us decide which label to query next, but we might not have to time to wait for the response.
-The problem is modeled using Bayesian decision theory; the intractable optimization problem is approximated using a Monte Carlo tree search.
 
-Finally, labels from crowd workers are often inaccurate. We use the measurements framework of\cite{liang09measurements} to model incorporate noisy measurements in our model. Using the model, we estimate the error rates of crowd workers in an unsupervised fashion. We also incorporate unlabeled data.
+Under time and budget constraints, we must optimize over which labels to query when. 
+Often, several queries are required on a particular label because of annotator errors by the crowdworker, while at other times it is better to distribute the queries across two labels.
+Similarly, observing a label from one worker let's us decide better which label to query next, but we might not have to time to wait for the response.
+We propose an approach using Bayesian decision theory that is able to make these complex behavioral decisions.
+This quickly leads to an intractable optimization problem that grows exponentially in complexity with the number of label queries we might ask.
+We propose a novel approximation based on Monte Carlo tree search that retains the behavior of the original Bayesian approach.
 
-We have implemented our system (source code will be made available).
-In experiments, we show magic!
+Finally, in practice, labels from crowd workers are often inaccurate.
+We use the measurements framework of Liang et.\ al\cite{liang09measurements} to incorporate noisy responses from crowdworkers in our model.
+Having an accurate estimate of the error rates for crowd workers is essential to accurately predicting how many queries are required.
+Prior work\findcite{unsupervised crowd labeling} uses inter-annotator agreement to predict per-user error rates in an unsupervised manner. 
+The online nature of our task limits the number of responses we have on the same label.
+Instead, we learn the error rates in an unsupervised fashion using online EM, which also allows us to incorporate unlabeled data.
 
 % Experiments
 We evaluate our system on four different tasks, named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
-We beat state of the art-ish.
+We show that by querying crowdworkers at classification time, we can significantly outperform a system trained on fully labeled data, for a fraction of the cost of the baseline of asking crowdworkers for labels for each example, as well as the system trained on fully labeled past data.
+On X of the Y tasks, we produce a classifier comparable with the state of the art while obtaining a much smaller subset of the training labels noisily from the crowd. 
+In fact, we are comparable with state of the art-ish with a handful of the training labels.
+An open-source implementation of our system will be made available.
 
 % Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
 % These purely crowd-based solutions are prohibitively expensive at scale.

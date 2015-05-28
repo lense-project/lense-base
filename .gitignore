@@ -13,7 +13,7 @@ tags
 java/junit
 java/bin
 java/out
-.idea
+#.idea
 target/
 
 # TeX
