@@ -85,7 +85,8 @@ abstract class GamePlayer {
 
 // This is the current state of the "game"
 
-case class GameState(graph : Graph,
+case class GameState(engine : LenseEngine,
+                     graph : Graph,
                      cost : Double,
                      hcuPool : HCUPool,
                      addHumanObservation : (Graph, GraphNode, String) => Unit,
@@ -106,7 +107,7 @@ case class GameState(graph : Graph,
   // We do some cacheing, but this shouldn't help very often, since the search space is very large.
   lazy val marginals : Map[GraphNode, Map[String, Double]] = synchronized {
     if (!marginalMemos.contains(observedNodes)) {
-      marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
+      marginalMemos.put(observedNodes, graph.marginalEstimate(engine.useKNNTuning).map(pair => {
         (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
       }))
     }
@@ -147,7 +148,8 @@ case class GameState(graph : Graph,
 
   def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, launchTime : Long) : GameState = {
     val clonePair = graph.clone()
-    val nextState : GameState = GameState(clonePair._1,
+    val nextState : GameState = GameState(engine,
+      clonePair._1,
       cost + hcu.cost,
       hcuPool,
       addHumanObservation,
@@ -165,7 +167,8 @@ case class GameState(graph : Graph,
 
   def getNextStateForFailedRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
     val clonePair = graph.clone()
-    val nextState : GameState = GameState(clonePair._1,
+    val nextState : GameState = GameState(engine,
+      clonePair._1,
       cost,
       hcuPool,
       addHumanObservation,
@@ -209,7 +212,8 @@ case class GameState(graph : Graph,
       observedNodes ++ Map(originalGraph.nodes.indexOf(node) -> Map(obs -> 1))
     }
 
-    val nextState : GameState = GameState(clonePair._1,
+    val nextState : GameState = GameState(engine,
+      clonePair._1,
       cost,
       hcuPool,
       addHumanObservation,

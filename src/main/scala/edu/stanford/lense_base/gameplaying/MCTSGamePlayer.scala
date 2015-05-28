@@ -25,7 +25,7 @@ object MCTSGamePlayer extends GamePlayer {
 
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
-    val samplesToTake = 1000*legalTopLevelMoves.size
+    val samplesToTake = 10*legalTopLevelMoves.size
     val threadCount = Runtime.getRuntime.availableProcessors()
 
     val threads = (1 to threadCount).map(i => {
@@ -41,10 +41,8 @@ object MCTSGamePlayer extends GamePlayer {
     threads.foreach(_.start())
     threads.foreach(_.join())
 
-    /*
     println("Final tree:")
     println(rootNode.recursiveToString(0))
-    */
 
     rootNode.mostVisitedAction()
   }

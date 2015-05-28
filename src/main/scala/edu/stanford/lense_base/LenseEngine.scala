@@ -23,7 +23,7 @@ class LenseEngine(stream : GraphStream,
                   initGamePlayer : GamePlayer,
                   humanErrorDistribution : HumanErrorDistribution,
                   humanDelayDistribution : HumanDelayDistribution,
-                  useKNNTuningDuringTest : Boolean = false) {
+                  useKNNTuningFlag : Boolean = false) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
@@ -66,6 +66,8 @@ class LenseEngine(stream : GraphStream,
       false
     }
   }
+
+  def useKNNTuning : Boolean = useKNNTuningFlag
 
   def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = budgetLock.synchronized {
     if (amount == 0) {
@@ -146,9 +148,14 @@ class LenseEngine(stream : GraphStream,
     promise
   }
 
+  def attachRandomHumanObservation(node : GraphNode, trueValue : String): Unit =  {
+    val sampledValue = humanErrorDistribution.guess(trueValue, node.nodeType.possibleValues)
+    attachHumanObservation(node.graph, node, sampledValue)
+  }
+
   def learnHoldingPastGuessesConstant(l2regularization : Double = getModelRegularization(pastGuesses.size)) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true)
+    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true, useKNNTuning, attachRandomHumanObservation)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
@@ -187,6 +194,9 @@ class LenseEngine(stream : GraphStream,
   def attachHumanObservation(graph : Graph, node : GraphNode, humanOpinion : String) : Unit = {
     val humanTypes = getHumanObservationTypes(node.nodeType)
     val humanObservationNode = graph.makeNode(humanTypes._1, observedValue = humanOpinion)
+    node.synchronized {
+      node.numHumanObservations += 1
+    }
     graph.makeFactor(humanTypes._2, List(node, humanObservationNode))
   }
 
@@ -228,7 +238,7 @@ case class InFlightPrediction(engine : LenseEngine,
                               maxLossPerNode : Double,
                               returnPromise : Promise[(Map[GraphNode, String], PredictionSummary)]) extends CaseClassEq {
   // Create an initial game state
-  var gameState = GameState(originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, maxLossPerNode)
+  var gameState = GameState(engine, originalGraph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, maxLossPerNode)
 
   var turnedIn = false
 
