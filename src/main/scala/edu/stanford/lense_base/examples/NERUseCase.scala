@@ -9,7 +9,7 @@ import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base._
 import edu.stanford.nlp.ie.NERFeatureFactory
-import edu.stanford.nlp.ling.CoreAnnotations.{PartOfSpeechAnnotation, TokensAnnotation}
+import edu.stanford.nlp.ling.CoreAnnotations.{LemmaAnnotation, PartOfSpeechAnnotation, TokensAnnotation}
 import edu.stanford.nlp.ling.{CoreAnnotations, CoreLabel}
 import edu.stanford.nlp.pipeline.{MorphaAnnotator, Annotation, StanfordCoreNLP}
 import edu.stanford.nlp.process.{WordShapeClassifier, CoreLabelTokenFactory}
@@ -123,6 +123,19 @@ class NERUseCase extends LenseSequenceUseCase {
 
     val word = sequence(i)
     val tokens = annotation.get(classOf[TokensAnnotation])
+    println(sequence.mkString(" "))
+    println(tokens)
+
+    var t = i
+    for (j <- 0 to i) {
+      val w : String = tokens.get(j).word()
+      println("word ["+j+"]: "+w+", "+(if (w.length > 4) w.charAt(2).asInstanceOf[Int] else null))
+      if (w.split("\\s").size > 1) {
+        println("FOUND WITH SPACE: "+tokens.get(j))
+        t -= 1
+      }
+    }
+
     def prefix(len : Int) = {
       word.substring(0, Math.min(word.length-1, len))
     }
@@ -133,10 +146,13 @@ class NERUseCase extends LenseSequenceUseCase {
 
     val basicFeatures = Map(
       "token:" + sequence(i).toLowerCase -> 1.0,
-      "left-word:" + (if (i > 0) sequence(i-1) else "#") -> 1.0,
-      "right-word:" + (if (i < sequence.size-1) sequence(i+1) else "$") -> 1.0,
+      "lemma:" + tokens.get(t).get(classOf[LemmaAnnotation]) -> 1.0,
+      "left-lemma:" + (if (t > 0) tokens.get(t-1).get(classOf[LemmaAnnotation]) else "#") -> 1.0,
+      "left-left-lemma:" + (if (t > 1) tokens.get(t-2).get(classOf[LemmaAnnotation]) else "#") -> 1.0,
+      "right-lemma:" + (if (t+1 < tokens.size) tokens.get(t+1).get(classOf[LemmaAnnotation]) else "$") -> 1.0,
+      "right-right-lemma:" + (if (t+2 < tokens.size) tokens.get(t+2).get(classOf[LemmaAnnotation]) else "$") -> 1.0,
+      "pos:" + tokens.get(t).get(classOf[PartOfSpeechAnnotation]) -> 1.0,
       "shape:" + WordShapeClassifier.wordShape(sequence(i), WordShapeClassifier.WORDSHAPECHRIS4) -> 1.0,
-      "pos:" + tokens.get(i).get(classOf[PartOfSpeechAnnotation]) -> 1.0,
       "prefix1:" + prefix(1) -> 1.0,
       "prefix2:" + prefix(2) -> 1.0,
       "prefix3:" + prefix(3) -> 1.0,
