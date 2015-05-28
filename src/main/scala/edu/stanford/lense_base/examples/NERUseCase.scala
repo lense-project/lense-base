@@ -149,7 +149,7 @@ class NERUseCase extends LenseSequenceUseCase {
     */
 
     def prefix(len : Int) = {
-      word.substring(0, Math.min(word.length-1, len))
+      word.substring(0, Math.min(Math.max(word.length-1,0), len))
     }
 
     def suffix(len : Int) = {

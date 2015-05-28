@@ -12,8 +12,8 @@ import edu.stanford.lense_base.graph.GraphNode
 
 object ThresholdHeuristic extends GamePlayer {
   // There are a lot more of these, we must be very certain every time, or we will make mistakes
-  val defaultClassThreshold = 0.985
-  val otherThreshold = 0.87
+  val defaultClassThreshold = 0.995
+  val otherThreshold = 0.88
 
   // One obsevation cuts uncertainty to the human error rate, as a rough heuristic
   val humanUncertaintyMultiple = 0.4
