@@ -1,5 +1,6 @@
 package edu.stanford.lense_base.examples
 
+import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.nlp.word2vec.Word2VecLoader
@@ -102,6 +103,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 100.0
+
+  override def gamePlayer : GamePlayer = ThresholdHeuristic
 
   lazy val random = new Random()
   lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
