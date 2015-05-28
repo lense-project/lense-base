@@ -153,7 +153,7 @@ class NERUseCase extends LenseSequenceUseCase {
     }
 
     def suffix(len : Int) = {
-      word.substring(Math.max(0, word.length-len), word.length-1)
+      word.substring(Math.max(0, word.length-len), Math.max(0,word.length-1))
     }
 
     val basicFeatures = Map(
@@ -236,7 +236,8 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = ThresholdHeuristic
+  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
   // override def gamePlayer : GamePlayer = MCTSGamePlayer
 }
 
