@@ -27,10 +27,10 @@ import scala.util.Random
  *
  * Does NER using sequence use cases
  */
-class NERUseCase extends LenseSequenceUseCase {
+abstract class NERUseCase extends LenseSequenceUseCase {
 
   // Exclude ORG & MISC, cause they're confusing to Turkers
-  lazy val legalTokens = Set("O","PER","LOC")
+  def legalTokens : Set[String]
 
   lazy val allData : List[(List[String],List[String])] = {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
@@ -188,7 +188,7 @@ class NERUseCase extends LenseSequenceUseCase {
 
   override def useCaseReportSubpath : String = "ner"
 
-  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/ner-2-class.yaml")
+  def yaml : (String,String,List[(List[String], Int, String, String)])
 
   override def getHumanTrainingExamples : List[(List[String], Int, String, String)] = yaml._3
   override def humanTrainingIntroduction : String = yaml._1
@@ -223,9 +223,6 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_2class.csv", random)
-  // override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
-  override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**
    * This specifies the budget that this run will spend, in dollars. You may not use all of it, but the engine will stop
@@ -247,38 +244,5 @@ class NERUseCase extends LenseSequenceUseCase {
   // override def gamePlayer : GamePlayer = MCTSGamePlayer
 
   // Flag to skip learning when running with all human baselines
-  override lazy val useLearning : Boolean = false
-}
-
-object NERUseCase extends App {
-  val nerUseCase = new NERUseCase()
-
-  def dumpData(data : List[(List[String],List[String])], name : String): Unit = {
-    val folder = new File("results/"+nerUseCase.useCaseReportSubpath)
-    if (!folder.exists()) folder.mkdirs()
-
-    val file = new File("results/"+nerUseCase.useCaseReportSubpath+"/"+name+".txt")
-    if (file.exists()) file.delete()
-    if (!file.exists()) file.createNewFile()
-    val bw = new BufferedWriter(new FileWriter(file))
-    for (pair <- data) {
-      bw.write("#"+data.indexOf(pair)+": ")
-      for (token <- pair._1) {
-        bw.write(token)
-        bw.write(" ")
-      }
-      bw.write("\n")
-    }
-    bw.close()
-  }
-
-  dumpData(nerUseCase.data, "test_data")
-  dumpData(nerUseCase.trainSet, "train_data")
-
-  val poolSize = 3
-  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-  // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  // override lazy val useLearning : Boolean = false
 }

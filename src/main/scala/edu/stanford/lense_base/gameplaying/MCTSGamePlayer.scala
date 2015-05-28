@@ -26,7 +26,8 @@ object MCTSGamePlayer extends GamePlayer {
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
     val samplesToTake = 20*legalTopLevelMoves.size
-    val threadCount = Runtime.getRuntime.availableProcessors()
+    // val threadCount = Runtime.getRuntime.availableProcessors()
+    val threadCount = 1
 
     val threads = (1 to threadCount).map(i => {
       new Thread(new Runnable {
@@ -41,10 +42,8 @@ object MCTSGamePlayer extends GamePlayer {
     threads.foreach(_.start())
     threads.foreach(_.join())
 
-    /*
     println("Final tree:")
     println(rootNode.recursiveToString(0))
-    */
 
     rootNode.mostVisitedAction()
   }
@@ -217,16 +216,22 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
     // TurnInGuess() is deterministic, so we don't need to handle infinite branching, cause all branches are the same
     val moveSupportsBranching : Boolean = bestMove match {
       case _ : TurnInGuess => false
-      case _ : MakeHumanObservation => true
+      case _ : MakeHumanObservation => false
       case _ : Wait => true
     }
 
     if (numChildrenForBestMove == 0 || (C > Math.sqrt(numChildrenForBestMove) && moveSupportsBranching)) {
-      // This means we get a new state
-      val nextStateSample = stateSample.sampleNextState(bestMove, r, humanErrorDistribution, humanDelayDistribution)
-      val nextTreeNode = TreeNode(nextStateSample, gamePlayer.getAllLegalMoves(nextStateSample.gameState, reserveRealBudget = false), gamePlayer, this)
-      children.put(bestMove, children(bestMove) :+ nextTreeNode)
-      nextTreeNode
+      if (children.contains(bestMove) && children(bestMove).size > 0) {
+        // This means we pick a state uniformly from previously visited ones
+        children(bestMove)(r.nextInt(children(bestMove).size))
+      }
+      else {
+        // This means we get a new state
+        val nextStateSample = stateSample.sampleNextState(bestMove, r, humanErrorDistribution, humanDelayDistribution)
+        val nextTreeNode = TreeNode(nextStateSample, gamePlayer.getAllLegalMoves(nextStateSample.gameState, reserveRealBudget = false), gamePlayer, this)
+        children.put(bestMove, children(bestMove) :+ nextTreeNode)
+        nextTreeNode
+      }
     }
     else {
       // This means we pick a state uniformly from previously visited ones
