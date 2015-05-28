@@ -2,29 +2,24 @@
 
 For the practitioner, supervised learning is largely a solved problem and software to efficiently train classifiers in a variety of domains is readily available.
 Yet, adoption remains limited because the deployment of a learning system requires extremely accurate classifiers: mistakes cost business.
-The typical solution to this problem is to use more labeled data, which recent crowdsourcing platforms such as Amazon Mechanical Turk\needcite{} or CrowdFlower\needcite{} have made relatively affordable to obtain\findcite{citefest!}.
-However, this not only presupposes the ready availability of large amounts of unlabeled data, but also advocates a long, expensive data collection for uncertain improvements in accuracy.
+The typical solution to this problem is to use more labeled data, which recent crowdsourcing platforms such as Amazon Mechanical Turk or CrowdFlower have made relatively affordable to obtain\findcite{citefest!}.
+However, this not only presupposes the ready availability of large amounts of unlabeled data, but also advocates a long, expensive data collection process for uncertain improvements in accuracy.
+% This two-stage process fundamentally limits the accuracy we can obtain.
+An alternate approach is to use cut out the middle man altogether and use the crowd to label all examples in real-time\cite{cheng2015flock}. 
+While this allows us to ensure accurate responses, it quickly becomes prohibitively expensive in the long run. 
 
-Let us re-imagine this problem:
-what if we could provide users high quality responses in real-time while starting with no data at all?
-In this paper, we propose a system to achieve this goal by intelligently querying crowdworkers.
-We explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
+Our approach interpolates between these two regimes: we use query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
+This results in a system that provides users high quality responses in real-time while starting {\em with no training data}.
+In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
 
-% Keeping costs low
-Existing crowd-labeling approaches ask the crowd for labels uniformly on all examples \needcite: this can quickly become an expensive proposition for a system running in practice. 
-We adopt a active classification approach that identifies which words have the most utility if labeled and focuses the attention of the crowd towards them.
-We note that this approach differs from the conventional active learning\findcite{gabor} where the optimization problem picks a good subset of the data to be labeled.
+% Cost and Low-latency
+We focus on structured classification problems using conditional exponential families, a general model class that has been used on \todo{citefest}.
+Given an input, $\bx$, we must predict a number of labels $\by = y_1, \ldots y_n$.
+Under time and budget constraints, we optimize over which labels to query when: observing a label from one worker let's us decide which label to query next, but we might not have to time to wait for the response.
+The problem is modeled using Bayesian decision theory; the intractable optimization problem is approximated using a Monte Carlo tree search.
 
-% Low-latency
-A barrier to using crowd-sourcing is the latency in responses: this makes it important to request for multiple labels at once.
-A natural decision problem then is whether to wait for responses to chose the best query, in other words, the question is when to query.
-We pose this question as a Bayesian game.
-It is computationally intractable, but we have good heuristics.
-Automatically tunes to the expected response times of Turkers.
+Finally, labels from crowd workers are often inaccurate. We use the measurements framework of\cite{liang09measurements} to model incorporate noisy measurements in our model. Using the model, we estimate the error rates of crowd workers in an unsupervised fashion. We also incorporate unlabeled data.
 
-% High accuracy
-Model crowdsourcing errors in a measurement framework.
-The model allows us to learn the error rate in an supervised fashion.
 We have implemented our system (source code will be made available).
 In experiments, we show magic!
 
