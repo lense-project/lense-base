@@ -127,13 +127,10 @@ class NERUseCase extends LenseSequenceUseCase {
     println(tokens)
 
     var t = i
-    for (j <- 0 to Math.min(tokens.size, i)) {
+    for (j <- 0 to Math.min(tokens.size-1, i)) {
       val w : String = tokens.get(j).word()
       println("word ["+j+"]: "+w+", "+(if (w.length > 4) w.charAt(2).asInstanceOf[Int] else null))
-      if (w.toCharArray.contains(160.asInstanceOf[Char])) {
-        println("FOUND WITH SPACE: "+tokens.get(j))
-        t -= 1
-      }
+      t -= w.toCharArray.count(_ == 160.asInstanceOf[Char])
     }
 
     def prefix(len : Int) = {

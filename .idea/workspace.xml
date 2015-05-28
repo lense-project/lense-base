@@ -69,8 +69,8 @@
       <file leaf-file-name="NERUseCase.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.24801587">
-              <caret line="132" column="58" selection-start-line="132" selection-start-column="58" selection-end-line="132" selection-end-column="58" />
+            <state vertical-scroll-proportion="0.41666666">
+              <caret line="131" column="6" selection-start-line="131" selection-start-column="6" selection-end-line="131" selection-end-column="6" />
               <folding>
                 <element signature="e#42#91#0" expanded="true" />
               </folding>
@@ -1135,7 +1135,7 @@
       <updated>1432254058164</updated>
       <workItem from="1432254616748" duration="182000" />
       <workItem from="1432254815978" duration="2806000" />
-      <workItem from="1432787039637" duration="1412000" />
+      <workItem from="1432787039637" duration="1532000" />
     </task>
     <task id="LOCAL-00001" summary="Fighting against string whitespace behavior.">
       <created>1432788412088</created>
@@ -1143,11 +1143,17 @@
       <option name="project" value="LOCAL" />
       <updated>1432788412088</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Seem to have a fix for the unpleasant whitespace issues.">
+      <created>1432788535306</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1432788535306</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4400000" />
+    <option name="totallyTimeSpent" value="4520000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -1227,7 +1233,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="More fine-tuning of interface, removing the showing of tutorial if no tutorial is specified." />
     <MESSAGE value="Started working on Expected-Utility gameplayer." />
     <MESSAGE value="Changed the testWithRealHumans to only wait for 1 person, which makes demos a lot easier." />
     <MESSAGE value="Added WaitForTime move." />
@@ -1252,7 +1257,8 @@
     <MESSAGE value="Have KNN normalization working, and it seems to actually do good work." />
     <MESSAGE value="Multithreading sampling, and fixing issues with time." />
     <MESSAGE value="Fighting against string whitespace behavior." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fighting against string whitespace behavior." />
+    <MESSAGE value="Seem to have a fix for the unpleasant whitespace issues." />
+    <option name="LAST_COMMIT_MESSAGE" value="Seem to have a fix for the unpleasant whitespace issues." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1512,8 +1518,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.24801587">
-          <caret line="132" column="58" selection-start-line="132" selection-start-column="58" selection-end-line="132" selection-end-column="58" />
+        <state vertical-scroll-proportion="0.41666666">
+          <caret line="131" column="6" selection-start-line="131" selection-start-column="6" selection-end-line="131" selection-end-column="6" />
           <folding>
             <element signature="e#42#91#0" expanded="true" />
           </folding>
