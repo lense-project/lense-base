@@ -127,10 +127,10 @@ class NERUseCase extends LenseSequenceUseCase {
     println(tokens)
 
     var t = i
-    for (j <- 0 to i) {
+    for (j <- 0 to Math.min(tokens.size, i)) {
       val w : String = tokens.get(j).word()
       println("word ["+j+"]: "+w+", "+(if (w.length > 4) w.charAt(2).asInstanceOf[Int] else null))
-      if (w.split("\\s").size > 1) {
+      if (w.toCharArray.contains(160.asInstanceOf[Char])) {
         println("FOUND WITH SPACE: "+tokens.get(j))
         t -= 1
       }
