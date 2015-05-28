@@ -311,7 +311,9 @@ abstract class WithDomain(stream : GraphStream) {
     }
   }
   val domain = new CategoricalVectorDomain[String] { override def dimensionDomain = featureDomain }
-  stream.withDomainList += this
+  stream.withDomainList.synchronized {
+    stream.withDomainList += this
+  }
 }
 
 case class NodeType(stream : GraphStream, possibleValues : Set[String], var weights : Map[String,Map[String,Double]] = null) extends WithDomain(stream) with CaseClassEq {
@@ -417,110 +419,112 @@ class GraphStream {
     // Now we need to decode the weights
 
     model.dotFamilyCache.synchronized {
-      for (withDomain <- withDomainList) {
-        if (!model.dotFamilyCache.contains(withDomain)) {
-          // We ignore these, on the assumption that we don't want to return weights full of zeros for no reason
-        }
-        else {
-          val dot: DotFamily = model.getDotFamilyWithStatisticsFor(withDomain)
-          val tensor = dot.weights.value
-          if (tensor.size > 0) {
-            withDomain match {
+      withDomainList.synchronized {
+        for (withDomain <- withDomainList) {
+          if (!model.dotFamilyCache.contains(withDomain)) {
+            // We ignore these, on the assumption that we don't want to return weights full of zeros for no reason
+          }
+          else {
+            val dot: DotFamily = model.getDotFamilyWithStatisticsFor(withDomain)
+            val tensor = dot.weights.value
+            if (tensor.size > 0) {
+              withDomain match {
 
-              // Translate a nodeType's weights back into the Map we use for weights
+                // Translate a nodeType's weights back into the Map we use for weights
 
-              case nodeType: NodeType =>
-                if (tensor.dimensions.length != 2) throw new IllegalStateException("Can't have weights for a node unary " +
-                  "factor that aren't nodeValues x nodeFeatures, which means dim=2. Instead got dim=" + tensor.dimensions.length)
-                if (tensor.dimensions(0) != nodeType.possibleValues.size) throw new IllegalStateException("Have a set of possibleValues that" +
-                  " doesn't match the value domain: " + nodeType.valueDomain.categories + ", " + nodeType.possibleValues)
-                // we need the weight values for each possible assignment
-                val tensor2 = tensor.asInstanceOf[Tensor2]
-                val keyValue: ListBuffer[(String, Map[String, Double])] = ListBuffer()
-                for (val1 <- nodeType.possibleValues) {
-                  val index1 = nodeType.valueDomain.index(val1)
-                  keyValue += val1 ->
-                    (0 to tensor2.dim2 - 1).map(featIndex => {
-                      val feature: String = nodeType.featureDomain.category(featIndex)
-                      val weight: Double = tensor2(index1, featIndex)
-                      feature -> weight
-                    }).toMap
-                }
-                nodeType.weights = keyValue.toMap
+                case nodeType: NodeType =>
+                  if (tensor.dimensions.length != 2) throw new IllegalStateException("Can't have weights for a node unary " +
+                    "factor that aren't nodeValues x nodeFeatures, which means dim=2. Instead got dim=" + tensor.dimensions.length)
+                  if (tensor.dimensions(0) != nodeType.possibleValues.size) throw new IllegalStateException("Have a set of possibleValues that" +
+                    " doesn't match the value domain: " + nodeType.valueDomain.categories + ", " + nodeType.possibleValues)
+                  // we need the weight values for each possible assignment
+                  val tensor2 = tensor.asInstanceOf[Tensor2]
+                  val keyValue: ListBuffer[(String, Map[String, Double])] = ListBuffer()
+                  for (val1 <- nodeType.possibleValues) {
+                    val index1 = nodeType.valueDomain.index(val1)
+                    keyValue += val1 ->
+                      (0 to tensor2.dim2 - 1).map(featIndex => {
+                        val feature: String = nodeType.featureDomain.category(featIndex)
+                        val weight: Double = tensor2(index1, featIndex)
+                        feature -> weight
+                      }).toMap
+                  }
+                  nodeType.weights = keyValue.toMap
 
-              // Translate a factorType's weights back into the Map we use for weights
+                // Translate a factorType's weights back into the Map we use for weights
 
-              case factorType: FactorType =>
-                factorType.neighborTypes.size match {
-                  case 1 =>
-                    if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
-                      "factor that isn't val1 x features, which means dim=2. Instead got dim=" + tensor.dimensions.length)
-                    if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
+                case factorType: FactorType =>
+                  factorType.neighborTypes.size match {
+                    case 1 =>
+                      if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
+                        "factor that isn't val1 x features, which means dim=2. Instead got dim=" + tensor.dimensions.length)
+                      if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
 
-                    val tensor2 = tensor.asInstanceOf[Tensor2]
-                    val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
-                    for (val1 <- factorType.neighborTypes(0).possibleValues) {
-                      val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
-                      keyValue += List(val1) ->
-                        (0 to tensor2.dim2 - 1).map(featIndex => {
-                          val feature = factorType.featureDomain.category(featIndex)
-                          val weight = tensor2(index1, featIndex)
-                          feature -> weight
-                        }).toMap
-                    }
-                    factorType.weights = keyValue.toMap
-                  case 2 =>
-                    if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
-                      "factor that isn't val1 x val2 x features, which means dim=3. Instead got dim=" + tensor.dimensions.length)
-                    if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
-                    if (tensor.dimensions(1) != factorType.neighborTypes(1).possibleValues.size) throw new IllegalStateException()
-                    if (tensor.dimensions(2) != factorType.featureDomain.size) throw new IllegalStateException()
-
-                    val tensor3 = tensor.asInstanceOf[Tensor3]
-                    val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
-                    for (val1 <- factorType.neighborTypes(0).possibleValues) {
-                      val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
-                      for (val2 <- factorType.neighborTypes(1).possibleValues) {
-                        val index2 = factorType.neighborTypes(1).valueDomain.index(val2)
-
-                        keyValue += List(val1, val2) ->
-                          (0 to tensor3.dim3 - 1).map(featIndex => {
+                      val tensor2 = tensor.asInstanceOf[Tensor2]
+                      val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
+                      for (val1 <- factorType.neighborTypes(0).possibleValues) {
+                        val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
+                        keyValue += List(val1) ->
+                          (0 to tensor2.dim2 - 1).map(featIndex => {
                             val feature = factorType.featureDomain.category(featIndex)
-                            val weight = tensor3(index1, index2, featIndex)
+                            val weight = tensor2(index1, featIndex)
                             feature -> weight
                           }).toMap
                       }
-                    }
-                    factorType.weights = keyValue.toMap
-                  case 3 =>
-                    if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
-                      "factor that isn't val1 x val2 x val3 x features, which means dim=4. Instead got dim=" + tensor.dimensions.length)
-                    if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
-                    if (tensor.dimensions(1) != factorType.neighborTypes(1).possibleValues.size) throw new IllegalStateException()
-                    if (tensor.dimensions(2) != factorType.neighborTypes(2).possibleValues.size) throw new IllegalStateException()
-                    if (tensor.dimensions(3) != factorType.featureDomain.size) throw new IllegalStateException()
+                      factorType.weights = keyValue.toMap
+                    case 2 =>
+                      if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
+                        "factor that isn't val1 x val2 x features, which means dim=3. Instead got dim=" + tensor.dimensions.length)
+                      if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
+                      if (tensor.dimensions(1) != factorType.neighborTypes(1).possibleValues.size) throw new IllegalStateException()
+                      if (tensor.dimensions(2) != factorType.featureDomain.size) throw new IllegalStateException()
 
-                    val tensor4 = tensor.asInstanceOf[Tensor4]
-                    val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
-                    for (val1 <- factorType.neighborTypes(0).possibleValues) {
-                      val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
-                      for (val2 <- factorType.neighborTypes(1).possibleValues) {
-                        val index2 = factorType.neighborTypes(1).valueDomain.index(val2)
-                        for (val3 <- factorType.neighborTypes(2).possibleValues) {
-                          val index3 = factorType.neighborTypes(2).valueDomain.index(val3)
+                      val tensor3 = tensor.asInstanceOf[Tensor3]
+                      val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
+                      for (val1 <- factorType.neighborTypes(0).possibleValues) {
+                        val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
+                        for (val2 <- factorType.neighborTypes(1).possibleValues) {
+                          val index2 = factorType.neighborTypes(1).valueDomain.index(val2)
 
-                          keyValue += List(val1, val2, val3) ->
-                            (0 to tensor4.dim4 - 1).map(featIndex => {
+                          keyValue += List(val1, val2) ->
+                            (0 to tensor3.dim3 - 1).map(featIndex => {
                               val feature = factorType.featureDomain.category(featIndex)
-                              val weight = tensor4(index1, index2, index3, featIndex)
+                              val weight = tensor3(index1, index2, featIndex)
                               feature -> weight
                             }).toMap
                         }
                       }
-                    }
-                    factorType.weights = keyValue.toMap
-                  case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
-                }
+                      factorType.weights = keyValue.toMap
+                    case 3 =>
+                      if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
+                        "factor that isn't val1 x val2 x val3 x features, which means dim=4. Instead got dim=" + tensor.dimensions.length)
+                      if (tensor.dimensions(0) != factorType.neighborTypes(0).possibleValues.size) throw new IllegalStateException()
+                      if (tensor.dimensions(1) != factorType.neighborTypes(1).possibleValues.size) throw new IllegalStateException()
+                      if (tensor.dimensions(2) != factorType.neighborTypes(2).possibleValues.size) throw new IllegalStateException()
+                      if (tensor.dimensions(3) != factorType.featureDomain.size) throw new IllegalStateException()
+
+                      val tensor4 = tensor.asInstanceOf[Tensor4]
+                      val keyValue: ListBuffer[(List[String], Map[String, Double])] = ListBuffer()
+                      for (val1 <- factorType.neighborTypes(0).possibleValues) {
+                        val index1 = factorType.neighborTypes(0).valueDomain.index(val1)
+                        for (val2 <- factorType.neighborTypes(1).possibleValues) {
+                          val index2 = factorType.neighborTypes(1).valueDomain.index(val2)
+                          for (val3 <- factorType.neighborTypes(2).possibleValues) {
+                            val index3 = factorType.neighborTypes(2).valueDomain.index(val3)
+
+                            keyValue += List(val1, val2, val3) ->
+                              (0 to tensor4.dim4 - 1).map(featIndex => {
+                                val feature = factorType.featureDomain.category(featIndex)
+                                val weight = tensor4(index1, index2, index3, featIndex)
+                                feature -> weight
+                              }).toMap
+                          }
+                        }
+                      }
+                      factorType.weights = keyValue.toMap
+                    case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
+                  }
+              }
             }
           }
         }
@@ -698,11 +702,13 @@ class GraphStream {
           modelTrainingClone.dotFamilyCache.clear()
         }
 
-        val frozenDomainMap = withDomainList.map(withDomain => {
-          val newDomain = new CategoricalDomain[String]()
-          newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
-          (withDomain.domain.dimensionDomain, newDomain)
-        }).toMap
+        val frozenDomainMap = withDomainList.synchronized {
+          withDomainList.map(withDomain => {
+            val newDomain = new CategoricalDomain[String]()
+            newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+            (withDomain.domain.dimensionDomain, newDomain)
+          }).toMap
+        }
 
         graphs.map(graph => {
           graph.setObservedVariablesForFactorie()
