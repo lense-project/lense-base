@@ -82,15 +82,24 @@ class NERUseCase extends LenseSequenceUseCase {
     case a => a
   }
 
+  /**
+   *
+   * @param sequence tokens
+   * @param mostLikelyGuesses (index in sequence, guess, confidence of guess)
+   * @param cost money in dollars
+   * @param time time in ms
+   * @return
+   */
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
-      // we much prefer to not tag 0s incorrectly
+      // We much prefer to not tag 0s incorrectly
       case (_,"0",p) => 1.0 - p
-      case t => 1.0 - t._3
+      // This is for non O predictions
+      case triple => 1.0 - triple._3
     }.sum
 
-    // A reduction in error of at least 1% for each cent spent
-    expectedErrors + cost*1
+    // A reduction in error of at least 10% for each cent spent
+    expectedErrors + 0.1*cost
   }
 
   override val maxLossPerNode : Double = {
@@ -208,8 +217,8 @@ class NERUseCase extends LenseSequenceUseCase {
   override def defaultClass : String = "O"
 
   lazy val random = new Random(42)
-  // override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_data_no_org.csv", random)
-  override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_2class.csv", random)
+  // override lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   /**

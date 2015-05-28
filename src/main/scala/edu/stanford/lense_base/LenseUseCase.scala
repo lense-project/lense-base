@@ -396,7 +396,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val f = new File(resultsPrefix+outputPath)
     if (!f.exists()) f.mkdirs()
 
-    val numBuckets = 20
+    val numBuckets = 7
 
     val buckets = mutable.Map[Int, (Int,Int)]()
     for (i <- 0 to numBuckets) {
@@ -608,6 +608,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val summaryResultFile = new File(resultsPrefix+outputPath+"/summary.txt")
     if (!summaryResultFile.exists()) summaryResultFile.createNewFile()
     val bw = new BufferedWriter(new FileWriter(summaryResultFile))
+    bw.write("Num Examples Processed: "+l.size+"\n")
+    bw.write("Individual Nodes: "+(correct + incorrect)+"\n")
+    bw.write("Correct: "+correct+"\n")
+    bw.write("Incorrect: "+incorrect+"\n")
     bw.write("Accuracy: "+(correct/(correct+incorrect))+"\n")
     bw.write("Requested task completion percentage: "+(completed / requested)+"\n")
     bw.write("Avg time/token: "+(time / tokens)+"\n")
@@ -624,6 +628,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       bw.write("\nOverall performance:\n")
 
+      bw.write("\tNon-Default Gold Token Count:"+foundNonDefaultSum+"\n")
+      bw.write("\tNon-Default Guessed Token Count:"+guessedNonDefaultSum+"\n")
+
       bw.write("\tPrecision: "+precision+"\n")
       bw.write("\tRecall: "+recall+"\n")
       bw.write("\tF1: "+f1+"\n")
@@ -635,6 +642,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         val localPrecision = nonDefaultCorrect.getOrElse(cl, 0.0) / guessedNonDefault.getOrElse(cl, 0.0)
         val localRecall = nonDefaultCorrect.getOrElse(cl, 0.0) / foundNonDefault.getOrElse(cl, 0.0)
         val localF1 = 2*localPrecision*localRecall / (localPrecision + localRecall)
+        bw.write("\tNon-Default Gold Token Count:"+foundNonDefault.getOrElse(cl, 0)+"\n")
+        bw.write("\tNon-Default Guessed Token Count:"+guessedNonDefault.getOrElse(cl, 0)+"\n")
         bw.write("\tPrecision: "+localPrecision+"\n")
         bw.write("\tRecall: "+localRecall+"\n")
         bw.write("\tF1: "+localF1+"\n")
