@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
+import java.util
 import java.util.Properties
 
 import cc.factorie.app.nlp.lemma.WordNetLemmatizer
@@ -44,7 +45,7 @@ class NERUseCase extends LenseSequenceUseCase {
     new StanfordCoreNLP(props)
   }
 
-  lazy val word2vec : java.util.Map[String, Array[Double]] = try {
+  lazy val word2vec : java.util.Map[String, Array[Double]] = if (useLearning) try {
     Word2VecLoader.loadData("data/google-300.ser.gz")
     // new java.util.HashMap[String, Array[Double]]()
   } catch {
@@ -55,6 +56,7 @@ class NERUseCase extends LenseSequenceUseCase {
       // return an empty map
       new java.util.HashMap[String, Array[Double]]()
   }
+  else new java.util.HashMap[String,Array[Double]]()
 
   override def initialTrainingData : List[(List[String], List[String])] = trainSet
 
@@ -99,7 +101,7 @@ class NERUseCase extends LenseSequenceUseCase {
     }.sum
 
     // A reduction in error of at least 10% for each cent spent
-    expectedErrors + 0.1*cost
+    expectedErrors + 10*cost
   }
 
   override val maxLossPerNode : Double = {
@@ -107,6 +109,8 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   override def featureExtractor(sequence: List[String], i: Int): Map[String, Double] = {
+    if (!useLearning) return Map()
+
     val annotation = new Annotation(sequence.mkString(" "))
     coreNLP.annotate(annotation)
 
@@ -142,6 +146,8 @@ class NERUseCase extends LenseSequenceUseCase {
       val w : String = tokens.get(j).word()
       t -= Math.min(i-j, w.toCharArray.count(_ == 160.asInstanceOf[Char]))
     }
+    // Prevent errors whenever possible by clipping
+    if (t >= tokens.size) t = tokens.size-1
     /*
     if (i != t) {
       println("word [" + i + "]: " + sequence(i) + ", tokens[" + t + "]: " + tokens.get(t).word())
@@ -236,9 +242,12 @@ class NERUseCase extends LenseSequenceUseCase {
    *
    * @return a game player
    */
-  // override def gamePlayer : GamePlayer = ThresholdHeuristic
-  override def gamePlayer : GamePlayer = LookaheadOneHeuristic
+  override def gamePlayer : GamePlayer = ThresholdHeuristic
+  // override def gamePlayer : GamePlayer = LookaheadOneHeuristic
   // override def gamePlayer : GamePlayer = MCTSGamePlayer
+
+  // Flag to skip learning when running with all human baselines
+  override lazy val useLearning : Boolean = false
 }
 
 object NERUseCase extends App {
@@ -267,9 +276,9 @@ object NERUseCase extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 3
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
   // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }

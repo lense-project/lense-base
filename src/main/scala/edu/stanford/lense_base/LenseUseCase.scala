@@ -30,7 +30,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     gamePlayer,
     humanErrorDistribution,
     humanDelayDistribution,
-    useKNNTuning)
+    useKNNTuning,
+    runLearningThread = useLearning)
 
   lazy val ensureWorkServer = {
     WorkUnitServlet.engine = lenseEngine
@@ -50,11 +51,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   def initialize(): Unit = {
     // Add the training data as a list of labeled graphs
-    lenseEngine.addTrainingData(
-      initialTrainingData.map(pair =>
-        toLabeledGraph(pair._1, pair._2)
+    if (useLearning) {
+      lenseEngine.addTrainingData(
+        initialTrainingData.map(pair =>
+          toLabeledGraph(pair._1, pair._2)
+        )
       )
-    )
+    }
     // Add budget as initial budget
     lenseEngine.addBudget(budget)
   }
@@ -201,6 +204,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    */
   def useKNNTuning : Boolean = false
 
+  def useLearning : Boolean = true
+
   ////////////////////////////////////////////////
   //
   //  These are functions that LenseUseCase provides, assuming the above are correct
@@ -323,6 +328,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
 
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
+    lenseEngine.gamePlayer.engine = lenseEngine
     lenseEngine.turnOffLearning()
 
     progressivelyAnalyze(goldPairs, pair => {

@@ -7,6 +7,8 @@ package edu.stanford.lense_base.gameplaying
  */
 class NQuestionBaseline(n : Int) extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
+    getAllLegalMoves(state, reserveRealBudget = true)
+
     for (node <- state.originalGraph.nodes) {
       val numReqs = state.completedRequests.count(_._1 eq node) + state.inFlightRequests.count(_._1 eq node)
       if (numReqs < n) {

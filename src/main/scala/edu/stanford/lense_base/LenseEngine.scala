@@ -23,7 +23,8 @@ class LenseEngine(stream : GraphStream,
                   initGamePlayer : GamePlayer,
                   humanErrorDistribution : HumanErrorDistribution,
                   humanDelayDistribution : HumanDelayDistribution,
-                  useKNNTuningFlag : Boolean = false) {
+                  useKNNTuningFlag : Boolean = false,
+                  var runLearningThread : Boolean = true) {
   val defaultHumanErrorEpsilon = 0.3
 
   val pastGuesses = mutable.ListBuffer[Graph]()
@@ -95,8 +96,6 @@ class LenseEngine(stream : GraphStream,
   initGamePlayer.engine = this
   var gamePlayer = initGamePlayer
 
-  var runLearningThread = true
-
   var currentModelLoss = 0.0
 
   def currentLoss() : Double = {
@@ -117,26 +116,28 @@ class LenseEngine(stream : GraphStream,
   val modelRegularization = 1.0
 
   // Create a thread to update retrain the weights asynchronously whenever there's an update
-  new Thread {
-    override def run() = {
-      var trainedOnGuesses = 0
-      while (runLearningThread) {
-        if (pastGuesses.size > trainedOnGuesses) {
-          System.err.println("Retraining model")
-          // Important to think about how to correctly handle removing regularization over time, or not...
-          learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
-          System.err.println("Hot swapping model")
-          numSwapsSoFar += 1
-          trainedOnGuesses = pastGuesses.size
-        }
-        else {
-          pastGuesses.synchronized {
-            pastGuesses.wait()
+  if (runLearningThread) {
+    new Thread {
+      override def run() = {
+        var trainedOnGuesses = 0
+        while (runLearningThread) {
+          if (pastGuesses.size > trainedOnGuesses) {
+            System.err.println("Retraining model")
+            // Important to think about how to correctly handle removing regularization over time, or not...
+            learnHoldingPastGuessesConstant(getModelRegularization(pastGuesses.size))
+            System.err.println("Hot swapping model")
+            numSwapsSoFar += 1
+            trainedOnGuesses = pastGuesses.size
+          }
+          else {
+            pastGuesses.synchronized {
+              pastGuesses.wait()
+            }
           }
         }
       }
-    }
-  }.start()
+    }.start()
+  }
 
   def getModelRegularization(dataSize : Int) : Double = {
     modelRegularization
