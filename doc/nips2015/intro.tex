@@ -32,8 +32,9 @@ Instead, we learn the error rates in an unsupervised fashion using online EM, wh
 
 % Experiments
 We evaluate our system on four different tasks, named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
-We significantly outperform the baseline of asking crowdworkers for labels for each example, as well as the system trained on fully labeled past data.
-We are comparable with state of the art-ish with a handful of the training labels.
+We show that by querying crowdworkers at classification time, we can significantly outperform a system trained on fully labeled data, for a fraction of the cost of the baseline of asking crowdworkers for labels for each example, as well as the system trained on fully labeled past data.
+On X of the Y tasks, we produce a classifier comparable with the state of the art while obtaining a much smaller subset of the training labels noisily from the crowd. 
+In fact, we are comparable with state of the art-ish with a handful of the training labels.
 An open-source implementation of our system will be made available.
 
 % Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
