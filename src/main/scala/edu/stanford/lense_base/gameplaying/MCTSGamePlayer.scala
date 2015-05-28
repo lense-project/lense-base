@@ -42,8 +42,10 @@ object MCTSGamePlayer extends GamePlayer {
     threads.foreach(_.start())
     threads.foreach(_.join())
 
+    /*
     println("Final tree:")
     println(rootNode.recursiveToString(0))
+    */
 
     rootNode.mostVisitedAction()
   }
