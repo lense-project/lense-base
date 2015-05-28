@@ -35,7 +35,7 @@ class NERUseCase extends LenseSequenceUseCase {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
   }
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
-  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(200)
+  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(400)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val coreNLP : StanfordCoreNLP = {
@@ -45,8 +45,8 @@ class NERUseCase extends LenseSequenceUseCase {
   }
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -123,15 +123,21 @@ class NERUseCase extends LenseSequenceUseCase {
 
     val word = sequence(i)
     val tokens = annotation.get(classOf[TokensAnnotation])
+    /*
     println(sequence.mkString(" "))
     println(tokens)
+    */
 
     var t = i
     for (j <- 0 to Math.min(tokens.size-1, i)) {
       val w : String = tokens.get(j).word()
-      println("word ["+j+"]: "+w+", "+(if (w.length > 4) w.charAt(2).asInstanceOf[Int] else null))
-      t -= w.toCharArray.count(_ == 160.asInstanceOf[Char])
+      t -= Math.min(i-j, w.toCharArray.count(_ == 160.asInstanceOf[Char]))
     }
+    /*
+    if (i != t) {
+      println("word [" + i + "]: " + sequence(i) + ", tokens[" + t + "]: " + tokens.get(t).word())
+    }
+    */
 
     def prefix(len : Int) = {
       word.substring(0, Math.min(word.length-1, len))
