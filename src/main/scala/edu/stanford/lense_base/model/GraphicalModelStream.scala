@@ -158,13 +158,19 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   def setNodesToMAP() : Unit = {
     val m = map
     for (variable <- vars) {
-      varToNode(variable).observedValue = m(variable)
+      if (variable.isObserved)
+        varToNode(variable).observedValue = variable.getObservedValue
+      else
+        varToNode(variable).observedValue = m(variable)
     }
   }
 
   def setNodesToNull() : Unit = {
     for (variable <- vars) {
-      varToNode(variable).observedValue = null
+      if (variable.isObserved)
+        varToNode(variable).observedValue = variable.getObservedValue
+      else
+        varToNode(variable).observedValue = null
     }
   }
 }
