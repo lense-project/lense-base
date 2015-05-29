@@ -159,7 +159,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }.toMap
   }
 
-  def marginalEstimate(useKNNTuning : Boolean = false): Map[GraphNode, Map[String,Double]] = {
+  def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
@@ -196,7 +196,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     // END SYNCHRONIZED SECTION
     ////////////////////////////
 
-    val rawMarginals = variables.filter(_.node.observedValue == null).map{
+    variables.filter(_.node.observedValue == null).map{
       case nodeVar : NodeVariable =>
         // Create node -> [value,score] pair for map
         nodeVar.node -> {
@@ -206,86 +206,6 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
           }).toMap
         }
     }.toMap
-
-    if (useKNNTuning) {
-      // Now we re-tune by looking for the K nearest neighbors in the training set, by dot product, and taking the average
-      // of the true classes, plus smoothing. This should yield an accurate, and probably under-estimate, of the true
-      // probabilities implied by the model outputs
-
-      val tuningSetSize = stream.confidenceVCorrectnessCache.getOrElse(0, List()).size
-      val K = Math.ceil(Math.sqrt(tuningSetSize)) // neighbors to avg
-      val M = 1.0 // smoothing to add
-
-      rawMarginals.map(estimatePair => {
-        val node = estimatePair._1
-        val estimateDistribution = estimatePair._2
-
-        // TODO: There are several ways this could be optimized
-
-        def twoNormSquared(map1 : Map[String,Double], map2 : Map[String,Double]) : Double = {
-          var squareSum = 0.0
-          for (keyVal <- map1) {
-            val dif = keyVal._2 - map2(keyVal._1)
-            squareSum += dif*dif
-          }
-          squareSum
-        }
-
-        // Just do a linear scan through the data, and keep a top-K list as we go
-        val topKList = ListBuffer[(Double,String)]()
-        var maxEntry : (Double,String) = null
-
-        // We filter the confidenceVCorrectness list for the number of human observations
-
-        for (pair <- stream.confidenceVCorrectnessCache.getOrElse(Math.min(node.numHumanObservations, 3), List())) {
-          val dist = twoNormSquared(pair._1, estimateDistribution)
-
-          // Handle updating the list as we go
-
-          if (topKList.size < K) {
-            var i = 0
-            while (i < topKList.size && topKList(i)._1 < dist) {
-              i += 1
-            }
-            if (i == topKList.size) maxEntry = (dist, pair._2)
-            topKList.insert(i, (dist, pair._2))
-          }
-          else {
-            if (dist < maxEntry._1) {
-              var i = 0
-              while (i < topKList.size && topKList(i)._1 < dist) {
-                i += 1
-              }
-              if (i == topKList.size) maxEntry = (dist, pair._2)
-              topKList.insert(i, (dist, pair._2))
-              topKList.remove(topKList.size-1)
-            }
-          }
-        }
-
-        val unnormalizedTopKEstimate = mutable.Map[String,Double]()
-        for (v <- node.nodeType.possibleValues) {
-          unnormalizedTopKEstimate.put(v, M)
-        }
-        for (pair <- topKList) {
-          unnormalizedTopKEstimate.put(pair._2, unnormalizedTopKEstimate(pair._2)+1)
-        }
-
-        val normalizationConstant = unnormalizedTopKEstimate.map(_._2).sum
-        val normalizedMarginals = unnormalizedTopKEstimate.map(estimatePair => {
-          (estimatePair._1, estimatePair._2 / normalizationConstant)
-        }).toMap
-
-        /*
-        println("Pre-normalized marginals for " + node + ": " + estimateDistribution)
-        println("Marginals for " + node + ": " + normalizedMarginals)
-        */
-        (node, normalizedMarginals)
-      })
-    }
-    else {
-      rawMarginals
-    }
   }
 
   def unobservedVariablesForFactorie(): Seq[NodeVariable] = {
@@ -391,30 +311,13 @@ class GraphStream {
   def learn(graphs : Iterable[Graph],
             l2regularization: Double = 0.1,
             clearOptimizer : Boolean = true,
-            useKNNTuning : Boolean = false,
             attachRandomHumanObservation : (GraphNode, String) => Unit = null) : Double = {
     if (graphs.size == 0) return 0.0
 
-    val trainingGraphs = if (useKNNTuning) {
-      graphs.take(Math.round(graphs.size.asInstanceOf[Double] * 0.7).asInstanceOf[Int]).toList
-    }
-    else {
-      graphs.toList
-    }
-
-    val validationGraphs = if (useKNNTuning) {
-      graphs.filter(g => !trainingGraphs.contains(g)).toList
-    }
-    else {
-      List()
-    }
-
-    System.err.println("Split data into "+trainingGraphs.size+" training graphs and "+validationGraphs.size+" validation graphs")
-
     val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
-    }))) learnEM(trainingGraphs, clearOptimizer)
-    else learnFullyObserved(trainingGraphs, l2regularization, clearOptimizer)
+    }))) learnEM(graphs, clearOptimizer)
+    else learnFullyObserved(graphs, l2regularization, clearOptimizer)
 
     // Now we need to decode the weights
 
@@ -529,77 +432,6 @@ class GraphStream {
           }
         }
       }
-    }
-
-    // Now we need to go through our training data and set our confidenceVCorrectnessCache correctly
-    // We cache everything against both guess type and guess confidence, in case we decide to care later
-
-    if (useKNNTuning) {
-      System.err.println("Generating tuning data for KNN tuning on dev set")
-      val confidenceVCorrect = ListBuffer[(Map[String, Double], String)]()
-      val confidenceVCorrect1HumanObs = ListBuffer[(Map[String, Double], String)]()
-      val confidenceVCorrect2HumanObs = ListBuffer[(Map[String, Double], String)]()
-      val confidenceVCorrect3HumanObs = ListBuffer[(Map[String, Double], String)]()
-
-      for (graph <- validationGraphs) {
-        System.err.println("Generating "+validationGraphs.indexOf(graph)+"/"+validationGraphs.size)
-        // Cache and clear observed values
-        val observedValueCache = graph.nodes.filter(_.observedValue != null).map(n => (n, n.observedValue)).toMap
-        graph.nodes.foreach(_.observedValue = null)
-
-        val rawMarginalsAfterTraining = graph.marginalEstimate(useKNNTuning = false)
-        for (nodeValue <- observedValueCache) {
-          confidenceVCorrect.+=((rawMarginalsAfterTraining(nodeValue._1), nodeValue._2))
-        }
-
-        // Sample graphs with attached human observations, so we can see how marginals interact for KNN tuning later
-        // Costs 15x marginals on the data, but may be worth it if we can get accurate tuning as a result
-
-        if (attachRandomHumanObservation != null) {
-          for (nodeValue <- observedValueCache) {
-            for (i <- 1 to 3) {
-              val clonePair = graph.clone()
-              val newGraph = clonePair._1
-              val newNode = clonePair._2(nodeValue._1)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              val marginalsWithObs = newGraph.marginalEstimate(useKNNTuning = false).apply(newNode)
-              confidenceVCorrect1HumanObs.+=((marginalsWithObs, nodeValue._2))
-            }
-
-            for (i <- 1 to 5) {
-              val clonePair = graph.clone()
-              val newGraph = clonePair._1
-              val newNode = clonePair._2(nodeValue._1)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              val marginalsWithObs = newGraph.marginalEstimate(useKNNTuning = false).apply(newNode)
-              confidenceVCorrect2HumanObs.+=((marginalsWithObs, nodeValue._2))
-            }
-
-            for (i <- 1 to 7) {
-              val clonePair = graph.clone()
-              val newGraph = clonePair._1
-              val newNode = clonePair._2(nodeValue._1)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              attachRandomHumanObservation(newNode, nodeValue._2)
-              val marginalsWithObs = newGraph.marginalEstimate(useKNNTuning = false).apply(newNode)
-              confidenceVCorrect3HumanObs.+=((marginalsWithObs, nodeValue._2))
-            }
-          }
-        }
-
-        // Recover observed values
-        graph.nodes.foreach(n => if (observedValueCache.contains(n)) n.observedValue = observedValueCache(n))
-      }
-
-      System.err.println("Done generating tuning data for KNN tuning on dev set")
-
-      confidenceVCorrectnessCache = Map(
-        0 -> confidenceVCorrect.toList,
-        1 -> confidenceVCorrect1HumanObs.toList,
-        2 -> confidenceVCorrect2HumanObs.toList
-      )
     }
 
     finalLoss

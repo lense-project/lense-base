@@ -6,6 +6,7 @@ import java.net.URL
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
 
 import scala.io.Source
 import scala.util.Random
@@ -125,9 +126,6 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 20.0
-
-  // Change the Tuning settings to get better classifier accuracy
-  override def useKNNTuning : Boolean = false
 
   override def gamePlayer : GamePlayer = ThresholdHeuristic
 }

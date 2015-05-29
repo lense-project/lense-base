@@ -1,8 +1,7 @@
 package edu.stanford.lense_base.gameplaying
 
-import edu.stanford.lense_base.{HumanDelayDistribution, HumanErrorDistribution}
 import edu.stanford.lense_base.graph.{GraphNode, Graph}
-import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.humancompute.{HumanErrorDistribution, HumanDelayDistribution, HumanComputeUnit}
 import scala.collection.mutable
 import scala.concurrent.Lock
 import scala.util.Random

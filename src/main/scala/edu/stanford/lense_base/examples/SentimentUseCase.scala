@@ -1,7 +1,8 @@
 package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
-import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.nlp.word2vec.Word2VecLoader
 

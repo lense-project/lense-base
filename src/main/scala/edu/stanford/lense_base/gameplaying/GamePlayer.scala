@@ -107,7 +107,7 @@ case class GameState(engine : LenseEngine,
   // We do some cacheing, but this shouldn't help very often, since the search space is very large.
   lazy val marginals : Map[GraphNode, Map[String, Double]] = synchronized {
     if (!marginalMemos.contains(observedNodes)) {
-      marginalMemos.put(observedNodes, graph.marginalEstimate(engine.useKNNTuning).map(pair => {
+      marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
         (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
       }))
     }

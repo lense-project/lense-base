@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
-import edu.stanford.lense_base.{ObservedHumanDelayDistribution, ConfusionMatrixErrorDistribution}
+import edu.stanford.lense_base.humancompute.{ConfusionMatrixErrorDistribution, ObservedHumanDelayDistribution}
 
 /**
  * Created by keenon on 5/28/15.

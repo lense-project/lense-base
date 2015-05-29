@@ -5,7 +5,7 @@ import java.io.{FileWriter, BufferedWriter, File}
 import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
-import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HCUPool, WorkUnit}
+import edu.stanford.lense_base.humancompute._
 import edu.stanford.lense_base.mturk.HITCreator
 import edu.stanford.lense_base.server._
 
@@ -30,7 +30,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     gamePlayer,
     humanErrorDistribution,
     humanDelayDistribution,
-    useKNNTuning,
     runLearningThread = useLearning)
 
   lazy val ensureWorkServer = {
@@ -197,12 +196,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
    */
   def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {}
-
-  /**
-   *
-   * @return
-   */
-  def useKNNTuning : Boolean = false
 
   def useLearning : Boolean = true
 

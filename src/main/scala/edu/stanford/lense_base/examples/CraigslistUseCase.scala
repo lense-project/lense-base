@@ -3,7 +3,7 @@ package edu.stanford.lense_base.examples
 import java.io.{FileWriter, BufferedWriter, File}
 
 import edu.stanford.lense_base.graph.GraphNode
-import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanComputeUnit}
 import edu.stanford.lense_base._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 

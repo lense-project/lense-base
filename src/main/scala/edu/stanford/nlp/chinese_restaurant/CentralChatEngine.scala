@@ -1,6 +1,7 @@
 package edu.stanford.nlp.chinese_restaurant
 
-import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, OneQuestionBaseline, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 

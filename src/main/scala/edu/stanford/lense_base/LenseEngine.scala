@@ -2,7 +2,7 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
-import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
+import edu.stanford.lense_base.humancompute._
 import edu.stanford.lense_base.util.CaseClassEq
 import edu.stanford.lense_base.server._
 
@@ -23,7 +23,6 @@ class LenseEngine(stream : GraphStream,
                   initGamePlayer : GamePlayer,
                   humanErrorDistribution : HumanErrorDistribution,
                   humanDelayDistribution : HumanDelayDistribution,
-                  useKNNTuningFlag : Boolean = false,
                   var runLearningThread : Boolean = true) {
   val defaultHumanErrorEpsilon = 0.3
 
@@ -67,8 +66,6 @@ class LenseEngine(stream : GraphStream,
       false
     }
   }
-
-  def useKNNTuning : Boolean = useKNNTuningFlag
 
   def spendReservedBudget(amount : Double, owner : Any, hcuPool : HCUPool) : Unit = budgetLock.synchronized {
     if (amount == 0) {
@@ -156,7 +153,7 @@ class LenseEngine(stream : GraphStream,
 
   def learnHoldingPastGuessesConstant(l2regularization : Double = getModelRegularization(pastGuesses.size)) = this.synchronized {
     // Keep the old optimizer, because we want the accumulated history, since we've hardly changed the function at all
-    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true, useKNNTuning, attachRandomHumanObservation)
+    currentModelLoss = stream.learn(pastGuesses, l2regularization, clearOptimizer = true, attachRandomHumanObservation)
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))

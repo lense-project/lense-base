@@ -1,7 +1,8 @@
 package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph.{Graph, GraphNode, GraphStream}
-import edu.stanford.lense_base.{ArtificialHCUPool, LenseEngine, ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution}
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.{ArtificialHCUPool, LenseEngine}
 
 import scala.util.Random
 
