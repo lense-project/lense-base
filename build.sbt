@@ -38,15 +38,15 @@ libraryDependencies += "javax.servlet" % "javax.servlet-api" % "3.1.0"
 
 libraryDependencies += "com.esotericsoftware.kryo" % "kryo" % "2.24.0"
 
-libraryDependencies += "com.h2database" % "h2" % "1.4.187"
-
-libraryDependencies += "org.yaml" % "snakeyaml" % "1.15"
-
 // Pull down CoreNLP to get useful features for the NER system
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2"
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models"
+
+libraryDependencies += "com.h2database" % "h2" % "1.4.187"
+
+libraryDependencies += "org.yaml" % "snakeyaml" % "1.15"
 
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime"
 

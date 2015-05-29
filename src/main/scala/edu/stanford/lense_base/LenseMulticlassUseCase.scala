@@ -2,7 +2,7 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.graph.{NodeType, Graph, GraphNode}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.model.{ModelStream, GraphicalModelStream, ModelVariable, Model}
+import edu.stanford.lense_base.model._
 import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQuestion, TrainingQuestion}
 
 /**
@@ -12,14 +12,11 @@ import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQue
  *
  */
 abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
-  def labelTypes : Set[String]
-  def getFeatures(input : Input) : Map[String, Double]
+  def labelTypes : List[String]
   def getHumanQuestion(input : Input) : String
   def getHumanVersionOfLabel(label : String) : String
 
-  val graphicalModelStream : GraphicalModelStream = new GraphicalModelStream(humanErrorDistribution)
-  override def getModelStream : ModelStream = graphicalModelStream
-  lazy val nodeType : NodeType = graphicalModelStream.graphStream.makeNodeType(labelTypes)
+  def univariateModelStream : UnivariateExternalModelStream[Input] = getModelStream.asInstanceOf[UnivariateExternalModelStream[Input]]
 
   /**
    * This gets the initial training examples to show to humans. Provide an input, the correct answer, and
@@ -46,13 +43,7 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
   override def toModel(input: Input): Model = {
-    val graph = graphicalModelStream.graphStream.newGraph()
-    val node = graph.makeNode(nodeType, getFeatures(input), payload = input)
-    if (graph.marginalEstimate().size != 1) throw new IllegalStateException("Seems marginals aren't computing correctly")
-
-    val model = graphicalModelStream.newModel()
-    model.setGraph(graph)
-    model
+    univariateModelStream.newModelForInput(input)
   }
 
   override def getQuestion(variable : ModelVariable, hcu: HumanComputeUnit): GraphNodeQuestion = {

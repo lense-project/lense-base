@@ -40,7 +40,7 @@ abstract class ExternalModelStream[Input](humanErrorDistribution : HumanErrorDis
     })
   }
 
-  var knnList : List[(Map[String,Double],String)]
+  var knnList : List[(Map[String,Double],String)] = List()
 
   /**
    * Retrains the model based on all examples seen so far.
@@ -175,4 +175,4 @@ class ExternalModel[Input](stream : ModelStream) extends Model(stream) {
   override def variables: List[ModelVariable] = vars
 }
 
-case class ExternalModelVariable(m : Model, possibleValues : List[String], payload : Any) extends ModelVariable(m) with CaseClassEq
+case class ExternalModelVariable(m : Model, possibleValues : List[String], payload : Any = null) extends ModelVariable(m) with CaseClassEq

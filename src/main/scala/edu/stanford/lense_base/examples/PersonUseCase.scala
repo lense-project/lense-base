@@ -7,7 +7,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
-import edu.stanford.lense_base.model.ModelVariable
+import edu.stanford.lense_base.model.{LogisticExternalModelStream, ModelStream, ModelVariable}
 
 import scala.io.Source
 import scala.util.Random
@@ -26,13 +26,23 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   lazy val trainSet : List[(PersonImage,String)] = List()
   lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d))
 
-  override def labelTypes: Set[String] = celebrities.toSet
+  override def labelTypes: List[String] = celebrities
 
-  override def getFeatures(input: PersonImage): Map[String, Double] = {
-    val features = input.embedding.zipWithIndex.map(pair => {
-      "nn:"+pair._2 -> pair._1
-    }).toMap
-    features
+  // Sets up the model we'll be using
+
+  override def getModelStream: ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution) {
+    override def getFeatures(input: PersonImage): Map[String, Double] = {
+      val features = input.embedding.zipWithIndex.map(pair => {
+        "nn:"+pair._2 -> pair._1
+      }).toMap
+      features
+    }
+
+    /**
+     * Defines the possible output values of the model
+     * @return
+     */
+    override def possibleValues: List[String] = labelTypes.toList
   }
 
   def loadDatabase() : List[PersonImage] = {

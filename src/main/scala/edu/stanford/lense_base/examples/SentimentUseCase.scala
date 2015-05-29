@@ -4,7 +4,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
-import edu.stanford.lense_base.model.ModelVariable
+import edu.stanford.lense_base.model.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
@@ -32,7 +32,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
       new java.util.HashMap[String, Array[Double]]()
   }
 
-  override def labelTypes: Set[String] = Set("POS", "NEG")
+  override def labelTypes: List[String] = List("POS", "NEG")
 
   override def getHumanVersionOfLabel(label: String): String = label match {
     case "POS" => "Positive"
@@ -45,32 +45,40 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
-  override def getFeatures(input: String): Map[String, Double] = {
-    // Stupid bag of words features...
-    val tokens = input.split(" ")
-    val unigrams = tokens.map(tok => (tok, 1.0)).toMap
-    val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
-    val basicFeatures = unigrams ++ bigrams
+  override def getModelStream: ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution) {
+    override def getFeatures(input: String): Map[String, Double] = {
+      // Stupid bag of words features...
+      val tokens = input.split(" ")
+      val unigrams = tokens.map(tok => (tok, 1.0)).toMap
+      val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
+      val basicFeatures = unigrams ++ bigrams
 
-    // Also normalized word embedding for whole document
-    val embedding = new Array[Double](300)
-    for (tok <- input.split(" ")) {
-      word2vec.get(tok) match {
-        case vec : Array[Double] =>
-          (0 to vec.length-1).foreach(i => embedding(i) += vec(i))
-        case null =>
+      // Also normalized word embedding for whole document
+      val embedding = new Array[Double](300)
+      for (tok <- input.split(" ")) {
+        word2vec.get(tok) match {
+          case vec : Array[Double] =>
+            (0 to vec.length-1).foreach(i => embedding(i) += vec(i))
+          case null =>
+        }
+      }
+
+      val squareSum = embedding.map(x => x*x).sum
+      val normalized = embedding.map(_ / Math.sqrt(squareSum))
+
+      if (squareSum > 0) {
+        (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap // ++ basicFeatures
+      }
+      else {
+        basicFeatures
       }
     }
 
-    val squareSum = embedding.map(x => x*x).sum
-    val normalized = embedding.map(_ / Math.sqrt(squareSum))
-
-    if (squareSum > 0) {
-      (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap // ++ basicFeatures
-    }
-    else {
-      basicFeatures
-    }
+    /**
+     * Defines the possible output values of the model
+     * @return
+     */
+    override def possibleValues: List[String] = labelTypes.toList
   }
 
   override def getHumanQuestion(input: String): String = {
