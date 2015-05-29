@@ -2,7 +2,7 @@ package edu.stanford.lense_base
 
 import edu.stanford.lense_base.graph.{NodeType, Graph, GraphNode}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.model._
+import edu.stanford.lense_base.models._
 import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQuestion, TrainingQuestion}
 
 /**

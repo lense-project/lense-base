@@ -159,6 +159,61 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }.toMap
   }
 
+  /*
+  def edgesMarginalEstimate(): Map[GraphFactor, Map[String,Double]] = {
+    setObservedVariablesForFactorie()
+    val variables = unobservedVariablesForFactorie()
+    if (variables.size == 0) return Map()
+    stream.model.synchronized {
+      stream.model.warmUpIndexes(this)
+    }
+
+    ////////////////////////////
+    // SYNCHRONIZED SECTION
+    stream.weightsReadWriteLock.readLock().lock()
+
+    // Do exact inference via trees if possible.
+    val sumMarginal = try {
+      InferByBPTree.infer(variables, stream.model)
+    }
+    // If that fails, perform gibbs sampling
+    catch {
+      case _ : Throwable =>
+        /*
+
+        It seems the Factorie Gibbs Sampler is very slow, creating tons of unnecessary objects to perform sampling.
+        So we don't use it.
+
+        // val r = new scala.util.Random(42)
+        // randomly initialize to valid values
+        // for (variable <- variables) variable.set(r.nextInt(variable.domain.size))(null)
+        // run gibbs sampler
+        // new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
+        */
+        InferByBPLoopyTreewise.infer(variables, stream.model)
+    }
+
+    stream.weightsReadWriteLock.readLock().unlock()
+    // END SYNCHRONIZED SECTION
+    ////////////////////////////
+
+    sumMarginal.factorMarginals.foreach(f => {
+      f.tensorStatistics.expNormalized
+    })
+
+    variables.filter(_.node.observedValue == null).map{
+      case nodeVar : NodeVariable =>
+        // Create node -> [value,score] pair for map
+        nodeVar.node -> {
+          val props : Array[Double] = sumMarginal.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].proportions.toArray
+          props.zipWithIndex.map(scoreIndexPair => {
+            nodeVar.node.nodeType.valueDomain.category(scoreIndexPair._2) -> scoreIndexPair._1
+          }).toMap
+        }
+    }.toMap
+  }
+  */
+
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()

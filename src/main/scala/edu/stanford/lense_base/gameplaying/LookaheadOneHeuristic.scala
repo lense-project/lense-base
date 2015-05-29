@@ -2,7 +2,7 @@ package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit}
-import edu.stanford.lense_base.model.ModelVariable
+import edu.stanford.lense_base.models.ModelVariable
 
 /**
  * Created by keenon on 5/21/15.

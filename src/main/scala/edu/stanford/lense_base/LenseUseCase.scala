@@ -6,7 +6,7 @@ import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute._
-import edu.stanford.lense_base.model.{Model, ModelVariable, ModelStream}
+import edu.stanford.lense_base.models.{Model, ModelVariable, ModelStream}
 import edu.stanford.lense_base.mturk.HITCreator
 import edu.stanford.lense_base.server._
 

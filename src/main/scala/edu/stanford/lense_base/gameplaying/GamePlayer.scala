@@ -1,7 +1,7 @@
 package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
-import edu.stanford.lense_base.model.{ModelVariable, Model}
+import edu.stanford.lense_base.models.{ModelVariable, Model}
 import edu.stanford.lense_base.util.AsyncBudgetManager
 
 /**

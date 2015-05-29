@@ -1,4 +1,4 @@
-package edu.stanford.lense_base.model
+package edu.stanford.lense_base.models
 
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HumanErrorDistribution}

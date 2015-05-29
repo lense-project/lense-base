@@ -4,7 +4,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
-import edu.stanford.lense_base.model.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
+import edu.stanford.lense_base.models.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer

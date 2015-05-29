@@ -7,7 +7,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
-import edu.stanford.lense_base.model.{LogisticExternalModelStream, ModelStream, ModelVariable}
+import edu.stanford.lense_base.models.{LogisticExternalModelStream, ModelStream, ModelVariable}
 
 import scala.io.Source
 import scala.util.Random

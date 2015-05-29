@@ -5,7 +5,7 @@ import java.util
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute._
-import edu.stanford.lense_base.model.{ModelVariable, Model, ModelStream}
+import edu.stanford.lense_base.models.{ModelVariable, Model, ModelStream}
 import edu.stanford.lense_base.util.{AsyncBudgetManager, CaseClassEq}
 import edu.stanford.lense_base.server._
 

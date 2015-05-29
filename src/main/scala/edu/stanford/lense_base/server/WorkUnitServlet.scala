@@ -7,7 +7,7 @@ import com.amazonaws.mturk.util.PropertiesClientConfig
 import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
-import edu.stanford.lense_base.model.ModelVariable
+import edu.stanford.lense_base.models.ModelVariable
 import edu.stanford.lense_base.mturk.{MTurkDBState, MTurkDatabase}
 
 import org.json4s._

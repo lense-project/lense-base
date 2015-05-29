@@ -5,7 +5,7 @@ import java.nio.charset.MalformedInputException
 
 import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
-import edu.stanford.lense_base.model._
+import edu.stanford.lense_base.models._
 import edu.stanford.lense_base.server.{TrainingQuestion, MulticlassTrainingQuestion}
 import org.yaml.snakeyaml.Yaml
 

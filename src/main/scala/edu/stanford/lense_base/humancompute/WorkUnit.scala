@@ -1,7 +1,7 @@
 package edu.stanford.lense_base.humancompute
 
 import edu.stanford.lense_base.graph.GraphNode
-import edu.stanford.lense_base.model.ModelVariable
+import edu.stanford.lense_base.models.ModelVariable
 
 import scala.concurrent.Promise
 import scala.util.Try
