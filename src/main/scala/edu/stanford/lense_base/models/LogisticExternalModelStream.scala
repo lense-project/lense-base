@@ -1,6 +1,12 @@
 package edu.stanford.lense_base.models
 
+import java.util
+
 import edu.stanford.lense_base.humancompute.HumanErrorDistribution
+import edu.stanford.nlp.classify._
+import edu.stanford.nlp.ling.{BasicDatum, Datum}
+import edu.stanford.nlp.stats.{ClassicCounter, Counter}
+import edu.stanford.nlp.ling.RVFDatum
 
 /**
  * Created by keenon on 5/29/15.
@@ -8,6 +14,11 @@ import edu.stanford.lense_base.humancompute.HumanErrorDistribution
  * Implements a stupid logistic model over the data, which can be tweaked as desired
  */
 abstract class LogisticExternalModelStream[Input](humanErrorDistribution : HumanErrorDistribution) extends UnivariateExternalModelStream[Input](humanErrorDistribution) {
+  println("Instantiated LogisticExternalModelStream!")
+
+  var classifier : LinearClassifier[String, String] = null
+  val classifierFactory : LinearClassifierFactory[String, String] = new LinearClassifierFactory[String,String]()
+
   /**
    * Extract the features to use for logistic regression
    * @param input the input over which to extract features
@@ -20,7 +31,26 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    * @param input the input object
    * @return
    */
-  override def prior(input: Input): Map[String, Double] = Map()
+  override def prior(input: Input): Map[String, Double] = {
+    var localClassifier : LinearClassifier[String,String] = null
+    classifierFactory.synchronized {
+      while (classifier == null) {
+        classifierFactory.wait()
+      }
+      localClassifier = classifier
+    }
+
+    val counter = new ClassicCounter[String]()
+    val feats = getFeatures(input)
+    for (feat <- feats) {
+      counter.incrementCount(feat._1, feat._2)
+    }
+    val rvf = new RVFDatum[String, String](counter)
+    val outputCounter = localClassifier.probabilityOf(rvf)
+    outputCounter.keySet().toArray().map(key => {
+      (key.asInstanceOf[String], outputCounter.getCount(key))
+    }).toMap
+  }
 
   /**
    * Retrain the model. This can be a no-op if you want.
@@ -28,5 +58,22 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    * @param inputOutputPairs a list of inputs to train against
    * @return the loss from model training
    */
-  override def train(inputOutputPairs: Iterable[(Input, String)]): Double = 0.0
+  override def train(inputOutputPairs: Iterable[(Input, String)]): Double = {
+    val rvfDataset : RVFDataset[String, String] = new RVFDataset[String,String]()
+    inputOutputPairs.foreach(pair => {
+      val counter = new ClassicCounter[String]()
+      val feats = getFeatures(pair._1)
+      for (feat <- feats) {
+        counter.incrementCount(feat._1, feat._2)
+      }
+
+      rvfDataset.add(new RVFDatum[String,String](counter, pair._2))
+    })
+
+    classifierFactory.synchronized {
+      classifier = classifierFactory.trainClassifier(rvfDataset)
+      classifierFactory.notifyAll()
+    }
+    0.0
+  }
 }

@@ -130,31 +130,39 @@ class ExternalModel[Input](stream : ModelStream) extends Model(stream) {
    * @return a map of the variables -> distributions over tokens
    */
   override def marginals: Map[ModelVariable, Map[String, Double]] = {
-    val tunedPrior = externalModelStream.tunedPrior(this).asInstanceOf[Map[ModelVariable, Map[String,Double]]]
-    tunedPrior.map(pair => {
-      // Get all the variables we will need to multiply our raw marginal by human observations
-      val variable = pair._1
-      val tunedMarginal = pair._2
-      val humanObservations = humanObs.getOrElse(variable, Map())
-      val humanErrorDistribution = stream.getHumanErrorDistribution
-      // Multiply by the human error distribution for all observations
-      val humanMarginalsUnnormalized = tunedMarginal.map(p => {
-        val hypotheticalValue = p._1
-        val priorProbability = p._2
+    lazy val tunedPrior = externalModelStream.tunedPrior(this).asInstanceOf[Map[ModelVariable, Map[String,Double]]]
 
-        var probability = priorProbability
-        humanObservations.foreach(humanObs => {
-          val obs = humanObs._1
-          val count = humanObs._2
-          probability *= Math.pow(humanErrorDistribution.jointProbability(hypotheticalValue, obs), count)
+    variables.map(variable => {
+      if (variable.isObserved) {
+        (variable, variable.possibleValues.map(v => v -> {
+          if (variable.getObservedValue == v) 1.0
+          else 0.0
+        }).toMap)
+      }
+      else {
+        // Get all the variables we will need to multiply our raw marginal by human observations
+        val tunedMarginal = tunedPrior(variable)
+        val humanObservations = humanObs.getOrElse(variable, Map())
+        val humanErrorDistribution = stream.getHumanErrorDistribution
+        // Multiply by the human error distribution for all observations
+        val humanMarginalsUnnormalized = tunedMarginal.map(p => {
+          val hypotheticalValue = p._1
+          val priorProbability = p._2
+
+          var probability = priorProbability
+          humanObservations.foreach(humanObs => {
+            val obs = humanObs._1
+            val count = humanObs._2
+            probability *= Math.pow(humanErrorDistribution.jointProbability(hypotheticalValue, obs), count)
+          })
+
+          (hypotheticalValue, probability)
         })
-
-        (hypotheticalValue, probability)
-      })
-      // Renormalize the results
-      val sum = humanMarginalsUnnormalized.map(_._2).sum
-      (variable, humanMarginalsUnnormalized.map(p => (p._1, p._2 / sum)))
-    })
+        // Renormalize the results
+        val sum = humanMarginalsUnnormalized.map(_._2).sum
+        (variable, humanMarginalsUnnormalized.map(p => (p._1, p._2 / sum)))
+      }
+    }).toMap
   }
 
   /**

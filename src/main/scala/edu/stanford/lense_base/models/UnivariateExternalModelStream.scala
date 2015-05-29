@@ -37,7 +37,7 @@ abstract class UnivariateExternalModelStream[Input](humanErrorDistribution : Hum
    */
   def newModelForInput(input : Input) : ExternalModel[Input] = {
     val model = newModel().asInstanceOf[ExternalModel[Input]]
-    val variable = List(new ExternalModelVariable(model, possibleValues))
+    val variable = List(new ExternalModelVariable(model, possibleValues, payload = input))
     model.setVariables(variable)
     model.setInput(input)
     model
@@ -58,6 +58,7 @@ abstract class UnivariateExternalModelStream[Input](humanErrorDistribution : Hum
    * @param inputOutputPairs the pairs of (input, output) to use in training, if desired
    */
   override def trainExternalModel(inputOutputPairs: Iterable[(Input, Map[ModelVariable, String])]): Double = {
+    System.out.println("Training external model...")
     train(inputOutputPairs.map(pair => {
       (pair._1, pair._2.head._2)
     }))

@@ -21,8 +21,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test").take(1000)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -45,7 +45,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
-  override def getModelStream: ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution) {
+  lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution) {
     override def getFeatures(input: String): Map[String, Double] = {
       // Stupid bag of words features...
       val tokens = input.split(" ")
@@ -80,6 +80,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
      */
     override def possibleValues: List[String] = labelTypes.toList
   }
+  override def getModelStream: ModelStream = logisticModelStream
 
   override def getHumanQuestion(input: String): String = {
     "Please label this movie review as either positive or negative: <div class='review'>"+input+"</div>"
