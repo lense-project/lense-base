@@ -22,6 +22,11 @@ abstract class ModelStream(humanErrorDistribution : HumanErrorDistribution) {
    * @return a new model
    */
   def newModel() : Model
+
+  /**
+   * @return the human error distribution object that this ModelStream was implemented with
+   */
+  def getHumanErrorDistribution : HumanErrorDistribution = humanErrorDistribution
 }
 
 /**
