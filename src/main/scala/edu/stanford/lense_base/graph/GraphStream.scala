@@ -310,8 +310,7 @@ class GraphStream {
 
   def learn(graphs : Iterable[Graph],
             l2regularization: Double = 0.1,
-            clearOptimizer : Boolean = true,
-            attachRandomHumanObservation : (GraphNode, String) => Unit = null) : Double = {
+            clearOptimizer : Boolean = true) : Double = {
     if (graphs.size == 0) return 0.0
 
     val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {

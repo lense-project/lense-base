@@ -16,6 +16,9 @@ object MCTSGamePlayer extends GamePlayer {
 
   val mainTreeLock = new Object()
 
+  var humanErrorDistribution : HumanErrorDistribution = null
+  var humanDelayDistribution : HumanDelayDistribution = null
+
   override def getOptimalMove(state: GameState): GameMove = {
     // Get all the legal moves
     val legalTopLevelMoves = getAllLegalMoves(state, reserveRealBudget = true)
@@ -60,8 +63,8 @@ object MCTSGamePlayer extends GamePlayer {
 
     while (node.isNonTerminal) {
       node = node.treePolicyStep(r,
-        engine.getHumanErrorDistribution,
-        engine.getHumanDelayDistribution)
+        humanErrorDistribution,
+        humanDelayDistribution)
       // We've just stepped off-tree, can hand back main lock
       if (node.visits == 0) {
         holdLock = false
@@ -85,7 +88,7 @@ case class StateSample(gameState : GameState,
 
     // reward is just negative loss. If we go over the maxLossPerNode term, this will return negative, and MCTS just won't
     // visit this node ever again
-    val normalizedLoss = gameState.loss(hypotheticalEndTime - startTime) / (gameState.maxLossPerNode * gameState.originalGraph.nodes.size)
+    val normalizedLoss = gameState.loss(hypotheticalEndTime - startTime) / (gameState.maxLossPerNode * gameState.model.variables.size)
     1.0 - normalizedLoss
   }
 
@@ -97,7 +100,7 @@ case class StateSample(gameState : GameState,
       case obs : MakeHumanObservation =>
         // This adds another request in flight, samples a time for the request to take, and adds it to the pile
         val requestDelay = humanDelayDistribution.sampleDelay()
-        val nextState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, null, hypotheticalEndTime + requestDelay)
+        val nextState = gameState.getNextStateForInFlightRequest(obs.variable, obs.hcu, null, hypotheticalEndTime + requestDelay)
         StateSample(nextState, startTime, hypotheticalEndTime)
 
       case wait : Wait =>
@@ -108,10 +111,10 @@ case class StateSample(gameState : GameState,
         // This waits for the next request to return, pops it off, and registers the observation
         val nextRequestToReturn = inFlightLandingTimes.minBy(_._2)
 
-        val beliefMarginals = gameState.marginals(nextRequestToReturn._1._1)
+        val beliefMarginals = gameState.model.marginals(nextRequestToReturn._1._1)
         val obs : String = humanErrorDistribution.sampleGivenMarginals(beliefMarginals)
 
-        val nextState = gameState.getNextStateForNodeObservation(nextRequestToReturn._1._1, nextRequestToReturn._1._2, null, obs)
+        val nextState = gameState.getNextStateForVariableObservation(nextRequestToReturn._1._1, nextRequestToReturn._1._2, null, obs)
         StateSample(nextState, startTime, nextRequestToReturn._2)
 
       case turnIn : TurnInGuess =>

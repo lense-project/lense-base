@@ -25,11 +25,11 @@ object ThresholdHeuristic extends GamePlayer {
     }
 
     // We should probably be cacheing this if it's every used in production, but no matter
-    val marginals = state.graph.marginalEstimate()
-    val moveOnNodes = state.originalGraph.nodes.filter(node => {
-      val dist = marginals(state.oldToNew(node))
+    val marginals = state.model.marginals
+    val moveOnVariables = state.model.variables.filter(variable => {
+      val dist = marginals(variable)
       val maxProb = dist.maxBy(_._2)
-      val inFlightRequestsForNode = state.inFlightRequests.count(_._1 eq node)
+      val inFlightRequestsForNode = state.inFlightRequests.count(_._1 eq variable)
       var certainty = maxProb._2
       for (i <- 1 to inFlightRequestsForNode) {
         certainty = 1 - ((1 - certainty)*humanUncertaintyMultiple)
@@ -43,10 +43,10 @@ object ThresholdHeuristic extends GamePlayer {
       }
     }).toSet
 
-    if (moveOnNodes.size > 0) {
+    if (moveOnVariables.size > 0) {
       val desiredLegalObservations = getAllLegalMoves(state).filter{
-        case MakeHumanObservation(node : GraphNode, hcu) =>
-          moveOnNodes.contains(node)
+        case MakeHumanObservation(variable, hcu) =>
+          moveOnVariables.contains(variable)
         case _ => false
       }
 
@@ -58,7 +58,7 @@ object ThresholdHeuristic extends GamePlayer {
       // Otherwise find the request-human pair we think can get it done the fastest, and do that
       else if (desiredLegalObservations.size > 0) {
         desiredLegalObservations.minBy{
-          case MakeHumanObservation(node, hcu) => hcu.estimateRequiredTimeIncludingQueue(node)
+          case MakeHumanObservation(variable, hcu) => hcu.estimateRequiredTimeIncludingQueue(variable)
         }
       }
       // There's more we'd like observations on, but we have no more annotators who could provide another independent

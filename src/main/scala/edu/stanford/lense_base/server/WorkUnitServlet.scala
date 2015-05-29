@@ -7,6 +7,7 @@ import com.amazonaws.mturk.util.PropertiesClientConfig
 import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
+import edu.stanford.lense_base.model.ModelVariable
 import edu.stanford.lense_base.mturk.{MTurkDBState, MTurkDatabase}
 
 import org.json4s._
@@ -169,12 +170,12 @@ class WorkUnitServlet extends ScalatraServlet
   }
 }
 
-abstract class WebWorkUnit(resultPromise : Promise[String], node : GraphNode) extends WorkUnit(resultPromise, node, RealHumanHCUPool) {
+abstract class WebWorkUnit(resultPromise : Promise[String], variable : ModelVariable) extends WorkUnit(resultPromise, variable, RealHumanHCUPool) {
   def getOutboundMessage : JValue
   def parseReplyMessage(m : JValue) : String
 }
 
-case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultPromise : Promise[String], node : GraphNode) extends WebWorkUnit(resultPromise, node) {
+case class MulticlassQuestion(questionHTML : String, choices : List[(String,String)], resultPromise : Promise[String], initVar : ModelVariable) extends WebWorkUnit(resultPromise, initVar) {
   override def getOutboundMessage: JValue = {
     new JObject(List(
       "type" -> new JString("multiclass"),
@@ -383,7 +384,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
           // Otherwise, we're good to go, so let's initialize this worker
           else {
             // Need to check if sufficient budget to pay worker...
-            val haveRetainerBudget = WorkUnitServlet.engine.tryReserveBudget(retainer, this, RealHumanHCUPool)
+            val haveRetainerBudget = WorkUnitServlet.engine.budget.tryReserveBudget(retainer, this)
             // This means we can't reserve enough budget to pay the retainer, so send away the worker
             if (!haveRetainerBudget) {
               System.err.println("Not enough budget to retain workerId="+workerId)
@@ -436,7 +437,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
-  override def estimateRequiredTimeToFinishItem(node : GraphNode): Long = {
+  override def estimateRequiredTimeToFinishItem(variable : ModelVariable): Long = {
     // TODO: this needs to be much more sophisticated
     1000
   }
@@ -498,7 +499,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
             Thread.sleep(15000)
             if (assignmentId != null) {
               System.err.println("Attempting to approve assignment")
-              WorkUnitServlet.engine.spendReservedBudget(retainer, HCUClient.this, RealHumanHCUPool)
+              WorkUnitServlet.engine.budget.spendReservedBudget(retainer, HCUClient.this)
               WorkUnitServlet.service.approveAssignment(assignmentId, "Good work on real-time tasks")
               System.err.println("Attempting to grant bonus")
               WorkUnitServlet.attemptGrantBonus(workerId, assignmentId, HCUClient.this)

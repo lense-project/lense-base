@@ -1,14 +1,8 @@
 package edu.stanford.lense_base.gameplaying
 
-import edu.stanford.lense_base.LenseEngine
-import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{WorkUnit, HumanComputeUnit, HCUPool}
-
-import scala.collection.mutable
-import scala.concurrent.{Await, Promise, Future}
-import scala.concurrent.duration._
-import scala.util.Try
-import scala.concurrent.ExecutionContext.Implicits.global
+import edu.stanford.lense_base.model.{ModelVariable, Model}
+import edu.stanford.lense_base.util.AsyncBudgetManager
 
 /**
  * Created by keenon on 4/27/15.
@@ -20,15 +14,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 abstract class GameMove
 case class TurnInGuess() extends GameMove
-case class MakeHumanObservation(node : GraphNode, hcu : HumanComputeUnit) extends GameMove
+case class MakeHumanObservation(variable : ModelVariable, hcu : HumanComputeUnit) extends GameMove
 case class Wait() extends GameMove
 case class WaitForTime(delay : Long) extends GameMove
 
 // This is the head of all game playing agents
 
 abstract class GamePlayer {
-
-  var engine : LenseEngine = null
+  var budget : AsyncBudgetManager = null
 
   def getOptimalMove(state : GameState) : GameMove
 
@@ -39,12 +32,12 @@ abstract class GamePlayer {
     var canAfford = 0.0
 
     if (reserveRealBudget) {
-      if (engine.tryReserveBudget(maxHCUCost, state, state.hcuPool)) {
+      if (budget.tryReserveBudget(maxHCUCost, state)) {
         // We've successfully reserved all the money we need
         canAfford = maxHCUCost
       }
       else {
-        if (engine.tryReserveBudget(minHCUCost, state, state.hcuPool)) {
+        if (budget.tryReserveBudget(minHCUCost, state)) {
           // We've successfully reserved some of the money we need
           canAfford = minHCUCost
         }
@@ -59,13 +52,12 @@ abstract class GamePlayer {
       canAfford = maxHCUCost
     }
 
-    state.originalGraph.nodes.filter(_.observedValue == null).flatMap(n => {
+    state.model.variables.flatMap(n => {
       state.hcuPool.synchronized {
         val list = state.hcuPool.hcuPool.
           // Take only HCU's we haven't used before for this node
           filter(hcu => !(state.inFlightRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)) || state.completedRequests.exists(t => t._1.eq(n) && t._2.eq(hcu)))).
           filter(_.cost <= canAfford)
-
         // If there are HCUs available for this node, pick the one with the shortest queue
         if (list.size > 0) {
           List(MakeHumanObservation(n, list.minBy(_.estimateTimeToFinishQueue)))
@@ -85,48 +77,22 @@ abstract class GamePlayer {
 
 // This is the current state of the "game"
 
-case class GameState(engine : LenseEngine,
-                     graph : Graph,
-                     cost : Double,
-                     hcuPool : HCUPool,
-                     addHumanObservation : (Graph, GraphNode, String) => Unit,
-                     lossFunction : (List[(GraphNode, String, Double)], Double, Long) => Double,
-                     maxLossPerNode : Double,
-                     inFlightRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit, Long)] = Set(),
-                     completedRequests : Set[(GraphNode, HumanComputeUnit, WorkUnit)] = Set(),
-                     startTime : Long = System.currentTimeMillis(),
-                     marginalMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, Map[String,Double]]] = mutable.Map(),
-                     mapMemos : mutable.Map[Map[Int,Map[String, Int]], Map[GraphNode, String]] = mutable.Map(),
-                     observedNodes : Map[Int,Map[String, Int]] = Map()) {
+case class GameState(model : Model,
+           hcuPool : HCUPool,
+           lossFunction : (List[(ModelVariable, String, Double)], Double, Long) => Double,
+           maxLossPerNode : Double,
+           cost : Double = 0.0,
+           startTime : Long = System.currentTimeMillis(),
+           inFlightRequests : Set[(ModelVariable, HumanComputeUnit, WorkUnit, Long)] = Set(),
+           completedRequests : Set[(ModelVariable, HumanComputeUnit, WorkUnit)] = Set()) {
+
   // A quick and dirty way for game players to store arbitrary extra state
   var payload : Any = null
-  var originalGraph : Graph = graph
-  var oldToNew : Map[GraphNode,GraphNode] = graph.nodes.map(n => (n,n)).toMap
-
-  // On creation, we have to do full *inference*. This is very expensive, compared to everything else we do
-  // We do some cacheing, but this shouldn't help very often, since the search space is very large.
-  lazy val marginals : Map[GraphNode, Map[String, Double]] = synchronized {
-    if (!marginalMemos.contains(observedNodes)) {
-      marginalMemos.put(observedNodes, graph.marginalEstimate().map(pair => {
-        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
-      }))
-    }
-    marginalMemos(observedNodes)
-  }
-
-  lazy val map : Map[GraphNode, String] = synchronized {
-    if (!mapMemos.contains(observedNodes)) {
-      mapMemos.put(observedNodes, graph.mapEstimate().map(pair => {
-        (oldToNew.filter(_._2 eq pair._1).head._1, pair._2)
-      }))
-    }
-    mapMemos(observedNodes)
-  }
 
   def loss(hypotheticalExtraDelay : Long = 0) : Double = {
-    val mapAssignments = map
+    val mapAssignments = model.map
 
-    val bestGuesses = marginals.toList.map(pair => {
+    val bestGuesses = model.marginals.toList.map(pair => {
       val mapAssignmentProb = pair._2(mapAssignments(pair._1))
       val mapAssignment = mapAssignments(pair._1)
       val node = pair._1
@@ -140,93 +106,47 @@ case class GameState(engine : LenseEngine,
     lossFunction(bestGuesses, cost, hypotheticalExtraDelay + System.currentTimeMillis() - startTime)
   }
 
-  def copyMutableState(nextState : GameState, copyOldToNew : Map[GraphNode,GraphNode]) = {
+  def copyMutableState(nextState : GameState) = {
     nextState.payload = payload
-    nextState.originalGraph = originalGraph
-    nextState.oldToNew = oldToNew.map(pair => (pair._1, copyOldToNew(pair._2)))
   }
 
-  def getNextStateForInFlightRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, launchTime : Long) : GameState = {
-    val clonePair = graph.clone()
-    val nextState : GameState = GameState(engine,
-      clonePair._1,
-      cost + hcu.cost,
+  def getNextStateForInFlightRequest(variable : ModelVariable, hcu : HumanComputeUnit, workUnit : WorkUnit, launchTime : Long) : GameState = {
+    val nextState : GameState = GameState(model,
       hcuPool,
-      addHumanObservation,
       lossFunction,
       maxLossPerNode,
-      inFlightRequests ++ Set((node, hcu, workUnit, launchTime)),
-      completedRequests,
+      cost + hcu.cost,
       startTime,
-      marginalMemos,
-      mapMemos,
-      observedNodes)
-    copyMutableState(nextState, clonePair._2)
+      inFlightRequests ++ Set((variable, hcu, workUnit, launchTime)),
+      completedRequests)
+    copyMutableState(nextState)
     nextState
   }
 
-  def getNextStateForFailedRequest(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
-    val clonePair = graph.clone()
-    val nextState : GameState = GameState(engine,
-      clonePair._1,
-      cost,
+  def getNextStateForFailedRequest(variable : ModelVariable, hcu : HumanComputeUnit, workUnit : WorkUnit) : GameState = {
+    val nextState : GameState = GameState(model,
       hcuPool,
-      addHumanObservation,
       lossFunction,
       maxLossPerNode,
-      inFlightRequests.filter(quad => quad._1 != node || quad._2 != hcu),
-      completedRequests,
+      cost,
       startTime,
-      marginalMemos,
-      mapMemos,
-      observedNodes)
-    copyMutableState(nextState, clonePair._2)
+      inFlightRequests.filter(quad => quad._1 != variable || quad._2 != hcu),
+      completedRequests)
+    copyMutableState(nextState)
     nextState
   }
 
   // Gets a GameState that corresponds to seeing observation "obs" on node "node"
-  def getNextStateForNodeObservation(node : GraphNode, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
-    val clonePair = graph.clone()
-
-    if (!originalGraph.nodes.contains(node)) throw new IllegalStateException("Cannot get next state for node not in originalGraph")
-
-    // Figure out the observed nodes set for the next state
-    val nextObservedNodes : Map[Int, Map[String,Int]] = if (observedNodes.map(_._1).toSet.contains(node)) {
-      observedNodes.map(pair => {
-        if (pair._1 == originalGraph.nodes.indexOf(node)) {
-          if (pair._2.map(_._1).toSet.contains(obs)) {
-            (pair._1, pair._2.map(obsCount => {
-              if (obsCount._1 == obs) {
-                (obsCount._1, obsCount._2 + 1)
-              }
-              else obsCount
-            }))
-          }
-          else (pair._1, pair._2 ++ Map(obs -> 1))
-        }
-        else {
-          pair
-        }
-      })
-    } else {
-      observedNodes ++ Map(originalGraph.nodes.indexOf(node) -> Map(obs -> 1))
-    }
-
-    val nextState : GameState = GameState(engine,
-      clonePair._1,
-      cost,
+  def getNextStateForVariableObservation(variable : ModelVariable, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
+    val nextState : GameState = GameState(model.cloneModelWithHumanObservation(variable, obs),
       hcuPool,
-      addHumanObservation,
       lossFunction,
       maxLossPerNode,
-      inFlightRequests.filter(quad => quad._1 != node || quad._2 != hcu),
-      completedRequests ++ Set((node, hcu, workUnit)),
+      cost,
       startTime,
-      marginalMemos,
-      mapMemos,
-      nextObservedNodes)
-    copyMutableState(nextState, clonePair._2)
-    addHumanObservation(clonePair._1, nextState.oldToNew(node), obs)
+      inFlightRequests.filter(quad => quad._1 != variable || quad._2 != hcu),
+      completedRequests ++ Set((variable, hcu, workUnit)))
+    copyMutableState(nextState)
     nextState
   }
 }

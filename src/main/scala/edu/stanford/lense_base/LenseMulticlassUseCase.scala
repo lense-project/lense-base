@@ -1,7 +1,8 @@
 package edu.stanford.lense_base
 
-import edu.stanford.lense_base.graph.{Graph, GraphNode}
+import edu.stanford.lense_base.graph.{NodeType, Graph, GraphNode}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.model.{ModelStream, GraphicalModelStream, ModelVariable, Model}
 import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQuestion, TrainingQuestion}
 
 /**
@@ -16,6 +17,10 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   def getHumanQuestion(input : Input) : String
   def getHumanVersionOfLabel(label : String) : String
 
+  val graphicalModelStream : GraphicalModelStream = new GraphicalModelStream(humanErrorDistribution)
+  override def getModelStream : ModelStream = graphicalModelStream
+  lazy val nodeType : NodeType = graphicalModelStream.graphStream.makeNodeType(labelTypes)
+
   /**
    * This gets the initial training examples to show to humans. Provide an input, the correct answer, and
    * any comments in HTML that you want displayed while the user is doing this example.
@@ -24,10 +29,8 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
    */
   def getHumanTrainingExamples : List[(Input, String, String)] = List()
 
-  lazy val nodeType = graphStream.makeNodeType(labelTypes)
-
-  override def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String = {
-    graph.nodes.head.payload.toString+"\t"+values(graph.nodes.head)
+  override def encodeModelWithValuesAsTSV(model : Model, values : Map[ModelVariable, String]) : String = {
+    model.variables.head.payload.toString+"\t"+values(model.variables.head)
   }
 
   override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(triple => {
@@ -42,16 +45,19 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
    * @param input the input that the graph will represent
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  override def toGraph(input: Input): Graph = {
-    val graph = graphStream.newGraph()
+  override def toModel(input: Input): Model = {
+    val graph = graphicalModelStream.graphStream.newGraph()
     val node = graph.makeNode(nodeType, getFeatures(input), payload = input)
     if (graph.marginalEstimate().size != 1) throw new IllegalStateException("Seems marginals aren't computing correctly")
-    graph
+
+    val model = graphicalModelStream.newModel()
+    model.setGraph(graph)
+    model
   }
 
-  override def getQuestion(node: GraphNode, hcu: HumanComputeUnit): GraphNodeQuestion = {
-    val input = node.payload.asInstanceOf[Input]
-    GraphNodeQuestion(getHumanQuestion(input), labelTypes.toList.map(l => new GraphNodeAnswer(getHumanVersionOfLabel(l), l)), hcu, node)
+  override def getQuestion(variable : ModelVariable, hcu: HumanComputeUnit): GraphNodeQuestion = {
+    val input = variable.payload.asInstanceOf[Input]
+    GraphNodeQuestion(getHumanQuestion(input), labelTypes.toList.map(l => new GraphNodeAnswer(getHumanVersionOfLabel(l), l)), hcu, variable)
   }
 
   /**
@@ -59,13 +65,13 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
    * values.
    * The keys of the values map will always correspond one-to-one with the nodes of the graph.
    *
-   * @param graph the graph, with observedValue's on all the nodes
+   * @param model the graph, with observedValue's on all the nodes
    * @param values a map corresponding the nodes of the graph with their String labels
    * @return an Output version of this graph
    */
-  override def toOutput(graph: Graph, values: Map[GraphNode, String]): String = {
-    values(graph.nodes.head)
+  override def toOutput(model : Model, values: Map[ModelVariable, String]): String = {
+    values(model.variables.head)
   }
 
-  override def getCorrectLabel(node: GraphNode, goldOutput: String): String = goldOutput
+  override def getCorrectLabel(variable : ModelVariable, goldOutput: String): String = goldOutput
 }

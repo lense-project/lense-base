@@ -7,6 +7,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
+import edu.stanford.lense_base.model.ModelVariable
 
 import scala.io.Source
 import scala.util.Random
@@ -102,11 +103,9 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * TODO: more docs here
    *
    * @param mostLikelyGuesses
-   * @param cost
-   * @param ms
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
+  override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
   }
 

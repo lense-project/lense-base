@@ -7,7 +7,7 @@ import scala.util.Random
  * Created by keenon on 5/23/15.
  */
 abstract class HumanErrorDistribution(rand : Random) {
-  def guess(correct : String, possibleValues : Set[String]) : String
+  def guess(correct : String, possibleValues : List[String]) : String
   def jointProbability(correct : String, guess : String) : Double
 
   def sampleGivenMarginals(marginals : Map[String,Double]) : String = {
@@ -33,14 +33,14 @@ abstract class HumanErrorDistribution(rand : Random) {
 }
 
 case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) extends HumanErrorDistribution(rand) {
-  override def guess(correct : String, possibleValues : Set[String]) : String = {
+  override def guess(correct : String, possibleValues : List[String]) : String = {
     // Do the automatic error generation
     if (rand.nextDouble() > epsilon) {
       correct
     }
     else {
       // Pick uniformly at random
-      possibleValues.toList(rand.nextInt(possibleValues.size))
+      possibleValues(rand.nextInt(possibleValues.size))
     }
   }
 
@@ -86,7 +86,7 @@ case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extend
     })
   }
 
-  override def guess(correct: String, possibleValues: Set[String]): String = {
+  override def guess(correct: String, possibleValues: List[String]): String = {
     val observedDistribution : List[(String,Double)] = conditionalConfusionMatrix(correct)
     var draw = rand.nextDouble()
     for (pair <- observedDistribution) {

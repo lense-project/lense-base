@@ -5,6 +5,7 @@ import java.nio.charset.MalformedInputException
 
 import edu.stanford.lense_base.graph.{FactorType, NodeType, GraphNode, Graph}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.model._
 import edu.stanford.lense_base.server.{TrainingQuestion, MulticlassTrainingQuestion}
 import org.yaml.snakeyaml.Yaml
 
@@ -78,11 +79,16 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
     (introText, cheatSheet, list.toList)
   }
 
-  lazy val nodeType : NodeType = graphStream.makeNodeType(labelTypes)
-  lazy val factorType : FactorType = graphStream.makeFactorType(List(nodeType, nodeType))
+  lazy val graphicalModelStream : GraphicalModelStream = new GraphicalModelStream(humanErrorDistribution)
 
-  override def encodeGraphWithValuesAsTSV(graph : Graph, values : Map[GraphNode, String]) : String = {
-    graph.nodes.toList.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => {
+  override def getModelStream : ModelStream = graphicalModelStream
+
+  lazy val nodeType : NodeType = graphicalModelStream.graphStream.makeNodeType(labelTypes)
+  lazy val factorType : FactorType = graphicalModelStream.graphStream.makeFactorType(List(nodeType, nodeType))
+
+  override def encodeModelWithValuesAsTSV(model : Model, values : Map[ModelVariable, String]) : String = {
+    val m = model.asInstanceOf[GraphicalModel]
+    m.variables.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => {
       val payload = n.payload.asInstanceOf[(List[String],Int)]
       payload._1(payload._2) + "\t" + values(n)
     }).mkString("\n")
@@ -100,9 +106,8 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @param input the input that the graph will represent
    * @return a graph representing the input, and taking labels from the output if it is passed in
    */
-  override def toGraph(input: List[String]): Graph = {
-    val graph = graphStream.newGraph(input.mkString(" "))
-    val questionMap = mutable.Map[GraphNode, GraphNodeQuestion]()
+  override def toModel(input: List[String]): Model = {
+    val graph = graphicalModelStream.graphStream.newGraph(input.mkString(" "))
 
     var lastNode : GraphNode = null
     for (i <- 0 to input.size-1) {
@@ -113,12 +118,14 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
       lastNode = newNode
     }
 
-    graph
+    val model = graphicalModelStream.newModel()
+    model.setGraph(graph)
+    model
   }
 
-  override def getQuestion(node : GraphNode, hcu : HumanComputeUnit) : GraphNodeQuestion = {
-    val pair = node.payload.asInstanceOf[(List[String],Int)]
-    GraphNodeQuestion(getHumanQuestion(pair._1, pair._2), labelTypes.toList.map(l => new GraphNodeAnswer(getHumanVersionOfLabel(l), l)), hcu, node)
+  override def getQuestion(variable : ModelVariable, hcu : HumanComputeUnit) : GraphNodeQuestion = {
+    val pair = variable.asInstanceOf[GraphicalModelVariable].payload.asInstanceOf[(List[String],Int)]
+    GraphNodeQuestion(getHumanQuestion(pair._1, pair._2), labelTypes.toList.map(l => new GraphNodeAnswer(getHumanVersionOfLabel(l), l)), hcu, variable)
   }
 
   /**
@@ -126,12 +133,12 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * values.
    * The keys of the values map will always correspond one-to-one with the nodes of the graph.
    *
-   * @param graph the graph, with observedValue's on all the nodes
+   * @param model the graph, with observedValue's on all the nodes
    * @param values a map corresponding the nodes of the graph with their String labels
    * @return an Output version of this graph
    */
-  override def toOutput(graph: Graph, values: Map[GraphNode, String]): List[String] = {
-    graph.nodes.toList.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => values(n))
+  override def toOutput(model : Model, values: Map[ModelVariable, String]): List[String] = {
+    model.asInstanceOf[GraphicalModel].variables.toList.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => values(n))
   }
 
   /**
@@ -145,23 +152,24 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
    * @param time
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, time: Long): Double = {
-    val sentence = mostLikelyGuesses.head._1.payload.asInstanceOf[(List[String], Int)]._1
-    val translatedGuesses = mostLikelyGuesses.map(triple => (triple._1.payload.asInstanceOf[(List[String], Int)]._2, triple._2, triple._3))
+  override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, time: Long): Double = {
+    val sentence = mostLikelyGuesses.head._1.asInstanceOf[GraphicalModelVariable].payload.asInstanceOf[(List[String], Int)]._1
+    val translatedGuesses = mostLikelyGuesses.map(triple => (triple._1.asInstanceOf[GraphicalModelVariable].payload.asInstanceOf[(List[String], Int)]._2, triple._2, triple._3))
     lossFunction(sentence, translatedGuesses, cost, time)
   }
 
-  override def getCorrectLabel(node : GraphNode, goldOutput : List[String]) : String = {
-    goldOutput(node.payload.asInstanceOf[(List[String],Int)]._2)
+  override def getCorrectLabel(variable : ModelVariable, goldOutput : List[String]) : String = {
+    goldOutput(variable.asInstanceOf[GraphicalModelVariable].payload.asInstanceOf[(List[String],Int)]._2)
   }
 
   /**
    * A hook to be able to render intermediate progress during testWith[...] calls. Intended to print to stdout.
    */
-  override def renderClassification(graph : Graph, goldMap : Map[GraphNode, String], guessMap : Map[GraphNode, String]) : Unit = {
-    if (graph.nodes.size > 0) {
-      val sequence = graph.nodes.head.payload.asInstanceOf[(List[String], Int)]._1
-      println(graph.nodes.map(n => (n,n.payload.asInstanceOf[(List[String], Int)]._2)).sortBy(_._2)
+  override def renderClassification(model : Model, goldMap : Map[ModelVariable, String], guessMap : Map[ModelVariable, String]) : Unit = {
+    val m = model.asInstanceOf[GraphicalModel]
+    if (m.variables.size > 0) {
+      val sequence = m.variables.head.payload.asInstanceOf[(List[String], Int)]._1
+      println(m.variables.map(n => (n,n.payload.asInstanceOf[(List[String], Int)]._2)).sortBy(_._2)
         .map(n => sequence(n._2)+"(gold:"+goldMap(n._1)+",guess:"+guessMap(n._1)+")").mkString(" "))
     }
     else {

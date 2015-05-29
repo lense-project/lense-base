@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.humancompute
 
 import edu.stanford.lense_base.graph.GraphNode
+import edu.stanford.lense_base.model.ModelVariable
 
 import scala.concurrent.Promise
 import scala.util.Try
@@ -10,9 +11,9 @@ import scala.util.Try
  *
  * Holds a single job to ask an HCU pool to complete
  */
-class WorkUnit(resultPromise : Promise[String], initNode : GraphNode, hcuPool : HCUPool) {
+class WorkUnit(resultPromise : Promise[String], initVar : ModelVariable, hcuPool : HCUPool) {
 
-  val graphNode = initNode
+  val variable = initVar
   private var _revoked = false
 
   hcuPool.numWorkUnitsRequested += 1

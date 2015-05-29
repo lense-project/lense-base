@@ -14,6 +14,7 @@ import scala.util.Random
  * Takes a surprising amount of machinery to simulate everything. Could maybe be designed better... no matter, reserach
  */
 object MCTSTest extends App {
+  /*
   val rand = new Random()
   val humanErrorDistribution = EpsilonRandomErrorDistribution(0.1, rand)
   val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(3000, 1000, rand)
@@ -73,4 +74,5 @@ object MCTSTest extends App {
   println("Got optimal move for MCTS: " +mctsOptimalMove)
   println("Got optimal move for OneStepLookahead: "+oneStepOptimalMove)
   println("Got optimal move for Threshold: "+thresholdOptimalMove)
+  */
 }

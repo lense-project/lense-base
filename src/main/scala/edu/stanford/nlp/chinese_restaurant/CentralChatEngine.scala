@@ -4,6 +4,7 @@ import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, Cli
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, OneQuestionBaseline, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
+import edu.stanford.lense_base.model.ModelVariable
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -63,7 +64,7 @@ class ResponseTypeClassification extends LenseMulticlassUseCase[String] {
    * @param ms
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
+  override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     cost
   }
 
