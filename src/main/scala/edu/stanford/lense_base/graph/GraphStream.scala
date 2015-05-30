@@ -41,7 +41,7 @@ case class GraphNode(graph : Graph,
   val id: Int = graph.nodes.size
   graph.nodes += this
 
-  val variable = NodeVariable(this, graph)
+  var variable = NodeVariable(this, graph)
 
   var numHumanObservations : Int = 0
 
@@ -118,12 +118,12 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     GraphFactor(this, factorType, nodes, features, payload, toString)
   }
 
-  def mapEstimate(): Map[GraphNode, String] = {
+  def mapEstimate(model : GraphStream#StreamModel = stream.model): Map[GraphNode, String] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    stream.model.synchronized {
-      stream.model.warmUpIndexes(this)
+    model.synchronized {
+      model.warmUpIndexes(this)
     }
 
     ////////////////////////////
@@ -132,7 +132,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
 
     // Do exact inference via trees if possible.
     val sumMax = try {
-      MaximizeByBPTree.infer(variables, stream.model)
+      MaximizeByBPTree.infer(variables, model)
     }
     // If that fails, perform loopy maximization
     catch {
@@ -140,7 +140,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
         e.printStackTrace()
         // run loopy bp
         println("MAP Inference is falling back to loopy BP. Results may be inexact")
-        MaximizeByBPLoopyTreewise.infer(variables, stream.model)
+        MaximizeByBPLoopyTreewise.infer(variables, model)
     }
 
     stream.weightsReadWriteLock.readLock().unlock()
@@ -159,12 +159,12 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }.toMap
   }
 
-  def factorsMarginalEstimate(): Map[GraphFactor, Map[List[String],Double]] = {
+  def factorsMarginalEstimate(model : GraphStream#StreamModel = stream.model, ignoreObservedValues : Boolean = false): Map[GraphFactor, Map[List[String],Double]] = {
     setObservedVariablesForFactorie()
-    val variables = unobservedVariablesForFactorie()
+    val variables = if (ignoreObservedValues) allVariablesForFactorie() else unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    stream.model.synchronized {
-      stream.model.warmUpIndexes(this)
+    model.synchronized {
+      model.warmUpIndexes(this)
     }
 
     ////////////////////////////
@@ -173,7 +173,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
 
     // Do exact inference via trees if possible.
     val sumMarginal = try {
-      InferByBPTree.infer(variables, stream.model)
+      InferByBPTree.infer(variables, model)
     }
     // If that fails, perform gibbs sampling
     catch {
@@ -189,7 +189,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
         // run gibbs sampler
         // new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
         */
-        InferByBPLoopyTreewise.infer(variables, stream.model)
+        InferByBPLoopyTreewise.infer(variables, model)
     }
 
     stream.weightsReadWriteLock.readLock().unlock()
@@ -198,7 +198,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
 
     sumMarginal.factorMarginals.map(f => {
       (f, factors.filter(factor => {
-        val featureVariable = stream.model.getFeatureVariableFor(factor, null)
+        val featureVariable = model.getFeatureVariableFor(factor, null)
         val variables = factor.nodeList.map(_.variable)
         val factorVariables = f.factor.variables.slice(0, f.factor.variables.size-1)
         factorVariables == variables
@@ -231,12 +231,56 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }).toMap
   }
 
-  def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
+  def logLikelihood(model : GraphStream#StreamModel = stream.model): Double = {
     setObservedVariablesForFactorie()
-    val variables = unobservedVariablesForFactorie()
+    val unobservedVariables = unobservedVariablesForFactorie()
+    if (unobservedVariables.size == 0) return 0.0
+    val allVariables = allVariablesForFactorie()
+    if (allVariables.size == 0) return 0.0
+
+    model.synchronized {
+      model.warmUpIndexes(this)
+    }
+
+    ////////////////////////////
+    // SYNCHRONIZED SECTION
+    stream.weightsReadWriteLock.readLock().lock()
+
+    // Do exact inference via trees if possible.
+    val sumMarginalObserved = try {
+      InferByBPTree.infer(unobservedVariables, model)
+    }
+    // If that fails, perform gibbs sampling
+    catch {
+      case _ : Throwable =>
+        InferByBPLoopyTreewise.infer(unobservedVariables, model)
+    }
+
+    val sumMarginalUnobserved = try {
+      InferByBPTree.infer(allVariables, model)
+    }
+    // If that fails, perform gibbs sampling
+    catch {
+      case _ : Throwable =>
+        InferByBPLoopyTreewise.infer(allVariables, model)
+    }
+
+    stream.weightsReadWriteLock.readLock().unlock()
+    // END SYNCHRONIZED SECTION
+    ////////////////////////////
+
+    println("Unobserved log-Z: "+sumMarginalUnobserved.logZ)
+    println("Partially observed log-Z: "+sumMarginalObserved.logZ)
+
+    sumMarginalObserved.logZ - sumMarginalUnobserved.logZ
+  }
+
+  def marginalEstimate(model : GraphStream#StreamModel = stream.model, ignoreObservedValues : Boolean = false): Map[GraphNode, Map[String,Double]] = {
+    setObservedVariablesForFactorie()
+    val variables = if (ignoreObservedValues) allVariablesForFactorie() else unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
-    stream.model.synchronized {
-      stream.model.warmUpIndexes(this)
+    model.synchronized {
+      model.warmUpIndexes(this)
     }
 
     ////////////////////////////
@@ -245,7 +289,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
 
     // Do exact inference via trees if possible.
     val sumMarginal = try {
-      InferByBPTree.infer(variables, stream.model)
+      InferByBPTree.infer(variables, model)
     }
     // If that fails, perform gibbs sampling
     catch {
@@ -261,7 +305,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
         // run gibbs sampler
         // new InferByGibbsSampling(samplesToCollect = 100, 10, r).infer(variables, stream.model)
         */
-        InferByBPLoopyTreewise.infer(variables, stream.model)
+        InferByBPLoopyTreewise.infer(variables, model)
     }
 
     stream.weightsReadWriteLock.readLock().unlock()
@@ -412,7 +456,7 @@ class GraphStream {
 
     val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
-    }))) learnEM(graphs, clearOptimizer)
+    }))) learnEM(graphs, l2regularization, clearOptimizer)
     else learnFullyObserved(graphs, l2regularization, clearOptimizer)
 
     finalLoss
@@ -420,9 +464,14 @@ class GraphStream {
 
   // performs EM on the graph. Still massively TODO
 
-  private def learnEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
+  private def learnEM(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true) : Double = {
     val nodeTypes = graphs.flatMap(_.nodes.map(_.nodeType)).toList.distinct
     val factorTypes = graphs.flatMap(_.factors.map(_.factorType)).toList.distinct
+
+    for (graph <- graphs) {
+      modelTrainingClone.warmUpIndexes(graph)
+    }
+    modelTrainingClone.dotFamilyCache.clear()
 
     for (i <- 0 to 100) {
 
@@ -441,9 +490,16 @@ class GraphStream {
 
       // Collect average marginals over all graphs
 
+      var logLikelihood = 0.0
+      var regularizer = 0.0
+
       for (graph <- graphs) {
-        val nodeMarginals = graph.marginalEstimate()
-        val factorMarginals = graph.factorsMarginalEstimate()
+        logLikelihood += graph.logLikelihood(modelTrainingClone)
+
+        val nodeMarginals = graph.marginalEstimate(modelTrainingClone)
+        val unobservedNodeMarginals = graph.marginalEstimate(modelTrainingClone, ignoreObservedValues = true)
+        val factorMarginals = graph.factorsMarginalEstimate(modelTrainingClone)
+        val unobservedFactorMarginals = graph.factorsMarginalEstimate(modelTrainingClone, ignoreObservedValues = true)
 
         // Node marginals
 
@@ -452,19 +508,31 @@ class GraphStream {
           val nt = node.nodeType
           nodeTypeCounts.put(nt, nodeTypeCounts(nt) + 1)
 
+          if (nt.weights != null) {
+            for (w <- nt.weights) {
+              for (q <- w._2) {
+                regularizer += q._2 * q._2
+              }
+            }
+          }
+
           if (!nodeTypeAverage.contains(nt)) nodeTypeAverage.put(nt, nt.possibleValues.map(value => (value, mutable.Map[String,Double]())).toMap)
           val nodeAverage = nodeTypeAverage(nt)
 
-          for (valueWithProb <- pair._2) {
+          val observedMarginals = pair._2
+          val unobservedMarginals = unobservedNodeMarginals(pair._1)
+
+          for (valueWithProb <- observedMarginals) {
             val value = valueWithProb._1
             val prob = valueWithProb._2
+            val unobservedProb = unobservedMarginals(value)
 
             val mutableWeightsAverageMap = nodeAverage(value)
             for (featureWithWeight <- node.features) {
               val feature = featureWithWeight._1
               val weight = featureWithWeight._2
 
-              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + prob*Math.exp(weight))
+              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + (prob-unobservedProb)*weight)
             }
           }
         })
@@ -476,23 +544,40 @@ class GraphStream {
           val ft = factor.factorType
           factorTypeCounts.put(ft, factorTypeCounts(ft) + 1)
 
+          if (ft.weights != null) {
+            for (w <- ft.weights) {
+              for (q <- w._2) {
+                regularizer += q._2 * q._2
+              }
+            }
+          }
+
           if (!factorTypeAverage.contains(ft)) factorTypeAverage.put(ft, ft.possibleValues.map(value => (value,mutable.Map[String,Double]())).toMap)
           val factorAverage = factorTypeAverage(ft)
+
+          val observedMarginals = pair._2
+          val unobservedMarginals = unobservedFactorMarginals(pair._1)
 
           for (valueWithProb <- pair._2) {
             val value = valueWithProb._1
             val prob = valueWithProb._2
+            val unobservedProb = unobservedMarginals(value)
 
             val mutableWeightsAverageMap = factorAverage(value)
             for (featureWithWeight <- factor.features) {
               val feature = featureWithWeight._1
               val weight = featureWithWeight._2
 
-              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + prob*Math.exp(weight))
+              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + (prob - unobservedProb)*weight)
             }
           }
         })
       }
+
+      regularizer = - regularizer * l2regularization / 2
+      println("SYSTEM RETURN REGULARIZER: "+regularizer)
+      println("SYSTEM RETURN VALUE: "+logLikelihood)
+      println("SYSTEM RETURN VALUE+REGURLAIZER: "+(logLikelihood + regularizer))
 
       // Done collecting marginals
 
@@ -509,9 +594,14 @@ class GraphStream {
           })
         }
         else {
-          nt.weights = nt.weights.map(oldWeights => {
-            (oldWeights._1, oldWeights._2.map(q => {
-              (q._1, q._2 + normalizedAverage.getOrElse(oldWeights._1, Map[String,Double]()).getOrElse(q._1, 0.0))
+          nt.weights = nt.weights.map(oldWeightsForSinglePossibleValue => {
+            val possibleValue = oldWeightsForSinglePossibleValue._1
+            val weightsForPossibleValue = oldWeightsForSinglePossibleValue._2
+            (possibleValue, weightsForPossibleValue.map(q => {
+              val v = normalizedAverage.getOrElse(possibleValue, Map[String,Double]()).getOrElse(q._1, 0.0)
+              val grad = v - (q._2 * l2regularization)
+              (q._1, q._2 + grad*0.5)
+              // (q._1, (1-alpha)*q._2 + alpha*v)
             }))
           })
         }
@@ -532,18 +622,22 @@ class GraphStream {
         else {
           ft.weights = ft.weights.map(oldWeights => {
             (oldWeights._1, oldWeights._2.map(q => {
-              (q._1, q._2 + normalizedAverage.getOrElse(oldWeights._1, Map[String,Double]()).getOrElse(q._1, 0.0))
+              val v = normalizedAverage.getOrElse(oldWeights._1, Map[String,Double]()).getOrElse(q._1, 0.0)
+              val grad = v - (q._2 * l2regularization)
+              (q._1, q._2 + grad*0.5)
+              // (q._1, (1-alpha)*q._2 + alpha*v)
             }))
           })
         }
       }
 
-      println(nodeTypes)
-    }
+      System.err.println(nodeTypes)
+      System.err.println(factorTypes)
 
-    // Force a regeneration of the dotFamilyCache
-    model.dotFamilyCache.synchronized {
-      model.dotFamilyCache.clear()
+      // Force a regeneration of the dotFamilyCache
+      modelTrainingClone.dotFamilyCache.synchronized {
+        modelTrainingClone.dotFamilyCache.clear()
+      }
     }
 
     0.0

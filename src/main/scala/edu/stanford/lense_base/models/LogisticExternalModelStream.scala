@@ -14,8 +14,6 @@ import edu.stanford.nlp.ling.RVFDatum
  * Implements a stupid logistic model over the data, which can be tweaked as desired
  */
 abstract class LogisticExternalModelStream[Input](humanErrorDistribution : HumanErrorDistribution) extends UnivariateExternalModelStream[Input](humanErrorDistribution) {
-  println("Instantiated LogisticExternalModelStream!")
-
   var classifier : LinearClassifier[String, String] = null
   val classifierFactory : LinearClassifierFactory[String, String] = new LinearClassifierFactory[String,String]()
 
@@ -47,7 +45,10 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
     }
     val rvf = new RVFDatum[String, String](counter)
     val outputCounter = localClassifier.probabilityOf(rvf)
-    outputCounter.keySet().toArray().map(key => {
+
+    println(outputCounter)
+
+    outputCounter.keySet().toArray.map(key => {
       (key.asInstanceOf[String], outputCounter.getCount(key))
     }).toMap
   }
@@ -67,11 +68,12 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
         counter.incrementCount(feat._1, feat._2)
       }
 
-      rvfDataset.add(new RVFDatum[String,String](counter, pair._2))
+      val datum = new RVFDatum[String,String](counter, pair._2)
+      rvfDataset.add(datum)
     })
 
     classifierFactory.synchronized {
-      classifier = classifierFactory.trainClassifier(rvfDataset)
+      classifier = classifierFactory.trainClassifier(rvfDataset, null, new LogPrior()).asInstanceOf[LinearClassifier[String,String]]
       classifierFactory.notifyAll()
     }
     0.0
