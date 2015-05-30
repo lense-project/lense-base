@@ -27,7 +27,7 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
     val loss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
     // Reset human weights to default, because regularizer will have messed with them
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
-      humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues))
+      humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
     }
     // Return loss
     loss
