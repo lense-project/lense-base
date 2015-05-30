@@ -21,14 +21,35 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
   override def learn(models : Iterable[Model]): Double = {
     // Set all the graphs to the MAP
     models.foreach(m => {
-      m.asInstanceOf[GraphicalModel].setNodesToMAP()
+      m.asInstanceOf[GraphicalModel].setVariablesToMAP()
     })
-    // Run learning
-    val loss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
-    // Reset human weights to default, because regularizer will have messed with them
+
+    // Run learning - MAP estimates for initialization
+    println("RUNNING MAP INITIALIZATION...")
+    val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
+    // Reset human weights to default, because regularizer will have messed with them, even though likelihoods should not have changed
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
     }
+
+    // Set all the graphs to the Unobserved, keeping human observations
+    models.foreach(m => {
+      m.asInstanceOf[GraphicalModel].setVariablesToNull()
+    })
+
+    val loss = if (models.exists(m => m.variables.exists(!_.isObserved))) {
+      // Run learning - soft EM
+      println("RUNNING EM FINE TUNING...")
+      val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
+      // Read out human weights
+      for (humanObservationTypePair <- humanObservationTypesCache.values) {
+        val w = humanObservationTypePair._2.getWeights
+        println("Human weights estimate: "+w)
+        // humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
+      }
+      emLoss
+    } else mapLoss
+
     // Return loss
     loss
   }
@@ -138,7 +159,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @return a map of the variables -> distributions over tokens
    */
   override def marginals: Map[ModelVariable, Map[String, Double]] = {
-    setNodesToNull()
+    setVariablesToNull()
     graph.marginalEstimate().map(p => (nodeToVar(p._1), p._2))
   }
 
@@ -146,7 +167,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @return a map of variables -> MAP assignment
    */
   override def map: Map[ModelVariable, String] = {
-    setNodesToNull()
+    setVariablesToNull()
     graph.mapEstimate().map(p => (nodeToVar(p._1), p._2))
   }
 
@@ -155,7 +176,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    */
   override def variables: List[ModelVariable] = vars
 
-  def setNodesToMAP() : Unit = {
+  def setVariablesToMAP() : Unit = {
     val m = map
     for (variable <- vars) {
       if (variable.isObserved)
@@ -165,7 +186,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
     }
   }
 
-  def setNodesToNull() : Unit = {
+  def setVariablesToNull() : Unit = {
     for (variable <- vars) {
       if (variable.isObserved)
         varToNode(variable).observedValue = variable.getObservedValue
@@ -176,7 +197,6 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
 }
 
 case class GraphicalModelVariable(node : GraphNode, gm : GraphicalModel) extends ModelVariable(gm) {
-  // TODO: This may cause a serious bug with the analysis, since it will rely on the order of the lists...
   override def possibleValues: List[String] = node.nodeType.possibleValues.toList
   def payload: Any = node.payload
 }

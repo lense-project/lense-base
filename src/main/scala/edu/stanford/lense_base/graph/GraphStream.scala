@@ -198,13 +198,22 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     ////////////////////////////
 
     sumMarginal.factorMarginals.map(f => {
+      // Get all corresponding Factors in the GraphStream sense
       (f, factors.filter(factor => {
         val featureVariable = model.getFeatureVariableFor(factor, null)
         val variables = factor.nodeList.map(_.variable)
         val factorVariables = f.factor.variables.slice(0, f.factor.variables.size-1)
         factorVariables == variables
       }))
-    }).filter(_._2.size == 1).map(pair => (pair._2.head, pair._1.tensorStatistics)).map(pair => {
+    })
+    // Only look at marginals who have exactly one corresponding factor
+    .filter(_._2.size == 1)
+    // Map to the (Factor,tensorStatistics) pair from the marginals
+    .map(pair => (pair._2.head, {
+      pair._1.asInstanceOf[DiscreteMarginal].proportions
+    }))
+    // Map raw tensor marginals to a map of key->value
+    .map(pair => {
       val factor = pair._1
       val tensor = pair._2
       val tensorArray = tensor.toArray
@@ -214,13 +223,37 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
           throw new IllegalStateException("Not yet supported")
         case 2 =>
           val domainSize = factor.nodeList(0).nodeType.valueDomain.size
-          factor.nodeList(0).nodeType.valueDomain.categories.flatMap(cat1 => {
-            val i1 = factor.nodeList(0).nodeType.valueDomain.index(cat1)
-            factor.nodeList(1).nodeType.valueDomain.categories.map(cat2 => {
-              val i2 = factor.nodeList(0).nodeType.valueDomain.index(cat2)
-              val i = (i1*domainSize) + i2
+
+          val node1 = factor.nodeList(0)
+          val node2 = factor.nodeList(1)
+
+          node1.nodeType.valueDomain.categories.flatMap(cat1 => {
+            var i1 = node1.nodeType.valueDomain.index(cat1)
+
+            node2.nodeType.valueDomain.categories.map(cat2 => {
+              var i2 = node2.nodeType.valueDomain.index(cat2)
+
               val key = List(cat1, cat2)
-              val v = tensorArray(i)
+
+              val v = if (node1.observedValue == cat1 && node2.observedValue == null) {
+                tensorArray(i2)
+              }
+              else if (node2.observedValue == cat2 && node1.observedValue == null) {
+                tensorArray(i1)
+              }
+              else if (node1.observedValue == cat1 && node2.observedValue == cat2) {
+                1.0
+              }
+              else if (node1.observedValue != null && node1.observedValue != cat1) {
+                0.0
+              }
+              else if (node2.observedValue != null && node2.observedValue != cat2) {
+                0.0
+              }
+              else {
+                tensorArray((i1*domainSize) + i2)
+              }
+
               // key value pair
               key -> v
             })
@@ -471,12 +504,10 @@ class GraphStream {
             clearOptimizer : Boolean = true) : Double = {
     if (graphs.size == 0) return 0.0
 
-    val finalLoss = if (graphs.exists(graph => graph.nodes.exists(node => {
+    if (graphs.exists(graph => graph.nodes.exists(node => {
       node.observedValue == null
     }))) learnEM(graphs, l2regularization, clearOptimizer)
     else learnFullyObserved(graphs, l2regularization, clearOptimizer)
-
-    finalLoss
   }
 
   // performs EM on the graph. Still massively TODO
@@ -555,15 +586,15 @@ class GraphStream {
       }
 
       regularizer = - regularizer * l2regularization / 2
-      println("SYSTEM RETURN REGULARIZER: "+regularizer)
-      println("SYSTEM RETURN VALUE: "+logLikelihood)
-      println("SYSTEM RETURN VALUE+REGURLAIZER: "+(logLikelihood + regularizer))
+      System.err.println("Value: "+logLikelihood)
+      System.err.println("Regularizer: "+regularizer)
+      System.err.println("Value + Regularizer: "+(logLikelihood + regularizer))
       val loss = logLikelihood + regularizer
       val percentage = (lastLoss - loss) / lastLoss
-      println("percentage improvement: "+percentage)
+      System.err.println("percentage improvement: "+percentage)
       if (percentage < 0.001) {
         convergenceCounter += 1
-        println("convergence counter: "+convergenceCounter)
+        System.err.println("convergence counter: "+convergenceCounter)
         if (convergenceCounter > 4) converged = true
       }
       lastLoss = loss
@@ -644,66 +675,31 @@ class GraphStream {
   private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Double = {
     val loss = modelTrainingClone.synchronized {
       if (batchOptimizer == null || clearOptimizer) {
-
-        /*
-        batchOptimizer = new LBFGS() with L2Regularization{
-          variance = 1.0 / l2regularization
-          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
-            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
-            gradient *= (1.0 / graphs.size)
-            super.step(weights, gradient, value / graphs.size)
-          }
-        }
-        */
-
-        /*
-        batchOptimizer = new ConjugateGradient() with L2Regularization{
-          variance = 1.0 / l2regularization
-          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
-            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
-            gradient *= (1.0 / graphs.size)
-            super.step(weights, gradient, value / graphs.size)
-          }
-        }
-        */
-
-        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
-        // with large sparse matrices, when things start to get slow
-
         batchOptimizer = new BatchAdaGrad()
-
-        /*
-        batchOptimizer = new ConstantLearningRate { // InvSqrtTStepSize
-          private var _isConverged = false
-          override def isConverged = _isConverged
-
-          // We just override to put in our regularizer... muahahaha
-          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
-            gradient += (weights, -l2regularization)
-            if (10.0 > gradient.twoNorm) _isConverged = true
-            super.processGradient(weights, gradient)
-          }
-        }
-        */
       }
-
       batchOptimizer.asInstanceOf[BatchAdaGrad]._isConverged = false
       batchOptimizer.asInstanceOf[BatchAdaGrad].l2regularization = l2regularization
 
+      val localWithDomainList = graphs.flatMap(g => {
+        g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
+      })
 
       // Don't want to be doing this part in parallel, things get broken
 
       val likelihoodExamples = model.synchronized {
         for (graph <- graphs) {
           model.warmUpIndexes(graph)
-          modelTrainingClone.warmUpIndexes(graph)
           modelTrainingClone.dotFamilyCache.clear()
         }
 
         val frozenDomainMap = withDomainList.synchronized {
-          withDomainList.map(withDomain => {
+          localWithDomainList.map(withDomain => {
             val newDomain = new CategoricalDomain[String]()
             newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+            /*
+            val featureDomain = new CategoricalDomain[String]()
+            featureDomain.indexAll(withDomain.featureDomain.dimensionDomain.categories.toArray)
+            */
             (withDomain.domain.dimensionDomain, newDomain)
           }).toMap
         }
@@ -729,7 +725,7 @@ class GraphStream {
       weightsReadWriteLock.writeLock().lock()
 
       // Copy over weights from the modelTrainingClone's dotFamilies to the model's dotFamilies
-      for (w <- withDomainList) {
+      for (w <- localWithDomainList) {
         val trainedDotFamily = modelTrainingClone.getDotFamilyWithStatisticsFor(w)
         val untrainedDotFamily = model.getDotFamilyWithStatisticsFor(w)
         if (untrainedDotFamily.weights.value.size == trainedDotFamily.weights.value.size) {
@@ -760,7 +756,7 @@ class GraphStream {
     model.dotFamilyCache.synchronized {
       withDomainList.synchronized {
         for (withDomain <- withDomainList) {
-          if (!model.dotFamilyCache.contains(withDomain)) {
+          if (!model.dotFamilyCache.containsKey(withDomain)) {
             // We ignore these, on the assumption that we don't want to return weights full of zeros for no reason
           }
           else {
@@ -1032,21 +1028,13 @@ class GraphStream {
       }
     }
 
-    val dotFamilyCache : mutable.Map[WithDomain, DotFamily] = mutable.Map()
+    val dotFamilyCache : java.util.IdentityHashMap[WithDomain, DotFamily] = new util.IdentityHashMap[WithDomain, DotFamily]()
     def getDotFamilyWithStatisticsFor(elemType : WithDomain, frozenDomain : Map[CategoricalDomain[String], CategoricalDomain[String]] = null) : DotFamily = {
       dotFamilyCache.synchronized {
-        if (dotFamilyCache.contains(elemType)) {
-          val option = dotFamilyCache.get(elemType)
-          option match {
-            case None =>
-              dotFamilyCache.get(elemType)
-              throw new IllegalStateException()
-            case s : Some[DotFamily] =>
-              return s.get
-          }
-          return dotFamilyCache.get(elemType).get
+        if (dotFamilyCache.containsKey(elemType)) {
+          return dotFamilyCache.get(elemType)
         }
-        if (!dotFamilyCache.contains(elemType)) {
+        if (!dotFamilyCache.containsKey(elemType)) {
           elemType match {
             case factorType: FactorType =>
               factorType.neighborTypes.size match {
@@ -1085,7 +1073,7 @@ class GraphStream {
           }
         }
 
-        val dotFamily = dotFamilyCache.get(elemType).get
+        val dotFamily = dotFamilyCache.get(elemType)
         if (dotFamily == null) throw new IllegalStateException("Shouldn't ever return a null dotFamily")
         dotFamily
       }
@@ -1171,29 +1159,34 @@ class GraphStream {
           }
         }
       }
+      // Pre-warm node values, and node features
       for (node <- graph.nodes) {
-        if (node.features != null) for (featureWeightPair <- node.features) {
-          val oldSize = node.nodeType.featureDomain.length
-          node.nodeType.featureDomain.index(featureWeightPair._1)
-          // Clear cached elements if we change the feature domain size
-          if (node.nodeType.featureDomain.length > oldSize) {
-            dotFamilyCache.synchronized {
-              dotFamilyCache.remove(node.nodeType)
+        if (node.features != null) {
+          for (featureWeightPair <- node.features) {
+            val oldSize = node.nodeType.featureDomain.length
+            node.nodeType.featureDomain.index(featureWeightPair._1)
+            // Clear cached elements if we change the feature domain size
+            if (clearCacheIfSizeChanges && node.nodeType.featureDomain.length > oldSize) {
+              dotFamilyCache.synchronized {
+                dotFamilyCache.remove(node.nodeType)
+              }
             }
           }
         }
-        if (clearCacheIfSizeChanges && node.observedValue != null) {
+        if (node.observedValue != null) {
           node.nodeType.valueDomain.index(node.observedValue)
         }
       }
       for (factor <- graph.factors) {
-        if (factor.features != null) for (featureWeightPair <- factor.features) {
-          val oldSize = factor.factorType.featureDomain.length
-          factor.factorType.featureDomain.index(featureWeightPair._1)
-          // Clear cached elements if we change the feature domain size
-          if (clearCacheIfSizeChanges && factor.factorType.featureDomain.length > oldSize) {
-            dotFamilyCache.synchronized {
-              dotFamilyCache.remove(factor.factorType)
+        if (factor.features != null) {
+          for (featureWeightPair <- factor.features) {
+            val oldSize = factor.factorType.featureDomain.length
+            factor.factorType.featureDomain.index(featureWeightPair._1)
+            // Clear cached elements if we change the feature domain size
+            if (clearCacheIfSizeChanges && factor.factorType.featureDomain.length > oldSize) {
+              dotFamilyCache.synchronized {
+                dotFamilyCache.remove(factor.factorType)
+              }
             }
           }
         }
