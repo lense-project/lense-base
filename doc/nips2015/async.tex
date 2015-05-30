@@ -1,5 +1,64 @@
-\section{Multiple asynchronous requests}
+\section{Choosing when and what to query}
 \label{sec:async}
+
+Our goal is to choose our querying strategy to minimize an arbitrary loss function:
+\[\sL(h_{\text{true}}, h, m, t)\]
+$\sL$ takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.
+ By tweaking $\sL$ practitioners applying our framework can move to arbitrary points on the cost-delay-accuracy tradeoff surface.
+ We deliberately make no assumptions about the form of $\sL$ while developing theory, and demonstrate several choices in our experiments.
+
+Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
+When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmax_{\by} \p(\by \given \bx)$.
+If we performed the measurement operator $\sigma$ and received a measurement $\tau$,
+then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$.
+Intuitively, if we had perfect feedback, observing $\tau$ would provide use more information, reducing our risk.
+However, taking measurements has an associated cost, $C(\sigma)$, a function of time and money that the designer must choose.
+There is also a possibility that the measurement does not return a value (because of a timeout).
+
+Let the CDF be $F_\sigma(t)$.
+We model the utility of a particular measurement operation, given a time window $t_0$ to be:
+\begin{align*}
+U(\sigma)
+&= F_\sigma(t_0) 
+  \E_{p(\tau \given x, \sigma)} \left[\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))] \right]
+  + (1 - F_\sigma(t_0)) 
+    \left[\E_{p(\by \given \bx)}[\ell(\by, \byt)] \right]
+  + C(\sigma).
+\end{align*}
+
+Without loss of generality, assume that the null measurement is free: $C(\sigma_0) = 0$.
+Intuitively, this ensures that we will only ever choose to measure something if the expected reduction in risk is more than the cost of executing the measurement.
+
+Let the label $\by$ have $n$ components: $\by = (y_1, ..., y_n)$.
+Further, let us assume that the loss function $\ell$ decomposes over labels: $\ell(\by, \byt) = \sum_{i=1}^n \ell(y_i, \yt_i)$. 
+Under this assumption, the expected utility of a single measurement operator $\sigma$ can be efficiently computed with $2L$ inference calls\footnote{The marginal inference query in lines 6 and 7 of \algorithmref{expected-utility} can be shared.} to the model using \algorithmref{expected-utility}.
+
+The measurement operator to take is simply $\sigma^* = \argmin_{\sigma \in \Sigma} U(\sigma)$.
+
+\begin{algorithm}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+  \caption{Computing expected utility $U(\sigma)$}
+  \label{algo:expected-utility}
+  \begin{algorithmic}[1]
+    \REQUIRE Measurement operator $\sigma$, input $\bx$, models $p_\theta(\by \given \bx)$ and $p_\theta(\by \given \bx, \tau, \sigma)$, $F_\sigma$ and $t_0$.
+    \ENSURE Expected utility $U(\sigma)$
+    \STATE Let $y_\sigma$ be label(s) measured by operator $\sigma$.
+    \STATE Compute $p_\theta(y_\sigma \given \bx)$ using marginal inference.
+    \STATE Set $p_\theta(\tau \given \bx) \gets p_\theta(\tau \given y_\sigma, \bx) p_\theta(y_\sigma \given \bx)$.
+    \STATE Initialize $u \gets (0, \dots, 0)$.
+    \FORALL{$i \in [L]$}
+    \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
+    \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau = i, \sigma)$ for $j \in [n]$ using marginal inference.
+    \STATE Update $u[i] \gets \p(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
+    \ENDFOR
+    \STATE Return the expected utility: $\frac{\sum_{i=1}^L u[i] p_\theta(\tau = i \given x)}{\sum_{i=1}^L p_\theta(\tau = i \given x)}$
+  \end{algorithmic}
+\end{algorithm}
+
+From a practical perspective, we need to execute multiple queries. We consider this in \sectionref{async}.
+
+
 
 For the system to be real-time, we need to dispatch multiple measurement queries at the same time.
 Let $\sigma_1, \sigma_2, \dots, \sigma_n$ be the set of queries we can dispatch.

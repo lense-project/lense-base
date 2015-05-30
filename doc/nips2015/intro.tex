@@ -19,6 +19,26 @@ Our approach interpolates between these two regimes: we query the crowd in real-
 This results in a system that provides users high quality responses in real-time while starting {\em with no training data}.
 In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
 
+Let us explore an example use-case for such a framework:
+\begin{example*}[Extracting fields from online classifieds]
+  \todo{arun: make sexy!}
+  You wish to create an online classifieds for apartment listings. 
+  Your USP is to automatically identify salient features like the number of bedrooms, housing features, the date of an open house, etc. to allow users to search for listings that match their requirements.
+  A successful service will receive thousands of such postings every day, making manual classification impractical.
+
+  Something about starting with zero training data.
+
+  \todo{arun: maybe the rest of the description of the system is in relation to this example}
+  Using the system described in this paper, you, the owner, need to specify a model to use - in this case, a linear chain conditional random field is relevant.
+  The next challenge is getting data. 
+  On each example we can get crowd workers to identify these features, an easy task for people.
+  There is a variety of tasks that you can ask people - identifying dates might be easier than not. 
+  Could ask people to identify what a particular word, say pool, is.
+  Alternatively, you could ask people to identify the nearest landmark.
+
+  This data incorporated into the system to provide a more accurate labeling in the future.
+\end{example*}
+
 % Cost and Low-latency
 We focus on structured classification problems using conditional exponential families, a general model class that has been used to \todo{citefest}. In such a model, we are given an input, $\bx$, and must predict a number of labels $\by = y_1, \ldots y_n$.
 
