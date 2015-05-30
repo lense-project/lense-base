@@ -1,0 +1,182 @@
+% Macros to help with writing slides
+%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{scabby-diag}
+\typeout{Scabby diagram macros}
+
+\RequirePackage{etoolbox}
+\RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\RequirePackage{graphicx}
+\RequirePackage{mathtools}
+\RequirePackage{calc}
+%\PassOptionsToPackage{customcolors}{hf-tikz}
+%\RequirePackage{hf-tikz}
+
+\newtoggle{debug}
+\togglefalse{debug}
+
+\newtoggle{debugmarks}
+\togglefalse{debugmarks}
+
+\DeclareOption{debug}{\toggletrue{debug}}
+\DeclareOption{debugmarks}{\toggletrue{debugmarks}}
+\ProcessOptions
+
+% Include the right tikz libraries.
+%\usetikzlibrary{calc,patterns,positioning,shapes,shadows,arrows,tikzmark,decorations,decorations.pathreplacing}
+\usetikzlibrary{calc,patterns,positioning,shapes,shadows,arrows,decorations,decorations.pathreplacing}
+
+% Basic macros
+%%%%%%%%%%%%%%%
+\providecommand{\hlmath}[2]{\textrm{\color{#1}\ensuremath{#2}}}
+
+\newcommand{\sidenote}[1]{\begin{itemize} \item #1 \end{itemize}}
+
+\iftoggle{debug}{\newcommand{\@dbgmark}{x}}
+{\newcommand{\@dbgmark}{}}
+
+
+\iftoggle{debug}{\setbeamertemplate{background}[grid][step=0.5cm]}{}
+%\setbeamerfont{alerted text}{fg=black,series=\bfseries}
+
+% Settings
+%%%%%%%%%%%%%%55
+% HF-tikz default settings
+%\hfsetfillcolor{blue!10}
+%\hfsetbordercolor{blue!90}
+
+\pgfplotsset{compat=1.10}
+
+
+%% DRAWING 
+%%%%%%%%%%%%%%%%%
+% Declare the right layers
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{debug}
+\pgfsetlayers{background,main,debug}
+
+% TikZ styles
+\tikzstyle{box}=[scale=0.8,rectangle,fill=white,draw=black]
+\tikzstyle{txt}=[minimum height=6ex]
+\tikzstyle{lbl}=[minimum height=1ex]
+\tikzstyle{loop}=[smooth,dashed,in=-90,out=-90,looseness=0.75]
+
+\tikzstyle{node}=[circle,minimum size=2em,fill=white,draw=black]
+\tikzstyle{obsnode}=[circle,minimum size=2em,fill=gray!50,draw=black]
+\tikzstyle{inactive}=[opacity=0.3]
+
+\newcommand{\point}[2]{%
+  \begin{pgfonlayer}{debug}
+    \node[scale=0.8] (#1) at #2 {\@dbgmark};
+    \iftoggle{debugmarks}{
+      \node[scale=0.5,below=0.1ex of #1] {#1};
+      }{}
+  \end{pgfonlayer}{debug}
+}
+
+% Canvas for drawing
+\newenvironment{canvas}{%
+  \begin{tikzpicture}[remember picture,overlay,trim left=0,x=1cm,y=1cm,shift=(current page.center)]
+  \draw[use as bounding box] (current page.north west) rectangle (current page.south east);
+  \iftoggle{debug}{%
+  \begin{pgfonlayer}{debug}
+    \node[red] at (0,0) {o};
+  \end{pgfonlayer}
+  }{};
+}{
+    \end{tikzpicture}
+}
+
+\tikzset{%
+  remember picture with id/.style={%
+    shift=(current page.center),
+    remember picture,
+    overlay,
+    save picture id=#1,
+  }
+}
+
+% A minipage object for Tikz
+\newcommand{\objw}[2]{%
+    {%
+    \begin{minipage}{#1}
+      #2
+    \end{minipage}
+    }
+}
+\newcommand{\obj}[1]{\objw{6cm}{#1}}
+
+% Common Shapes
+\newcommand*{\tikzrect}[5]{%
+  \node (#1) at #3 {};
+  \draw[#2] #3 -- ++(-#4,0) -- ++(0,-#5) -- ++(#4,0) -- cycle;
+}
+\newcommand*{\tikzcube}[6]{%
+  \node (#1) at #3 {};
+  \draw[#2] #3 -- ++(-#4,0,0) -- ++(0,-#5,0) -- ++(#4,0,0) -- cycle;
+  \draw[#2] #3 -- ++(0,0,-#6) -- ++(0,-#5,0) -- ++(0,0,#6) -- cycle;
+  \draw[#2] #3 -- ++(-#4,0,0) -- ++(0,0,-#6) -- ++(#4,0,0) -- cycle;
+}
+
+\newcommand{\tensorfiber}[3]{%
+  \point{#1}{#3}
+  \tikzcube{#1-a}{#2}{($(#1)$)}{1}{0.3}{0.3};
+  \tikzcube{#1-b}{#2}{($(#1)$)}{0.3}{1}{0.3};
+  \tikzcube{#1-c}{#2}{($(#1)$)}{0.3}{0.3}{1};
+}
+
+\newcommand{\matfiber}[3]{%
+  \point{#1}{#3}
+  \tikzrect{#1-a}{#2}{($(#1)$)}{1}{0.3};
+  \tikzrect{#1-b}{#2}{($(#1)$)}{0.3}{1};
+}
+
+% LAYOUTS
+%%%%%%%%%%%%%%%%%
+\newcommand{\splitcolumn}[2]{%
+\begin{columns}[onlytextwidth]
+  \begin{column}{0.48\textwidth}
+    #1
+  \end{column}
+  \hfill
+  \begin{column}{0.48\textwidth}
+    #2
+  \end{column}
+\end{columns}
+}
+
+\newcommand{\withrmargin}[2]{%
+\begin{columns}[onlytextwidth]
+  \begin{column}{0.68\textwidth}
+    #1
+  \end{column}
+  \hfill
+  \begin{column}{0.28\textwidth}
+    #2
+  \end{column}
+\end{columns}
+}
+
+% Convenient
+%%%%%%%%%%%%%%%%%
+\newcommand*{\textmr}[1]{\textrm{\color{red}#1}}
+\newcommand*{\textmb}[1]{\textrm{\color{blue}#1}}
+\newcommand*{\textmg}[1]{\textrm{\color{DarkGreen}#1}}
+\newcommand*{\mathmr}[1]{\color{red}#1}
+\newcommand*{\mathmb}[1]{\color{blue}#1}
+\newcommand*{\mathmg}[1]{\color{DarkGreen}#1}
+\newcommand*{\ub}{\underbrace}
+\newcommand*{\ob}{\overbrace}
+
+% Hacks
+%%%%%%%%%%%%%%%%%
+\newcommand{\maxwidthof}[2]{\maxof{\widthof{#1}}{\widthof{#2}}}
+\newcommand{\maxwidthofm}[2]{\maxof{\widthof{$#1$}}{\widthof{$#2$}}}
+\newcommand{\mboxg}[2]{%
+  \tikzmarkin[set fill color=green!10,set border color=green!70]{#1}#2\tikzmarkend{#1}
+}
+\newcommand{\mboxb}[2]{%
+  \tikzmarkin[set fill color=blue!10,set border color=blue!70]{#1}#2\tikzmarkend{#1}
+}
+
