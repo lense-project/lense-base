@@ -1,0 +1,43 @@
+% vim:ft=tex
+\documentclass[tikz,convert={outfile=hmm.pdf}]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usepackage{scabby-diag}
+
+\begin{document}
+
+\begin{tikzpicture}
+
+% Hidden nodes
+   \node[style=node, scale=0.8] (h1) at (0,0) {$h_1$};
+   \node[style=node, scale=0.8, right= 0.5cm of h1] (h2) {$h_2$};
+   \node[style=node, scale=0.8, right= 0.5cm of h2] (h3) {$h_3$};
+   \node[scale=0.8, right= 0.5cm of h3] (h4) {$\ldots$};
+
+   \draw[-latex] (h1) -- (h2);
+   \draw[-latex] (h2) -- (h3);
+   \draw[-latex] (h3) -- (h4);
+
+% Observed nodes
+   \node[style=obsnode, scale=0.7, below=0.3cm of h1] (x1) {$x_1$};
+   \draw[-latex] (h1) -- (x1);
+
+   \node[style=obsnode, scale=0.7, below=0.3cm of h2] (x2) {$x_2$};
+   \draw[-latex] (h2) -- (x2);
+
+   \node[style=obsnode, scale=0.7, below=0.3cm of h3] (x3) {$x_3$};
+   \draw[-latex] (h3) -- (x3);
+
+%\begin{pgfonlayer}{background}
+%\draw[rounded corners,line width=1pt, dotted, black] 
+%                ($(h2.north east) + (45:0.2cm)$) -- 
+%                ($(x3.north east) + (45:0.2cm)$) -- 
+%                ($(x3.south east) + (-45:0.2cm)$) -- 
+%                ($(x1.south west) + (-135:0.2cm)$) -- 
+%                ($(x1.north west) + (135:0.2cm)$) -- 
+%                ($(h2.north west) + (135:0.2cm)$) -- 
+%                cycle;
+%\end{pgfonlayer}
+
+\end{tikzpicture}
+
+\end{document}

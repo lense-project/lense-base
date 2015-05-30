@@ -1,0 +1,38 @@
+\section{Modeling human error}
+\label{sec:human-error}
+
+Accurately identifying and hence modeling labeling noise is important if we would like to maximize the information we can get from labelers.
+
+
+\todo{(arun): rewrite}
+
+Our learner will be allowed to query humans for additional certainty about individual random variables (nodes) $X_i$.
+ Humans will exist in a pool $\sP$.
+ An individual human $o_i \in \sP$ (for ``oracle'', using the loosest possible definition of oracle) has a model for expected behavior.
+Our learner will be allowed to query humans for additional certainty about individual random variables (nodes) $X_i$.
+ Humans will exist in a pool $\sP$.
+ An individual human $o_i \in \sP$ (for ``oracle'', using the loosest possible definition of oracle) has a model for expected behavior. Specifically, we model the $o_i$ expected delay to respond to a question, and the error function (i.e. response given the true state of the world $h_{\text{true}}$).
+
+For this work we use a simplified model of error, shared uniformly across crowd workers.
+ Previous work \cite{yan2011active} \cite{donmez2008proactive} \cite{golovin2010near} has shown that in an offline setting treating oracles uniformly leads to a loss, but in practice our pool is churning so quickly that we don't have time to learn accurate distinctions between workers.
+ We leave a solution to this problem to future work.
+
+When asked about variable $X_j$, human error is modeled as correct (returns $h_{\text{true}}(X_j)$) with probability $1-\epsilon$, and chosen uniformly at random from $D_j$ with probability $\epsilon$.
+ We use the notation $Q(o_i, X_j)$ to denote the response from asking human $i$ about random variable $j$.
+
+\begin{equation}
+    Q(o_i, X_j) \sim
+    \begin{cases}
+       \text{uniformly drawn from } D_j = \{1 \ldots K_j\}, & \text{with probability}\ \epsilon \\
+      h_{\text{true}}(X_j), & \text{otherwise}
+    \end{cases}
+ \end{equation}
+ 
+This answer arrives after a delay.
+ We model the amount of time the worker takes to answer with a gaussian, parameterized by $\mu$ and $\sigma$.
+ We use the notation $\sD(o_i, X_j)$ to denote the delay in response when asking human $i$ about random variable $j$.
+
+\[\sD(o_i, X_j) \sim \sN(\mu, \sigma^2)\]
+
+This is an imperfect model, since it assigns some mass to a negative response time, which is impossible, but given a large $\mu$ and relatively small $\sigma$ the mass assigned to $\sD(o_i, X_j) < 0$ is negligible, and it otherwise accurately reflects human response times.
+
