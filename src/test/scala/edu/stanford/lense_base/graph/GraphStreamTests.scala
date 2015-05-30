@@ -111,6 +111,33 @@ object EpsilonLearn extends App {
   println(nodeType.weights)
 }
 
+object EMLearning extends App {
+  val s = new GraphStream()
+  val t = s.makeNodeType(Set("true", "false"), Map("true" -> Map("Feature1" -> 1.0)))
+  val f = s.makeFactorType(List(t,t))
+
+  val rand : Random = new Random()
+
+  val g = s.newGraph()
+  val node1 = g.makeNode(t, Map("Feature1" -> 1.0), observedValue = "true")
+  val node2 = g.makeNode(t, Map("Feature1" -> -1.0))
+  val factor = g.makeFactor(f, List(node1,node2))
+
+  val factorMarginals = g.factorsMarginalEstimate()
+
+  println(g.factorsMarginalEstimate())
+
+  s.learn(List(g))
+
+  println(f)
+  println(t)
+
+  println(s.model.getDotFamilyWithStatisticsFor(t).weights.value)
+  println(g.mapEstimate())
+
+  println(g.factorsMarginalEstimate())
+}
+
 object FeatureLearnClone extends App {
 
   val s = new GraphStream()

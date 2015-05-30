@@ -159,8 +159,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     }.toMap
   }
 
-  /*
-  def edgesMarginalEstimate(): Map[GraphFactor, Map[String,Double]] = {
+  def factorsMarginalEstimate(): Map[GraphFactor, Map[List[String],Double]] = {
     setObservedVariablesForFactorie()
     val variables = unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
@@ -197,22 +196,40 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     // END SYNCHRONIZED SECTION
     ////////////////////////////
 
-    sumMarginal.factorMarginals.foreach(f => {
-      f.tensorStatistics.expNormalized
-    })
+    sumMarginal.factorMarginals.map(f => {
+      (f, factors.filter(factor => {
+        val featureVariable = stream.model.getFeatureVariableFor(factor, null)
+        val variables = factor.nodeList.map(_.variable)
+        val factorVariables = f.factor.variables.slice(0, f.factor.variables.size-1)
+        factorVariables == variables
+      }))
+    }).filter(_._2.size == 1).map(pair => (pair._2.head, pair._1.tensorStatistics)).map(pair => {
+      val factor = pair._1
+      val tensor = pair._2
+      val tensorArray = tensor.toArray
 
-    variables.filter(_.node.observedValue == null).map{
-      case nodeVar : NodeVariable =>
-        // Create node -> [value,score] pair for map
-        nodeVar.node -> {
-          val props : Array[Double] = sumMarginal.getMarginal(nodeVar).get.asInstanceOf[DiscreteMarginal1[NodeVariable]].proportions.toArray
-          props.zipWithIndex.map(scoreIndexPair => {
-            nodeVar.node.nodeType.valueDomain.category(scoreIndexPair._2) -> scoreIndexPair._1
+      val marginals = factor.nodeList.size match {
+        case 1 =>
+          throw new IllegalStateException("Not yet supported")
+        case 2 =>
+          val domainSize = factor.nodeList(0).nodeType.valueDomain.size
+          factor.nodeList(0).nodeType.valueDomain.categories.flatMap(cat1 => {
+            val i1 = factor.nodeList(0).nodeType.valueDomain.index(cat1)
+            factor.nodeList(1).nodeType.valueDomain.categories.map(cat2 => {
+              val i2 = factor.nodeList(0).nodeType.valueDomain.index(cat2)
+              val i = (i1*domainSize) + i2
+              val key = List(cat1, cat2)
+              val v = tensorArray(i)
+              // key value pair
+              key -> v
+            })
           }).toMap
-        }
-    }.toMap
+        case 3 =>
+          throw new IllegalStateException("Not yet supported")
+      }
+      (factor, marginals)
+    }).toMap
   }
-  */
 
   def marginalEstimate(): Map[GraphNode, Map[String,Double]] = {
     setObservedVariablesForFactorie()
@@ -312,6 +329,31 @@ case class FactorType(stream : GraphStream, neighborTypes : List[NodeType], var 
 
   override def hashCode : Int = neighborTypes.hashCode()
 
+  def possibleValues : Set[List[String]] = {
+    if (neighborTypes.size == 1) {
+      neighborTypes(0).possibleValues.map(v => List(v))
+    }
+    else if (neighborTypes.size == 2) {
+      neighborTypes(0).possibleValues.flatMap(v1 => {
+        neighborTypes(1).possibleValues.map(v2 => {
+          List(v1,v2)
+        })
+      })
+    }
+    else if (neighborTypes.size == 3) {
+      neighborTypes(0).possibleValues.flatMap(v1 => {
+        neighborTypes(1).possibleValues.flatMap(v2 => {
+          neighborTypes(2).possibleValues.map(v3 => {
+            List(v1, v2, v3)
+          })
+        })
+      })
+    }
+    else {
+      throw new IllegalStateException("Factor has the wrong number of neighbors")
+    }
+  }
+
   def setWeights(newWeights : Map[List[String],Map[String,Double]]) = {
     weights = newWeights
     stream.model.synchronized {
@@ -372,6 +414,286 @@ class GraphStream {
       node.observedValue == null
     }))) learnEM(graphs, clearOptimizer)
     else learnFullyObserved(graphs, l2regularization, clearOptimizer)
+
+    finalLoss
+  }
+
+  // performs EM on the graph. Still massively TODO
+
+  private def learnEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
+    val nodeTypes = graphs.flatMap(_.nodes.map(_.nodeType)).toList.distinct
+    val factorTypes = graphs.flatMap(_.factors.map(_.factorType)).toList.distinct
+
+    for (i <- 0 to 100) {
+
+      // Create blank weight sets
+
+      val nodeTypeAverage = mutable.Map[NodeType, Map[String, mutable.Map[String,Double]]]()
+      val nodeTypeCounts = mutable.Map[NodeType, Int]()
+
+      val factorTypeAverage = mutable.Map[FactorType, Map[List[String], mutable.Map[String,Double]]]()
+      val factorTypeCounts = mutable.Map[FactorType, Int]()
+
+      // Initialize the weight sets with all zeros
+
+      nodeTypeCounts ++= nodeTypes.map(nt => (nt, 0))
+      factorTypeCounts ++= factorTypes.map(ft => (ft, 0))
+
+      // Collect average marginals over all graphs
+
+      for (graph <- graphs) {
+        val nodeMarginals = graph.marginalEstimate()
+        val factorMarginals = graph.factorsMarginalEstimate()
+
+        // Node marginals
+
+        nodeMarginals.foreach(pair => {
+          val node = pair._1
+          val nt = node.nodeType
+          nodeTypeCounts.put(nt, nodeTypeCounts(nt) + 1)
+
+          if (!nodeTypeAverage.contains(nt)) nodeTypeAverage.put(nt, nt.possibleValues.map(value => (value, mutable.Map[String,Double]())).toMap)
+          val nodeAverage = nodeTypeAverage(nt)
+
+          for (valueWithProb <- pair._2) {
+            val value = valueWithProb._1
+            val prob = valueWithProb._2
+
+            val mutableWeightsAverageMap = nodeAverage(value)
+            for (featureWithWeight <- node.features) {
+              val feature = featureWithWeight._1
+              val weight = featureWithWeight._2
+
+              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + prob*Math.exp(weight))
+            }
+          }
+        })
+
+        // Factor marginals
+
+        factorMarginals.foreach(pair => {
+          val factor = pair._1
+          val ft = factor.factorType
+          factorTypeCounts.put(ft, factorTypeCounts(ft) + 1)
+
+          if (!factorTypeAverage.contains(ft)) factorTypeAverage.put(ft, ft.possibleValues.map(value => (value,mutable.Map[String,Double]())).toMap)
+          val factorAverage = factorTypeAverage(ft)
+
+          for (valueWithProb <- pair._2) {
+            val value = valueWithProb._1
+            val prob = valueWithProb._2
+
+            val mutableWeightsAverageMap = factorAverage(value)
+            for (featureWithWeight <- factor.features) {
+              val feature = featureWithWeight._1
+              val weight = featureWithWeight._2
+
+              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + prob*Math.exp(weight))
+            }
+          }
+        })
+      }
+
+      // Done collecting marginals
+
+      for (pair <- nodeTypeAverage) {
+        val nt = pair._1
+        val unnormalizedAverage = pair._2
+        val normalizedAverage = unnormalizedAverage.map(assignmentAvg => {
+          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / nodeTypeCounts.getOrElse(nt, 1))))
+        })
+
+        if (nt.weights == null) {
+          nt.weights = normalizedAverage.map(assignmentAvg => {
+            (assignmentAvg._1, assignmentAvg._2.toMap)
+          })
+        }
+        else {
+          nt.weights = nt.weights.map(oldWeights => {
+            (oldWeights._1, oldWeights._2.map(q => {
+              (q._1, q._2 + normalizedAverage.getOrElse(oldWeights._1, Map[String,Double]()).getOrElse(q._1, 0.0))
+            }))
+          })
+        }
+      }
+
+      for (pair <- factorTypeAverage) {
+        val ft = pair._1
+        val unnormalizedAverage = pair._2
+        val normalizedAverage = unnormalizedAverage.map(assignmentAvg => {
+          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / factorTypeCounts.getOrElse(ft, 1))))
+        })
+
+        if (ft.weights == null) {
+          ft.weights = normalizedAverage.map(assignmentAvg => {
+            (assignmentAvg._1, assignmentAvg._2.toMap)
+          })
+        }
+        else {
+          ft.weights = ft.weights.map(oldWeights => {
+            (oldWeights._1, oldWeights._2.map(q => {
+              (q._1, q._2 + normalizedAverage.getOrElse(oldWeights._1, Map[String,Double]()).getOrElse(q._1, 0.0))
+            }))
+          })
+        }
+      }
+
+      println(nodeTypes)
+    }
+
+    // Force a regeneration of the dotFamilyCache
+    model.dotFamilyCache.synchronized {
+      model.dotFamilyCache.clear()
+    }
+
+    0.0
+  }
+
+  private def onlineEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
+    throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
+  }
+
+  var onlineOptimizer : GradientOptimizer = null
+  private def onlineUpdateFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Double = {
+    if (onlineOptimizer == null || clearOptimizer) {
+      onlineOptimizer = new AdaGrad()
+    }
+    // Don't want to be doing this part in parallel, things get broken
+    for (graph <- graphs) {
+      model.warmUpIndexes(graph)
+    }
+
+    val likelihoodExamples = graphs.map(graph => {
+      graph.setObservedVariablesForFactorie()
+      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
+    }).toSeq
+
+    val trainer = new OnlineTrainer(model.parameters, onlineOptimizer, maxIterations = 100)
+    trainer.processExamples(likelihoodExamples)
+
+    val value = new SynchronizedDoubleAccumulator()
+    for (likelihoodExample <- likelihoodExamples) {
+      likelihoodExample.accumulateValueAndGradient(value, null)
+    }
+    value.l.value
+  }
+
+  // This will learn just Weight() values from the fully observed values in the graphs
+
+  var batchOptimizer : GradientOptimizer = null
+  private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Double = {
+    val loss = modelTrainingClone.synchronized {
+      if (batchOptimizer == null || clearOptimizer) {
+
+        /*
+        batchOptimizer = new LBFGS() with L2Regularization{
+          variance = 1.0 / l2regularization
+          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
+            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
+            gradient *= (1.0 / graphs.size)
+            super.step(weights, gradient, value / graphs.size)
+          }
+        }
+        */
+
+        /*
+        batchOptimizer = new ConjugateGradient() with L2Regularization{
+          variance = 1.0 / l2regularization
+          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
+            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
+            gradient *= (1.0 / graphs.size)
+            super.step(weights, gradient, value / graphs.size)
+          }
+        }
+        */
+
+        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
+        // with large sparse matrices, when things start to get slow
+
+        batchOptimizer = new BatchAdaGrad()
+
+        /*
+        batchOptimizer = new ConstantLearningRate { // InvSqrtTStepSize
+          private var _isConverged = false
+          override def isConverged = _isConverged
+
+          // We just override to put in our regularizer... muahahaha
+          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
+            gradient += (weights, -l2regularization)
+            if (10.0 > gradient.twoNorm) _isConverged = true
+            super.processGradient(weights, gradient)
+          }
+        }
+        */
+      }
+
+      batchOptimizer.asInstanceOf[BatchAdaGrad]._isConverged = false
+      batchOptimizer.asInstanceOf[BatchAdaGrad].l2regularization = l2regularization
+
+
+      // Don't want to be doing this part in parallel, things get broken
+
+      val likelihoodExamples = model.synchronized {
+        for (graph <- graphs) {
+          model.warmUpIndexes(graph)
+          modelTrainingClone.warmUpIndexes(graph)
+          modelTrainingClone.dotFamilyCache.clear()
+        }
+
+        val frozenDomainMap = withDomainList.synchronized {
+          withDomainList.map(withDomain => {
+            val newDomain = new CategoricalDomain[String]()
+            newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+            (withDomain.domain.dimensionDomain, newDomain)
+          }).toMap
+        }
+
+        graphs.map(graph => {
+          graph.setObservedVariablesForFactorie()
+          val nodeVariables = graph.allVariablesForFactorie()
+          for (nodeVariable <- nodeVariables) {
+            nodeVariable.frozenDomainMap = frozenDomainMap
+          }
+          new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+        }).toSeq
+      }
+
+      // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
+
+      // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
+      // trainer.trainFromExamples(likelihoodExamples)
+
+      ////////////////////////////
+      // SYNCHRONIZED SECTION
+      weightsReadWriteLock.writeLock().lock()
+
+      // Copy over weights from the modelTrainingClone's dotFamilies to the model's dotFamilies
+      for (w <- withDomainList) {
+        val trainedDotFamily = modelTrainingClone.getDotFamilyWithStatisticsFor(w)
+        val untrainedDotFamily = model.getDotFamilyWithStatisticsFor(w)
+        if (untrainedDotFamily.weights.value.size == trainedDotFamily.weights.value.size) {
+          untrainedDotFamily.weights.value := trainedDotFamily.weights.value
+        }
+        else {
+          println("Tensors are different size now")
+        }
+      }
+
+      weightsReadWriteLock.writeLock().unlock()
+      // END SYNCHRONIZED SECTION
+      ////////////////////////////
+
+      val value = new SynchronizedDoubleAccumulator()
+      for (likelihoodExample <- likelihoodExamples) {
+        likelihoodExample.accumulateValueAndGradient(value, null)
+      }
+      val regularizer = - (modelTrainingClone.parameters.dot(modelTrainingClone.parameters) * l2regularization / 2)
+      println("SYSTEM RETURN REGULARIZER: "+regularizer)
+      println("SYSTEM RETURN VALUE: "+value.l.value)
+      println("SYSTEM RETURN VALUE+REGURLAIZER: "+(value.l.value+regularizer))
+      value.l.value + regularizer
+    }
 
     // Now we need to decode the weights
 
@@ -487,161 +809,7 @@ class GraphStream {
         }
       }
     }
-
-    finalLoss
-  }
-
-  // performs EM on the graph. Still massively TODO
-
-  private def learnEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
-    throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
-  }
-
-  private def onlineEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
-    throw new UnsupportedOperationException("We don't yet support EM. Make sure all your variables have observed values.")
-  }
-
-  var onlineOptimizer : GradientOptimizer = null
-  private def onlineUpdateFullyObserved(graphs : Iterable[Graph], regularization : Double, clearOptimizer : Boolean = true): Double = {
-    if (onlineOptimizer == null || clearOptimizer) {
-      onlineOptimizer = new AdaGrad()
-    }
-    // Don't want to be doing this part in parallel, things get broken
-    for (graph <- graphs) {
-      model.warmUpIndexes(graph)
-    }
-
-    val likelihoodExamples = graphs.map(graph => {
-      graph.setObservedVariablesForFactorie()
-      new LikelihoodExample(graph.allVariablesForFactorie(), model, InferByBPChain)
-    }).toSeq
-
-    val trainer = new OnlineTrainer(model.parameters, onlineOptimizer, maxIterations = 100)
-    trainer.processExamples(likelihoodExamples)
-
-    val value = new SynchronizedDoubleAccumulator()
-    for (likelihoodExample <- likelihoodExamples) {
-      likelihoodExample.accumulateValueAndGradient(value, null)
-    }
-    value.l.value
-  }
-
-  // This will learn just Weight() values from the fully observed values in the graphs
-
-  var batchOptimizer : GradientOptimizer = null
-  private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Double = {
-    modelTrainingClone.synchronized {
-      if (batchOptimizer == null || clearOptimizer) {
-
-        /*
-        batchOptimizer = new LBFGS() with L2Regularization{
-          variance = 1.0 / l2regularization
-          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
-            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
-            gradient *= (1.0 / graphs.size)
-            super.step(weights, gradient, value / graphs.size)
-          }
-        }
-        */
-
-        /*
-        batchOptimizer = new ConjugateGradient() with L2Regularization{
-          variance = 1.0 / l2regularization
-          override def step(weights: WeightsSet, gradient: WeightsMap, value: Double): Unit = {
-            // Make sure more examples don't linearly overwhelm the gradient, by normalizing based on num examples
-            gradient *= (1.0 / graphs.size)
-            super.step(weights, gradient, value / graphs.size)
-          }
-        }
-        */
-
-        // Consider also ConstantLearningRate() and AdaGrad() or AdaMira() for faster alternatives
-        // with large sparse matrices, when things start to get slow
-
-        batchOptimizer = new BatchAdaGrad()
-
-        /*
-        batchOptimizer = new ConstantLearningRate { // InvSqrtTStepSize
-          private var _isConverged = false
-          override def isConverged = _isConverged
-
-          // We just override to put in our regularizer... muahahaha
-          override def processGradient(weights: WeightsSet, gradient: WeightsMap): Unit = {
-            gradient += (weights, -l2regularization)
-            if (10.0 > gradient.twoNorm) _isConverged = true
-            super.processGradient(weights, gradient)
-          }
-        }
-        */
-      }
-
-      batchOptimizer.asInstanceOf[BatchAdaGrad]._isConverged = false
-      batchOptimizer.asInstanceOf[BatchAdaGrad].l2regularization = l2regularization
-
-
-      // Don't want to be doing this part in parallel, things get broken
-
-      val likelihoodExamples = model.synchronized {
-        for (graph <- graphs) {
-          model.warmUpIndexes(graph)
-          modelTrainingClone.warmUpIndexes(graph)
-          modelTrainingClone.dotFamilyCache.clear()
-        }
-
-        val frozenDomainMap = withDomainList.synchronized {
-          withDomainList.map(withDomain => {
-            val newDomain = new CategoricalDomain[String]()
-            newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
-            (withDomain.domain.dimensionDomain, newDomain)
-          }).toMap
-        }
-
-        graphs.map(graph => {
-          graph.setObservedVariablesForFactorie()
-          val nodeVariables = graph.allVariablesForFactorie()
-          for (nodeVariable <- nodeVariables) {
-            nodeVariable.frozenDomainMap = frozenDomainMap
-          }
-          new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
-        }).toSeq
-      }
-
-      // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
-
-      // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
-      // trainer.trainFromExamples(likelihoodExamples)
-
-      ////////////////////////////
-      // SYNCHRONIZED SECTION
-      weightsReadWriteLock.writeLock().lock()
-
-      // Copy over weights from the modelTrainingClone's dotFamilies to the model's dotFamilies
-      for (w <- withDomainList) {
-        val trainedDotFamily = modelTrainingClone.getDotFamilyWithStatisticsFor(w)
-        val untrainedDotFamily = model.getDotFamilyWithStatisticsFor(w)
-        if (untrainedDotFamily.weights.value.size == trainedDotFamily.weights.value.size) {
-          untrainedDotFamily.weights.value := trainedDotFamily.weights.value
-        }
-        else {
-          println("Tensors are different size now")
-        }
-      }
-
-      weightsReadWriteLock.writeLock().unlock()
-      // END SYNCHRONIZED SECTION
-      ////////////////////////////
-
-      val value = new SynchronizedDoubleAccumulator()
-      for (likelihoodExample <- likelihoodExamples) {
-        likelihoodExample.accumulateValueAndGradient(value, null)
-      }
-      val regularizer = - (modelTrainingClone.parameters.dot(modelTrainingClone.parameters) * l2regularization / 2)
-      println("SYSTEM RETURN REGULARIZER: "+regularizer)
-      println("SYSTEM RETURN VALUE: "+value.l.value)
-      println("SYSTEM RETURN VALUE+REGURLAIZER: "+(value.l.value+regularizer))
-      value.l.value + regularizer
-    }
+    loss
   }
 
 
