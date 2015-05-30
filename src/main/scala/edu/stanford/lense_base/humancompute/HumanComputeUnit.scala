@@ -1,6 +1,7 @@
 package edu.stanford.lense_base.humancompute
 
 import edu.stanford.lense_base.graph.GraphNode
+import edu.stanford.lense_base.models.ModelVariable
 import edu.stanford.lense_base.server.WebWorkUnit
 
 import scala.collection.mutable
@@ -94,24 +95,24 @@ trait HumanComputeUnit {
     if (currentWork == null) 0
     else {
       val elapsedTime = System.currentTimeMillis() - startedWorkMillis
-      Math.max(0, estimateRequiredTimeToFinishItem(currentWork.graphNode) - elapsedTime)
+      Math.max(0, estimateRequiredTimeToFinishItem(currentWork.variable) - elapsedTime)
     }
   }
 
   def estimateTimeToFinishQueue : Long = {
     workQueue.synchronized {
-      estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.graphNode)).sum
+      estimateTimeToFinishCurrentItem + workQueue.map(work => estimateRequiredTimeToFinishItem(work.variable)).sum
     }
   }
 
-  def estimateRequiredTimeIncludingQueue(node : GraphNode) : Long = {
-    estimateRequiredTimeToFinishItem(node) + estimateTimeToFinishQueue
+  def estimateRequiredTimeIncludingQueue(variable : ModelVariable) : Long = {
+    estimateRequiredTimeToFinishItem(variable) + estimateTimeToFinishQueue
   }
 
   def getName : String
 
   // Gets the estimated required time to perform this task, in milliseconds
-  def estimateRequiredTimeToFinishItem(node : GraphNode) : Long
+  def estimateRequiredTimeToFinishItem(variable : ModelVariable) : Long
   // Kick off a job
   def startWork(workUnit : WorkUnit)
   // Cancel the current job

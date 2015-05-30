@@ -7,7 +7,7 @@ FIGURES = $(wildcard figures/*.tikz)
 all: $(OUTPUT).pdf
 
 $(OUTPUT).pdf: paper.tex $(SECTIONS) $(FIGURES)
-	#make -C figures
+	make -C figures
 	$(LATEX) $<
 	mv $(subst .tex,.pdf,$<) $@
 

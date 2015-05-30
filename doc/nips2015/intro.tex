@@ -1,4 +1,11 @@
+
 \section{Introduction}
+
+\begin{epigraph}
+``It ain't what you don't know that gets you into trouble.\\
+It's what you know for sure that just ain't so.'' \\
+-- Mark Twain
+\end{epigraph}
 
 For the practitioner, supervised learning is largely a solved problem and software to efficiently train classifiers in a variety of domains is readily available.
 Yet, adoption remains limited because the deployment of a learning system requires extremely accurate classifiers: mistakes cost business.
@@ -23,6 +30,8 @@ Similarly, observing a label from one worker lets us decide better which label t
 We propose an active classification approach using Bayesian decision theory that is able to make these complex behavioral decisions.
 This quickly leads to an intractable optimization problem that grows exponentially in complexity with the number of label queries we might ask on a single example.
 We propose a novel approximation based on Monte Carlo tree search that retains the behavior of the original Bayesian approach while being computationally tractable.
+
+\todo{(arun): We should make the distinction with active learning much stronger since that's what everyone thinks we're doing. I've moved the related work section to the latter parts because I feel like it's easier to compare our work with existing work given our model.} 
 
 Finally, in practice, labels from crowd workers are often inaccurate.
 We use the measurements framework of Liang et.\ al\cite{liang09measurements} to incorporate noisy responses from crowdworkers in our model.

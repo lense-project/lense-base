@@ -6,6 +6,8 @@ import java.net.URL
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
+import edu.stanford.lense_base.models.{LogisticExternalModelStream, ModelStream, ModelVariable}
 
 import scala.io.Source
 import scala.util.Random
@@ -24,13 +26,23 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   lazy val trainSet : List[(PersonImage,String)] = List()
   lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d))
 
-  override def labelTypes: Set[String] = celebrities.toSet
+  override def labelTypes: List[String] = celebrities
 
-  override def getFeatures(input: PersonImage): Map[String, Double] = {
-    val features = input.embedding.zipWithIndex.map(pair => {
-      "nn:"+pair._2 -> pair._1
-    }).toMap
-    features
+  // Sets up the model we'll be using
+
+  val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution) {
+    override def getFeatures(input: PersonImage): Map[String, Double] = {
+      val features = input.embedding.zipWithIndex.map(pair => {
+        "nn:"+pair._2 -> pair._1
+      }).toMap
+      features
+    }
+
+    /**
+     * Defines the possible output values of the model
+     * @return
+     */
+    override def possibleValues: List[String] = labelTypes.toList
   }
 
   def loadDatabase() : List[PersonImage] = {
@@ -77,6 +89,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
       bw.close()
     }
   }
+  override def getModelStream: ModelStream = logisticModelStream
 
   def getCelebritiesSet(names : List[String]) : List[PersonImage] = {
     val allImages = loadDatabase()
@@ -101,11 +114,9 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * TODO: more docs here
    *
    * @param mostLikelyGuesses
-   * @param cost
-   * @param ms
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
+  override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
   }
 
@@ -125,9 +136,6 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 20.0
-
-  // Change the Tuning settings to get better classifier accuracy
-  override def useKNNTuning : Boolean = false
 
   override def gamePlayer : GamePlayer = ThresholdHeuristic
 }

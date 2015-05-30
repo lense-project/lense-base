@@ -1,4 +1,4 @@
-package edu.stanford.lense_base
+package edu.stanford.lense_base.humancompute
 
 import scala.io.Source
 import scala.util.Random

@@ -111,6 +111,33 @@ object EpsilonLearn extends App {
   println(nodeType.weights)
 }
 
+object EMLearning extends App {
+  val s = new GraphStream()
+  val t = s.makeNodeType(Set("true", "false"), Map("true" -> Map("Feature1" -> 1.0)))
+  val f = s.makeFactorType(List(t,t))
+
+  val rand : Random = new Random()
+
+  val g = s.newGraph()
+  val node1 = g.makeNode(t, Map("Feature1" -> 1.0), observedValue = "true")
+  val node2 = g.makeNode(t, Map("Feature1" -> -1.0))
+  val factor = g.makeFactor(f, List(node1,node2))
+
+  val factorMarginals = g.factorsMarginalEstimate()
+
+  println(g.factorsMarginalEstimate())
+
+  s.learn(List(g))
+
+  println(f)
+  println(t)
+
+  println(s.model.getDotFamilyWithStatisticsFor(t).weights.value)
+  println(g.mapEstimate())
+
+  println(g.factorsMarginalEstimate())
+}
+
 object FeatureLearnClone extends App {
 
   val s = new GraphStream()
@@ -133,62 +160,6 @@ object FeatureLearnClone extends App {
   s.learn(examples)
 
   println(t.weights)
-}
-
-object KNNMarginalization extends App {
-  val s = new GraphStream()
-
-  val t = s.makeNodeType(Set("0","ORG"))
-
-  val stubTrainingList = List(
-    ("EU", "NN", "ORG"),
-    ("rejects", "VBZ", "0"),
-    ("German", "NN", "ORG"),
-    ("call", "VBZ", "0"),
-    ("to", "PP", "0"),
-    ("boycott", "NN", "0"),
-    ("British", "NN", "ORG"),
-    ("lamb", "NN", "0")
-  )
-
-  var longTrainingList = ListBuffer[(String,String,String)]()
-  for (i <- 0 to 5) {
-    longTrainingList ++= stubTrainingList
-  }
-
-  val graphs = longTrainingList.map(triplet => {
-    val graph = s.newGraph()
-    val node = graph.makeNode(t,
-      Map(
-        "token:"+triplet._1 -> 1.0,
-        "pos:"+triplet._2 -> 1.0
-      ),
-      observedValue = triplet._3
-    )
-    graph
-  })
-
-  val testGraph = graphs.head
-
-  s.learn(graphs, useKNNTuning = true)
-
-  val factors = s.model.factors(testGraph.allVariablesForFactorie())
-
-  for (classWeights <- t.weights) {
-    println(classWeights)
-  }
-
-  stubTrainingList.foreach(triplet => {
-    val graph = s.newGraph()
-    val node = graph.makeNode(t,
-      Map(
-        "token:"+triplet._1 -> 1.0,
-        "pos:"+triplet._2 -> 1.0
-      )
-    )
-    val marginal = graph.marginalEstimate(useKNNTuning = true)
-    println(triplet._1+":"+triplet._3+" -> guessed -> "+marginal)
-  })
 }
 
 object MapLearn extends App {

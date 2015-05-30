@@ -1,7 +1,8 @@
 package edu.stanford.lense_base.gameplaying
 
 import edu.stanford.lense_base.graph.{Graph, GraphNode, GraphStream}
-import edu.stanford.lense_base.{ArtificialHCUPool, LenseEngine, ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution}
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.{ArtificialHCUPool, LenseEngine}
 
 import scala.util.Random
 
@@ -13,6 +14,7 @@ import scala.util.Random
  * Takes a surprising amount of machinery to simulate everything. Could maybe be designed better... no matter, reserach
  */
 object MCTSTest extends App {
+  /*
   val rand = new Random()
   val humanErrorDistribution = EpsilonRandomErrorDistribution(0.1, rand)
   val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(3000, 1000, rand)
@@ -39,7 +41,7 @@ object MCTSTest extends App {
     }.sum
 
     // We expect each extra cent to generate at-least a K% reduction in average error
-    val K = 2.0
+    val K = 10.0
     expectedErrors + cost*K
   }
 
@@ -57,7 +59,20 @@ object MCTSTest extends App {
 
   var gameState = GameState(engine, graph, 0.0, hcuPool, engine.attachHumanObservation, lossFunction, 1.0)
 
-  val optimalMove = MCTSGamePlayer.getOptimalMove(gameState)
+  println("RUNNING MCTS")
+  val mctsOptimalMove = MCTSGamePlayer.getOptimalMove(gameState)
+  engine.spendReservedBudget(0.0, gameState, hcuPool)
+  LookaheadOneHeuristic.engine = engine
+  println("RUNNING LOOKAHEAD ONE")
+  val oneStepOptimalMove = LookaheadOneHeuristic.getOptimalMove(gameState)
+  engine.spendReservedBudget(0.0, gameState, hcuPool)
+  ThresholdHeuristic.engine = engine
+  println("RUNNING THRESHOLD")
+  val thresholdOptimalMove = ThresholdHeuristic.getOptimalMove(gameState)
+  engine.spendReservedBudget(0.0, gameState, hcuPool)
 
-  println("Got optimal move: "+optimalMove)
+  println("Got optimal move for MCTS: " +mctsOptimalMove)
+  println("Got optimal move for OneStepLookahead: "+oneStepOptimalMove)
+  println("Got optimal move for Threshold: "+thresholdOptimalMove)
+  */
 }

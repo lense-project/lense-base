@@ -1,8 +1,7 @@
 package edu.stanford.lense_base.gameplaying
 
-import edu.stanford.lense_base.{HumanDelayDistribution, HumanErrorDistribution}
 import edu.stanford.lense_base.graph.{GraphNode, Graph}
-import edu.stanford.lense_base.humancompute.HumanComputeUnit
+import edu.stanford.lense_base.humancompute.{HumanErrorDistribution, HumanDelayDistribution, HumanComputeUnit}
 import scala.collection.mutable
 import scala.concurrent.Lock
 import scala.util.Random
@@ -17,6 +16,9 @@ object MCTSGamePlayer extends GamePlayer {
 
   val mainTreeLock = new Object()
 
+  var humanErrorDistribution : HumanErrorDistribution = null
+  var humanDelayDistribution : HumanDelayDistribution = null
+
   override def getOptimalMove(state: GameState): GameMove = {
     // Get all the legal moves
     val legalTopLevelMoves = getAllLegalMoves(state, reserveRealBudget = true)
@@ -26,7 +28,8 @@ object MCTSGamePlayer extends GamePlayer {
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
     val samplesToTake = 20*legalTopLevelMoves.size
-    val threadCount = Runtime.getRuntime.availableProcessors()
+    // val threadCount = Runtime.getRuntime.availableProcessors()
+    val threadCount = 1
 
     val threads = (1 to threadCount).map(i => {
       new Thread(new Runnable {
@@ -60,8 +63,8 @@ object MCTSGamePlayer extends GamePlayer {
 
     while (node.isNonTerminal) {
       node = node.treePolicyStep(r,
-        engine.getHumanErrorDistribution,
-        engine.getHumanDelayDistribution)
+        humanErrorDistribution,
+        humanDelayDistribution)
       // We've just stepped off-tree, can hand back main lock
       if (node.visits == 0) {
         holdLock = false
@@ -85,7 +88,7 @@ case class StateSample(gameState : GameState,
 
     // reward is just negative loss. If we go over the maxLossPerNode term, this will return negative, and MCTS just won't
     // visit this node ever again
-    val normalizedLoss = gameState.loss(hypotheticalEndTime - startTime) / (gameState.maxLossPerNode * gameState.originalGraph.nodes.size)
+    val normalizedLoss = gameState.loss(hypotheticalEndTime - startTime) / (gameState.maxLossPerNode * gameState.model.variables.size)
     1.0 - normalizedLoss
   }
 
@@ -97,7 +100,7 @@ case class StateSample(gameState : GameState,
       case obs : MakeHumanObservation =>
         // This adds another request in flight, samples a time for the request to take, and adds it to the pile
         val requestDelay = humanDelayDistribution.sampleDelay()
-        val nextState = gameState.getNextStateForInFlightRequest(obs.node, obs.hcu, null, hypotheticalEndTime + requestDelay)
+        val nextState = gameState.getNextStateForInFlightRequest(obs.variable, obs.hcu, null, hypotheticalEndTime + requestDelay)
         StateSample(nextState, startTime, hypotheticalEndTime)
 
       case wait : Wait =>
@@ -108,10 +111,10 @@ case class StateSample(gameState : GameState,
         // This waits for the next request to return, pops it off, and registers the observation
         val nextRequestToReturn = inFlightLandingTimes.minBy(_._2)
 
-        val beliefMarginals = gameState.marginals(nextRequestToReturn._1._1)
+        val beliefMarginals = gameState.model.marginals(nextRequestToReturn._1._1)
         val obs : String = humanErrorDistribution.sampleGivenMarginals(beliefMarginals)
 
-        val nextState = gameState.getNextStateForNodeObservation(nextRequestToReturn._1._1, nextRequestToReturn._1._2, null, obs)
+        val nextState = gameState.getNextStateForVariableObservation(nextRequestToReturn._1._1, nextRequestToReturn._1._2, null, obs)
         StateSample(nextState, startTime, nextRequestToReturn._2)
 
       case turnIn : TurnInGuess =>
@@ -217,16 +220,22 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
     // TurnInGuess() is deterministic, so we don't need to handle infinite branching, cause all branches are the same
     val moveSupportsBranching : Boolean = bestMove match {
       case _ : TurnInGuess => false
-      case _ : MakeHumanObservation => true
+      case _ : MakeHumanObservation => false
       case _ : Wait => true
     }
 
     if (numChildrenForBestMove == 0 || (C > Math.sqrt(numChildrenForBestMove) && moveSupportsBranching)) {
-      // This means we get a new state
-      val nextStateSample = stateSample.sampleNextState(bestMove, r, humanErrorDistribution, humanDelayDistribution)
-      val nextTreeNode = TreeNode(nextStateSample, gamePlayer.getAllLegalMoves(nextStateSample.gameState, reserveRealBudget = false), gamePlayer, this)
-      children.put(bestMove, children(bestMove) :+ nextTreeNode)
-      nextTreeNode
+      if (children.contains(bestMove) && children(bestMove).size > 0) {
+        // This means we pick a state uniformly from previously visited ones
+        children(bestMove)(r.nextInt(children(bestMove).size))
+      }
+      else {
+        // This means we get a new state
+        val nextStateSample = stateSample.sampleNextState(bestMove, r, humanErrorDistribution, humanDelayDistribution)
+        val nextTreeNode = TreeNode(nextStateSample, gamePlayer.getAllLegalMoves(nextStateSample.gameState, reserveRealBudget = false), gamePlayer, this)
+        children.put(bestMove, children(bestMove) :+ nextTreeNode)
+        nextTreeNode
+      }
     }
     else {
       // This means we pick a state uniformly from previously visited ones

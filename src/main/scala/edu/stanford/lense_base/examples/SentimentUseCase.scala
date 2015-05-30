@@ -1,8 +1,10 @@
 package edu.stanford.lense_base.examples
 
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
-import edu.stanford.lense_base.{ClippedGaussianHumanDelayDistribution, EpsilonRandomErrorDistribution, LenseMulticlassUseCase}
+import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
+import edu.stanford.lense_base.models.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
 import edu.stanford.nlp.word2vec.Word2VecLoader
 
 import scala.collection.mutable.ListBuffer
@@ -19,8 +21,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test").take(1000)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -30,7 +32,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
       new java.util.HashMap[String, Array[Double]]()
   }
 
-  override def labelTypes: Set[String] = Set("POS", "NEG")
+  override def labelTypes: List[String] = List("POS", "NEG")
 
   override def getHumanVersionOfLabel(label: String): String = label match {
     case "POS" => "Positive"
@@ -43,33 +45,42 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
-  override def getFeatures(input: String): Map[String, Double] = {
-    // Stupid bag of words features...
-    val tokens = input.split(" ")
-    val unigrams = tokens.map(tok => (tok, 1.0)).toMap
-    val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
-    val basicFeatures = unigrams ++ bigrams
+  lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution) {
+    override def getFeatures(input: String): Map[String, Double] = {
+      // Stupid bag of words features...
+      val tokens = input.split(" ")
+      val unigrams = tokens.map(tok => (tok, 1.0)).toMap
+      val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
+      val basicFeatures = unigrams ++ bigrams
 
-    // Also normalized word embedding for whole document
-    val embedding = new Array[Double](300)
-    for (tok <- input.split(" ")) {
-      word2vec.get(tok) match {
-        case vec : Array[Double] =>
-          (0 to vec.length-1).foreach(i => embedding(i) += vec(i))
-        case null =>
+      // Also normalized word embedding for whole document
+      val embedding = new Array[Double](300)
+      for (tok <- input.split(" ")) {
+        word2vec.get(tok) match {
+          case vec : Array[Double] =>
+            (0 to vec.length-1).foreach(i => embedding(i) += vec(i))
+          case null =>
+        }
+      }
+
+      val squareSum = embedding.map(x => x*x).sum
+      val normalized = embedding.map(_ / Math.sqrt(squareSum))
+
+      if (squareSum > 0) {
+        (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap // ++ basicFeatures
+      }
+      else {
+        basicFeatures
       }
     }
 
-    val squareSum = embedding.map(x => x*x).sum
-    val normalized = embedding.map(_ / Math.sqrt(squareSum))
-
-    if (squareSum > 0) {
-      (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap // ++ basicFeatures
-    }
-    else {
-      basicFeatures
-    }
+    /**
+     * Defines the possible output values of the model
+     * @return
+     */
+    override def possibleValues: List[String] = labelTypes.toList
   }
+  override def getModelStream: ModelStream = logisticModelStream
 
   override def getHumanQuestion(input: String): String = {
     "Please label this movie review as either positive or negative: <div class='review'>"+input+"</div>"
@@ -86,7 +97,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    * @param ms
    * @return
    */
-  override def lossFunction(mostLikelyGuesses: List[(GraphNode, String, Double)], cost: Double, ms: Long): Double = {
+  override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
   }
 
