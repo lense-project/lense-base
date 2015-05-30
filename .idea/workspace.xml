@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/models/EMTest.scala" afterPath="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/models/EMTest.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/GraphicalModelStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/GraphicalModelStream.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -61,8 +59,8 @@
       <file leaf-file-name="GraphStream.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49462366">
-              <caret line="385" column="37" selection-start-line="385" selection-start-column="37" selection-end-line="385" selection-end-column="37" />
+            <state vertical-scroll-proportion="0.516129">
+              <caret line="558" column="51" selection-start-line="558" selection-start-column="51" selection-end-line="558" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -178,9 +176,9 @@
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/ModelStream.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase2Class.scala" />
-        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/GraphicalModelStream.scala" />
         <option value="$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/models/EMTest.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
       </list>
     </option>
   </component>
@@ -1334,7 +1332,7 @@
       <workItem from="1432254815978" duration="2806000" />
       <workItem from="1432787039637" duration="8401000" />
       <workItem from="1432834664779" duration="239000" />
-      <workItem from="1432882275518" duration="12160000" />
+      <workItem from="1432882275518" duration="12858000" />
     </task>
     <task id="LOCAL-00001" summary="Fighting against string whitespace behavior.">
       <created>1432788412088</created>
@@ -1390,11 +1388,17 @@
       <option name="project" value="LOCAL" />
       <updated>1433029195639</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Discovering more reasons why EM is a pain in the ass. Seems to be that our gradients are broken again...">
+      <created>1433029541043</created>
+      <option name="number" value="00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1433029541043</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="23788000" />
+    <option name="totallyTimeSpent" value="24486000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -1474,7 +1478,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
-    <MESSAGE value="Added support for YAML tutorial, also added intro slide and cheat-sheet." />
     <MESSAGE value="Getting everything all buttoned up. Still need to fix turn-in button, but otherwise we are ready to go with NER. Scary stuff." />
     <MESSAGE value="Final idiot check passed. Gonna try a real run." />
     <MESSAGE value="Minorly fixing bugs and removing issues." />
@@ -1499,7 +1502,8 @@
     <MESSAGE value="Committing for the day" />
     <MESSAGE value="Making some minor fixes to GraphicalModelStream for observed variables." />
     <MESSAGE value="Fixing piles of nasty bugs that were preventing EM from working properly" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixing piles of nasty bugs that were preventing EM from working properly" />
+    <MESSAGE value="Discovering more reasons why EM is a pain in the ass. Seems to be that our gradients are broken again..." />
+    <option name="LAST_COMMIT_MESSAGE" value="Discovering more reasons why EM is a pain in the ass. Seems to be that our gradients are broken again..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1947,8 +1951,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49462366">
-          <caret line="385" column="37" selection-start-line="385" selection-start-column="37" selection-end-line="385" selection-end-column="37" />
+        <state vertical-scroll-proportion="0.516129">
+          <caret line="558" column="51" selection-start-line="558" selection-start-column="51" selection-end-line="558" selection-end-column="51" />
           <folding />
         </state>
       </provider>

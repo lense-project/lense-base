@@ -555,6 +555,9 @@ class GraphStream {
         val marginals = graph.marginalEstimate(modelTrainingClone) ++ graph.factorsMarginalEstimate(modelTrainingClone).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
         val unobservedMarginals = graph.marginalEstimate(modelTrainingClone, ignoreObservedValues = true) ++ graph.factorsMarginalEstimate(modelTrainingClone, ignoreObservedValues = true).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
 
+        println("Marginals:\n"+marginals)
+        println("Unobserved marginals:\n"+marginals)
+
         marginals.foreach(pair => {
           val withDomain = pair._1
           val domainType: WithDomain = withDomain match {
