@@ -389,6 +389,13 @@ abstract class WithDomain(stream : GraphStream) {
 
   def getWeights : Map[Any, Map[String,Double]]
 
+  def getExpNormalizedWeights : Map[Any, Map[String,Double]] = {
+    val rawWeights = getWeights
+    val expWeights = rawWeights.map(pair => (pair._1, pair._2.map(q => (q._1, Math.exp(q._2)))))
+    val sum = expWeights.flatMap(_._2.map(_._2)).sum
+    expWeights.map(pair => (pair._1, pair._2.map(q => (q._1, q._2 / sum))))
+  }
+
   def setWeights(newWeights : Map[Any, Map[String,Double]])
 
   def abstractPossibleValues : Set[Any]

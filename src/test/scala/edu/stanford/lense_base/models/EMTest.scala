@@ -27,7 +27,7 @@ object EMTest extends App {
   model1.setGraph(g1)
 
   val model2 = model1.cloneModelWithHumanObservation(model1.variables.head, "True")
-  val model3 = model2.cloneModelWithHumanObservation(model1.variables.head, "True")
+  val model3 = model2.cloneModelWithHumanObservation(model1.variables.head, "False")
 
-  modelStream.learn(List(model2))
+  modelStream.learn(List(model3, model3, model3))
 }
