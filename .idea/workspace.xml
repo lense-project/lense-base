@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/LogisticExternalModelStream.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/LogisticExternalModelStream.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/PersonUseCase.scala" afterPath="$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/PersonUseCase.scala" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
@@ -54,8 +52,8 @@
       <file leaf-file-name="GraphStream.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.59859157" vertical-offset="8925" max-vertical-offset="19665">
-              <caret line="612" column="46" selection-start-line="612" selection-start-column="46" selection-end-line="612" selection-end-column="46" />
+            <state vertical-scroll-proportion="0.15492958" vertical-offset="9144" max-vertical-offset="19815">
+              <caret line="614" column="9" selection-start-line="614" selection-start-column="9" selection-end-line="614" selection-end-column="9" />
               <folding>
                 <element signature="e#39#55#0" expanded="true" />
               </folding>
@@ -71,16 +69,6 @@
               <folding>
                 <element signature="e#40#56#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="BasicDatum.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$USER_HOME$/.ivy2/cache/edu.stanford.nlp/stanford-corenlp/srcs/stanford-corenlp-3.5.2-sources.jar!/edu/stanford/nlp/ling/BasicDatum.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="322" max-vertical-offset="2040">
-              <caret line="43" column="48" selection-start-line="43" selection-start-column="48" selection-end-line="43" selection-end-column="48" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -164,7 +152,7 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="106" />
     <option name="y" value="24" />
-    <option name="width" value="1086" />
+    <option name="width" value="1685" />
     <option name="height" value="917" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -939,12 +927,12 @@
     <option name="totallyTimeSpent" value="2988000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="106" y="24" width="1086" height="917" extended-state="0" />
+    <frame x="106" y="24" width="1685" height="917" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32996634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32786885" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4476671" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SBT" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -952,9 +940,9 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40857503" sideWeight="0.49969825" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.40857503" sideWeight="0.49969825" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.44230768" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28065893" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run with VisualVM" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32951117" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1020,7 +1008,6 @@
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
-    <MESSAGE value="Tweaking front-end to improve styling and fix minor behavior glitches." />
     <MESSAGE value="More fine-tuning of interface, removing the showing of tutorial if no tutorial is specified." />
     <MESSAGE value="Started working on Expected-Utility gameplayer." />
     <MESSAGE value="Changed the testWithRealHumans to only wait for 1 person, which makes demos a lot easier." />
@@ -1045,7 +1032,8 @@
     <MESSAGE value="Slight refactoring" />
     <MESSAGE value="Getting LogisticRegression working for person and sentiment." />
     <MESSAGE value="Have an EM system in, with a baby standalone test, though I'm not sure exactly what behavior to expect, so I can't tell if it's totally working." />
-    <option name="LAST_COMMIT_MESSAGE" value="Have an EM system in, with a baby standalone test, though I'm not sure exactly what behavior to expect, so I can't tell if it's totally working." />
+    <MESSAGE value="Online EM implemented, but with bogus gradients..." />
+    <option name="LAST_COMMIT_MESSAGE" value="Online EM implemented, but with bogus gradients..." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1485,8 +1473,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.59859157" vertical-offset="8925" max-vertical-offset="19665">
-          <caret line="612" column="46" selection-start-line="612" selection-start-column="46" selection-end-line="612" selection-end-column="46" />
+        <state vertical-scroll-proportion="0.15492958" vertical-offset="9144" max-vertical-offset="19815">
+          <caret line="614" column="9" selection-start-line="614" selection-start-column="9" selection-end-line="614" selection-end-column="9" />
           <folding>
             <element signature="e#39#55#0" expanded="true" />
           </folding>
