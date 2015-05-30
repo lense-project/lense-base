@@ -30,7 +30,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   // Sets up the model we'll be using
 
-  lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution) {
+  val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution) {
     override def getFeatures(input: PersonImage): Map[String, Double] = {
       val features = input.embedding.zipWithIndex.map(pair => {
         "nn:"+pair._2 -> pair._1
