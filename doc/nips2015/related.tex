@@ -35,8 +35,11 @@ Our labeling decision in the asynchronous delay-sensitive setting is much more c
 
 Active Learning in the context of PGMs has been previously explored from several angles.
 Active Learning for CRF sequence models was explored in the context of batch active learning, where the oracle is able to provide labels for an entire sequence at once~\cite{settles2008analysis}.
+
 It's also been explored in the context of fully Bayesian networks where the oracle\cite{tong2000active} can draw samples conditioned on certain ``controllable'' values.
-The ability to request observations of single nodes has also been explored ~\cite{angeli2014combining}.
+Note: \cite{tong2000active} introduce the notion of expected posterior risk - something we also use.
+
+The ability to request observations of single nodes has also been explored ~\cite{angeli2014combining} - but not in an online setting - they didn't see how much information they'd get on the whole problem by labeling that one thing.
 
 
 Active Learning has also been explored for specific structure-prediction tasks,~\cite{roth2006active} and~\cite{culotta2005reducing}, where humans perform top-K selection over model predictions.
@@ -46,6 +49,7 @@ The systems fall back by stages to traditional no-assistance annotation if the t
 There's been a line of work on Active Learning in the context of multiple noisy, expensive oracles (\cite{yan2011active},~\cite{donmez2008proactive},~\cite{golovin2010near},~\cite{vijayanarasimhan2014large}).
 This work tries to relax the traditional assumptions in Active Learning that the oracle is infallible and has no economic cost.
 Some of this work is directly motivated by applications to crowd-sourcing platforms that we investigate.
+WHY DIFFERENT?
 
 
 Finally Bayesian Active Learning (\cite{golovin2010near},~\cite{tong2000active}) allows us to incorporate a Bayesian prior over our data, and we'll use this as a foundation for our approach to solving the asynchronous behavior problem.

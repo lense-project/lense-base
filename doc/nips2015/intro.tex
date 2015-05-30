@@ -13,22 +13,43 @@ The typical solution to this problem is to use more labeled data, which recent c
 However, this not only presupposes the ready availability of large amounts of unlabeled data, but also advocates a long, expensive data collection process for uncertain improvements in accuracy.
 % This two-stage process fundamentally limits the accuracy we can obtain.
 An alternate approach is to use cut out the middle man altogether and use the crowd to label all examples in real-time\cite{cheng2015flock}. 
-While this allows us to ensure accurate responses, it quickly becomes prohibitively expensive in the long run. 
+While this allows us to ensure accurate responses, it becomes prohibitively expensive to scale to more data. 
 
-Our approach interpolates between these two regimes: we use query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
+Our approach interpolates between these two regimes: we query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
 This results in a system that provides users high quality responses in real-time while starting {\em with no training data}.
 In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.
 
-% Cost and Low-latency
-We focus on structured classification problems using conditional exponential families, a general model class that has been used to \todo{citefest}.
-Given an input, $\bx$, we must predict a number of labels $\by = y_1, \ldots y_n$.
+Let us explore an example use-case for such a framework:
+\begin{example*}[Extracting fields from online classifieds]
+  \todo{arun: make sexy!}
+  You wish to create an online classifieds for apartment listings. 
+  Your USP is to automatically identify salient features like the number of bedrooms, housing features, the date of an open house, etc. to allow users to search for listings that match their requirements.
+  A successful service will receive thousands of such postings every day, making manual classification impractical.
 
+  Something about starting with zero training data.
+
+  \todo{arun: maybe the rest of the description of the system is in relation to this example}
+  Using the system described in this paper, you, the owner, need to specify a model to use - in this case, a linear chain conditional random field is relevant.
+  The next challenge is getting data. 
+  On each example we can get crowd workers to identify these features, an easy task for people.
+  There is a variety of tasks that you can ask people - identifying dates might be easier than not. 
+  Could ask people to identify what a particular word, say pool, is.
+  Alternatively, you could ask people to identify the nearest landmark.
+
+  This data incorporated into the system to provide a more accurate labeling in the future.
+\end{example*}
+
+% Cost and Low-latency
+We focus on structured classification problems using conditional exponential families, a general model class that has been used to \todo{citefest}. In such a model, we are given an input, $\bx$, and must predict a number of labels $\by = y_1, \ldots y_n$.
+
+We treat crowd workers as a resource that can provide noisy measurements of some subset of the labels.
 Under time and budget constraints, we must optimize over which labels to query when. 
-Often, several queries are required on a particular label because of annotator errors by the crowdworker, while at other times it is better to distribute the queries across two labels.
-Similarly, observing a label from one worker let's us decide better which label to query next, but we might not have to time to wait for the response.
-We propose an approach using Bayesian decision theory that is able to make these complex behavioral decisions.
-This quickly leads to an intractable optimization problem that grows exponentially in complexity with the number of label queries we might ask.
-We propose a novel approximation based on Monte Carlo tree search that retains the behavior of the original Bayesian approach.
+Often, several queries are required on a particular label because of annotator errors by the crowdworker, while at other times it is better to distribute queries across labels.
+Similarly, observing a label from one worker lets us decide better which label to query next, but we might not have to time to wait for the response.
+
+We propose an active classification approach using Bayesian decision theory that is able to make these complex behavioral decisions.
+This quickly leads to an intractable optimization problem that grows exponentially in complexity with the number of label queries we might ask on a single example.
+We propose a novel approximation based on Monte Carlo tree search that retains the behavior of the original Bayesian approach while being computationally tractable.
 
 \todo{(arun): We should make the distinction with active learning much stronger since that's what everyone thinks we're doing. I've moved the related work section to the latter parts because I feel like it's easier to compare our work with existing work given our model.} 
 
@@ -40,7 +61,7 @@ The online nature of our task limits the number of responses we have on the same
 Instead, we learn the error rates in an unsupervised fashion using online EM, which also allows us to incorporate unlabeled data.
 
 % Experiments
-We evaluate our system on four different tasks, named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
+We evaluate our system on four different tasks: named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
 We show that by querying crowdworkers at classification time, we can significantly outperform a system trained on fully labeled data, for a fraction of the cost of the baseline of asking crowdworkers for labels for each example, as well as the system trained on fully labeled past data.
 On X of the Y tasks, we produce a classifier comparable with the state of the art while obtaining a much smaller subset of the training labels noisily from the crowd. 
 In fact, we are comparable with state of the art-ish with a handful of the training labels.
