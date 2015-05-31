@@ -1,9 +1,13 @@
 package edu.stanford.lense_base.models
 
+import java.util
+
 import edu.stanford.lense_base.graph._
 import edu.stanford.lense_base.humancompute.{HumanComputeUnit, HumanErrorDistribution}
 
 import scala.collection.mutable
+
+import scala.collection.JavaConversions._
 
 /**
  * Created by keenon on 5/28/15.
@@ -21,21 +25,32 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
   override def learn(models : Iterable[Model]): Double = {
     // Set all the graphs to the MAP
     models.foreach(m => {
-      m.asInstanceOf[GraphicalModel].setVariablesToMAP()
+      val gm = m.asInstanceOf[GraphicalModel]
+      gm.setVariablesToMAP()
+
+      /*
+      // Double check by printing
+      if (gm.variables.exists(v => !v.isObserved)) {
+        gm.variables.foreach(v => {
+          println("Value: "+v.asInstanceOf[GraphicalModelVariable].node.observedValue)
+          if (v.asInstanceOf[GraphicalModelVariable].node.observedValue == null) {
+            throw new IllegalStateException("Can't have a null observed value, we just set it!")
+          }
+        })
+      }
+      */
     })
+
+    val mapLoss = 0.0
 
     // Run learning - MAP estimates for initialization
     println("RUNNING MAP INITIALIZATION...")
     val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
+
     // Reset human weights to default, because regularizer will have messed with them, even though likelihoods should not have changed
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
     }
-
-    // Set all the graphs to the Unobserved, keeping human observations
-    models.foreach(m => {
-      m.asInstanceOf[GraphicalModel].setVariablesToNull()
-    })
 
     val loss = if (models.exists(m => m.variables.exists(!_.isObserved))) {
       // Run learning - soft EM
@@ -97,8 +112,8 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   private var graph : Graph = null
   private var vars : List[GraphicalModelVariable] = null
 
-  private var varToNode : Map[ModelVariable, GraphNode] = null
-  private var nodeToVar : Map[GraphNode, GraphicalModelVariable] = null
+  private var varToNode : java.util.IdentityHashMap[ModelVariable, GraphNode] = null
+  private var nodeToVar : java.util.IdentityHashMap[GraphNode, GraphicalModelVariable] = null
 
   /**
    * You have to set this before your GraphicalModel is useful
@@ -108,8 +123,12 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   def setGraph(g : Graph) = {
     graph = g
     val pairs = graph.nodes.map(n => (GraphicalModelVariable(n, this), n))
-    varToNode = pairs.toMap
-    nodeToVar = pairs.map(p => (p._2, p._1)).toMap
+    varToNode = new util.IdentityHashMap()
+    nodeToVar = new util.IdentityHashMap()
+    for (pair <- pairs) {
+      varToNode.put(pair._1, pair._2)
+      nodeToVar.put(pair._2, pair._1)
+    }
     vars = pairs.map(_._1).toList
   }
   def getGraph = graph
@@ -120,11 +139,14 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @param g graph
    * @param overrideVarToNode a mapping describing how variables should correspond with nodes
    */
-  private def setGraphWithVarToNode(g : Graph, overrideVarToNode : Map[ModelVariable, GraphNode]) = {
+  private def setGraphWithVarToNode(g : Graph, overrideVarToNode : java.util.IdentityHashMap[ModelVariable, GraphNode]) = {
     graph = g
     varToNode = overrideVarToNode
-    nodeToVar = overrideVarToNode.map(p => (p._2, p._1.asInstanceOf[GraphicalModelVariable]))
-    vars = overrideVarToNode.map(_._1.asInstanceOf[GraphicalModelVariable]).toList
+    nodeToVar = new util.IdentityHashMap()
+    for (key <- overrideVarToNode.keySet().iterator()) {
+      nodeToVar.put(overrideVarToNode.get(key), key.asInstanceOf[GraphicalModelVariable])
+    }
+    vars = overrideVarToNode.keySet().toArray.map(_.asInstanceOf[GraphicalModelVariable]).toList
   }
 
   /**
@@ -136,16 +158,19 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @return a new model, representing adding this observation
    */
   override def cloneModelWithHumanObservation(variable: ModelVariable, observation: String): Model = {
-    val humanNodeAndFactorTypes = modelStream.getHumanObservationTypes(varToNode(variable).nodeType)
+    val humanNodeAndFactorTypes = modelStream.getHumanObservationTypes(varToNode.get(variable).nodeType)
 
     val graphClonePair = graph.clone()
     val newGraph = graphClonePair._1
-    val newVarToNode = varToNode.map(p => (p._1, graphClonePair._2(p._2)))
+    val newVarToNode = new java.util.IdentityHashMap[ModelVariable, GraphNode]()
+    for (v <- varToNode.keySet().iterator()) {
+      newVarToNode.put(v, graphClonePair._2(varToNode.get(v)))
+    }
 
     val humanObservationNode = newGraph.makeNode(humanNodeAndFactorTypes._1, observedValue = observation)
-    newVarToNode(variable).numHumanObservations += 1
+    newVarToNode.get(variable).numHumanObservations += 1
 
-    newGraph.makeFactor(humanNodeAndFactorTypes._2, List(newVarToNode(variable), humanObservationNode))
+    newGraph.makeFactor(humanNodeAndFactorTypes._2, List(newVarToNode.get(variable), humanObservationNode))
 
     val modelClone = modelStream.newModel()
 
@@ -159,16 +184,16 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @return a map of the variables -> distributions over tokens
    */
   override def marginals: Map[ModelVariable, Map[String, Double]] = {
-    setVariablesToNull()
-    graph.marginalEstimate().map(p => (nodeToVar(p._1), p._2))
+    graph.marginalEstimate().map(p => (nodeToVar.get(p._1), p._2)) ++
+      vars.filter(_.isObserved).map(v => (v.asInstanceOf[ModelVariable], v.possibleValues.map(q => (q, if (q == v.getObservedValue) 1.0 else 0.0)).toMap)).toMap
   }
 
   /**
    * @return a map of variables -> MAP assignment
    */
   override def map: Map[ModelVariable, String] = {
-    setVariablesToNull()
-    graph.mapEstimate().map(p => (nodeToVar(p._1), p._2))
+    graph.mapEstimate().map(p => (nodeToVar.get(p._1), p._2)) ++
+      vars.filter(_.isObserved).map(v => (v.asInstanceOf[ModelVariable], v.getObservedValue)).toMap
   }
 
   /**
@@ -177,21 +202,23 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   override def variables: List[ModelVariable] = vars
 
   def setVariablesToMAP() : Unit = {
-    val m = map
+    lazy val m = map
     for (variable <- vars) {
       if (variable.isObserved)
-        varToNode(variable).observedValue = variable.getObservedValue
-      else
-        varToNode(variable).observedValue = m(variable)
+        varToNode.get(variable).observedValue = variable.getObservedValue
+      else {
+        varToNode.get(variable).observedValue = m(variable)
+      }
     }
   }
 
   def setVariablesToNull() : Unit = {
     for (variable <- vars) {
       if (variable.isObserved)
-        varToNode(variable).observedValue = variable.getObservedValue
-      else
-        varToNode(variable).observedValue = null
+        varToNode.get(variable).observedValue = variable.getObservedValue
+      else {
+        varToNode.get(variable).observedValue = null
+      }
     }
   }
 }

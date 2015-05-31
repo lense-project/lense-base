@@ -324,6 +324,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     setObservedVariablesForFactorie()
     val variables = if (ignoreObservedValues) allVariablesForFactorie() else unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
+
     model.synchronized {
       model.warmUpIndexes(this)
     }
@@ -734,7 +735,7 @@ class GraphStream {
       }
 
       // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = false, maxIterations = 10000)(new scala.util.Random(42))
 
       // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
       // trainer.trainFromExamples(likelihoodExamples)
@@ -803,7 +804,7 @@ class GraphStream {
                         feature -> weight
                       }).toMap
                   }
-                  nodeType.weights = keyValue.toMap
+                  nodeType.setWeights(keyValue.toMap)
 
                 // Translate a factorType's weights back into the Map we use for weights
 
@@ -825,7 +826,7 @@ class GraphStream {
                             feature -> weight
                           }).toMap
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case 2 =>
                       if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
                         "factor that isn't val1 x val2 x features, which means dim=3. Instead got dim=" + tensor.dimensions.length)
@@ -848,7 +849,7 @@ class GraphStream {
                             }).toMap
                         }
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case 3 =>
                       if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
                         "factor that isn't val1 x val2 x val3 x features, which means dim=4. Instead got dim=" + tensor.dimensions.length)
@@ -875,7 +876,7 @@ class GraphStream {
                           }
                         }
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
                   }
               }
