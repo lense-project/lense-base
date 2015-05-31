@@ -228,30 +228,39 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
           val node2 = factor.nodeList(1)
 
           node1.nodeType.valueDomain.categories.flatMap(cat1 => {
-            var i1 = node1.nodeType.valueDomain.index(cat1)
+            val i1 = node1.nodeType.valueDomain.index(cat1)
 
             node2.nodeType.valueDomain.categories.map(cat2 => {
-              var i2 = node2.nodeType.valueDomain.index(cat2)
+              val i2 = node2.nodeType.valueDomain.index(cat2)
 
               val key = List(cat1, cat2)
 
-              val v = if (node1.observedValue == cat1 && node2.observedValue == null) {
-                tensorArray(i2)
+              // If we're observing values, the proportions array is shortened to just include marginals over un-observed values
+              // so we need some ugly logic to pick apart all the marginals
+              val v = if (!ignoreObservedValues) {
+                if (node1.observedValue == cat1 && node2.observedValue == null) {
+                  tensorArray(i2)
+                }
+                else if (node2.observedValue == cat2 && node1.observedValue == null) {
+                  tensorArray(i1)
+                }
+                else if (node1.observedValue == cat1 && node2.observedValue == cat2) {
+                  1.0
+                }
+                else if (node1.observedValue != null && node1.observedValue != cat1) {
+                  0.0
+                }
+                else if (node2.observedValue != null && node2.observedValue != cat2) {
+                  0.0
+                }
+                else {
+                  tensorArray((i1*domainSize) + i2)
+                }
               }
-              else if (node2.observedValue == cat2 && node1.observedValue == null) {
-                tensorArray(i1)
-              }
-              else if (node1.observedValue == cat1 && node2.observedValue == cat2) {
-                1.0
-              }
-              else if (node1.observedValue != null && node1.observedValue != cat1) {
-                0.0
-              }
-              else if (node2.observedValue != null && node2.observedValue != cat2) {
-                0.0
-              }
+              // If we're ignoring observed values, don't bother with zeroing out or remapping, cause the proportions will
+              // be exactly the right size
               else {
-                tensorArray((i1*domainSize) + i2)
+                tensorArray((i1 * domainSize) + i2)
               }
 
               // key value pair
@@ -522,6 +531,7 @@ class GraphStream {
   private def learnEM(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true) : Double = {
     val nodeTypes = graphs.flatMap(_.nodes.map(_.nodeType)).toList.distinct
     val factorTypes = graphs.flatMap(_.factors.map(_.factorType)).toList.distinct
+    val withDomainTypes = nodeTypes ++ factorTypes
 
     for (graph <- graphs) {
       modelTrainingClone.warmUpIndexes(graph)
@@ -555,9 +565,6 @@ class GraphStream {
         val marginals = graph.marginalEstimate(modelTrainingClone) ++ graph.factorsMarginalEstimate(modelTrainingClone).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
         val unobservedMarginals = graph.marginalEstimate(modelTrainingClone, ignoreObservedValues = true) ++ graph.factorsMarginalEstimate(modelTrainingClone, ignoreObservedValues = true).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
 
-        println("Marginals:\n"+marginals)
-        println("Unobserved marginals:\n"+marginals)
-
         marginals.foreach(pair => {
           val withDomain = pair._1
           val domainType: WithDomain = withDomain match {
@@ -565,14 +572,6 @@ class GraphStream {
             case factor: GraphFactor => factor.factorType
           }
           typeCounts.put(domainType, typeCounts(domainType) + 1)
-
-          if (domainType.getWeights != null) {
-            for (w <- domainType.getWeights) {
-              for (q <- w._2) {
-                regularizer += q._2 * q._2
-              }
-            }
-          }
 
           if (!typeAverage.contains(domainType)) typeAverage.put(domainType, domainType.abstractPossibleValues.map(value => (value, mutable.Map[String, Double]())).toMap)
 
@@ -585,14 +584,24 @@ class GraphStream {
             val unobservedProb = localUnobservedMarginals(value)
 
             val mutableWeightsAverageMap = typeAverage(domainType)(value)
+
             for (featureWithWeight <- withDomain.features) {
               val feature = featureWithWeight._1
               val weight = featureWithWeight._2
-
               mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + (prob - unobservedProb) * weight)
             }
           }
         })
+      }
+
+      for (withDomain <- withDomainTypes) {
+        if (withDomain.getWeights != null) {
+          for (w <- withDomain.getWeights) {
+            for (q <- w._2) {
+              regularizer += q._2 * q._2
+            }
+          }
+        }
       }
 
       regularizer = - regularizer * l2regularization / 2
@@ -612,19 +621,19 @@ class GraphStream {
       // Done collecting marginals
 
       for (pair <- typeAverage) {
-        val nt = pair._1
+        val withDomain = pair._1
         val unnormalizedAverage = pair._2
         val normalizedAverage = unnormalizedAverage.map(assignmentAvg => {
-          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / typeCounts.getOrElse(nt, 1))))
+          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / typeCounts.getOrElse(withDomain, 1))))
         })
 
-        if (nt.getWeights == null) {
-          nt.setWeights(normalizedAverage.map(assignmentAvg => {
+        if (withDomain.getWeights == null) {
+          withDomain.setWeights(normalizedAverage.map(assignmentAvg => {
             (assignmentAvg._1, assignmentAvg._2.toMap)
           }))
         }
         else {
-          nt.setWeights(nt.getWeights.map(oldWeightsForSinglePossibleValue => {
+          withDomain.setWeights(withDomain.getWeights.map(oldWeightsForSinglePossibleValue => {
             val possibleValue = oldWeightsForSinglePossibleValue._1
             val weightsForPossibleValue = oldWeightsForSinglePossibleValue._2
             (possibleValue, weightsForPossibleValue.map(q => {
