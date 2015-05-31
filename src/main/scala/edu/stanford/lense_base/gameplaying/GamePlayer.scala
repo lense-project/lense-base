@@ -92,6 +92,11 @@ case class GameState(model : Model,
   def loss(hypotheticalExtraDelay : Long = 0) : Double = {
     val mapAssignments = model.map
 
+    val marginals = model.marginals
+    if (marginals.size != model.variables.size) {
+      System.err.println("Breakpoint")
+    }
+
     val bestGuesses = model.marginals.toList.map(pair => {
       val mapAssignmentProb = pair._2(mapAssignments(pair._1))
       val mapAssignment = mapAssignments(pair._1)

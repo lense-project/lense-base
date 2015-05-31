@@ -23,29 +23,9 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
    * @return model loss, for tracking and debugging optimizers
    */
   override def learn(models : Iterable[Model]): Double = {
-    // Set all the graphs to the MAP
-    models.foreach(m => {
-      val gm = m.asInstanceOf[GraphicalModel]
-      gm.setVariablesToMAP()
-
-      /*
-      // Double check by printing
-      if (gm.variables.exists(v => !v.isObserved)) {
-        gm.variables.foreach(v => {
-          println("Value: "+v.asInstanceOf[GraphicalModelVariable].node.observedValue)
-          if (v.asInstanceOf[GraphicalModelVariable].node.observedValue == null) {
-            throw new IllegalStateException("Can't have a null observed value, we just set it!")
-          }
-        })
-      }
-      */
-    })
-
-    val mapLoss = 0.0
-
     // Run learning - MAP estimates for initialization
     println("RUNNING MAP INITIALIZATION...")
-    val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
+    val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].cloneWithMAP()))
 
     // Reset human weights to default, because regularizer will have messed with them, even though likelihoods should not have changed
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
@@ -58,7 +38,7 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
       val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
       // Read out human weights
       for (humanObservationTypePair <- humanObservationTypesCache.values) {
-        val w = humanObservationTypePair._2.getExpNormalizedWeights.asInstanceOf[Map[List[String],Double]]
+        val w = humanObservationTypePair._2.getExpNormalizedWeights.map(pair => (pair._1, pair._2.apply("BIAS"))).asInstanceOf[Map[List[String],Double]]
         humanErrorDistribution.setLatestEMObservation(w)
         println("Human weights estimate: "+w)
       }
@@ -183,7 +163,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   /**
    * @return a map of the variables -> distributions over tokens
    */
-  override def marginals: Map[ModelVariable, Map[String, Double]] = {
+  lazy val marginals: Map[ModelVariable, Map[String, Double]] = {
     graph.marginalEstimate().map(p => (nodeToVar.get(p._1), p._2)) ++
       vars.filter(_.isObserved).map(v => (v.asInstanceOf[ModelVariable], v.possibleValues.map(q => (q, if (q == v.getObservedValue) 1.0 else 0.0)).toMap)).toMap
   }
@@ -191,7 +171,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
   /**
    * @return a map of variables -> MAP assignment
    */
-  override def map: Map[ModelVariable, String] = {
+  lazy val map: Map[ModelVariable, String] = {
     graph.mapEstimate().map(p => (nodeToVar.get(p._1), p._2)) ++
       vars.filter(_.isObserved).map(v => (v.asInstanceOf[ModelVariable], v.getObservedValue)).toMap
   }
@@ -201,25 +181,21 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    */
   override def variables: List[ModelVariable] = vars
 
-  def setVariablesToMAP() : Unit = {
+  def cloneWithMAP() : Graph = {
     lazy val m = map
-    for (variable <- vars) {
-      if (variable.isObserved)
-        varToNode.get(variable).observedValue = variable.getObservedValue
-      else {
-        varToNode.get(variable).observedValue = m(variable)
-      }
-    }
-  }
+    val clonePair = graph.clone()
+    val newGraph = clonePair._1
+    val oldToNew = clonePair._2
 
-  def setVariablesToNull() : Unit = {
     for (variable <- vars) {
       if (variable.isObserved)
-        varToNode.get(variable).observedValue = variable.getObservedValue
+        oldToNew(varToNode.get(variable)).observedValue = variable.getObservedValue
       else {
-        varToNode.get(variable).observedValue = null
+        oldToNew(varToNode.get(variable)).observedValue = m(variable)
       }
     }
+
+    newGraph
   }
 }
 

@@ -539,6 +539,27 @@ class GraphStream {
     }
     modelTrainingClone.dotFamilyCache.clear()
 
+    val localWithDomainList = graphs.flatMap(g => {
+      g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
+    }).toList.distinct
+
+    val frozenDomainMap = withDomainList.synchronized {
+      localWithDomainList.map(withDomain => {
+        val newDomain = new CategoricalDomain[String]()
+        newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+        (withDomain.domain.dimensionDomain, newDomain)
+      }).toMap
+    }
+
+    graphs.map(graph => {
+      graph.setObservedVariablesForFactorie()
+      val nodeVariables = graph.allVariablesForFactorie()
+      for (nodeVariable <- nodeVariables) {
+        nodeVariable.frozenDomainMap = frozenDomainMap
+      }
+      new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+    }).toSeq
+
     var converged = false
     var lastLoss = Double.NegativeInfinity
     var convergenceCounter = 0
@@ -702,7 +723,7 @@ class GraphStream {
 
       val localWithDomainList = graphs.flatMap(g => {
         g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
-      })
+      }).toList.distinct
 
       // Don't want to be doing this part in parallel, things get broken
 
@@ -716,10 +737,6 @@ class GraphStream {
           localWithDomainList.map(withDomain => {
             val newDomain = new CategoricalDomain[String]()
             newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
-            /*
-            val featureDomain = new CategoricalDomain[String]()
-            featureDomain.indexAll(withDomain.featureDomain.dimensionDomain.categories.toArray)
-            */
             (withDomain.domain.dimensionDomain, newDomain)
           }).toMap
         }
@@ -1149,7 +1166,7 @@ class GraphStream {
     }
 
     def warmUpIndexes(graph : Graph) : Unit = {
-      val clearCacheIfSizeChanges = false
+      val clearCacheIfSizeChanges = true
       // Pre-warm node type weights
       for (nodeType <- graph.nodes.map(_.nodeType).distinct) {
         if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {
