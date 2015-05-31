@@ -610,14 +610,21 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val f3 = new File(confusionMatricesPath)
     if (!f3.exists()) f3.mkdirs()
 
-    for (i <- 0 to summaries.length-1) {
+    for (i <- 0 to l.length-1) {
+      val humanPredictionsVsCorrect : List[(String,String,ModelVariable,HumanComputeUnit)] = l.slice(0,i-1).flatMap(quad => {
+        val graph = quad._1
+        val goldMap = quad._2
+        quad._4.humanQueryResponses.map(triple => {
+          (goldMap(triple._1), triple._3, triple._1, triple._2)
+        })
+      })
+
       val variableTypes = l.flatMap(_._1.variables).map(_.possibleValues.toSet).distinct.toList
       for (valueSet <- variableTypes) {
+        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == valueSet).map(quad => (quad._1, quad._2))
         printConfusion(confusionMatricesPath+"/confusion_iteration_"+i+"_nodetype_"+variableTypes.indexOf(valueSet)+".csv",
           valueSet.toList,
-          l.flatMap(quad => {
-            quad._1.variables.filter(_.possibleValues.toSet == valueSet).map(variable => (quad._2(variable), quad._3(variable)))
-          }))
+          pairs)
       }
     }
 

@@ -145,6 +145,9 @@ case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extend
 
   override def guess(correct: String, possibleValues: List[String]): String = {
     val observedDistribution : List[(String,Double)] = conditionalConfusionMatrix(correct)
+
+    if (observedDistribution.map(_._2).sum != 1) throw new IllegalStateException("Can't be drawing from a distribution that doesn't sum to 1")
+
     var draw = rand.nextDouble()
     for (pair <- observedDistribution) {
       if (draw <= pair._2) {
@@ -154,6 +157,7 @@ case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extend
         draw -= pair._2
       }
     }
+
     observedDistribution(observedDistribution.size - 1)._1
   }
 
