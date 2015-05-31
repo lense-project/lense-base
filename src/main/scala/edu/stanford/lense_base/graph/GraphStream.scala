@@ -752,7 +752,7 @@ class GraphStream {
       }
 
       // Trainer.batchTrain(model.parameters, likelihoodExamples, optimizer = new ConjugateGradient() with L2Regularization)(new scala.util.Random(42))
-      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = false, maxIterations = 10000)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
 
       // val trainer = new BatchTrainer(model.parameters, new LBFGS() with L2Regularization{variance = regularization}, maxIterations = 100)
       // trainer.trainFromExamples(likelihoodExamples)

@@ -557,7 +557,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     cw.close()
   }
 
-  private def printHumanErrorBeliefsSummary(path : String, summaries : List[PredictionSummary]) : Unit = {
+  private def printHumanErrorBeliefsSummary(path : String, l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)]) : Unit = {
+    val summaries = l.map(_._4)
+
     val f = new File(path)
     if (!f.exists()) {
       f.mkdirs()
@@ -603,6 +605,22 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         }
       }
     }
+
+    val confusionMatricesPath = path+"confusion_matrices_over_time/"
+    val f3 = new File(confusionMatricesPath)
+    if (!f3.exists()) f3.mkdirs()
+
+    for (i <- 0 to summaries.length-1) {
+      val variableTypes = l.flatMap(_._1.variables).map(_.possibleValues.toSet).distinct.toList
+      for (valueSet <- variableTypes) {
+        printConfusion(confusionMatricesPath+"/confusion_iteration_"+i+"_nodetype_"+variableTypes.indexOf(valueSet)+".csv",
+          valueSet.toList,
+          l.flatMap(quad => {
+            quad._1.variables.filter(_.possibleValues.toSet == valueSet).map(variable => (quad._2(variable), quad._3(variable)))
+          }))
+      }
+    }
+
     dw.close()
   }
 
@@ -861,28 +879,28 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     if (!hcuReportFolder.exists()) hcuReportFolder.mkdirs()
     frequencyLinePlot(hcuPrefix+"overall_latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
     dumpRawNumbers(hcuPrefix+"overall_latency_data.txt", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
+
+    // Plot human confusion matrices
+
+    val summaries = l.map(_._4)
+    val errorBeliefsPrefix = hcuPrefix+"error_beliefs/"
+    printHumanErrorBeliefsSummary(errorBeliefsPrefix, l)
+
+    // Plot the error in our assessment over number of queries observed
+
+    val humanObsOverTime : List[Int] = summaries.scanLeft(0)((sum, summary) => {
+      sum + summary.numRequestsCompleted
+    }).tail
+    val frobeniusOverTime : List[Double] = summaries.map(summary => {
+      summary.believedVsReceivedHumanDistribution.map(pair => frobeniusNorm(pair._1, pair._2)).sum / summary.believedVsReceivedHumanDistribution.length
+    })
+    plotAgainst(errorBeliefsPrefix, "queries", humanObsOverTime.map(_.asInstanceOf[Double]).toArray, "error in beliefs", frobeniusOverTime.toArray)
+
     for (nodeType <- variableTypes) {
       val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).map(quad => (quad._1, quad._2))
       printConfusion(hcuPrefix+"overall_confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
         nodeType.toList,
         pairs)
-
-      // Plot human confusion matrices
-
-      val summaries = l.map(_._4)
-      val errorBeliefsPrefix = hcuPrefix+"error_beliefs/"
-      printHumanErrorBeliefsSummary(errorBeliefsPrefix, summaries)
-
-      // Plot the error in our assessment over number of queries observed
-
-      val humanObsOverTime : List[Int] = summaries.scanLeft(0)((sum, summary) => {
-        sum + summary.numRequestsCompleted
-      }).tail
-      val frobeniusOverTime : List[Double] = summaries.map(summary => {
-        summary.believedVsReceivedHumanDistribution.map(pair => frobeniusNorm(pair._1, pair._2)).sum / summary.believedVsReceivedHumanDistribution.length
-      })
-      plotAgainst(errorBeliefsPrefix, "queries", humanObsOverTime.map(_.asInstanceOf[Double]).toArray, "error in beliefs", frobeniusOverTime.toArray)
-
       printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
       printExamples(hcuPrefix+"overall_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.map(quad => (quad._1, quad._2, quad._3)))
       printExamples(hcuPrefix+"overall_correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
