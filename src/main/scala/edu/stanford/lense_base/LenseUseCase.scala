@@ -622,9 +622,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       cw.write(",")
       cw.write(guess)
     }
-    cw.write("\n")
 
     for (gold <- values) {
+      cw.write("\n")
       cw.write(gold)
       cw.write(",")
       var j = 0
@@ -635,7 +635,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         j += 1
         cw.write(""+confusion.getOrElse((gold, guess), 0))
       }
-      cw.write("\n")
     }
     cw.close()
   }
@@ -863,7 +862,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     frequencyLinePlot(hcuPrefix+"overall_latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
     dumpRawNumbers(hcuPrefix+"overall_latency_data.txt", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
     for (nodeType <- variableTypes) {
-      val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues == nodeType).map(quad => (quad._1, quad._2))
+      val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).map(quad => (quad._1, quad._2))
       printConfusion(hcuPrefix+"overall_confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
         nodeType.toList,
         pairs)
@@ -896,7 +895,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
 
       for (nodeType <- variableTypes) {
-        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues == nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))
+        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))
         printConfusion(thisHcuPrefix+"confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
           nodeType.toList,
           pairs)
