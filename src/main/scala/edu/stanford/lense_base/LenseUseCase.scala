@@ -311,7 +311,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       renderClassification(model, goldMap, guessMap)
       val loss = 0
-      (model, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List(), "turn-in-guess"))
+      (model, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List(), List(), "turn-in-guess"))
     }, null, "offline_baseline")
 
     System.exit(0)
@@ -513,6 +513,57 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       cw.write("\tGUESS:"+triple._2+"\n")
     }
     cw.close()
+  }
+
+  private def froebiniusNorm(map1 : Map[List[String],Double], map2 : Map[List[String],Double]) : Double = {
+    0.0
+  }
+
+  private def printHumanErrorBeliefsSummary(path : String, summaries : List[PredictionSummary]) : Unit = {
+    val f = new File(path)
+    if (!f.exists()) {
+      f.mkdirs()
+    }
+
+    println("DUMPING HUMAN ERROR BELIEFS TO "+path)
+
+    for (i <- 0 to summaries.length-1) {
+      if (i % 2 == 0) {
+        val summary = summaries(i)
+
+        var j = 0
+        for (pair <- summary.believedVsReceivedHumanDistribution) {
+          val believedProbabilities = pair._1
+          // val receivedProbabilities = pair._2
+
+          val believedPath = path+"believedError_iteration_"+i+"_type_"+j+".csv"
+          val cw = new BufferedWriter(new FileWriter(believedPath))
+
+          val keys = believedProbabilities.map(_._1.head).toList.distinct
+          cw.write("COL=GUESS;ROW=GOLD")
+          for (key <- keys) {
+            cw.write(","+key)
+          }
+
+          for (key <- keys) {
+            cw.write("\n")
+            cw.write(key)
+
+            val subMap = believedProbabilities.filter(_._1.head == key).map(pair => (pair._1.last, pair._2))
+            val sum = subMap.map(_._2).sum
+            val normalizedSubMap = subMap.map(pair => (pair._1, pair._2 / sum))
+
+            for (guess <- keys) {
+              cw.write(","+normalizedSubMap(guess))
+            }
+          }
+
+          cw.close()
+
+          j += 1
+        }
+      }
+    }
   }
 
   private def printConfusion(path : String, values : List[String], guesses : List[(String,String)]) : Unit = {
@@ -724,6 +775,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       printConfusion(hcuPrefix+"overall_confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
         nodeType.toList,
         pairs)
+      printHumanErrorBeliefsSummary(hcuPrefix+"errorBeliefs/", l.map(_._4))
       printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
       printExamples(hcuPrefix+"overall_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.map(quad => (quad._1, quad._2, quad._3)))
       printExamples(hcuPrefix+"overall_correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))

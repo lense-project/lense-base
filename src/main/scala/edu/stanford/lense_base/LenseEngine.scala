@@ -120,6 +120,7 @@ case class PredictionSummary(loss : Double,
                              numExamplesSeen : Int,
                              humanQueryResponses : List[(ModelVariable, HumanComputeUnit, String)],
                              humanQueryDelays : List[(HumanComputeUnit, Long)],
+                             believedVsReceivedHumanDistribution : List[(Map[List[String],Double],Map[List[String],Double])],
                              behaviorLog : String)
 
 case class InFlightPrediction(engine : LenseEngine,
@@ -245,21 +246,35 @@ case class InFlightPrediction(engine : LenseEngine,
 
         // Complete the query promise, returning the async request to us with a value
         returnPromise.complete(Try {
-            (gameState.model.map, PredictionSummary(gameState.loss(),
-              numRequests,
-              numRequestsCompleted,
-              numRequestsFailed,
-              totalCost,
-              System.currentTimeMillis() - gameState.startTime,
-              initialMinConfidence,
-              initialMaxConfidence,
-              initialAverageConfidence,
-              engine.numSwapsSoFar,
-              engine.currentLoss(),
-              engine.pastGuesses.size,
-              humanResponses.toList,
-              humanQueryDelays.toList,
-              behaviorLog))
+            (gameState.model.map,
+              ////////////////////////////////////
+              // Analytics stuff
+              {
+                val model = gameState.model
+                val valueSets = model.variables.map(_.possibleValues).distinct
+
+                PredictionSummary(gameState.loss(),
+                  numRequests,
+                  numRequestsCompleted,
+                  numRequestsFailed,
+                  totalCost,
+                  System.currentTimeMillis() - gameState.startTime,
+                  initialMinConfidence,
+                  initialMaxConfidence,
+                  initialAverageConfidence,
+                  engine.numSwapsSoFar,
+                  engine.currentLoss(),
+                  engine.pastGuesses.size,
+                  humanResponses.toList,
+                  humanQueryDelays.toList,
+                  valueSets.map(
+                    set => (engine.getHumanErrorDistribution.enumerateBelievedProbabilities(set), engine.getHumanErrorDistribution.enumerateReceivedProbabilities(set))
+                  ),
+                  behaviorLog)
+              }
+              // End analytics stuff
+              ////////////////////////////////////
+            )
           })
       case obs : MakeHumanObservation =>
 

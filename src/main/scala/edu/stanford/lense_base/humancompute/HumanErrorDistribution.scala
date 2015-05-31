@@ -43,6 +43,30 @@ abstract class HumanErrorDistribution(rand : Random) {
     }
   }
 
+  /**
+   * This is for analytics, so we can log our believed probabilities over time
+   * @return a map of our joint beliefs
+   */
+  def enumerateBelievedProbabilities(possibleValues : List[String]) : Map[List[String],Double] = {
+    possibleValues.flatMap(trueValue => {
+      possibleValues.map(guessedValue => {
+        (List(trueValue, guessedValue), jointProbability(trueValue, guessedValue))
+      })
+    }).toMap
+  }
+
+  /**
+   * This is for analytics, so we can log our believed probabilities over time
+   * @return a map of our joint beliefs, as received by the specification
+   */
+  def enumerateReceivedProbabilities(possibleValues : List[String]) : Map[List[String],Double] = {
+    possibleValues.flatMap(trueValue => {
+      possibleValues.map(guessedValue => {
+        (List(trueValue, guessedValue), rawJointProbability(trueValue, guessedValue))
+      })
+    }).toMap
+  }
+
   def sampleGivenMarginals(marginals : Map[String,Double]) : String = {
     val possibleValues = marginals.map(_._1).toList
 
