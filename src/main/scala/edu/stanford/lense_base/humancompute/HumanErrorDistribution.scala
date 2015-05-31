@@ -5,10 +5,43 @@ import scala.util.Random
 
 /**
  * Created by keenon on 5/23/15.
+ *
+ * Holds all the human error distributions that the model is using to make decisions
+ * These can receive feedback from EM, and update their beliefs accordingly
  */
 abstract class HumanErrorDistribution(rand : Random) {
+
+  /**
+   * This method is only ever used by ArtificialHumans, so it shouldn't update as we get EM observations
+   *
+   * @param correct the true underlying value we're sampling againgst
+   * @param possibleValues the possible values this could take on
+   * @return a random guess
+   */
   def guess(correct : String, possibleValues : List[String]) : String
-  def jointProbability(correct : String, guess : String) : Double
+
+  /**
+   * This should return the probability of a joint estimate according to the prior, having not seen any human data.
+   *
+   * @param correct the underlying value
+   * @param guess the human guess
+   * @return a joint probability
+   */
+  def rawJointProbability(correct : String, guess : String) : Double
+
+  var latestEMObservation : Map[List[String],Double] = null
+  def setLatestEMObservation(jointProbabilities : Map[List[String],Double]) : Unit = {
+    latestEMObservation = jointProbabilities
+  }
+
+  def jointProbability(correct : String, guess : String) : Double = {
+    if (latestEMObservation == null) {
+      rawJointProbability(correct, guess)
+    }
+    else {
+      latestEMObservation(List(correct, guess))
+    }
+  }
 
   def sampleGivenMarginals(marginals : Map[String,Double]) : String = {
     val possibleValues = marginals.map(_._1).toList
@@ -44,7 +77,7 @@ case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) exten
     }
   }
 
-  override def jointProbability(correct: String, guess: String): Double = if (correct == guess) {
+  override def rawJointProbability(correct: String, guess: String): Double = if (correct == guess) {
     1 - epsilon
   }
   else {
@@ -100,7 +133,7 @@ case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extend
     observedDistribution(observedDistribution.size - 1)._1
   }
 
-  override def jointProbability(correct: String, guess: String): Double = {
+  override def rawJointProbability(correct: String, guess: String): Double = {
     oneNormConfusionMatrix(correct).toMap.apply(guess)
   }
 }

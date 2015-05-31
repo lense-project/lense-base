@@ -43,9 +43,9 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
       val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
       // Read out human weights
       for (humanObservationTypePair <- humanObservationTypesCache.values) {
-        val w = humanObservationTypePair._2.getExpNormalizedWeights
+        val w = humanObservationTypePair._2.getExpNormalizedWeights.asInstanceOf[Map[List[String],Double]]
+        humanErrorDistribution.setLatestEMObservation(w)
         println("Human weights estimate: "+w)
-        // humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
       }
       emLoss
     } else mapLoss
