@@ -683,8 +683,8 @@ class GraphStream {
         }).toSeq
       }
 
-      // Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
-      Trainer.onlineTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000, logEveryN = 1, miniBatch = 100)(new scala.util.Random(42))
+      Trainer.batchTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000)(new scala.util.Random(42))
+      // Trainer.onlineTrain(modelTrainingClone.parameters, likelihoodExamples, optimizer = batchOptimizer, useParallelTrainer = true, maxIterations = 10000, logEveryN = 1, miniBatch = 100)(new scala.util.Random(42))
 
       ////////////////////////////
       // SYNCHRONIZED SECTION
