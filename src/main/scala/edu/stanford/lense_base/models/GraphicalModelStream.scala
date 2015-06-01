@@ -17,6 +17,7 @@ import scala.collection.JavaConversions._
  */
 class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) extends ModelStream(humanErrorDistribution) {
   val graphStream : GraphStream = new GraphStream()
+  var useEM : Boolean = true
 
   /**
    * Retrains the model based on all examples seen so far.
@@ -32,7 +33,7 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
       humanObservationTypePair._2.setWeights(getInitialHumanErrorGuessWeights(humanObservationTypePair._1.possibleValues).asInstanceOf[Map[Any, Map[String,Double]]])
     }
 
-    val loss = if (models.exists(m => m.variables.exists(!_.isObserved))) {
+    val loss = if (useEM && models.exists(m => m.variables.exists(!_.isObserved))) {
       // Run learning - soft EM
       println("RUNNING EM FINE TUNING...")
       val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))

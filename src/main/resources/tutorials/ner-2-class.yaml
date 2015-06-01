@@ -61,7 +61,11 @@ examples:
 
   - sequence: "[He] wasn't much of a soldier."
     correctTag: "O"
-    comment: "Words like \"he\", \"she\", and \"they\" don't get labeled as Person. Label it as None."
+    comment: "Words like \"he\", \"she\", and \"they\" get labeled as None."
+
+  - sequence: "He took [them] with him."
+    correctTag: "O"
+    comment: "Words like \"he\", \"she\", and \"they\" get labeled as None."
 
   - sequence: "I went to [Germany] on vacation."
     correctTag: "LOC"

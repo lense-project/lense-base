@@ -206,7 +206,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    */
   def renderClassification(model : Model, goldMap : Map[ModelVariable, String], guessMap : Map[ModelVariable, String]) : Unit = {}
 
-  def useLearning : Boolean = true
+  var useLearning : Boolean = true
 
   ////////////////////////////////////////////////
   //
@@ -304,7 +304,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
 
       val idx = goldPairs.indexOf(pair)
-      if ((idx < 100 && idx % 10 == 0) || (idx < 200 && idx % 20 == 0)  || (idx % 80 == 0)) {
+      if ((idx < 200 && idx % 40 == 0)  || (idx % 80 == 0)) {
         modelStream.learn(lenseEngine.pastGuesses)
         numSwapsSoFar += 1
       }
@@ -321,12 +321,23 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                               humanErrorDistribution : HumanErrorDistribution,
                               humanDelayDistribution : HumanDelayDistribution,
                               workUnitCost : Double,
-                              startNumArtificialHumans : Int,
-                              numQueriesPerNode : Int) : Unit = {
+                              poolSize : Int,
+                              numQueriesPerNode : Int,
+                              useRealHumans : Boolean = false) : Unit = {
     val rand = new Random()
-    val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
+    ensureWorkServer
+    val hitId = if (useRealHumans) makeHITAndWaitFor(poolSize) else ""
 
+    val hcuPool : HCUPool = if (useRealHumans) {
+      RealHumanHCUPool
+    }
+    else {
+      ArtificialHCUPool(poolSize, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
+    }
+
+    useLearning = false
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
+    lenseEngine.gamePlayer.budget = lenseEngine.budget
     lenseEngine.turnOffLearning()
 
     progressivelyAnalyze(goldPairs, pair => {
@@ -335,15 +346,23 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       for (variable <- model.variables) {
         if (!goldMap.contains(variable)) throw new IllegalStateException("Can't have a gold graph not built from graph's actual nodes")
       }
-      val guessMap = Await.result(classifyWithArtificialHumans(model, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
+      val guessMap = if (useRealHumans) {
+        Await.result(classifyWithRealHumans(model, RealHumanHCUPool).future, 1000 days)
+      } else {
+        Await.result(classifyWithArtificialHumans(model, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
+      }
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
       renderClassification(model, goldMap, guessMap._1)
       (model, goldMap, guessMap._1, guessMap._2)
     }, hcuPool, "all_human_"+numQueriesPerNode)
 
-    hcuPool.kill()
-
-    System.exit(0)
+    // We're now done with the run, so we need to expire the HIT, if we haven't already
+    if (useRealHumans) {
+      HITCreator.expireHIT(hitId)
+    }
+    else {
+      hcuPool.asInstanceOf[ArtificialHCUPool].kill()
+    }
   }
 
   /**
@@ -354,7 +373,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)], poolSize : Int) : Unit = {
     ensureWorkServer
-
     val hitId = makeHITAndWaitFor(poolSize)
 
     progressivelyAnalyze(goldPairs, pair => {

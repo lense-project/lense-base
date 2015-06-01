@@ -29,6 +29,7 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
   def getHumanQuestion(sequence : List[String], i : Int) : String
   def getHumanVersionOfLabel(label : String) : String
   def lossFunction(sequence : List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double) : Double
+  def useEM : Boolean = false
 
   /**
    * This gets the initial training examples to show to humans. Provide a sequence, an index, the correct answer, and
@@ -79,7 +80,11 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
     (introText, cheatSheet, list.toList)
   }
 
-  lazy val graphicalModelStream : GraphicalModelStream = new GraphicalModelStream(humanErrorDistribution)
+  lazy val graphicalModelStream : GraphicalModelStream = {
+    val s = new GraphicalModelStream(humanErrorDistribution)
+    s.useEM = useEM
+    s
+  }
 
   override def getModelStream : ModelStream = graphicalModelStream
 
