@@ -326,6 +326,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                               poolSize : Int,
                               numQueriesPerNode : Int,
                               useRealHumans : Boolean = false) : Unit = {
+    useLearning = false
+    initialize()
+
     val rand = new Random()
     val hitId = if (useRealHumans) {
       ensureWorkServer
@@ -339,8 +342,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       ArtificialHCUPool(poolSize, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
     }
 
-    useLearning = false
-    initialize()
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
     lenseEngine.gamePlayer.budget = lenseEngine.budget
     lenseEngine.turnOffLearning()

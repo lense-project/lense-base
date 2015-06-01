@@ -50,7 +50,7 @@ abstract class ExternalModelStream[Input](humanErrorDistribution : HumanErrorDis
     val loss = trainExternalModel(models.map(m => (m.asInstanceOf[ExternalModel[Input]].getInput, m.map)))
     val rawPriors = models.flatMap(m => rawPrior(m.asInstanceOf[ExternalModel[Input]]))
     // TODO: This should probably be on a separate tuning set, rather than the training set
-    knnList = rawPriors.map(pair => (pair._2, pair._1.getObservedValue)).toList
+    knnList = rawPriors.map(pair => (pair._2, pair._1.m.map(pair._1))).toList
     loss
   }
 

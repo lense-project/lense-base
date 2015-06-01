@@ -13,7 +13,7 @@ import edu.stanford.nlp.ling.RVFDatum
  *
  * Implements a stupid logistic model over the data, which can be tweaked as desired
  */
-abstract class LogisticExternalModelStream[Input](humanErrorDistribution : HumanErrorDistribution) extends UnivariateExternalModelStream[Input](humanErrorDistribution) {
+abstract class LogisticExternalModelStream[Input](humanErrorDistribution : HumanErrorDistribution, classes : List[String]) extends UnivariateExternalModelStream[Input](humanErrorDistribution) {
   var classifier : LinearClassifier[String, String] = null
   val classifierFactory : LinearClassifierFactory[String, String] = new LinearClassifierFactory[String,String]()
 
@@ -30,27 +30,24 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    * @return
    */
   override def prior(input: Input): Map[String, Double] = {
-    var localClassifier : LinearClassifier[String,String] = null
-    classifierFactory.synchronized {
-      while (classifier == null) {
-        classifierFactory.wait()
+    if (classifier == null) {
+      classes.map(cl => (cl, 1.0)).toMap
+    }
+    else {
+      val counter = new ClassicCounter[String]()
+      val feats = getFeatures(input)
+      for (feat <- feats) {
+        counter.incrementCount(feat._1, feat._2)
       }
-      localClassifier = classifier
+      val rvf = new RVFDatum[String, String](counter)
+      val outputCounter = classifier.probabilityOf(rvf)
+
+      println(outputCounter)
+
+      outputCounter.keySet().toArray.map(key => {
+        (key.asInstanceOf[String], outputCounter.getCount(key))
+      }).toMap
     }
-
-    val counter = new ClassicCounter[String]()
-    val feats = getFeatures(input)
-    for (feat <- feats) {
-      counter.incrementCount(feat._1, feat._2)
-    }
-    val rvf = new RVFDatum[String, String](counter)
-    val outputCounter = localClassifier.probabilityOf(rvf)
-
-    println(outputCounter)
-
-    outputCounter.keySet().toArray.map(key => {
-      (key.asInstanceOf[String], outputCounter.getCount(key))
-    }).toMap
   }
 
   /**
@@ -60,7 +57,11 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    * @return the loss from model training
    */
   override def train(inputOutputPairs: Iterable[(Input, String)]): Double = {
+    if (inputOutputPairs.size == 0) return 0.0
+
     val rvfDataset : RVFDataset[String, String] = new RVFDataset[String,String]()
+    println("Retraining...")
+
     inputOutputPairs.foreach(pair => {
       val counter = new ClassicCounter[String]()
       val feats = getFeatures(pair._1)

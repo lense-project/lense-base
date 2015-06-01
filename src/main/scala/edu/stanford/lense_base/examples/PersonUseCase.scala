@@ -30,7 +30,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   // Sets up the model we'll be using
 
-  val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution) {
+  val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution, labelTypes) {
     override def getFeatures(input: PersonImage): Map[String, Double] = {
       val features = input.embedding.zipWithIndex.map(pair => {
         "nn:"+pair._2 -> pair._1
@@ -174,10 +174,10 @@ object PersonUseCase {
   def main(args: Array[String]) {
     val personUseCase = new PersonUseCase()
 
-    val poolSize = 10
-    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    val poolSize = 3
+    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
-    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 7) // 3 query baseline
+    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
     // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, poolSize)
   }

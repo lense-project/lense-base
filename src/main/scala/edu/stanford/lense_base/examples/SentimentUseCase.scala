@@ -45,7 +45,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
-  lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution) {
+  lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution, labelTypes) {
     override def getFeatures(input: String): Map[String, Double] = {
       // Stupid bag of words features...
       val tokens = input.split(" ")

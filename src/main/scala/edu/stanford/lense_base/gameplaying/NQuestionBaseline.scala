@@ -7,17 +7,25 @@ package edu.stanford.lense_base.gameplaying
  */
 class NQuestionBaseline(n : Int) extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
-    getAllLegalMoves(state, reserveRealBudget = true)
+    val legalMoves = getAllLegalMoves(state, reserveRealBudget = true)
 
+    // Ask everything we legally can first
     for (variable <- state.model.variables) {
       val numReqs = state.completedRequests.count(_._1 eq variable) + state.inFlightRequests.count(_._1 eq variable)
       if (numReqs < n) {
-        if (state.hcuPool.hcuPool.size > 0) {
-          return MakeHumanObservation(variable, state.hcuPool.hcuPool.minBy(hcu => hcu.estimateRequiredTimeIncludingQueue(variable)))
+        val legalMovesOnThisVariable = legalMoves.filter(_.isInstanceOf[MakeHumanObservation]).map(_.asInstanceOf[MakeHumanObservation]).filter(_.variable == variable)
+        if (legalMovesOnThisVariable.size > 0) {
+          return legalMovesOnThisVariable.minBy(move => move.hcu.estimateRequiredTimeIncludingQueue(variable))
         }
-        else {
-          return Wait()
-        }
+      }
+    }
+
+    // Wait only if we've exhausted all other legal moves
+    for (variable <- state.model.variables) {
+      val numReqs = state.completedRequests.count(_._1 eq variable) + state.inFlightRequests.count(_._1 eq variable)
+      if (numReqs < n) {
+        val legalMovesOnThisVariable = legalMoves.filter(_.isInstanceOf[MakeHumanObservation]).map(_.asInstanceOf[MakeHumanObservation]).filter(_.variable == variable)
+        if (legalMovesOnThisVariable.size == 0) return Wait()
       }
     }
 
