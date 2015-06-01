@@ -228,30 +228,39 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
           val node2 = factor.nodeList(1)
 
           node1.nodeType.valueDomain.categories.flatMap(cat1 => {
-            var i1 = node1.nodeType.valueDomain.index(cat1)
+            val i1 = node1.nodeType.valueDomain.index(cat1)
 
             node2.nodeType.valueDomain.categories.map(cat2 => {
-              var i2 = node2.nodeType.valueDomain.index(cat2)
+              val i2 = node2.nodeType.valueDomain.index(cat2)
 
               val key = List(cat1, cat2)
 
-              val v = if (node1.observedValue == cat1 && node2.observedValue == null) {
-                tensorArray(i2)
+              // If we're observing values, the proportions array is shortened to just include marginals over un-observed values
+              // so we need some ugly logic to pick apart all the marginals
+              val v = if (!ignoreObservedValues) {
+                if (node1.observedValue == cat1 && node2.observedValue == null) {
+                  tensorArray(i2)
+                }
+                else if (node2.observedValue == cat2 && node1.observedValue == null) {
+                  tensorArray(i1)
+                }
+                else if (node1.observedValue == cat1 && node2.observedValue == cat2) {
+                  1.0
+                }
+                else if (node1.observedValue != null && node1.observedValue != cat1) {
+                  0.0
+                }
+                else if (node2.observedValue != null && node2.observedValue != cat2) {
+                  0.0
+                }
+                else {
+                  tensorArray((i1*domainSize) + i2)
+                }
               }
-              else if (node2.observedValue == cat2 && node1.observedValue == null) {
-                tensorArray(i1)
-              }
-              else if (node1.observedValue == cat1 && node2.observedValue == cat2) {
-                1.0
-              }
-              else if (node1.observedValue != null && node1.observedValue != cat1) {
-                0.0
-              }
-              else if (node2.observedValue != null && node2.observedValue != cat2) {
-                0.0
-              }
+              // If we're ignoring observed values, don't bother with zeroing out or remapping, cause the proportions will
+              // be exactly the right size
               else {
-                tensorArray((i1*domainSize) + i2)
+                tensorArray((i1 * domainSize) + i2)
               }
 
               // key value pair
@@ -315,6 +324,7 @@ case class Graph(stream : GraphStream, overrideToString : String = null) extends
     setObservedVariablesForFactorie()
     val variables = if (ignoreObservedValues) allVariablesForFactorie() else unobservedVariablesForFactorie()
     if (variables.size == 0) return Map()
+
     model.synchronized {
       model.warmUpIndexes(this)
     }
@@ -522,11 +532,33 @@ class GraphStream {
   private def learnEM(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true) : Double = {
     val nodeTypes = graphs.flatMap(_.nodes.map(_.nodeType)).toList.distinct
     val factorTypes = graphs.flatMap(_.factors.map(_.factorType)).toList.distinct
+    val withDomainTypes = nodeTypes ++ factorTypes
 
     for (graph <- graphs) {
       modelTrainingClone.warmUpIndexes(graph)
     }
     modelTrainingClone.dotFamilyCache.clear()
+
+    val localWithDomainList = graphs.flatMap(g => {
+      g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
+    }).toList.distinct
+
+    val frozenDomainMap = withDomainList.synchronized {
+      localWithDomainList.map(withDomain => {
+        val newDomain = new CategoricalDomain[String]()
+        newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
+        (withDomain.domain.dimensionDomain, newDomain)
+      }).toMap
+    }
+
+    graphs.map(graph => {
+      graph.setObservedVariablesForFactorie()
+      val nodeVariables = graph.allVariablesForFactorie()
+      for (nodeVariable <- nodeVariables) {
+        nodeVariable.frozenDomainMap = frozenDomainMap
+      }
+      new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+    }).toSeq
 
     var converged = false
     var lastLoss = Double.NegativeInfinity
@@ -563,14 +595,6 @@ class GraphStream {
           }
           typeCounts.put(domainType, typeCounts(domainType) + 1)
 
-          if (domainType.getWeights != null) {
-            for (w <- domainType.getWeights) {
-              for (q <- w._2) {
-                regularizer += q._2 * q._2
-              }
-            }
-          }
-
           if (!typeAverage.contains(domainType)) typeAverage.put(domainType, domainType.abstractPossibleValues.map(value => (value, mutable.Map[String, Double]())).toMap)
 
           val localObservedMarginals: Map[Any, Double] = pair._2.asInstanceOf[Map[Any, Double]]
@@ -582,14 +606,24 @@ class GraphStream {
             val unobservedProb = localUnobservedMarginals(value)
 
             val mutableWeightsAverageMap = typeAverage(domainType)(value)
+
             for (featureWithWeight <- withDomain.features) {
               val feature = featureWithWeight._1
               val weight = featureWithWeight._2
-
               mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + (prob - unobservedProb) * weight)
             }
           }
         })
+      }
+
+      for (withDomain <- withDomainTypes) {
+        if (withDomain.getWeights != null) {
+          for (w <- withDomain.getWeights) {
+            for (q <- w._2) {
+              regularizer += q._2 * q._2
+            }
+          }
+        }
       }
 
       regularizer = - regularizer * l2regularization / 2
@@ -609,19 +643,19 @@ class GraphStream {
       // Done collecting marginals
 
       for (pair <- typeAverage) {
-        val nt = pair._1
+        val withDomain = pair._1
         val unnormalizedAverage = pair._2
         val normalizedAverage = unnormalizedAverage.map(assignmentAvg => {
-          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / typeCounts.getOrElse(nt, 1))))
+          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / typeCounts.getOrElse(withDomain, 1))))
         })
 
-        if (nt.getWeights == null) {
-          nt.setWeights(normalizedAverage.map(assignmentAvg => {
+        if (withDomain.getWeights == null) {
+          withDomain.setWeights(normalizedAverage.map(assignmentAvg => {
             (assignmentAvg._1, assignmentAvg._2.toMap)
           }))
         }
         else {
-          nt.setWeights(nt.getWeights.map(oldWeightsForSinglePossibleValue => {
+          withDomain.setWeights(withDomain.getWeights.map(oldWeightsForSinglePossibleValue => {
             val possibleValue = oldWeightsForSinglePossibleValue._1
             val weightsForPossibleValue = oldWeightsForSinglePossibleValue._2
             (possibleValue, weightsForPossibleValue.map(q => {
@@ -689,7 +723,7 @@ class GraphStream {
 
       val localWithDomainList = graphs.flatMap(g => {
         g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
-      })
+      }).toList.distinct
 
       // Don't want to be doing this part in parallel, things get broken
 
@@ -703,10 +737,6 @@ class GraphStream {
           localWithDomainList.map(withDomain => {
             val newDomain = new CategoricalDomain[String]()
             newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
-            /*
-            val featureDomain = new CategoricalDomain[String]()
-            featureDomain.indexAll(withDomain.featureDomain.dimensionDomain.categories.toArray)
-            */
             (withDomain.domain.dimensionDomain, newDomain)
           }).toMap
         }
@@ -791,7 +821,7 @@ class GraphStream {
                         feature -> weight
                       }).toMap
                   }
-                  nodeType.weights = keyValue.toMap
+                  nodeType.setWeights(keyValue.toMap)
 
                 // Translate a factorType's weights back into the Map we use for weights
 
@@ -813,7 +843,7 @@ class GraphStream {
                             feature -> weight
                           }).toMap
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case 2 =>
                       if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
                         "factor that isn't val1 x val2 x features, which means dim=3. Instead got dim=" + tensor.dimensions.length)
@@ -836,7 +866,7 @@ class GraphStream {
                             }).toMap
                         }
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case 3 =>
                       if (tensor.dimensions.length != 3) throw new IllegalStateException("Can't have weights for a Factor's " +
                         "factor that isn't val1 x val2 x val3 x features, which means dim=4. Instead got dim=" + tensor.dimensions.length)
@@ -863,7 +893,7 @@ class GraphStream {
                           }
                         }
                       }
-                      factorType.weights = keyValue.toMap
+                      factorType.setWeights(keyValue.toMap)
                     case _ => throw new IllegalStateException("FactorType shouldn't have a neighborTypes that's size is <1 or >3")
                   }
               }
@@ -1136,7 +1166,7 @@ class GraphStream {
     }
 
     def warmUpIndexes(graph : Graph) : Unit = {
-      val clearCacheIfSizeChanges = false
+      val clearCacheIfSizeChanges = true
       // Pre-warm node type weights
       for (nodeType <- graph.nodes.map(_.nodeType).distinct) {
         if (nodeType.weights != null) for (valueFeaturesPair <- nodeType.weights) {

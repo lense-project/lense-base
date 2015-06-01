@@ -36,7 +36,7 @@ abstract class NERUseCase extends LenseSequenceUseCase {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
   }
   lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000) // .slice(20, 50)
-  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(400)
+  lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(4)
   // lazy val trainSet : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(20)
 
   lazy val coreNLP : StanfordCoreNLP = {
@@ -46,8 +46,8 @@ abstract class NERUseCase extends LenseSequenceUseCase {
   }
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = if (useLearning) try {
-    Word2VecLoader.loadData("data/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/google-300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors

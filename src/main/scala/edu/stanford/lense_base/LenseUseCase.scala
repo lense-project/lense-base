@@ -311,7 +311,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
       renderClassification(model, goldMap, guessMap)
       val loss = 0
-      (model, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List(), "turn-in-guess"))
+      (model, goldMap, guessMap, PredictionSummary(loss, 0, 0, 0, 0, 0, initialMinConfidence, initialMaxConfidence, initialAverageConfidence, numSwapsSoFar, lenseEngine.currentLoss(), lenseEngine.pastGuesses.size, List(), List(), List(), "turn-in-guess"))
     }, null, "offline_baseline")
 
     System.exit(0)
@@ -515,6 +515,122 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     cw.close()
   }
 
+  private def frobeniusNorm(map1 : Map[List[String],Double], map2 : Map[List[String],Double]) : Double = {
+    val map1Sum = map1.map(_._2).sum
+    val map1Normalized = map1.map(pair => (pair._1, pair._2 / map1Sum))
+    val map2Sum = map2.map(_._2).sum
+    val map2Normalized = map2.map(pair => (pair._1, pair._2 / map2Sum))
+
+    var squareSum = 0.0
+
+    for (pair <- map1Normalized) {
+      val key = pair._1
+      val v1 = pair._2
+      val v2 = map2Normalized(key)
+      squareSum += Math.pow(v1 - v2, 2.0)
+    }
+
+    Math.sqrt(squareSum)
+  }
+
+  private def printConditionalNormalizedCSV(path : String, probs : Map[List[String],Double]) : Unit = {
+    val cw = new BufferedWriter(new FileWriter(path))
+    val keys = probs.map(_._1.head).toList.distinct
+    cw.write("COL=GUESS;ROW=GOLD")
+    for (key <- keys) {
+      cw.write(","+key)
+    }
+
+    for (key <- keys) {
+      cw.write("\n")
+      cw.write(key)
+
+      val subMap = probs.filter(_._1.head == key).map(pair => (pair._1.last, pair._2))
+      val sum = subMap.map(_._2).sum
+      val normalizedSubMap = subMap.map(pair => (pair._1, pair._2 / sum))
+
+      for (guess <- keys) {
+        cw.write(","+normalizedSubMap(guess))
+      }
+    }
+
+    cw.close()
+  }
+
+  private def printHumanErrorBeliefsSummary(path : String, l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)]) : Unit = {
+    val summaries = l.map(_._4)
+
+    val f = new File(path)
+    if (!f.exists()) {
+      f.mkdirs()
+    }
+
+    // Print out underlying distribution in the same format as our guesses
+
+    if (summaries.size > 0) {
+      val summary = summaries.head
+      var j = 0
+      for (pair <- summary.believedVsReceivedHumanDistribution) {
+        printConditionalNormalizedCSV(path + "receivedError_type_" + j + ".csv", pair._2)
+        j += 1
+      }
+    }
+
+    val dw = new BufferedWriter(new FileWriter(path+"human_observations.txt"))
+
+    // Log the actual resulting distributions
+
+    val conditionalMatricesPath = path+"conditional_matrices_over_time/"
+    val f2 = new File(conditionalMatricesPath)
+    if (!f2.exists()) f2.mkdirs()
+
+    var humanRequests = 0
+    for (i <- 0 to summaries.length-1) {
+      val summary = summaries(i)
+      humanRequests += summary.numRequestsCompleted
+
+      if (i % 1 == 0) {
+        var j = 0
+        for (pair <- summary.believedVsReceivedHumanDistribution) {
+          val believedProbabilities = pair._1
+          // val receivedProbabilities = pair._2
+          dw.write(i.toString+": ")
+          dw.write(humanRequests.toString)
+          dw.write("\n")
+
+          val believedPath = conditionalMatricesPath+"believedError_iteration_"+i+"_type_"+j+".csv"
+          printConditionalNormalizedCSV(believedPath, believedProbabilities)
+
+          j += 1
+        }
+      }
+    }
+
+    val confusionMatricesPath = path+"confusion_matrices_over_time/"
+    val f3 = new File(confusionMatricesPath)
+    if (!f3.exists()) f3.mkdirs()
+
+    for (i <- 0 to l.length-1) {
+      val humanPredictionsVsCorrect : List[(String,String,ModelVariable,HumanComputeUnit)] = l.slice(0,i-1).flatMap(quad => {
+        val graph = quad._1
+        val goldMap = quad._2
+        quad._4.humanQueryResponses.map(triple => {
+          (goldMap(triple._1), triple._3, triple._1, triple._2)
+        })
+      })
+
+      val variableTypes = l.flatMap(_._1.variables).map(_.possibleValues.toSet).distinct.toList
+      for (valueSet <- variableTypes) {
+        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == valueSet).map(quad => (quad._1, quad._2))
+        printConfusion(confusionMatricesPath+"/confusion_iteration_"+i+"_nodetype_"+variableTypes.indexOf(valueSet)+".csv",
+          valueSet.toList,
+          pairs)
+      }
+    }
+
+    dw.close()
+  }
+
   private def printConfusion(path : String, values : List[String], guesses : List[(String,String)]) : Unit = {
     // Get the confusion matrix
     val confusion : mutable.Map[(String,String), Int] = mutable.Map()
@@ -531,9 +647,9 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       cw.write(",")
       cw.write(guess)
     }
-    cw.write("\n")
 
     for (gold <- values) {
+      cw.write("\n")
       cw.write(gold)
       cw.write(",")
       var j = 0
@@ -544,7 +660,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         j += 1
         cw.write(""+confusion.getOrElse((gold, guess), 0))
       }
-      cw.write("\n")
     }
     cw.close()
   }
@@ -713,45 +828,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     })
     val hcusInvolved = humanPredictionsVsCorrect.map(_._4).distinct
 
-    // Do overall HCU collective analysis
-    val hcuPrefix = resultsPrefix+outputPath+"/hcu_report/"
-    val hcuReportFolder = new File(hcuPrefix)
-    if (!hcuReportFolder.exists()) hcuReportFolder.mkdirs()
-    frequencyLinePlot(hcuPrefix+"overall_latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
-    dumpRawNumbers(hcuPrefix+"overall_latency_data.txt", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
-    for (nodeType <- variableTypes) {
-      val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues == nodeType).map(quad => (quad._1, quad._2))
-      printConfusion(hcuPrefix+"overall_confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
-        nodeType.toList,
-        pairs)
-      printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
-      printExamples(hcuPrefix+"overall_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.map(quad => (quad._1, quad._2, quad._3)))
-      printExamples(hcuPrefix+"overall_correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
-      printExamples(hcuPrefix+"overall_incorrect_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
-    }
-    // Do individual HCU level analysis
-    for (hcu <- hcusInvolved) {
-      val thisHcuPrefix = hcuPrefix+"/"+hcu.getName+"/"
-      val thisHcuReportFolder = new File(thisHcuPrefix)
-      if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
-
-      for (nodeType <- variableTypes) {
-        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues == nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))
-        printConfusion(thisHcuPrefix+"confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
-          nodeType.toList,
-          pairs)
-        printAccuracy(thisHcuPrefix+"accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
-        printExamples(thisHcuPrefix+"examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).map(quad => (quad._1, quad._2, quad._3)))
-        printExamples(thisHcuPrefix+"correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
-        printExamples(thisHcuPrefix+"incorrect_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
-      }
-
-      frequencyLinePlot(thisHcuPrefix+"latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
-      dumpRawNumbers(thisHcuPrefix+"latency_data.txt", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
-    }
-
-    // First we print an overall HCU confusion matrix and accuracy etc
-
     def smoothTimeSeries(timeSeriesData : Array[Double], timeToAvg : Int) : Array[Double] = {
       var sum = 0.0
       val newData = new Array[Double](timeSeriesData.length)
@@ -785,18 +861,77 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         List[Int]()
       }
     })
-    def plotAgainstQueries(xLabel : String, timeSeriesData : Array[Double]) = {
+
+    def plotAgainstQueries(yLabel : String, timeSeriesData : Array[Double]) = {
+      plotAgainst(resultsPrefix+outputPath+"/", "time", queries, yLabel, timeSeriesData)
+    }
+
+    def plotAgainst(path : String, xLabel : String, xData : Array[Double], yLabel : String, yData : Array[Double]) = {
       val plot = new GNUPlot
-      plot.addLine(queries, timeSeriesData)
-      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 30))
-      plot.addLine(queries, smoothTimeSeries(timeSeriesData, 100))
-      plot.title = xLabel+" vs time"
-      plot.yLabel = xLabel
-      plot.xLabel = "time"
+      plot.addLine(xData, yData)
+      plot.addLine(xData, smoothTimeSeries(yData, 30))
+      plot.addLine(xData, smoothTimeSeries(yData, 100))
+      plot.title = yLabel+" vs "+xLabel
+      plot.yLabel = yLabel
+      plot.xLabel = xLabel
       for (idx <- hotSwapIndexes) {
         plot.addVerticalLine(idx)
       }
-      plot.saveAnalysis(resultsPrefix+outputPath+"/"+xLabel.replaceAll(" ","_")+"_plot")
+      plot.saveAnalysis(path+yLabel.replaceAll(" ","_")+"_plot")
+    }
+
+    // Do overall HCU collective analysis
+    val hcuPrefix = resultsPrefix+outputPath+"/hcu_report/"
+    val hcuReportFolder = new File(hcuPrefix)
+    if (!hcuReportFolder.exists()) hcuReportFolder.mkdirs()
+    frequencyLinePlot(hcuPrefix+"overall_latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
+    dumpRawNumbers(hcuPrefix+"overall_latency_data.txt", l.flatMap(_._4.humanQueryDelays.map(_._2.asInstanceOf[Double])).toList)
+
+    // Plot human confusion matrices
+
+    val summaries = l.map(_._4)
+    val errorBeliefsPrefix = hcuPrefix+"error_beliefs/"
+    printHumanErrorBeliefsSummary(errorBeliefsPrefix, l)
+
+    // Plot the error in our assessment over number of queries observed
+
+    val humanObsOverTime : List[Int] = summaries.scanLeft(0)((sum, summary) => {
+      sum + summary.numRequestsCompleted
+    }).tail
+    val frobeniusOverTime : List[Double] = summaries.map(summary => {
+      summary.believedVsReceivedHumanDistribution.map(pair => frobeniusNorm(pair._1, pair._2)).sum / summary.believedVsReceivedHumanDistribution.length
+    })
+    plotAgainst(errorBeliefsPrefix, "queries", humanObsOverTime.map(_.asInstanceOf[Double]).toArray, "error in beliefs", frobeniusOverTime.toArray)
+
+    for (nodeType <- variableTypes) {
+      val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).map(quad => (quad._1, quad._2))
+      printConfusion(hcuPrefix+"overall_confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
+        nodeType.toList,
+        pairs)
+      printAccuracy(hcuPrefix+"overall_accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
+      printExamples(hcuPrefix+"overall_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.map(quad => (quad._1, quad._2, quad._3)))
+      printExamples(hcuPrefix+"overall_correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
+      printExamples(hcuPrefix+"overall_incorrect_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
+    }
+    // Do individual HCU level analysis
+    for (hcu <- hcusInvolved) {
+      val thisHcuPrefix = hcuPrefix+"/"+hcu.getName+"/"
+      val thisHcuReportFolder = new File(thisHcuPrefix)
+      if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
+
+      for (nodeType <- variableTypes) {
+        val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))
+        printConfusion(thisHcuPrefix+"confusion_nodetype_"+variableTypes.indexOf(nodeType)+".csv",
+          nodeType.toList,
+          pairs)
+        printAccuracy(thisHcuPrefix+"accuracy_nodetype_"+variableTypes.indexOf(nodeType)+".txt", pairs)
+        printExamples(thisHcuPrefix+"examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).map(quad => (quad._1, quad._2, quad._3)))
+        printExamples(thisHcuPrefix+"correct_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 == q._2).map(quad => (quad._1, quad._2, quad._3)))
+        printExamples(thisHcuPrefix+"incorrect_examples_nodetype_"+variableTypes.indexOf(nodeType)+".txt", humanPredictionsVsCorrect.filter(_._4 eq hcu).filter(q => q._1 != q._2).map(quad => (quad._1, quad._2, quad._3)))
+      }
+
+      frequencyLinePlot(thisHcuPrefix+"latency_curve", "latency", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
+      dumpRawNumbers(thisHcuPrefix+"latency_data.txt", l.flatMap(_._4.humanQueryDelays.filter(_._1 eq hcu).map(_._2.asInstanceOf[Double])).toList)
     }
     plotAgainstQueries("loss per token", l.map(quad => quad._4.loss / quad._1.variables.size).toArray)
     plotAgainstQueries("cost per token", l.map(quad => quad._4.requestCost / quad._1.variables.size).toArray)
