@@ -27,7 +27,7 @@ bib: paper.tex all.bib $(SECTIONS)
 	mv $(subst .tex,.pdf,$<) $(OUTPUT).pdf
 
 run:
-	go nips2014.pdf
+	go $(OUTPUT).pdf
 
 split: $(OUTPUT).pdf
 	pdfjam --paper letterpaper --outfile main.pdf $(OUTPUT).pdf 1-9

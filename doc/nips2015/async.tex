@@ -1,11 +1,21 @@
 \section{Choosing when and what to query}
 \label{sec:async}
 
+\pl{I'd move some of the setup before the model section,
+but explain the setup more}
+
 Our goal is to choose our querying strategy to minimize an arbitrary loss function:
 \[\sL(h_{\text{true}}, h, m, t)\]
 $\sL$ takes as parameters the true state of the world $h_{\text{true}}$, our guess $h$, and the money $m$ and time $t$ spent arriving at our guess.
  By tweaking $\sL$ practitioners applying our framework can move to arbitrary points on the cost-delay-accuracy tradeoff surface.
  We deliberately make no assumptions about the form of $\sL$ while developing theory, and demonstrate several choices in our experiments.
+ \pl{get off of that high horse and give concrete examples!}
+
+\pl{Instead of writing down equations,
+cast this as a game tree from the beginning with actions, possible feedback, etc.
+Draw a nice example.
+Then expected utility, expectimax policy, etc. should be conceptually obvious.
+}
 
 Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
 When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmax_{\by} \p(\by \given \bx)$.
@@ -25,6 +35,7 @@ U(\sigma)
     \left[\E_{p(\by \given \bx)}[\ell(\by, \byt)] \right]
   + C(\sigma).
 \end{align*}
+\pl{too abstract!  I know the measurements paper was a bit abstract...do as I say, not as I did}
 
 Without loss of generality, assume that the null measurement is free: $C(\sigma_0) = 0$.
 Intuitively, this ensures that we will only ever choose to measure something if the expected reduction in risk is more than the cost of executing the measurement.
@@ -105,6 +116,10 @@ Instead, we propose using a particle filter to estimate utilities (\algorithmref
 
 For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmax U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
 \todo{(arun): BAD NOTATION! The subscripts refer to members of $\Sigma$, but also the sequence of measurements.}
+
+\pl{I guess the particle filter is out of date;
+  in any case, I think we give one algorithm
+that works on the game tree, and say what the computational complexity of the different operations}
 
 \subsection{Modeling time}
 \label{sec:time}
