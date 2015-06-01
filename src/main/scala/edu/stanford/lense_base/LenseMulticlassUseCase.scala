@@ -27,7 +27,9 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   def getHumanTrainingExamples : List[(Input, String, String)] = List()
 
   override def encodeModelWithValuesAsTSV(model : Model, values : Map[ModelVariable, String]) : String = {
-    model.variables.head.payload.toString+"\t"+values(model.variables.head)
+    model.variables.head.payload.toString+"\t"+values(model.variables.head)+model.getHumanObservationsForVariable(model.variables.head).map(triple => {
+      triple._1+","+triple._2.getName+","+triple._3
+    }).mkString("\t")
   }
 
   override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(triple => {

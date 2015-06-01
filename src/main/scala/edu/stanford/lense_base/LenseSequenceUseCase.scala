@@ -95,7 +95,9 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
     val m = model.asInstanceOf[GraphicalModel]
     m.variables.sortBy(_.payload.asInstanceOf[(List[String],Int)]._2).map(n => {
       val payload = n.payload.asInstanceOf[(List[String],Int)]
-      payload._1(payload._2) + "\t" + values(n)
+      payload._1(payload._2) + "\t" + values(n) + "\t" + model.getHumanObservationsForVariable(n).map(triple => {
+        triple._1+","+triple._2.getName+","+triple._3
+      }).mkString("\t")
     }).mkString("\n")
   }
 

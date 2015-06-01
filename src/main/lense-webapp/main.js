@@ -92,12 +92,15 @@ $(function () {
                 content.html("Took too long answering query. Server revoked. Waiting for next question to answer.");
             }
             if (json['bonus'] !== undefined) {
-                var roundedBonus = Math.round(json.bonus * 100) / 100;
+                var roundedBonus = Math.round(json.bonus * 1000) / 1000;
                 var bonusString = "$"+roundedBonus;
                 if (bonusString.length === 3) {
+                    bonus.html(bonusString+"000");
+                }
+                else if (bonusString.length === 4) {
                     bonus.html(bonusString+"00");
                 }
-                if (bonusString.length === 4) {
+                else if (bonusString.length === 5) {
                     bonus.html(bonusString+"0");
                 }
                 else {
@@ -106,7 +109,7 @@ $(function () {
 
                 // Create animating bonus
                 var bonusDiv = $('<div/>', {class: "bonus-ping"});
-                bonusDiv.html("+$0.01");
+                bonusDiv.html("+0.25&#162;");
                 $("body").append(bonusDiv);
                 bonusDiv.animate({
                     top: "0px",

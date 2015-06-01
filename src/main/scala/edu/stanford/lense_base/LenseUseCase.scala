@@ -62,8 +62,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     lenseEngine.budget.addBudget(budget)
   }
 
-  initialize()
-
   def humanErrorDistribution : HumanErrorDistribution
 
   def humanDelayDistribution : HumanDelayDistribution
@@ -261,6 +259,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                                workUnitCost : Double,
                                startNumArtificialHumans : Int,
                                saveTitle : String) : Unit = {
+    initialize()
+
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
 
@@ -282,6 +282,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)]) = {
+    initialize()
+
     var numSwapsSoFar = 0
 
     progressivelyAnalyze(goldPairs, pair => {
@@ -325,8 +327,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                               numQueriesPerNode : Int,
                               useRealHumans : Boolean = false) : Unit = {
     val rand = new Random()
-    ensureWorkServer
-    val hitId = if (useRealHumans) makeHITAndWaitFor(poolSize) else ""
+    val hitId = if (useRealHumans) {
+      ensureWorkServer
+      makeHITAndWaitFor(poolSize)
+    } else ""
 
     val hcuPool : HCUPool = if (useRealHumans) {
       RealHumanHCUPool
@@ -336,6 +340,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
 
     useLearning = false
+    initialize()
     lenseEngine.gamePlayer = new NQuestionBaseline(numQueriesPerNode)
     lenseEngine.gamePlayer.budget = lenseEngine.budget
     lenseEngine.turnOffLearning()
@@ -372,6 +377,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
   def testWithRealHumans(goldPairs : List[(Input, Output)], poolSize : Int) : Unit = {
+    initialize()
+
     ensureWorkServer
     val hitId = makeHITAndWaitFor(poolSize)
 

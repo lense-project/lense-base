@@ -118,7 +118,7 @@ class ExternalModel[Input](stream : ModelStream) extends Model(stream) {
    * @param observation the value observed
    * @return a new model, representing adding this observation
    */
-  override def cloneModelWithHumanObservation(variable: ModelVariable, observation: String): Model = {
+  override def protectedCloneModelWithHumanObservation(variable: ModelVariable, observation: String): Model = {
     val newModel = new ExternalModel[Input](stream)
     newModel.setInput(getInput)
     newModel.setVariables(vars)

@@ -17,7 +17,13 @@ import scala.collection.JavaConversions._
  */
 class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) extends ModelStream(humanErrorDistribution) {
   val graphStream : GraphStream = new GraphStream()
-  var useEM : Boolean = true
+  var useEM : Boolean = false
+
+  def getRegularizationForSize(size : Int) : Double = {
+    if (size < 50) 1.0
+    else if (size < 100) 0.5
+    else 0.1
+  }
 
   /**
    * Retrains the model based on all examples seen so far.
@@ -26,7 +32,7 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
   override def learn(models : Iterable[Model]): Double = {
     // Run learning - MAP estimates for initialization
     println("RUNNING MAP INITIALIZATION...")
-    val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].cloneWithMAP()))
+    val mapLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].cloneWithMAP()), getRegularizationForSize(models.size))
 
     // Reset human weights to default, because regularizer will have messed with them, even though likelihoods should not have changed
     for (humanObservationTypePair <- humanObservationTypesCache.values) {
@@ -36,7 +42,7 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
     val loss = if (useEM && models.exists(m => m.variables.exists(!_.isObserved))) {
       // Run learning - soft EM
       println("RUNNING EM FINE TUNING...")
-      val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph))
+      val emLoss = graphStream.learn(models.map(_.asInstanceOf[GraphicalModel].getGraph), getRegularizationForSize(models.size))
       // Read out human weights
       for (humanObservationTypePair <- humanObservationTypesCache.values) {
         val w = humanObservationTypePair._2.getExpNormalizedWeights.map(pair => (pair._1, pair._2.apply("BIAS"))).asInstanceOf[Map[List[String],Double]]
@@ -138,7 +144,7 @@ class GraphicalModel(modelStream : GraphicalModelStream) extends Model(modelStre
    * @param observation the value observed
    * @return a new model, representing adding this observation
    */
-  override def cloneModelWithHumanObservation(variable: ModelVariable, observation: String): Model = {
+  override def protectedCloneModelWithHumanObservation(variable: ModelVariable, observation: String): Model = {
     val humanNodeAndFactorTypes = modelStream.getHumanObservationTypes(varToNode.get(variable).nodeType)
 
     val graphClonePair = graph.clone()

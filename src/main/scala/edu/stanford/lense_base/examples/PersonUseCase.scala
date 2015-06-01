@@ -175,9 +175,9 @@ object PersonUseCase {
     val personUseCase = new PersonUseCase()
 
     val poolSize = 10
-    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
-    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
+    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 7) // 3 query baseline
     // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, poolSize)
   }

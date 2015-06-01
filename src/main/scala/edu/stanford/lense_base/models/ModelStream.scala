@@ -36,6 +36,8 @@ abstract class ModelStream(humanErrorDistribution : HumanErrorDistribution) {
  */
 abstract class Model(modelStream : ModelStream) {
 
+  private var humanObservations = new java.util.IdentityHashMap[ModelVariable, List[(String, HumanComputeUnit, Long)]]()
+
   /**
    * Adds a new observation to the given variable, with updates according to the modelStream.humanErrorDistribution,
    * and returns the new model representing this new state of the world.
@@ -44,7 +46,23 @@ abstract class Model(modelStream : ModelStream) {
    * @param observation the value observed
    * @return a new model, representing adding this observation
    */
-  def cloneModelWithHumanObservation(variable : ModelVariable, observation : String) : Model
+  def cloneModelWithHumanObservation(variable : ModelVariable, observation : String, hcu : HumanComputeUnit, delayTaken : Long) : Model = {
+    val newModel = protectedCloneModelWithHumanObservation(variable, observation)
+
+    humanObservations.put(variable, humanObservations.getOrDefault(variable, List()) :+ (observation, hcu, delayTaken))
+    newModel.humanObservations = humanObservations
+    newModel
+  }
+
+  /**
+   * Adds a new observation to the given variable, with updates according to the modelStream.humanErrorDistribution,
+   * and returns the new model representing this new state of the world.
+   *
+   * @param variable the variable to which we will add an observation
+   * @param observation the value observed
+   * @return a new model, representing adding this observation
+   */
+  protected def protectedCloneModelWithHumanObservation(variable : ModelVariable, observation : String) : Model
 
   /**
    * @return a map of the variables -> distributions over tokens
@@ -60,6 +78,15 @@ abstract class Model(modelStream : ModelStream) {
    * @return a list of the variables that this model covers
    */
   def variables : List[ModelVariable]
+
+  /**
+   * Returns a list of human observations for this variable
+   * @param variable the variable of interest
+   * @return the human observations received for this variable
+   */
+  def getHumanObservationsForVariable(variable : ModelVariable) : List[(String, HumanComputeUnit, Long)] = {
+    humanObservations.getOrDefault(variable, List())
+  }
 }
 
 /**

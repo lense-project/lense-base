@@ -11,7 +11,8 @@ import scala.util.Try
  *
  * Holds a single job to ask an HCU pool to complete
  */
-class WorkUnit(resultPromise : Promise[String], initVar : ModelVariable, hcuPool : HCUPool) {
+class WorkUnit(resultPromise : Promise[String], initVar : ModelVariable, hcuPool : HCUPool, creationTime : Long = System.currentTimeMillis()) {
+  def timeSinceCreation() : Long = System.currentTimeMillis() - creationTime
 
   val variable = initVar
   private var _revoked = false

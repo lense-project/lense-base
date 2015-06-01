@@ -457,7 +457,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   // Get the cost
   override def cost: Double = {
     // TODO: this needs to be set in a flag someplace
-    0.01
+    0.0025
   }
 
   // Milliseconds that this worker is expected to remain on call before being paid

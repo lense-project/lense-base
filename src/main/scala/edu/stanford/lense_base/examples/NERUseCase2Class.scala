@@ -19,6 +19,8 @@ class NERUseCase2Class extends NERUseCase {
 
   override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_2class.csv", random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
+
+  override def budget: Double = 25.00
 }
 
 object NERUseCase2Class extends App {
@@ -46,10 +48,10 @@ object NERUseCase2Class extends App {
   dumpData(nerUseCase.data, "test_data")
   dumpData(nerUseCase.trainSet, "train_data")
 
-  val poolSize = 3
+  val poolSize = 10
   // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.01, poolSize, 2) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
 }
