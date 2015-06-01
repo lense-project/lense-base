@@ -8,7 +8,7 @@ import cc.factorie.la
 import cc.factorie.la._
 import cc.factorie.model._
 import cc.factorie.optimize._
-import cc.factorie.util.{DoubleSeq, Logger}
+import cc.factorie.util.{DoubleAccumulator, DoubleSeq, Logger}
 import cc.factorie.variable.{CategoricalVectorDomain, FeatureVectorVariable, _}
 import edu.stanford.lense_base.util.CaseClassEq
 
@@ -521,164 +521,98 @@ class GraphStream {
             clearOptimizer : Boolean = true) : Double = {
     if (graphs.size == 0) return 0.0
 
-    if (graphs.exists(graph => graph.nodes.exists(node => {
-      node.observedValue == null
-    }))) learnEM(graphs, l2regularization, clearOptimizer)
-    else learnFullyObserved(graphs, l2regularization, clearOptimizer)
+    if (graphs.exists(graph => graph.nodes.exists(node => node.observedValue == null))) {
+      // Run EM
+      learnWithFactorie(graphs, l2regularization, clearOptimizer, (graph, frozenDomainMap) => {
+        graph.setObservedVariablesForFactorie()
+        val allVariables = graph.allVariablesForFactorie()
+        for (nodeVariable <- allVariables) {
+          nodeVariable.frozenDomainMap = frozenDomainMap
+        }
+        new EMExample(allVariables, graph.unobservedVariablesForFactorie(), modelTrainingClone, InferByBPTree)
+      })
+    }
+    else {
+      // Run MLE
+      learnWithFactorie(graphs, l2regularization, clearOptimizer, (graph, frozenDomainMap) => {
+        graph.setObservedVariablesForFactorie()
+        val nodeVariables = graph.allVariablesForFactorie()
+        for (nodeVariable <- nodeVariables) {
+          nodeVariable.frozenDomainMap = frozenDomainMap
+        }
+        new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+      })
+    }
   }
 
-  // performs EM on the graph. Still massively TODO
+  class EMExample[A<:Iterable[Var],B<:Model](allVariables: A, observedVariables : A, model: B, val infer: Infer[A,B]) extends Example {
+    def accumulateValueAndGradient(value: DoubleAccumulator, gradient: WeightsMapAccumulator): Unit = {
+      val summaryObserved = infer.infer(observedVariables, model)
+      val summaryUnobserved = infer.infer(allVariables, model)
 
-  private def learnEM(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true) : Double = {
-    val nodeTypes = graphs.flatMap(_.nodes.map(_.nodeType)).toList.distinct
-    val factorTypes = graphs.flatMap(_.factors.map(_.factorType)).toList.distinct
-    val withDomainTypes = nodeTypes ++ factorTypes
+      if (value != null)
+        value.accumulate(summaryObserved.logZ - summaryUnobserved.logZ)
 
-    for (graph <- graphs) {
-      modelTrainingClone.warmUpIndexes(graph)
-    }
-    modelTrainingClone.dotFamilyCache.clear()
+      // + observed
+      val factorMarginals = summaryObserved.factorMarginals
 
-    val localWithDomainList = graphs.flatMap(g => {
-      g.nodes.map(_.nodeType).distinct ++ g.factors.map(_.factorType).distinct
-    }).toList.distinct
-
-    val frozenDomainMap = withDomainList.synchronized {
-      localWithDomainList.map(withDomain => {
-        val newDomain = new CategoricalDomain[String]()
-        newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
-        (withDomain.domain.dimensionDomain, newDomain)
-      }).toMap
-    }
-
-    graphs.map(graph => {
-      graph.setObservedVariablesForFactorie()
-      val nodeVariables = graph.allVariablesForFactorie()
-      for (nodeVariable <- nodeVariables) {
-        nodeVariable.frozenDomainMap = frozenDomainMap
+      val observedFamilyCount = new java.util.IdentityHashMap[DotFamily, Int]()
+      for (factorMarginal <- factorMarginals) {
+        factorMarginal.factor match {
+          case factor: DotFamily#Factor =>
+            observedFamilyCount.put(factor.family, observedFamilyCount.getOrDefault(factor.family, 0) + 1)
+        }
       }
-      new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
-    }).toSeq
 
-    var converged = false
-    var lastLoss = Double.NegativeInfinity
-    var convergenceCounter = 0
-
-    while (!converged) {
-
-      // Create blank weight sets
-
-      val typeAverage = mutable.Map[WithDomain, Map[Any, mutable.Map[String,Double]]]()
-      val typeCounts = mutable.Map[WithDomain, Int]()
-
-      // Initialize the weight sets with all zeros
-
-      typeCounts ++= nodeTypes.map(nt => (nt, 0))
-      typeCounts ++= factorTypes.map(ft => (ft, 0))
-
-      // Collect average marginals over all graphs
-
-      var logLikelihood = 0.0
-      var regularizer = 0.0
-
-      for (graph <- graphs) {
-        logLikelihood += graph.logLikelihoodWithUnobserved(modelTrainingClone)
-
-        val marginals = graph.marginalEstimate(modelTrainingClone) ++ graph.factorsMarginalEstimate(modelTrainingClone).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
-        val unobservedMarginals = graph.marginalEstimate(modelTrainingClone, ignoreObservedValues = true) ++ graph.factorsMarginalEstimate(modelTrainingClone, ignoreObservedValues = true).asInstanceOf[Map[GraphVarWithDomain, Map[Any, Double]]]
-
-        marginals.foreach(pair => {
-          val withDomain = pair._1
-          val domainType: WithDomain = withDomain match {
-            case node: GraphNode => node.nodeType
-            case factor: GraphFactor => factor.factorType
-          }
-          typeCounts.put(domainType, typeCounts(domainType) + 1)
-
-          if (!typeAverage.contains(domainType)) typeAverage.put(domainType, domainType.abstractPossibleValues.map(value => (value, mutable.Map[String, Double]())).toMap)
-
-          val localObservedMarginals: Map[Any, Double] = pair._2.asInstanceOf[Map[Any, Double]]
-          val localUnobservedMarginals: Map[Any, Double] = unobservedMarginals(pair._1).asInstanceOf[Map[Any, Double]]
-
-          for (valueWithProb <- localObservedMarginals) {
-            val value = valueWithProb._1
-            val prob = valueWithProb._2
-            val unobservedProb = localUnobservedMarginals(value)
-
-            val mutableWeightsAverageMap = typeAverage(domainType)(value)
-
-            for (featureWithWeight <- withDomain.features) {
-              val feature = featureWithWeight._1
-              val weight = featureWithWeight._2
-              mutableWeightsAverageMap.put(feature, mutableWeightsAverageMap.getOrElse(feature, 0.0) + (prob - unobservedProb) * weight)
+      for (factorMarginal <- factorMarginals) {
+        factorMarginal.factor match {
+          case factor: DotFamily#Factor if factor.family.isInstanceOf[DotFamily] =>
+            if (gradient != null) {
+              factorMarginal match {
+                case fac2 : BPFactor2Factor3 =>
+                  gradient.accumulate(factor.family.weights, fac2.factor._3.value outer fac2.proportions, 1.0 / observedFamilyCount.get(factor.family))
+                case fac1 : BPFactor1Factor3 =>
+                  gradient.accumulate(factor.family.weights, (fac1.proportions outer fac1.factor._2.value) outer fac1.factor._3.value, 1.0 / observedFamilyCount.get(factor.family))
+                case fac1 : BPFactor1Factor2 =>
+                  gradient.accumulate(factor.family.weights, fac1.proportions outer fac1.factor._2.value, 1.0 / observedFamilyCount.get(factor.family))
+                case _ =>
+                  throw new IllegalStateException("Should always match!")
+              }
             }
-          }
-        })
+        }
       }
 
-      for (withDomain <- withDomainTypes) {
-        if (withDomain.getWeights != null) {
-          for (w <- withDomain.getWeights) {
-            for (q <- w._2) {
-              regularizer += q._2 * q._2
+      // - unobserved
+      val unobservedFactorMarginals = summaryUnobserved.factorMarginals
+
+      val unObservedFamilyCount = new java.util.IdentityHashMap[DotFamily, Int]()
+      for (factorMarginal <- unobservedFactorMarginals) {
+        factorMarginal.factor match {
+          case factor : DotFamily#Factor =>
+            factor.family
+            unObservedFamilyCount.put(factor.family, unObservedFamilyCount.getOrDefault(factor.family, 0) + 1)
+        }
+      }
+
+      for (factorMarginal <- unobservedFactorMarginals) {
+        factorMarginal.factor match {
+          case factor: DotFamily#Factor if factor.family.isInstanceOf[DotFamily] =>
+            if (gradient != null && observedFamilyCount.containsKey(factor.family)) {
+              factorMarginal match {
+                case fac2 : BPFactor2Factor3 =>
+                  gradient.accumulate(factor.family.weights, fac2.proportions outer fac2.factor._3.value, -1.0 / unObservedFamilyCount.get(factor.family))
+                case fac1 : BPFactor1Factor3 =>
+                  // This should be impossible under our usual CRF setup. We support it anyways
+                  gradient.accumulate(factor.family.weights, fac1.proportions outer fac1.factor._3.value, -1.0 / unObservedFamilyCount.get(factor.family))
+                case fac1 : BPFactor1Factor2 =>
+                  gradient.accumulate(factor.family.weights, fac1.proportions outer fac1.factor._2.value, -1.0 / unObservedFamilyCount.get(factor.family))
+                case _ =>
+                  throw new IllegalStateException("Should always match!")
+              }
             }
-          }
         }
-      }
-
-      regularizer = - regularizer * l2regularization / 2
-      System.err.println("Value: "+logLikelihood)
-      System.err.println("Regularizer: "+regularizer)
-      System.err.println("Value + Regularizer: "+(logLikelihood + regularizer))
-      val loss = logLikelihood + regularizer
-      val percentage = (lastLoss - loss) / lastLoss
-      System.err.println("percentage improvement: "+percentage)
-      if (percentage < 0.001) {
-        convergenceCounter += 1
-        System.err.println("convergence counter: "+convergenceCounter)
-        if (convergenceCounter > 4) converged = true
-      }
-      lastLoss = loss
-
-      // Done collecting marginals
-
-      for (pair <- typeAverage) {
-        val withDomain = pair._1
-        val unnormalizedAverage = pair._2
-        val normalizedAverage = unnormalizedAverage.map(assignmentAvg => {
-          (assignmentAvg._1, assignmentAvg._2.map(q => (q._1, q._2 / typeCounts.getOrElse(withDomain, 1))))
-        })
-
-        if (withDomain.getWeights == null) {
-          withDomain.setWeights(normalizedAverage.map(assignmentAvg => {
-            (assignmentAvg._1, assignmentAvg._2.toMap)
-          }))
-        }
-        else {
-          withDomain.setWeights(withDomain.getWeights.map(oldWeightsForSinglePossibleValue => {
-            val possibleValue = oldWeightsForSinglePossibleValue._1
-            val weightsForPossibleValue = oldWeightsForSinglePossibleValue._2
-            (possibleValue, weightsForPossibleValue.map(q => {
-              val v = normalizedAverage.getOrElse(possibleValue, Map[String,Double]()).getOrElse(q._1, 0.0)
-              val grad = v - (q._2 * l2regularization)
-              (q._1, q._2 + grad*0.5)
-            }))
-          }))
-        }
-      }
-
-      /*
-      System.err.println(nodeTypes)
-      System.err.println(factorTypes)
-      */
-
-      // Force a regeneration of the dotFamilyCache
-      modelTrainingClone.dotFamilyCache.synchronized {
-        modelTrainingClone.dotFamilyCache.clear()
       }
     }
-
-    lastLoss
   }
 
   private def onlineEM(graphs : Iterable[Graph], clearOptimizer : Boolean = true) : Double = {
@@ -713,7 +647,10 @@ class GraphStream {
   // This will learn just Weight() values from the fully observed values in the graphs
 
   var batchOptimizer : GradientOptimizer = null
-  private def learnFullyObserved(graphs : Iterable[Graph], l2regularization : Double, clearOptimizer : Boolean = true): Double = {
+  private def learnWithFactorie(graphs : Iterable[Graph],
+                               l2regularization : Double,
+                               clearOptimizer : Boolean = true,
+                               getExample : (Graph, Map[CategoricalDomain[String],CategoricalDomain[String]]) => Example): Double = {
     val loss = modelTrainingClone.synchronized {
       if (batchOptimizer == null || clearOptimizer) {
         batchOptimizer = new BatchAdaGrad()
@@ -733,7 +670,7 @@ class GraphStream {
           modelTrainingClone.dotFamilyCache.clear()
         }
 
-        val frozenDomainMap = withDomainList.synchronized {
+        val frozenDomainMap : Map[CategoricalDomain[String],CategoricalDomain[String]] = withDomainList.synchronized {
           localWithDomainList.map(withDomain => {
             val newDomain = new CategoricalDomain[String]()
             newDomain.indexAll(withDomain.domain.dimensionDomain.categories.toArray)
@@ -742,12 +679,7 @@ class GraphStream {
         }
 
         graphs.map(graph => {
-          graph.setObservedVariablesForFactorie()
-          val nodeVariables = graph.allVariablesForFactorie()
-          for (nodeVariable <- nodeVariables) {
-            nodeVariable.frozenDomainMap = frozenDomainMap
-          }
-          new LikelihoodExample(nodeVariables, modelTrainingClone, InferByBPTree)
+          getExample(graph, frozenDomainMap)
         }).toSeq
       }
 

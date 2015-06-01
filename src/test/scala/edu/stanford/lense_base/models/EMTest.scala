@@ -2,6 +2,7 @@ package edu.stanford.lense_base.models
 
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution}
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 /**
@@ -29,5 +30,6 @@ object EMTest extends App {
   val model2 = model1.cloneModelWithHumanObservation(model1.variables.head, "True")
   val model3 = model2.cloneModelWithHumanObservation(model1.variables.head, "False")
 
-  modelStream.learn(List(model3))
+
+  modelStream.learn((0 to 1000).map(i => model3).toList)
 }
