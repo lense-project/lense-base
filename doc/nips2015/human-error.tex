@@ -1,6 +1,9 @@
 \section{Modeling human error}
 \label{sec:human-error}
 
+\pl{should we have this entire section up front;
+it seems like you have to talk about human error in the original framework}
+
 Accurately identifying and hence modeling labeling noise is important if we would like to maximize the information we can get from labelers.
 
 
@@ -35,4 +38,3 @@ This answer arrives after a delay.
 \[\sD(o_i, X_j) \sim \sN(\mu, \sigma^2)\]
 
 This is an imperfect model, since it assigns some mass to a negative response time, which is impossible, but given a large $\mu$ and relatively small $\sigma$ the mass assigned to $\sD(o_i, X_j) < 0$ is negligible, and it otherwise accurately reflects human response times.
-

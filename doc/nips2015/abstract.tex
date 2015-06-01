@@ -1,6 +1,10 @@
 \begin{abstract}
 % V1
 % Recent work in real-time crowd-powered products has demonstrated the possibility of using human ``crowd workers'' to power live, low latency products that accomplish AI complete tasks. Human-only solutions remain expensive, and do not scale into production. We propose a \textit{active classification} approach to dramatically reduce the scaling cost of such systems, backed by a pool of unreliable crowd-workers. In order to achieve this, we investigate \textit{asynchronous active classification}, where multiple requests can be simultaneously ``in-flight.'' This paper analyzes the \textit{asynchronous requests problem} of how to behave optimally in the presence of asynchronous oracle queries that have not yet returned, and the \textit{optimal stopping problem} of when a classification is ``good enough'' in such a setting. Our solutions to these problems enable a system that shows dramatic improvement over the human-only, machine-only, and baseline human-machine hybrid alternatives in the cost-delay-accuracy tradeoff surface.
+  \pl{open with the typical setting - crowdsourcing to collect dataset, use supervised learning to learn;
+    then propose solution; currently, this seems too much aimed at the crowdsourcing community
+    rather than ML
+  }
 Recent work in crowd-powered products has demonstrated the potential of using ``crowd workers'' to power live, low latency systems that accomplish AI complete tasks. 
 These systems suffer from high scaling cost, and the unreliability of workers.
 We propose an \textit{active classification} approach to dramatically reduce the scaling cost and improve the accuracy of such systems.
