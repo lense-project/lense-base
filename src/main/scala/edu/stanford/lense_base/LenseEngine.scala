@@ -63,7 +63,7 @@ class LenseEngine(stream : ModelStream,
           if (pastGuesses.size > trainedOnGuesses) {
             System.err.println("Retraining model")
             // Important to think about how to correctly handle removing regularization over time, or not...
-            stream.learn(pastGuesses)
+            currentModelLoss = stream.learn(pastGuesses)
             System.err.println("Hot swapping model")
             numSwapsSoFar += 1
             trainedOnGuesses = pastGuesses.size
