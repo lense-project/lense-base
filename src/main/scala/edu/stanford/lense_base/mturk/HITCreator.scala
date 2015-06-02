@@ -33,8 +33,7 @@ object HITCreator {
     service.forceExpireHIT(id)
   }
 
-  // This will let me post HITs that I can accept to give bonuses when things get broken
-  def main(args : Array[String]) : Unit = {
+  def createFixerHIT() : Unit = {
     val title = "Private HIT"
     val description = "DO NOT ACCEPT THIS if I did not contact you personally."
     val question = RequesterService.getBasicFreeTextQuestion("Thanks again for your patients. You can leave this box empty and submit the HIT")
@@ -45,5 +44,10 @@ object HITCreator {
       1)
     println("Created HIT: "+hit.getHITId)
     println("You can see it here: "+service.getWebsiteURL+"/mturk/preview?groupId="+hit.getHITTypeId)
+  }
+
+  // This will let me post HITs that I can accept to give bonuses when things get broken
+  def main(args : Array[String]) : Unit = {
+    createHIT(1.00, 2)
   }
 }

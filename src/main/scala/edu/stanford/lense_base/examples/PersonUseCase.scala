@@ -23,7 +23,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   lazy val dataSet = rand.shuffle(getCelebritiesSet(celebrities).map(p => (p, p.name)))
 
-  lazy val trainSet : List[(PersonImage,String)] = List()
+  lazy val trainSet : List[(PersonImage,String)] = celebrities.map(celeb => dataSet.filter(_._1.name == celeb).head)
   lazy val devSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d)).take(50)
   lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !(trainSet.contains(d) || devSet.contains(d)))
 
@@ -119,7 +119,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty + cost*2
+    uncertainty + cost
   }
 
   /**

@@ -1056,7 +1056,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val numClassifications = humanPredictionsVsCorrect.count(_._4 eq hcu)
       val cost = numClassifications*hcu.cost
       val ew = new BufferedWriter(new FileWriter(thisHcuPrefix+"cost.txt"))
-      ew.write("Classification Decisions: "+numClassifications)
+      ew.write("Classification Decisions: "+numClassifications+"\n")
       ew.write("Amount owed: $"+cost)
       ew.close()
 

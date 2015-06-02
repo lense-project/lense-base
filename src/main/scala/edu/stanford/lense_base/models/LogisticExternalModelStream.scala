@@ -31,7 +31,7 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    */
   override def prior(input: Input): Map[String, Double] = {
     if (classifier == null) {
-      classes.map(cl => (cl, 1.0)).toMap
+      classes.map(cl => (cl, 1.0 / classes.size)).toMap
     }
     else {
       val counter = new ClassicCounter[String]()
@@ -57,6 +57,11 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
   override def train(inputOutputPairs: Iterable[(Input, String)]): Double = {
     if (inputOutputPairs.size == 0) return 0.0
 
+    // Don't retrain if we don't yet have an example for each class
+    for (cl <- classes) {
+      if (inputOutputPairs.count(_._2 == cl) == 0) return 0.0
+    }
+
     val rvfDataset : RVFDataset[String, String] = new RVFDataset[String,String]()
 
     inputOutputPairs.foreach(pair => {
@@ -75,7 +80,7 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
       // Turn on per-iteration convergence updates
       classifierFactory.setVerbose(true)
       // Large amount of smoothing
-      classifierFactory.setSigma(0.3)
+      classifierFactory.setSigma(0.1)
       // Build a classifier
       classifier = classifierFactory.trainClassifier(rvfDataset) // , null, new LogPrior()
       classifierFactory.notifyAll()
