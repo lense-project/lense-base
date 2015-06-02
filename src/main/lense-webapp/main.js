@@ -25,14 +25,22 @@ $(function () {
     var ready = $('#ready');
     var retainer = $('#retainer');
     var form = $("#successForm")
+    var returnForm = $("#returnForm")
     var trainingComments = $("#training-comments")
     var cheatSheet = $("#cheat-sheet")
+
+    // Setup state to handle whether or not we're in a query right now
+
+    var inQuery = false
+    var timeouts = 0
 
     // Setup submit form
 
     form.attr("action", turkSubmitTo+"/mturk/externalSubmit");
     $("#assignmentId").val(assignmentId);
     $("#hitId").val(hitId);
+    returnForm.attr("action", turkSubmitTo+"/mturk/return");
+    $("#hitIdReturn").val(hitId);
 
     // Build socket
 
@@ -70,6 +78,10 @@ $(function () {
             var json = jQuery.parseJSON(message);
             if (json['status'] !== undefined) {
                 if (json['status'] === 'failure') {
+                    content.html(json['display']);
+                    socket.unsubscribe();
+                }
+                if (json['status'] === 'timeout') {
                     content.html(json['display']);
                     socket.unsubscribe();
                 }
@@ -181,6 +193,24 @@ $(function () {
                 runThroughExamples(filteredExamples, 0, null);
             }
             if (json['type'] !== undefined && json.type === "multiclass") {
+                // This only happens if we're overwriting the current query
+                if (inQuery) {
+                    timeouts = timeouts + 1;
+                    console.log("Overwriting query");
+                    // Create animating punishment
+                    var timeoutDiv = $('<div/>', {class: "timeout-ping"});
+                    timeoutDiv.html("Took too long, missed "+timeouts+"/3 in a row");
+                    $("body").append(timeoutDiv);
+                    timeoutDiv.animate({
+                        top: "0px",
+                        "font-size": "5em",
+                        opacity: "0"
+                    }, 4000, "swing", function() {
+                        timeoutDiv.remove();
+                    });
+                }
+
+                inQuery = true;
                 renderMulticlassQuery(json, function(closureChoice) {
                     console.log("Choosing "+closureChoice);
                     subSocket.push(jQuery.stringifyJSON({ answer: closureChoice }));
@@ -188,7 +218,15 @@ $(function () {
                         height: content.height()
                     });
 
-                    content.html("Waiting for next question from the server...");
+                    timeouts = 0;
+
+                    inQuery = false;
+                    content.html("...");
+                    setTimeout(function() {
+                        if (!inQuery) {
+                            content.html("Waiting for the other Turkers participating in this HIT to catch up with you...<br><br>Good work on finishing so quickly!<br><br>(We'll alert you when your co-workers are all caught up. Feel free to go do something else for a few seconds.)");
+                        }
+                    }, 1000);
                 });
             }
         } catch (e) {

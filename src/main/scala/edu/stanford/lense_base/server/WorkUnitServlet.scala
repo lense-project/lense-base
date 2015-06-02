@@ -8,7 +8,7 @@ import edu.stanford.lense_base.LenseEngine
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.humancompute.{HCUPool, HumanComputeUnit, WorkUnit}
 import edu.stanford.lense_base.models.ModelVariable
-import edu.stanford.lense_base.mturk.{MTurkDBState, MTurkDatabase}
+import edu.stanford.lense_base.mturk.{MTurkConfig, MTurkDBState, MTurkDatabase}
 
 import org.json4s._
 import org.json4s.jackson.Json
@@ -263,6 +263,8 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   var workerAccepted = false
 
+  var timedOutRequestsInSequence = 0
+
   def updateWaiting() = {
     val currentNum = WorkUnitServlet.workerIdConnectionMap.count(_._2.workerAccepted)
 
@@ -419,6 +421,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
       // Let our currentWork unit handle the returned value
 
       else if (currentWork != null) {
+        timedOutRequestsInSequence = 0
         val replyValue = currentWork.asInstanceOf[WebWorkUnit].parseReplyMessage(m.content)
         val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
         val newState = MTurkDBState(workerId, state.queriesAnswered + 1, System.currentTimeMillis() - startTime, state.outstandingBonus + cost, currentlyConnected = true, assignmentId)
@@ -462,8 +465,10 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
   // Milliseconds that this worker is expected to remain on call before being paid
   def retainerDuration(): Long = {
+    // 45 minutes retainer
+    MTurkConfig.retainerMinutes * 60 * 1000L
     // 30 minutes retainer
-    30 * 60 * 1000L
+    // 30 * 60 * 1000L
     // 3 second retainer
     // 3 * 1000L
   }
@@ -483,6 +488,14 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
             // Timeout the work
             workUnit.revoke()
             cancelCurrentWork()
+            timedOutRequestsInSequence += 1
+            val numTolerated = 3
+            if (timedOutRequestsInSequence >= numTolerated) {
+              send(new JsonMessage(new JObject(List("status" -> JString("timeout"), "display" -> JString("ERROR: It appears that "+
+                "you have abandoned this HIT."+
+                " You missed "+numTolerated+" requests in a row. Please return this HIT.")))))
+              noteDisconnection()
+            }
           }
         }
       }).start()

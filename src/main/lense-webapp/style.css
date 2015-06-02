@@ -91,6 +91,14 @@ button.hover {
     font-size: 5em;
 }
 
+.timeout-ping {
+    position: fixed;
+    right: 100px;
+    top: 100px;
+    color: firebrick;
+    font-size: 3em;
+}
+
 .ready {
     padding: 10px 50px;
     margin: 10px;
