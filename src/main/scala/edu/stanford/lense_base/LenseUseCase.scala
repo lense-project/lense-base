@@ -6,7 +6,7 @@ import com.github.keenon.minimalml.GNUPlot
 import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute._
-import edu.stanford.lense_base.models.{Model, ModelVariable, ModelStream}
+import edu.stanford.lense_base.models._
 import edu.stanford.lense_base.mturk.HITCreator
 import edu.stanford.lense_base.server._
 
@@ -214,6 +214,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   ////////////////////////////////////////////////
 
   def progressivelyAnalyze(goldPairs : List[(Input, Output)],
+                           devPairs : List[(Input, Output)],
                            fn : ((Input, Output)) => (Model, Map[ModelVariable,String], Map[ModelVariable,String], PredictionSummary),
                            hcuPool : HCUPool,
                            saveTitle : String) = {
@@ -221,12 +222,20 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
     val mutableResultSet = mutable.ListBuffer[ResultSet]()
 
+    // Warm up indexes on the dev pairs out of parallel
+    for (pair <- devPairs) {
+      val model = toModel(pair._1)
+      if (model.isInstanceOf[GraphicalModel]) {
+        modelStream.asInstanceOf[GraphicalModelStream].graphStream.model.warmUpIndexes(model.asInstanceOf[GraphicalModel].getGraph)
+      }
+    }
+
     var i = 0
     for (pair <- goldPairs) {
       mutableAnalysis.+=(fn(pair))
       i += 1
       if (i % 1 == 0) {
-        analyzeOutput(mutableAnalysis.toList, hcuPool, goldPairs.slice(0, i+1), mutableResultSet, saveTitle)
+        analyzeOutput(mutableAnalysis.toList, hcuPool, devPairs, mutableResultSet, saveTitle)
       }
       if (i % 50 == 0) {
         analyzeConfidence(goldPairs, saveTitle, i)
@@ -245,7 +254,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
     }
 
-    analyzeOutput(mutableAnalysis.toList, hcuPool, goldPairs, mutableResultSet, saveTitle)
+    analyzeOutput(mutableAnalysis.toList, hcuPool, devPairs, mutableResultSet, saveTitle)
     analyzeConfidence(goldPairs, saveTitle, i)
   }
 
@@ -259,6 +268,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @param humanErrorDistribution the error distribution for artificial humans
    */
   def testWithArtificialHumans(goldPairs : List[(Input, Output)],
+                               devPairs : List[(Input, Output)],
                                humanErrorDistribution : HumanErrorDistribution,
                                humanDelayDistribution : HumanDelayDistribution,
                                workUnitCost : Double,
@@ -269,7 +279,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val rand = new Random()
     val hcuPool = ArtificialHCUPool(startNumArtificialHumans, humanErrorDistribution, humanDelayDistribution, workUnitCost, rand)
 
-    progressivelyAnalyze(goldPairs, pair => {
+    progressivelyAnalyze(goldPairs, devPairs, pair => {
       val model = toModel(pair._1)
       val goldMap = toGoldModelLabels(model, pair._2)
       for (variable <- model.variables) {
@@ -286,12 +296,12 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     System.exit(0)
   }
 
-  def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)]) = {
+  def testBaselineForOfflineLabeling(goldPairs : List[(Input, Output)], devPairs : List[(Input, Output)]) = {
     initialize()
 
     var numSwapsSoFar = 0
 
-    progressivelyAnalyze(goldPairs, pair => {
+    progressivelyAnalyze(goldPairs, devPairs, pair => {
       val model = toModel(pair._1)
       val goldMap = toGoldModelLabels(model, pair._2)
 
@@ -325,6 +335,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   def testBaselineForAllHuman(goldPairs : List[(Input, Output)],
+                              devPairs : List[(Input, Output)],
                               humanErrorDistribution : HumanErrorDistribution,
                               humanDelayDistribution : HumanDelayDistribution,
                               workUnitCost : Double,
@@ -351,7 +362,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     lenseEngine.gamePlayer.budget = lenseEngine.budget
     lenseEngine.turnOffLearning()
 
-    progressivelyAnalyze(goldPairs, pair => {
+    progressivelyAnalyze(goldPairs, devPairs, pair => {
       val model = toModel(pair._1)
       val goldMap = toGoldModelLabels(model, pair._2)
       for (variable <- model.variables) {
@@ -382,13 +393,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @param goldPairs pairs of Input and the corresponding correct Output objects
    */
-  def testWithRealHumans(goldPairs : List[(Input, Output)], poolSize : Int) : Unit = {
+  def testWithRealHumans(goldPairs : List[(Input, Output)], devPairs : List[(Input, Output)], poolSize : Int) : Unit = {
     initialize()
 
     ensureWorkServer
     val hitId = makeHITAndWaitFor(poolSize)
 
-    progressivelyAnalyze(goldPairs, pair => {
+    progressivelyAnalyze(goldPairs, devPairs, pair => {
       val model = toModel(pair._1)
       val goldMap = toGoldModelLabels(model, pair._2)
       for (variable <- model.variables) {

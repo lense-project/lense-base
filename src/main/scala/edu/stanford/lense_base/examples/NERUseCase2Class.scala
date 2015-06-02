@@ -64,9 +64,9 @@ object NERUseCase2Class extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 3
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, "artificial_human")
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 1, useRealHumans = true) // 1 query baseline
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 2) // 3 query baseline
-  // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data)
-  // nerUseCase.testWithRealHumans(nerUseCase.data, poolSize)
+  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, "artificial_human")
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 1, useRealHumans = true) // 1 query baseline
+  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 2) // 3 query baseline
+  // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data, nerUseCase.devSet)
+  // nerUseCase.testWithRealHumans(nerUseCase.data, nerUseCase.devSet, poolSize)
 }

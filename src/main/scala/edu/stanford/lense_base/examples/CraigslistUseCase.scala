@@ -155,7 +155,7 @@ object CraigslistUseCase extends App {
 
 
   val poolSize = 10
-  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.devSet, craigslistUseCase.humanErrorDistribution, craigslistUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  craigslistUseCase.testWithArtificialHumans(craigslistUseCase.testSet, craigslistUseCase.devSet, craigslistUseCase.humanErrorDistribution, craigslistUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
   // craigslistUseCase.testBaselineForAllHuman(craigslistUseCase.devSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
   // craigslistUseCase.testBaselineForOfflineLabeling(craigslistUseCase.devSet)

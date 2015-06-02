@@ -18,7 +18,9 @@ import scala.util.Random
  */
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(100)
-  lazy val testSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test").take(1000)
+  lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1000)
+  lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
     // Word2VecLoader.loadData("data/google-300.ser.gz")
@@ -157,9 +159,9 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 10
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 1) // 1 query baseline
-  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, 0.3, 2000, 500, 0.01, poolSize, 3) // 3 query baseline
-  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet)
-  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, poolSize)
+  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
+  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
+  // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, poolSize)
 }
