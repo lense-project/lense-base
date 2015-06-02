@@ -20,10 +20,10 @@ class GraphicalModelStream(humanErrorDistribution : HumanErrorDistribution) exte
   var useEM : Boolean = false
 
   def getRegularizationForSize(size : Int) : Double = {
-    if (size < 50) 2.0
-    else if (size < 100) 1.5
-    else if (size < 300) 0.7
-    else 0.35
+    if (size < 50) 1.5
+    else if (size < 100) 0.75
+    else if (size < 300) 0.5
+    else 0.3
   }
 
   /**

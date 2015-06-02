@@ -50,7 +50,7 @@ class SamplingLookaheadOneHeuristic(humanErrorDistribution : HumanErrorDistribut
     // Don't both calculating expectations if there's only one choice anyways
     if (legalMoves.size == 1) return legalMoves.head
 
-    val movesWithEstimatedLoss = legalMoves.par.map(move => {
+    val movesWithEstimatedLoss = legalMoves.map(move => {
       (move, estimateLossForMove(move, state))
     })
 

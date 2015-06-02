@@ -19,7 +19,7 @@ public class Word2VecLoader {
     static final int WORD_SIZE = 50;
 
     public static void main(String[] args) throws IOException {
-        translate("data/wordvectors/glove.6B.50d.txt", "data/wordvectors/glove50.ser.gz");
+        translate("data/wordvectors/glove.6B.100d.txt", "data/wordvectors/glove100.ser.gz");
     }
 
     // This is an unfortunate necessity, since it seems that Java's InputStream handles file differently than fscanf in
@@ -32,10 +32,15 @@ public class Word2VecLoader {
         Output output = new Output(new GZIPOutputStream(new FileOutputStream(o)));
 
         BufferedReader br = new BufferedReader(new FileReader(f));
+        String line;
+        /*
         String line = br.readLine(); // ignore first line
         String[] initialParts = line.split(" ");
-        int words = Integer.parseInt(initialParts[0]);
-        int dimension = Integer.parseInt(initialParts[1]);
+        */
+
+        int words = (int)(br.lines().count()); // Integer.parseInt(initialParts[0]);
+        br = new BufferedReader(new FileReader(f));
+        int dimension = 100; // Integer.parseInt(initialParts[1]);
 
         output.writeInt(words);
         output.writeInt(dimension);

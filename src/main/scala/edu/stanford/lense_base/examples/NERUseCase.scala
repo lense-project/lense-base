@@ -46,8 +46,9 @@ abstract class NERUseCase extends LenseSequenceUseCase {
   }
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = if (useLearning) try {
-    Word2VecLoader.loadData("data/wordvectors/google-300.ser.gz")
-    // new java.util.HashMap[String, Array[Double]]()
+    // Word2VecLoader.loadData("data/wordvectors/google-300.ser.gz")
+    // Word2VecLoader.loadData("data/wordvectors/glove300.ser.gz")
+    new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -95,7 +96,7 @@ abstract class NERUseCase extends LenseSequenceUseCase {
   override def lossFunction(sequence: List[String], mostLikelyGuesses: List[(Int, String, Double)], cost: Double, time: Double): Double = {
     val expectedErrors = mostLikelyGuesses.map{
       // We much prefer to not tag 0s incorrectly
-      case (_,"0",p) => 1.0 - p
+      case (_,"0",p) => 2*(1.0 - p)
       // This is for non O predictions
       case triple => 1.0 - triple._3
     }.sum
