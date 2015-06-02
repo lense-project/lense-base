@@ -49,6 +49,7 @@ public class GNUPlot {
 
     private void dumpScript(String folder) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(folder+"/gnuplot_script"));
+        bw.append("set nokey\n");
         bw.append("set terminal png medium\n");
         bw.append("set output \"").append(folder).append("/").append(title.replaceAll(" ", "_").replaceAll("/", "-"))
                 .append(".png\"\n");
