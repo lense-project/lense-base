@@ -12,6 +12,7 @@ import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
+import scala.collection.parallel.mutable.ParMap
 import scala.concurrent.{Await, Promise}
 import scala.io.Source
 import scala.util.{Random, Try}
@@ -218,12 +219,14 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                            saveTitle : String) = {
     val mutableAnalysis = mutable.ListBuffer[(Model, Map[ModelVariable,String], Map[ModelVariable,String], PredictionSummary)]()
 
+    val mutableResultSet = mutable.ListBuffer[ResultSet]()
+
     var i = 0
     for (pair <- goldPairs) {
       mutableAnalysis.+=(fn(pair))
       i += 1
-      if (i % 2 == 0) {
-        analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+      if (i % 1 == 0) {
+        analyzeOutput(mutableAnalysis.toList, hcuPool, goldPairs.slice(0, i+1), mutableResultSet, saveTitle)
       }
       if (i % 50 == 0) {
         analyzeConfidence(goldPairs, saveTitle, i)
@@ -242,9 +245,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
     }
 
-    analyzeOutput(mutableAnalysis.toList, hcuPool, saveTitle)
+    analyzeOutput(mutableAnalysis.toList, hcuPool, goldPairs, mutableResultSet, saveTitle)
     analyzeConfidence(goldPairs, saveTitle, i)
   }
+
+  case class ResultSet(fullPrecision : Double, fullRecall : Double, fullF1 : Double, machinePrecision : Double, machineRecall : Double, machineF1 : Double)
 
   /**
    * This will run a test against artificial humans, with a "probability epsilon choose uniformly at random" error
@@ -419,6 +424,63 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
     })
     promise
+  }
+
+  private def analyzeClassifierPerformance(goldPairs : List[(Input, Output)]) : (Double,Double,Double) = {
+    val nonDefaultCorrect = ParMap[String, Double]()
+    val foundNonDefault = ParMap[String, Double]()
+    val guessedNonDefault = ParMap[String, Double]()
+
+    val numThreads = Runtime.getRuntime.availableProcessors()
+
+    val threads = (0 to numThreads-1).map(threadIdx => {
+      new Thread(new Runnable {
+        override def run(): Unit = {
+          var j = threadIdx
+          while (j < goldPairs.size) {
+            val pair = goldPairs(j)
+            val model = toModel(pair._1)
+            val map = model.map
+            val trueLabels = toGoldModelLabels(model, pair._2)
+
+            for (variable <- model.variables) {
+              val trueValue = trueLabels(variable)
+              val guessedValue = map(variable)
+
+              if (defaultClass != null) {
+                if (trueValue != defaultClass) {
+                  foundNonDefault.put(trueValue, foundNonDefault.getOrElse(trueValue, 0.0) + 1)
+                }
+                if (guessedValue != defaultClass) {
+                  guessedNonDefault.put(guessedValue, guessedNonDefault.getOrElse(guessedValue, 0.0) + 1)
+                }
+                if (trueValue == guessedValue && trueValue != defaultClass) {
+                  nonDefaultCorrect.put(trueValue, nonDefaultCorrect.getOrElse(trueValue, 0.0) + 1)
+                }
+              }
+            }
+            j += numThreads
+          }
+        }
+      })
+    })
+
+    threads.foreach(_.start())
+    threads.foreach(_.join())
+
+    if (defaultClass != null) {
+      val nonDefaultCorrectSum = nonDefaultCorrect.map(_._2).sum
+      val foundNonDefaultSum = foundNonDefault.map(_._2).sum
+      val guessedNonDefaultSum = guessedNonDefault.map(_._2).sum
+
+      val precision = nonDefaultCorrectSum / guessedNonDefaultSum
+      val recall = nonDefaultCorrectSum / foundNonDefaultSum
+      val f1 = 2 * precision * recall / (precision + recall)
+      (precision, recall, f1)
+    }
+    else {
+      (0,0,0)
+    }
   }
 
   private def analyzeConfidence(goldPairs : List[(Input, Output)], outputPath : String = "default", iteration : Int) : Unit = {
@@ -691,7 +753,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   // Prints some outputs to stdout that are the result of analysis
-  private def analyzeOutput(l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)], hcuPool : HCUPool, outputPath : String = "default") : Unit = {
+  private def analyzeOutput(l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)], hcuPool : HCUPool, goldPairs : List[(Input, Output)], mutableResultSet : mutable.ListBuffer[ResultSet], outputPath : String = "default") : Unit = {
     var correct = 0.0
     var incorrect = 0.0
 
@@ -762,6 +824,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     bw.write("Avg time/token: "+(time / tokens)+"\n")
     bw.write("Avg requests/token: "+(requested / tokens)+"\n")
     bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
+
+    var mainPrecision = 0.0
+    var mainRecall = 0.0
+    var mainF1 = 0.0
+
     if (defaultClass != null) {
       val nonDefaultCorrectSum = nonDefaultCorrect.map(_._2).sum
       val foundNonDefaultSum = foundNonDefault.map(_._2).sum
@@ -770,6 +837,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val precision = nonDefaultCorrectSum / guessedNonDefaultSum
       val recall = nonDefaultCorrectSum / foundNonDefaultSum
       val f1 = 2*precision*recall / (precision + recall)
+
+      mainPrecision = precision
+      mainRecall = recall
+      mainF1 = f1
 
       bw.write("\nOverall performance:\n")
 
@@ -795,6 +866,16 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
     }
     bw.close()
+
+    // Record performance over time
+
+    val machinePerformance = analyzeClassifierPerformance(goldPairs)
+    val machinePrecision = machinePerformance._1
+    val machineRecall = machinePerformance._2
+    val machineF1 = machinePerformance._3
+
+    def nanSafe(d : Double) = if (d.isNaN) 0.0 else d
+    mutableResultSet += ResultSet(nanSafe(mainPrecision), nanSafe(mainRecall), nanSafe(mainF1), nanSafe(machinePrecision), nanSafe(machineRecall), nanSafe(machineF1))
 
     // Print the actual output guess and gold
 
@@ -918,6 +999,15 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val summaries = l.map(_._4)
     val errorBeliefsPrefix = hcuPrefix+"error_beliefs/"
     printHumanErrorBeliefsSummary(errorBeliefsPrefix, l)
+
+    // Plot performance over time, according to saved logs
+
+    plotAgainstQueries("f1", mutableResultSet.map(_.fullF1).toArray)
+    plotAgainstQueries("recall", mutableResultSet.map(_.fullRecall).toArray)
+    plotAgainstQueries("precision", mutableResultSet.map(_.fullPrecision).toArray)
+    plotAgainstQueries("machine_f1", mutableResultSet.map(_.machineF1).toArray)
+    plotAgainstQueries("machine_recall", mutableResultSet.map(_.machineRecall).toArray)
+    plotAgainstQueries("machine_precision", mutableResultSet.map(_.machinePrecision).toArray)
 
     // Plot the error in our assessment over number of queries observed
 

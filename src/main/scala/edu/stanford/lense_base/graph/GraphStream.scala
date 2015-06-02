@@ -419,7 +419,7 @@ case class NodeType(stream : GraphStream, possibleValues : Set[String], var weig
 
   def setWeights(newWeights : Map[Any,Map[String,Double]]) = {
     weights = newWeights.asInstanceOf[Map[String,Map[String,Double]]]
-    stream.model.synchronized {
+    stream.model.dotFamilyCache.synchronized {
       stream.model.dotFamilyCache.remove(this)
     }
   }
@@ -1133,8 +1133,10 @@ class GraphStream {
             node.nodeType.featureDomain.index(featureWeightPair._1)
             // Clear cached elements if we change the feature domain size
             if (clearCacheIfSizeChanges && node.nodeType.featureDomain.length > oldSize) {
-              dotFamilyCache.synchronized {
-                dotFamilyCache.remove(node.nodeType)
+              if (dotFamilyCache.containsKey(node.nodeType)) {
+                dotFamilyCache.synchronized {
+                  dotFamilyCache.remove(node.nodeType)
+                }
               }
             }
           }
