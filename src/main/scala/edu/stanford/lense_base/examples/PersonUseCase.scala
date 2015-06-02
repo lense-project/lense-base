@@ -24,7 +24,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   lazy val dataSet = rand.shuffle(getCelebritiesSet(celebrities).map(p => (p, p.name)))
 
   lazy val trainSet : List[(PersonImage,String)] = List()
-  lazy val devSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d))
+  lazy val devSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d)).take(50)
   lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !(trainSet.contains(d) || devSet.contains(d)))
 
   override def labelTypes: List[String] = celebrities
@@ -176,10 +176,10 @@ object PersonUseCase {
     val personUseCase = new PersonUseCase()
 
     val poolSize = 3
-    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-    // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
+    personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)
   }
 }

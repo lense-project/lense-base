@@ -17,7 +17,7 @@ import scala.util.Random
  * Using the Stanford sentiment dataset for a simple turk-able question set
  */
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
-  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(100)
+  lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
   lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
   lazy val testSet : List[(String,String)] = fullTestSet.take(1000)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
@@ -100,7 +100,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    * @return
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
-    (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
+    val uncertainty = 1 - mostLikelyGuesses(0)._3
+    uncertainty*10 + cost
   }
 
   override val maxLossPerNode : Double = {

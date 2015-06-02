@@ -192,7 +192,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    *
    * @return a game player
    */
-  def gamePlayer : GamePlayer = ThresholdHeuristic
+  def gamePlayer : GamePlayer = new SamplingLookaheadOneHeuristic(humanErrorDistribution, humanDelayDistribution) // ThresholdHeuristic
 
   /**
    * This is used when calculating recall and F1, if non-null. Useful for cases like NER where there's a dominant NULL class.
@@ -315,7 +315,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val guessMap = model.map
 
       // Retrain after each example
-      guessMap.foreach(pair => (pair._1.setObservedValue(pair._2)))
+      goldMap.foreach(pair => pair._1.setObservedValue(pair._2))
       lenseEngine.pastGuesses += model
 
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
@@ -810,9 +810,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
     println("Accuracy: "+(correct/(correct+incorrect)))
     println("Requested task completion percentage: "+(completed / requested))
-    println("Avg time/token: "+(time / tokens))
-    println("Avg requests/token: "+(requested / tokens))
-    println("Avg completed requests/token: "+(completed / tokens))
+    if (tokens > 0) {
+      println("Avg time/token: " + (time / tokens))
+      println("Avg requests/token: " + (requested / tokens))
+      println("Avg completed requests/token: " + (completed / tokens))
+    }
 
     val resultsPrefix = "results/"+useCaseReportSubpath+(if (useCaseReportSubpath.endsWith("/")) "" else "/")
 
@@ -832,9 +834,11 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     bw.write("Incorrect: "+incorrect+"\n")
     bw.write("Accuracy: "+(correct/(correct+incorrect))+"\n")
     bw.write("Requested task completion percentage: "+(completed / requested)+"\n")
-    bw.write("Avg time/token: "+(time / tokens)+"\n")
-    bw.write("Avg requests/token: "+(requested / tokens)+"\n")
-    bw.write("Avg completed requests/token: "+(completed / tokens)+"\n")
+    if (tokens > 0) {
+      bw.write("Avg time/token: " + (time / tokens) + "\n")
+      bw.write("Avg requests/token: " + (requested / tokens) + "\n")
+      bw.write("Avg completed requests/token: " + (completed / tokens) + "\n")
+    }
 
     var mainPrecision = 0.0
     var mainRecall = 0.0
@@ -1048,6 +1052,13 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val thisHcuPrefix = hcuPrefix+"/"+hcu.getName+"/"
       val thisHcuReportFolder = new File(thisHcuPrefix)
       if (!thisHcuReportFolder.exists()) thisHcuReportFolder.mkdirs()
+
+      val numClassifications = humanPredictionsVsCorrect.count(_._4 eq hcu)
+      val cost = numClassifications*hcu.cost
+      val ew = new BufferedWriter(new FileWriter(thisHcuPrefix+"cost.txt"))
+      ew.write("Classification Decisions: "+numClassifications)
+      ew.write("Amount owed: $"+cost)
+      ew.close()
 
       for (nodeType <- variableTypes) {
         val pairs = humanPredictionsVsCorrect.filter(_._3.possibleValues.toSet == nodeType).filter(_._4 eq hcu).map(quad => (quad._1, quad._2))

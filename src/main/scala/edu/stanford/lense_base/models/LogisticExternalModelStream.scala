@@ -42,8 +42,6 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
       val rvf = new RVFDatum[String, String](counter)
       val outputCounter = classifier.probabilityOf(rvf)
 
-      println(outputCounter)
-
       outputCounter.keySet().toArray.map(key => {
         (key.asInstanceOf[String], outputCounter.getCount(key))
       }).toMap
@@ -60,7 +58,6 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
     if (inputOutputPairs.size == 0) return 0.0
 
     val rvfDataset : RVFDataset[String, String] = new RVFDataset[String,String]()
-    println("Retraining...")
 
     inputOutputPairs.foreach(pair => {
       val counter = new ClassicCounter[String]()
@@ -74,9 +71,16 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
     })
 
     classifierFactory.synchronized {
-      classifier = classifierFactory.trainClassifier(rvfDataset, null, new LogPrior()).asInstanceOf[LinearClassifier[String,String]]
+      classifierFactory.useConjugateGradientAscent()
+      // Turn on per-iteration convergence updates
+      classifierFactory.setVerbose(true)
+      // Large amount of smoothing
+      classifierFactory.setSigma(0.3)
+      // Build a classifier
+      classifier = classifierFactory.trainClassifier(rvfDataset) // , null, new LogPrior()
       classifierFactory.notifyAll()
     }
+
     0.0
   }
 }

@@ -32,7 +32,11 @@ object LogisticTest extends App {
 
   logisticExternalStream.train(List(("rabbit", "true"), ("bunny", "true"), ("hare", "true"), ("tortoise", "false"), ("turtle", "false"), ("shell", "false")))
 
+  val logisticModel = logisticExternalStream.newModelForInput("rabbit")
+
   println("Prior for \"rabbit\" (should be true): "+logisticExternalStream.prior("rabbit"))
+  println("Prior for \"rabbit\" (should be true): "+logisticModel.marginals)
+  println("Prior for \"rabbit\" given observation of \"true\" (should be true): "+logisticModel.cloneModelWithHumanObservation(logisticModel.variables.head, "true", null, 0).marginals)
   println("Prior for \"bunny\" (should be true): "+logisticExternalStream.prior("bunny"))
   println("Prior for \"hare\" (should be true): "+logisticExternalStream.prior("hare"))
   println("Prior for \"tortoise\" (should be false): "+logisticExternalStream.prior("tortoise"))
