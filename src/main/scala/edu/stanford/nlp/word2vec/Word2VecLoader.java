@@ -19,7 +19,7 @@ public class Word2VecLoader {
     static final int WORD_SIZE = 50;
 
     public static void main(String[] args) throws IOException {
-        translate("data/google-300.txt", "data/google-300.ser.gz");
+        translate("data/wordvectors/glove.6B.50d.txt", "data/wordvectors/glove50.ser.gz");
     }
 
     // This is an unfortunate necessity, since it seems that Java's InputStream handles file differently than fscanf in

@@ -47,6 +47,9 @@ class SamplingLookaheadOneHeuristic(humanErrorDistribution : HumanErrorDistribut
   override def getOptimalMove(state: GameState): GameMove = {
     val legalMoves = getAllLegalMoves(state)
 
+    // Don't both calculating expectations if there's only one choice anyways
+    if (legalMoves.size == 1) return legalMoves.head
+
     val movesWithEstimatedLoss = legalMoves.par.map(move => {
       (move, estimateLossForMove(move, state))
     })

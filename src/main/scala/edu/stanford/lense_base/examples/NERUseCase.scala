@@ -46,8 +46,8 @@ abstract class NERUseCase extends LenseSequenceUseCase {
   }
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = if (useLearning) try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/wordvectors/google-300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors

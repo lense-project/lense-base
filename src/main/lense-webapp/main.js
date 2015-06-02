@@ -9,7 +9,7 @@ $.urlParam = function(name){
 }
 
 $(function () {
-    "use strict";
+    // "use strict";
 
     // Get Worker information
 
