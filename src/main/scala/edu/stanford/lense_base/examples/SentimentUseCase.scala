@@ -101,7 +101,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty*10 + cost
+    uncertainty + cost*2
   }
 
   override val maxLossPerNode : Double = {
@@ -117,8 +117,6 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 100.0
-
-  override def gamePlayer : GamePlayer = ThresholdHeuristic
 
   lazy val random = new Random()
   lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
@@ -159,10 +157,10 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
-  val poolSize = 10
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  val poolSize = 4
+  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
+  // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, poolSize)
 }

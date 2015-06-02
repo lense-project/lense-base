@@ -118,7 +118,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * @return
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
-    (1 - mostLikelyGuesses(0)._3) + cost + (ms / 1000)
+    val uncertainty = 1 - mostLikelyGuesses(0)._3
+    uncertainty + cost*2
   }
 
   /**
@@ -137,8 +138,6 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 20.0
-
-  override def gamePlayer : GamePlayer = ThresholdHeuristic
 }
 
 case class PersonImage(name : String, index : Int, url : String) {
@@ -176,10 +175,10 @@ object PersonUseCase {
     val personUseCase = new PersonUseCase()
 
     val poolSize = 3
-    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-    personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
+    // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)
   }
 }
