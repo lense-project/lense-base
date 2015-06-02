@@ -20,9 +20,11 @@ object ThresholdHeuristic extends GamePlayer {
 
   override def getOptimalMove(state: GameState): GameMove = {
     // If it's been more than 10s, just force a TurnInGuess()
+    /*
     if (System.currentTimeMillis() - state.startTime > 10000) {
       return TurnInGuess()
     }
+    */
 
     // We should probably be cacheing this if it's every used in production, but no matter
     val marginals = state.model.marginals

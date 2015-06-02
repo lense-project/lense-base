@@ -120,7 +120,7 @@ case class GameState(model : Model,
       hcuPool,
       lossFunction,
       maxLossPerNode,
-      cost + hcu.cost,
+      cost,
       startTime,
       inFlightRequests ++ Set((variable, hcu, workUnit, launchTime)),
       completedRequests)
@@ -143,11 +143,11 @@ case class GameState(model : Model,
 
   // Gets a GameState that corresponds to seeing observation "obs" on node "node"
   def getNextStateForVariableObservation(variable : ModelVariable, hcu : HumanComputeUnit, workUnit : WorkUnit, obs : String) : GameState = {
-    val nextState : GameState = GameState(model.cloneModelWithHumanObservation(variable, obs, hcu, workUnit.timeSinceCreation()),
+    val nextState : GameState = GameState(model.cloneModelWithHumanObservation(variable, obs, hcu, if (workUnit == null) 0 else workUnit.timeSinceCreation()),
       hcuPool,
       lossFunction,
       maxLossPerNode,
-      cost,
+      cost + hcu.cost,
       startTime,
       inFlightRequests.filter(quad => quad._1 != variable || quad._2 != hcu),
       completedRequests ++ Set((variable, hcu, workUnit)))

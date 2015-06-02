@@ -49,8 +49,10 @@ abstract class Model(modelStream : ModelStream) {
   def cloneModelWithHumanObservation(variable : ModelVariable, observation : String, hcu : HumanComputeUnit, delayTaken : Long) : Model = {
     val newModel = protectedCloneModelWithHumanObservation(variable, observation)
 
-    humanObservations.put(variable, humanObservations.getOrDefault(variable, List()) :+ (observation, hcu, delayTaken))
-    newModel.humanObservations = humanObservations
+    val newHumanObservations = new java.util.IdentityHashMap[ModelVariable, List[(String, HumanComputeUnit, Long)]]()
+    newHumanObservations.putAll(humanObservations)
+    newHumanObservations.put(variable, newHumanObservations.getOrDefault(variable, List()) :+ (observation, hcu, delayTaken))
+    newModel.humanObservations = newHumanObservations
     newModel
   }
 

@@ -82,8 +82,8 @@ class LenseEngine(stream : ModelStream,
     modelRegularization
   }
 
-  def predict(model : Model, askHuman : (ModelVariable, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(ModelVariable, String, Double)],  Double, Long) => Double, maxLossPerNode : Double) : Promise[(Map[ModelVariable, String], PredictionSummary)] = {
-    val promise = Promise[(Map[ModelVariable,String], PredictionSummary)]()
+  def predict(model : Model, askHuman : (ModelVariable, HumanComputeUnit) => WorkUnit, hcuPool : HCUPool, lossFunction : (List[(ModelVariable, String, Double)],  Double, Long) => Double, maxLossPerNode : Double) : Promise[(Model, Map[ModelVariable, String], PredictionSummary)] = {
+    val promise = Promise[(Model, Map[ModelVariable,String], PredictionSummary)]()
     InFlightPrediction(this, model, budget, askHuman, hcuPool, lossFunction, maxLossPerNode, promise)
     promise
   }
@@ -130,7 +130,7 @@ case class InFlightPrediction(engine : LenseEngine,
                               hcuPool : HCUPool,
                               lossFunction : (List[(ModelVariable, String, Double)], Double, Long) => Double,
                               maxLossPerNode : Double,
-                              returnPromise : Promise[(Map[ModelVariable, String], PredictionSummary)]) extends CaseClassEq {
+                              returnPromise : Promise[(Model, Map[ModelVariable, String], PredictionSummary)]) extends CaseClassEq {
   // Create an initial game state
   var gameState = GameState(model, hcuPool, lossFunction, maxLossPerNode)
 
@@ -239,14 +239,14 @@ case class InFlightPrediction(engine : LenseEngine,
           // If we queried at least 2 humans for this one, hopefully minimizes noise in training data
           if (numRequestsCompleted >= 2) {
             engine.pastGuesses += gameState.model
+            // Wake up the parallel weights trainer:
+            engine.pastGuesses.notifyAll()
           }
-          // Wake up the parallel weights trainer:
-          engine.pastGuesses.notifyAll()
         }
 
         // Complete the query promise, returning the async request to us with a value
         returnPromise.complete(Try {
-            (gameState.model.map,
+            (gameState.model, gameState.model.map,
               ////////////////////////////////////
               // Analytics stuff
               {

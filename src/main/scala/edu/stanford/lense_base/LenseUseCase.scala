@@ -272,8 +272,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
       val guessMap = Await.result(classifyWithArtificialHumans(model, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
-      renderClassification(model, goldMap, guessMap._1)
-      (model, goldMap, guessMap._1, guessMap._2)
+      renderClassification(model, goldMap, guessMap._2)
+      (guessMap._1, goldMap, guessMap._2, guessMap._3)
     }, hcuPool, saveTitle)
 
     hcuPool.kill()
@@ -358,8 +358,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
         Await.result(classifyWithArtificialHumans(model, pair._2, humanErrorDistribution, humanDelayDistribution, rand, hcuPool).future, 1000 days)
       }
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
-      renderClassification(model, goldMap, guessMap._1)
-      (model, goldMap, guessMap._1, guessMap._2)
+      renderClassification(model, goldMap, guessMap._2)
+      (guessMap._1, goldMap, guessMap._2, guessMap._3)
     }, hcuPool, "all_human_"+numQueriesPerNode)
 
     // We're now done with the run, so we need to expire the HIT, if we haven't already
@@ -391,8 +391,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       }
       val guessMap = Await.result(classifyWithRealHumans(model, RealHumanHCUPool).future, 1000 days)
       System.err.println("*** finished "+goldPairs.indexOf(pair)+"/"+goldPairs.size)
-      renderClassification(model, goldMap, guessMap._1)
-      (model, goldMap, guessMap._1, guessMap._2)
+      renderClassification(model, goldMap, guessMap._2)
+      (guessMap._1, goldMap, guessMap._2, guessMap._3)
     }, RealHumanHCUPool, "real_human")
 
     // We're now done with the run, so we need to expire the HIT, if we haven't already
@@ -410,7 +410,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     val promise = Promise[Output]()
     classifyWithRealHumans(graphAndQuestion, RealHumanHCUPool).future.onComplete(t => {
       if (t.isSuccess) {
-        promise.complete(Try { toOutput(graphAndQuestion, t.get._1) })
+        promise.complete(Try { toOutput(graphAndQuestion, t.get._2) })
       }
       else {
         promise.complete(Try {
@@ -840,7 +840,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       printConfusion(resultsPrefix+outputPath+"/confusion_nodetype_"+variableTypes.indexOf(valueSet)+".csv",
         valueSet.toList,
         l.flatMap(quad => {
-          quad._1.variables.filter(_.possibleValues == valueSet).map(variable => (quad._2(variable), quad._3(variable)))
+          quad._1.variables.filter(_.possibleValues.toSet == valueSet).map(variable => (quad._2(variable), quad._3(variable)))
         }))
     }
 
@@ -984,7 +984,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     println("Detailed charts printed to \""+resultsPrefix+outputPath+"\"")
   }
 
-  private def classifyWithRealHumans(model : Model, hcuPool : HCUPool) : Promise[(Map[ModelVariable, String],PredictionSummary)] = {
+  private def classifyWithRealHumans(model : Model, hcuPool : HCUPool) : Promise[(Model, Map[ModelVariable, String],PredictionSummary)] = {
     // Just ensure that we have a server up, this will start it if it isn't running yet
     WorkUnitServlet.server
     // Run actual prediction
@@ -996,7 +996,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
                                            humanErrorDistribution : HumanErrorDistribution,
                                            humanDelayDistribution : HumanDelayDistribution,
                                            rand : Random,
-                                           hcuPool : HCUPool) : Promise[(Map[ModelVariable, String],PredictionSummary)] = {
+                                           hcuPool : HCUPool) : Promise[(Model, Map[ModelVariable, String],PredictionSummary)] = {
     lenseEngine.predict(model, (variable, hcu) => {
       val correct = getCorrectLabel(variable, output)
 
