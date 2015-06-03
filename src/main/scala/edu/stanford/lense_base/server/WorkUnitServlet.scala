@@ -435,8 +435,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   }
 
   def retainer : Double = {
-    // TODO: This needs to be set in a flag someplace
-    1.00
+    MTurkConfig.retainerCost
   }
 
   // Gets the estimated required time to perform this task, in milliseconds

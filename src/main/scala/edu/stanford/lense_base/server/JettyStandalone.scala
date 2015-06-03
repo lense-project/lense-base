@@ -89,9 +89,14 @@ class JettyStandalone(webapp : String) {
 
   val server = new Server(threadPool)
 
+  val useDevPorts = false
+
+  val publicPort = if (useDevPorts) 8081 else 8080
+  val securePort = if (useDevPorts) 8444 else 8443
+
   val http_config = new HttpConfiguration()
   http_config.setSecureScheme("https")
-  http_config.setSecurePort(8443)
+  http_config.setSecurePort(securePort)
   http_config.setOutputBufferSize(32768)
   http_config.setRequestHeaderSize(8192)
   http_config.setResponseHeaderSize(8192)
@@ -100,7 +105,7 @@ class JettyStandalone(webapp : String) {
 
   val http = new ServerConnector(server,
     new HttpConnectionFactory(http_config))
-  http.setPort(8080)
+  http.setPort(publicPort) // 8080
   http.setIdleTimeout(30000)
   server.addConnector(http)
 
@@ -122,7 +127,7 @@ class JettyStandalone(webapp : String) {
   val sslConnector = new ServerConnector(server,
     new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
     new HttpConnectionFactory(https_config))
-  sslConnector.setPort(8443)
+  sslConnector.setPort(securePort)
   server.addConnector(sslConnector)
 
   val context: WebAppContext = new WebAppContext(webapp, "/")

@@ -23,7 +23,7 @@ import scala.util.Random
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
   lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
-  lazy val testSet : List[(String,String)] = fullTestSet.take(1000)
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(441, 1000)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
@@ -192,7 +192,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
-  val poolSize = 4
+  val poolSize = 1
   // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline

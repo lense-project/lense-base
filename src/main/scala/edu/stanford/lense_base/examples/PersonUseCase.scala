@@ -1,6 +1,6 @@
 package edu.stanford.lense_base.examples
 
-import java.io.{FileWriter, BufferedWriter, File}
+import java.io._
 import java.net.URL
 
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
@@ -8,7 +8,9 @@ import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
 import edu.stanford.lense_base.models.{LogisticExternalModelStream, ModelStream, ModelVariable}
+import org.yaml.snakeyaml.Yaml
 
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.Random
 
@@ -108,7 +110,36 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   override def useCaseReportSubpath : String = "celebrity"
 
-  override def getHumanTrainingExamples : List[(PersonImage,String,String)] = List()
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/people.yaml")
+
+  override def getHumanTrainingExamples : List[(PersonImage, String, String)] = yaml._3
+  override def humanTrainingIntroduction : String = yaml._1
+  override def humanCheatSheet : String = yaml._2
+
+  def loadTutorialYAML(path : String) : (String,String,List[(PersonImage, String, String)]) = {
+    if (!scala.reflect.io.File(path).exists) return ("","",List())
+    val yaml = new Yaml()
+
+    val doc : java.util.Map[String, Any] = yaml.load(new FileInputStream(path)).asInstanceOf[java.util.Map[String, Any]]
+
+    val introText = doc.get("introduction").asInstanceOf[String]
+    val cheatSheet = doc.get("cheat-sheet").asInstanceOf[String]
+
+    val list = ListBuffer[(PersonImage, String, String)]()
+
+    val exampleList : java.util.ArrayList[java.util.Map[String,String]] = doc.get("examples").asInstanceOf[java.util.ArrayList[java.util.Map[String,String]]]
+    for (i <- 0 to exampleList.size()-1) {
+      val example = exampleList.get(i)
+
+      val photo = example.get("photo")
+      val correctTag = example.get("correctTag")
+      val comment = example.get("comment")
+
+      list.+=((PersonImage(correctTag, 0, photo), correctTag, comment))
+    }
+
+    (introText, cheatSheet, list.toList)
+  }
 
   /**
    * A way to define the loss function for you system. mostLikelyGuesses is a list of all the nodes being chosen on,
@@ -176,9 +207,9 @@ object PersonUseCase {
   def main(args: Array[String]) {
     val personUseCase = new PersonUseCase()
 
-    val poolSize = 3
-    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+    val poolSize = 1
+    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
     // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)

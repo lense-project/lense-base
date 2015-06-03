@@ -15,7 +15,7 @@ object HITCreator {
 
   def createHIT(reward : Double = 0.10,
                 numAssignments : Int = 1) : String = {
-    val title = MTurkConfig.retainerMinutes+" minutes of real time classification with LARGE BONUS"
+    val title = MTurkConfig.retainerMinutes+" minutes of real time classification WITH BONUS"
     val description = "Receive a retainer for staying for "+MTurkConfig.retainerMinutes+" minutes, and a bonus for all the HITs you perform in real time"
     val question = new HITQuestion("src/main/resources/mturk/external.question").getQuestion
     val mastersQualification = "2F1QJWKUDD8XADTFD2Q0G6UTO95ALH"

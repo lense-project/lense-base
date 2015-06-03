@@ -12,7 +12,7 @@ examples:
     correctTag: "NEG"
     comment: "Label reviews that didn't like the movie as negative."
 
-  - review: "Yeah, this movie is totally awesome."
+  - review: "The cast may be a bit over the top, but this movie is totally awesome!"
     correctTag: "POS"
     comment: "Don't forget to use the hotkeys!"
 

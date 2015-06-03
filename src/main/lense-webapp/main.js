@@ -439,7 +439,7 @@ $(function () {
     }
     else {
         ready.click(function() {
-            bonus.html("$1.00");
+            bonus.html("$5.00");
 
             var instructions = $("#instructions");
             var instructionsHeader = $("#instructions-header");

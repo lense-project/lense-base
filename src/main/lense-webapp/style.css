@@ -12,6 +12,11 @@ html, body {
     padding: 1.0em;
 }
 
+.thumb {
+    height: 100px;
+    text-align: center;
+}
+
 .info {
     background-color: beige;
     margin: 0.5em;
