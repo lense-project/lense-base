@@ -7,6 +7,8 @@ package edu.stanford.lense_base.gameplaying
  */
 class NQuestionBaseline(n : Int) extends GamePlayer {
   override def getOptimalMove(state: GameState): GameMove = {
+    if (state.hcuPool.hcuPool.size == 0) return Wait()
+
     val legalMoves = getAllLegalMoves(state, reserveRealBudget = true)
 
     // Ask everything we legally can first

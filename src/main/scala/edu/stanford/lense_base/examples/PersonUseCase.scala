@@ -100,7 +100,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
     allImages.filter(p => names.contains(p.name) && p.embedding != null)
   }
 
-  override def getHumanQuestion(input: PersonImage): String = "Who is this celebrity?<div style='width: 200px; height: 200px; background-color: black'><img src=\""+input.url+"\" style='width: 100%'></div>"
+  override def getHumanQuestion(input: PersonImage): String = "<center>Who is this celebrity?<div style='width: 300px; height: 300px; background-color: black; overflow: hidden;'><img src=\""+input.url+"\" style='width: 100%'></div></center>"
 
   override def getHumanVersionOfLabel(label: String): String = label
 

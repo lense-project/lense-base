@@ -29,7 +29,7 @@ import scala.util.parsing.json.JSONObject
 /**
  * Created by keenon on 4/30/15.
  *
- * A Websocket implementation for asking questions and receiving answers.
+ * A Websocket implementation for asking questions and receiving answers
  */
 object WorkUnitServlet {
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
@@ -121,15 +121,27 @@ object WorkUnitServlet {
       val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
       println("Granting bonus of: " + state.outstandingBonus)
       if (state.outstandingBonus > 0) {
-        try {
-          // Do the approval
-          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing " + state.queriesAnswered + " real-time tasks")
-          // Reset all info on this worker
-          MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
-        }
-        catch {
-          case t: Throwable => t.printStackTrace()
-        }
+        new Thread(new Runnable {
+          override def run(): Unit = {
+            var granted = false
+            while (!granted) {
+              try {
+                // Do the approval
+                WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing " + state.queriesAnswered + " real-time tasks")
+                // Reset all info on this worker
+                MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
+                granted = true
+              }
+              catch {
+                case t: Throwable => {
+                  t.printStackTrace()
+                  System.err.println("Sleeping for another 15 seconds before trying again...")
+                  Thread.sleep(15*1000)
+                }
+              }
+            }
+          }
+        }).start()
       }
     }
   }
@@ -486,14 +498,21 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
           if (!workUnit.promise.isCompleted) {
             // Timeout the work
             workUnit.revoke()
-            cancelCurrentWork()
-            timedOutRequestsInSequence += 1
-            val numTolerated = 3
-            if (timedOutRequestsInSequence >= numTolerated) {
-              send(new JsonMessage(new JObject(List("status" -> JString("timeout"), "display" -> JString("ERROR: It appears that "+
-                "you have abandoned this HIT."+
-                " You missed "+numTolerated+" requests in a row. Please return this HIT.")))))
-              noteDisconnection()
+            if (completed) {
+              // we're already disconnected, no need to send any more messages
+            }
+            else {
+              if (workUnit == currentWork) {
+                cancelCurrentWork()
+                timedOutRequestsInSequence += 1
+                val numTolerated = 3
+                if (timedOutRequestsInSequence >= numTolerated) {
+                  send(new JsonMessage(new JObject(List("status" -> JString("timeout"), "display" -> JString("ERROR: It appears that " +
+                    "you have abandoned this HIT." +
+                    " You missed " + numTolerated + " requests in a row. Please return this HIT.")))))
+                  noteDisconnection()
+                }
+              }
             }
           }
         }
