@@ -109,6 +109,27 @@ case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) exten
   }
 }
 
+case class ObservedErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution(rand) {
+
+  /**
+   * This method is only ever used by ArtificialHumans, so it shouldn't update as we get EM observations
+   *
+   * @param correct the true underlying value we're sampling againgst
+   * @param possibleValues the possible values this could take on
+   * @return a random guess
+   */
+  override def guess(correct: String, possibleValues: List[String]): String = throw new UnsupportedOperationException()
+
+  /**
+   * This should return the probability of a joint estimate according to the prior, having not seen any human data.
+   *
+   * @param correct the underlying value
+   * @param guess the human guess
+   * @return a joint probability
+   */
+  override def rawJointProbability(correct: String, guess: String): Double = 0.0
+}
+
 case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution(rand) {
   lazy val unnormalizedConfusionMatrix : Map[String, List[(String,Double)]] = {
     val lines = Source.fromFile(path).getLines().toList

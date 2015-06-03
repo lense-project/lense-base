@@ -208,6 +208,15 @@ case class InFlightPrediction(engine : LenseEngine,
     // If it still has budget and workers, then get an optimal move
     else engine.gamePlayer.getOptimalMove(gameState)
 
+    // This sometimes actually happens in the NQuestionBaseline
+    /*
+    if (optimalMove.isInstanceOf[Wait]) {
+      if (gameState.inFlightRequests.size == 0) {
+        optimalMove = TurnInGuess()
+      }
+    }
+    */
+
     optimalMove match {
       case _ : TurnInGuess =>
 

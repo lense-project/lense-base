@@ -1,0 +1,21 @@
+%The sentiment user tutorial
+%hardly needs explaining, but there you go
+---
+introduction: "Labeling movie reviews as positive or negative."
+cheat-sheet: ""
+examples:
+  - review: "I love this movie, and I watch it every night!"
+    correctTag: "POS"
+    comment: "Label reviews that liked the movie as positive."
+
+  - review: "The acting in this movie sucks!!"
+    correctTag: "NEG"
+    comment: "Label reviews that didn't like the movie as negative."
+
+  - review: "Yeah, this movie is totally awesome."
+    correctTag: "POS"
+    comment: "Don't forget to use the hotkeys!"
+
+  - review: "I can't wait for the sequel!"
+    correctTag: "POS"
+    comment: "And remember to go as fast as you can"

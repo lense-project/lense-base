@@ -26,6 +26,16 @@ html, body {
     display: none;
 }
 
+.review {
+    background-color: beige;
+    margin: 0.5em;
+    padding-left: 1.0em;
+    padding-top: 1.0em;
+    padding-bottom: 1.0em;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
 .upperright {
     position: absolute;
     top: 0.75em;

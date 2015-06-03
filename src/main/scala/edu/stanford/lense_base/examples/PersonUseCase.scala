@@ -108,6 +108,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   override def useCaseReportSubpath : String = "celebrity"
 
+  override def getHumanTrainingExamples : List[(PersonImage,String,String)] = List()
+
   /**
    * A way to define the loss function for you system. mostLikelyGuesses is a list of all the nodes being chosen on,
    * with their corresponding most likely label, and the probability the model assigns to the label.

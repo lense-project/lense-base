@@ -61,6 +61,20 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
     // Add budget as initial budget
     lenseEngine.budget.addBudget(budget)
+
+    // Add training questions
+
+    RealHumanHCUPool.trainingQuestions = {
+      if (humanTrainingIntroduction.length > 0) {
+        List(IntroductionTrainingQuestion(humanTrainingIntroduction))
+      }
+      else List()
+    } ++ {
+      if (humanCheatSheet.length > 0) {
+        List(TrainingCheatSheet(humanCheatSheet))
+      }
+      else List()
+    } ++ humanTrainingExamples
   }
 
   def humanErrorDistribution : HumanErrorDistribution
@@ -174,18 +188,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @return
    */
   def humanCheatSheet: String = ""
-
-  RealHumanHCUPool.trainingQuestions = {
-    if (humanTrainingIntroduction.length > 0) {
-      List(IntroductionTrainingQuestion(humanTrainingIntroduction))
-    }
-    else List()
-  } ++ {
-    if (humanCheatSheet.length > 0) {
-      List(TrainingCheatSheet(humanCheatSheet))
-    }
-    else List()
-  } ++ humanTrainingExamples
 
   /**
    * An opportunity to provide a new game player, besides the default

@@ -1,14 +1,18 @@
 package edu.stanford.lense_base.examples
 
+import java.io.FileInputStream
+
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.models.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
 import edu.stanford.nlp.word2vec.Word2VecLoader
+import org.yaml.snakeyaml.Yaml
 
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
+import scala.reflect.io.File
 import scala.util.Random
 
 /**
@@ -85,7 +89,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   override def getModelStream: ModelStream = logisticModelStream
 
   override def getHumanQuestion(input: String): String = {
-    "Please label this movie review as either positive or negative: <div class='review'>"+input+"</div>"
+    "Please label this <b>movie review</b> as either <b>positive</b> or <b>negative</b>: <br><br><b>Movie Review:</b><div class='review'>"+input+"</div>"
   }
 
   /**
@@ -152,14 +156,45 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     // Make sure it's not just all NEG, then all POS
     rand.shuffle(examples).toList
   }
+
+  lazy val yaml = loadTutorialYAML("src/main/resources/tutorials/sentiment.yaml")
+
+  override def getHumanTrainingExamples : List[(String, String, String)] = yaml._3
+  override def humanTrainingIntroduction : String = yaml._1
+  override def humanCheatSheet : String = yaml._2
+
+  def loadTutorialYAML(path : String) : (String,String,List[(String, String, String)]) = {
+    if (!File(path).exists) return ("","",List())
+    val yaml = new Yaml()
+
+    val doc : java.util.Map[String, Any] = yaml.load(new FileInputStream(path)).asInstanceOf[java.util.Map[String, Any]]
+
+    val introText = doc.get("introduction").asInstanceOf[String]
+    val cheatSheet = doc.get("cheat-sheet").asInstanceOf[String]
+
+    val list = ListBuffer[(String, String, String)]()
+
+    val exampleList : java.util.ArrayList[java.util.Map[String,String]] = doc.get("examples").asInstanceOf[java.util.ArrayList[java.util.Map[String,String]]]
+    for (i <- 0 to exampleList.size()-1) {
+      val example = exampleList.get(i)
+
+      val review = example.get("review")
+      val correctTag = example.get("correctTag")
+      val comment = example.get("comment")
+
+      list.+=((review, correctTag, comment))
+    }
+
+    (introText, cheatSheet, list.toList)
+  }
 }
 
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 4
-  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
   // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, poolSize)
