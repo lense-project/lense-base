@@ -194,7 +194,7 @@ case class InFlightPrediction(engine : LenseEngine,
 
     System.err.println("Reserved by gameplayer on start of move: $"+budget.reserved.getOrDefault(gameState, 0.0))
 
-    // Force the system to turn in all guesses after it's run out of budget or workers
+    // Force the system to freeze after it's run out of budget or workers
     val optimalMove = if (budget.budget < 0.001 || hcuPool.hcuPool.size == 0) {
       for (hcu <- hcuPool.hcuPool) {
         hcu match {
@@ -203,7 +203,7 @@ case class InFlightPrediction(engine : LenseEngine,
           case _ =>
         }
       }
-      TurnInGuess()
+      Wait()
     }
     // If it still has budget and workers, then get an optimal move
     else engine.gamePlayer.getOptimalMove(gameState)

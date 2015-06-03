@@ -31,9 +31,11 @@ $(function () {
 
     // Setup state to handle whether or not we're in a query right now
 
-    var inQuery = false
-    var timeouts = 0
-    var use3Digits = false
+    var inQuery = false;
+    var timeouts = 0;
+    var use3Digits = false;
+
+    var taskCompleted = false;
 
     // Setup submit form
 
@@ -240,7 +242,7 @@ $(function () {
                     inQuery = false;
                     content.html("...");
                     setTimeout(function() {
-                        if (!inQuery) {
+                        if (!inQuery && !taskCompleted) {
                             content.html("Waiting for the other Turkers participating in this HIT to catch up with you...<br><br>Good work on finishing so quickly!<br><br>(We'll alert you when your co-workers are all caught up. Feel free to go do something else for a few seconds.)");
                         }
                     }, 1000);
@@ -425,6 +427,7 @@ $(function () {
 
     function workComplete(code) {
         content.html($('<p>', { text: 'Received a completion code from the server! Thanks for all your hard work. Turning in HIT in 3 seconds.' }));
+        taskCompleted = true;
         $("#completionCode").val(code);
         setTimeout(function() {
             form.submit();

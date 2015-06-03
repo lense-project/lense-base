@@ -31,8 +31,16 @@ cheat-sheet: "<ul>
 examples:
   - photo: "http://farm1.static.flickr.com/27/102923498_4685e849eb_o.jpg"
     correctTag: "Anderson Cooper"
-    comment: "Look at the people on the cheat sheet to figure which of them is in this picture."
+    comment: "Look at the people on the cheat sheet to figure who is in this picture."
+
+  - photo: "http://addicted2fashion.files.wordpress.com/2008/05/miley-cyrus.jpg"
+    correctTag: "Miley Cyrus"
+    comment: "Don't forget to use the hot keys!"
 
   - photo: "http://farm1.static.flickr.com/105/306944741_67d3a3667a_o.jpg"
     correctTag: "Anderson Cooper"
     comment: "Sometimes there will be other people in the photo. Just pick the appropriate celebrity."
+
+  - photo: "http://images.askmen.com/toys/entertainment_100/pictures_100/147b_gossip.jpg"
+    correctTag: "Daniel Craig"
+    comment: "And that's all there is to it..."

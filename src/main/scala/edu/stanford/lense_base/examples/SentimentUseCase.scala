@@ -23,7 +23,7 @@ import scala.util.Random
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
   lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
-  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(441, 1000)
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(672, 1000)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
