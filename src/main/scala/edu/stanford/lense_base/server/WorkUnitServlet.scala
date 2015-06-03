@@ -29,7 +29,7 @@ import scala.util.parsing.json.JSONObject
 /**
  * Created by keenon on 4/30/15.
  *
- * A Websocket implementation for asking questions and receiving answers.
+ * A Websocket implementation for asking questions and receiving answers
  */
 object WorkUnitServlet {
   val workerPool = parallel.mutable.ParHashSet[HCUClient]()
@@ -486,14 +486,21 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
           if (!workUnit.promise.isCompleted) {
             // Timeout the work
             workUnit.revoke()
-            cancelCurrentWork()
-            timedOutRequestsInSequence += 1
-            val numTolerated = 3
-            if (timedOutRequestsInSequence >= numTolerated) {
-              send(new JsonMessage(new JObject(List("status" -> JString("timeout"), "display" -> JString("ERROR: It appears that "+
-                "you have abandoned this HIT."+
-                " You missed "+numTolerated+" requests in a row. Please return this HIT.")))))
-              noteDisconnection()
+            if (completed) {
+              // we're already disconnected, no need to send any more messages
+            }
+            else {
+              if (workUnit == currentWork) {
+                cancelCurrentWork()
+                timedOutRequestsInSequence += 1
+                val numTolerated = 3
+                if (timedOutRequestsInSequence >= numTolerated) {
+                  send(new JsonMessage(new JObject(List("status" -> JString("timeout"), "display" -> JString("ERROR: It appears that " +
+                    "you have abandoned this HIT." +
+                    " You missed " + numTolerated + " requests in a row. Please return this HIT.")))))
+                  noteDisconnection()
+                }
+              }
             }
           }
         }
