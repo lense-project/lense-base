@@ -80,7 +80,7 @@ where $\omega$ and $\psi$ are extra parameters and features for the human error 
 A simple human error model is to return the true label with probability $1-\epsilon$ and a random label otherwise.
 In our running example, some classes, e.g.\ $\textsc{none}$, are more easily identified than others: in this setting human responses can be modeled to be sampled from a confusion matrix.
 
-Finally, we model delay of a single request using a Gamma distribution: $\tau_r \sim \Gamma(k, \theta)$\footnote{We assume that the response delays are independent of the input and which label is being queried, though the model can easily be generalized.}.
+Finally, we model delay to be drawn from a Gamma distribution: $\tau_r \sim \Gamma$\footnote{We assume that the response delays are independent of the input and which label is being queried, though the model can easily be generalized to this setting.}.
 The total time taken on a prediction, $\tau$, depends not only on how many requests are made, but also when they are scheduled.
 We study the problem of how to best schedule multiple requests in \sectionref{async}.
 
