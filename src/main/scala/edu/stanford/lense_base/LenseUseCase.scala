@@ -1106,6 +1106,8 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     lenseEngine.predict(model, (v, hcu) => getQuestion(v, hcu).getHumanOpinion, hcuPool, lossFunction, maxLossPerNode)
   }
 
+  def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String
+
   private def classifyWithArtificialHumans(model : Model,
                                            output : Output,
                                            humanErrorDistribution : HumanErrorDistribution,
@@ -1116,7 +1118,10 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       val correct = getCorrectLabel(variable, output)
 
       val promise = Promise[String]()
-      val workUnit = ArtificialWorkUnit(promise, humanErrorDistribution.guess(correct, variable.possibleValues), variable, hcuPool)
+      val workUnit = if (humanErrorDistribution.isInstanceOf[ObservedErrorDistribution])
+        ArtificialWorkUnit(promise, humanErrorDistribution.asInstanceOf[ObservedErrorDistribution].guessGivenContext(getContextForHumanErrorReplay(variable, model), correct, variable.possibleValues), variable, hcuPool)
+      else
+        ArtificialWorkUnit(promise, humanErrorDistribution.guess(correct, variable.possibleValues), variable, hcuPool)
       hcu.addWorkUnit(workUnit)
       workUnit
     },

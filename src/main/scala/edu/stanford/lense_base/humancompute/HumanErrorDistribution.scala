@@ -1,5 +1,9 @@
 package edu.stanford.lense_base.humancompute
 
+import java.io.File
+
+import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scala.io.Source
 import scala.util.Random
 
@@ -109,7 +113,45 @@ case class EpsilonRandomErrorDistribution(epsilon : Double, rand : Random) exten
   }
 }
 
-case class ObservedErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution(rand) {
+case class ObservedErrorDistribution(replayFolder : String, confusionPath : String, rand : Random) extends HumanErrorDistribution(rand) {
+  def addContextFromFile(map : mutable.Map[String,ListBuffer[String]], path : String) = {
+    val lines = Source.fromFile(path).getLines().toList
+
+    lines.foreach(line => {
+      val parts = line.split("\t")
+      // Ignore blank lines
+      if (parts.size >= 3) {
+        val context = parts(0)
+        for (i <- 2 to parts.size-1) {
+          val value = parts(i).split(",")(0)
+          if (!map.contains(context)) map.put(context, new ListBuffer[String]())
+          map(context) += value
+        }
+      }
+    })
+  }
+
+  lazy val contextToValueMap : Map[String, ListBuffer[String]] = {
+    val map = mutable.Map[String,ListBuffer[String]]()
+    val f = new File(replayFolder)
+    for (file <- f.list()) {
+      println("Attempting to load replayable data from "+file)
+      addContextFromFile(map, replayFolder+"/"+file)
+    }
+    map.toMap
+  }
+
+  val confusionMatrixDistribution = ConfusionMatrixErrorDistribution(confusionPath, rand)
+
+  def guessGivenContext(context : String, correct : String, possibleValues : List[String]) : String = {
+    if (contextToValueMap.contains(context)) {
+      val list = contextToValueMap(context)
+      list(rand.nextInt(list.size))
+    }
+    else {
+      confusionMatrixDistribution.guess(correct, possibleValues)
+    }
+  }
 
   /**
    * This method is only ever used by ArtificialHumans, so it shouldn't update as we get EM observations
@@ -127,7 +169,7 @@ case class ObservedErrorDistribution(path : String, rand : Random) extends Human
    * @param guess the human guess
    * @return a joint probability
    */
-  override def rawJointProbability(correct: String, guess: String): Double = 0.0
+  override def rawJointProbability(correct: String, guess: String): Double = confusionMatrixDistribution.rawJointProbability(correct, guess)
 }
 
 case class ConfusionMatrixErrorDistribution(path : String, rand : Random) extends HumanErrorDistribution(rand) {

@@ -7,7 +7,7 @@ import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
-import edu.stanford.lense_base.models.{LogisticExternalModelStream, ModelStream, ModelVariable}
+import edu.stanford.lense_base.models.{Model, LogisticExternalModelStream, ModelStream, ModelVariable}
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.mutable.ListBuffer
@@ -171,6 +171,10 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    * @return amount in dollars to use as budget
    */
   override def budget: Double = 20.0
+
+  def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
+    variable.payload.asInstanceOf[PersonImage].url
+  }
 }
 
 case class PersonImage(name : String, index : Int, url : String) {
