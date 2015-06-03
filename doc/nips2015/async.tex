@@ -10,14 +10,21 @@ we would like to develop an algorithm that can select and schedule several reque
 \end{align*}
 where $C$ is a given cost function.
 
+\begin{figure}
+  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/mcts.pdf}
+  \hfill
+  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/mcts_simple.pdf}
+  \caption{Monte Carlo tree search}
+\label{fig:mcts}
+\end{figure}
+
 We cast the problem in the Bayesian decision theoretic framework using an expectimax game tree.
 The game alternates between our agent (max nodes) and the environment (expectation nodes).
 The state keeps track of time, responses received so far and responses in flight.
-At each max node, the agent can make an additional request ($\request(r)$, where $r \in \{1, \ldots, n\}$), wait for an in-flight request to return ($\wait$)
-\footnote{Note that we have restricted our agent to not be able to wait arbitrary amounts of time, and rather just wait till the next possible action.}
+At each max node, the agent can make an additional request ($\request(r)$, where $r \in \{1, \ldots, n\}$), wait for an in-flight request to return ($\wait$)\footnote{Note that we have restricted our agent to not be able to wait arbitrary amounts of time, and rather just wait till the next possible action.}
 or turn in its the best guess ($\turnin$).
-When an $\request(r)$ action is made, the environment samples a response $z_r$ under the current model, $z_r \sim \p(\cdot \given \bx, z_1, ..., z_n$, and delay $\tau_r$, but the agent does not get to observe these yet.
-When a $\wait$ action is made, the environment returns the nearest response, $r$, and advances time by $\tau_r$.
+When an $\request(r)$ action is made, the environment samples a response $z_r$ under the current model, $z_r \sim \p(\cdot \given \bx, z_1, \dots z_n)$, and delay $\tau_r$, but the agent does not get to observe these, yet.
+When a $\wait$ action is made, the environment returns the nearest response, $r$, and advances time by $\tau_r$\expand.
 When the agent takes the $\turnin$ action, it receives a reward equal to the expected loss under the current state:
 \begin{align*}
   \hat\sL &= \E_{\by \sim \p(\cdot \given \bx, \bz)}[\ell(\by, \byt) + C(R, \tau)],

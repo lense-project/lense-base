@@ -25,6 +25,10 @@ However, this not only presupposes the ready availability of large amounts of un
 An alternate approach is to use cut out the middle man altogether and use the crowd to label all examples in real-time\cite{cheng2015flock}. 
 While this allows us to ensure accurate responses, it becomes prohibitively expensive to scale to more data. 
 
+KEY ELEMENTS: actively query on the test set. how do we actively query? Use magical TD-tree. NEW in the active learning literature.
+
+
+
 Our approach interpolates between these two regimes: we query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
 This results in a system that provides users high quality responses in real-time while starting {\em with no training data}.
 In this paper, we explicitly address three main challenges that arise in doing so: keeping costs low, guaranteeing low latency and maximizing accuracy.

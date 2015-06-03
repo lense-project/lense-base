@@ -1,0 +1,32 @@
+% vim:ft=tex
+\documentclass[tikz,convert={outfile=mcts.pdf}]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usepackage{scabby-diag}
+
+\begin{document}
+
+\begin{tikzpicture}[
+    triangle/.style = {regular polygon, regular polygon sides=3},
+    square/.style = {regular polygon, regular polygon sides=4},
+    elem/.style = {minimum height=9em}
+    node rotated/.style = {rotate=180},
+    border rotated/.style = {shape border rotate=180}
+    ]
+  % Root node
+  \node[triangle, elem, draw] (root) {$1$}
+    child {node [circle, elem, draw] (r1) {$2$}
+      child {node [triangle, elem, draw] (r11) {$5$}
+        child {node [circle, elem, draw] {$7$}
+          child {node [square, elem, draw] {$9$}}}
+        child {node [square, elem, draw] (r1s) {$8$}}}
+      child {node [triangle, elem, draw] {$6$}
+      child {node {$\dots$}}
+      }
+    }
+    child {node [circle, elem,draw] {$3$}
+    child {node {$\dots$}}
+    }
+    child {node [square, elem,draw] {$4$}};
+\end{tikzpicture}
+
+\end{document}
