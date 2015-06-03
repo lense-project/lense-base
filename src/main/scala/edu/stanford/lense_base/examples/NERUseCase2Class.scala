@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.{FileWriter, BufferedWriter, File}
 
-import edu.stanford.lense_base.gameplaying.{SamplingLookaheadOneHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, SamplingLookaheadOneHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{ConfusionMatrixErrorDistribution, ObservedHumanDelayDistribution}
 
 /**
@@ -35,7 +35,7 @@ class NERUseCase2Class extends NERUseCase {
     expectedErrors + 10*cost
   }
 
-  override def gamePlayer : GamePlayer = new SamplingLookaheadOneHeuristic(humanErrorDistribution,humanDelayDistribution)
+  override def gamePlayer : GamePlayer = new MCTSGamePlayer(humanErrorDistribution,humanDelayDistribution)
 }
 
 object NERUseCase2Class extends App {

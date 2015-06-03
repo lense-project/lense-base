@@ -11,13 +11,10 @@ import scala.util.Random
  *
  * Implements fast, tree-parallel UCT MCTS with Double Progressive Widening to do state space search
  */
-object MCTSGamePlayer extends GamePlayer {
+class MCTSGamePlayer(humanErrorDistribution : HumanErrorDistribution, humanDelayDistribution : HumanDelayDistribution) extends GamePlayer {
   val r = new Random()
 
   val mainTreeLock = new Object()
-
-  var humanErrorDistribution : HumanErrorDistribution = null
-  var humanDelayDistribution : HumanDelayDistribution = null
 
   override def getOptimalMove(state: GameState): GameMove = {
     // Get all the legal moves
@@ -27,7 +24,7 @@ object MCTSGamePlayer extends GamePlayer {
 
     val rootNode = TreeNode(StateSample(state), legalTopLevelMoves, this, null)
 
-    val samplesToTake = 20*legalTopLevelMoves.size
+    val samplesToTake = 10*legalTopLevelMoves.size
     // val threadCount = Runtime.getRuntime.availableProcessors()
     val threadCount = 1
 
@@ -83,13 +80,12 @@ case class StateSample(gameState : GameState,
                        hypotheticalEndTime : Long = System.currentTimeMillis(),
                        terminal : Boolean = false) {
 
-  def calculateReward() : Double = {
+  def calculateLoss() : Double = {
     if (!terminal) throw new IllegalStateException("Shouldn't be asking for reward at an intermediate state!")
 
     // reward is just negative loss. If we go over the maxLossPerNode term, this will return negative, and MCTS just won't
     // visit this node ever again
-    val normalizedLoss = gameState.loss(hypotheticalEndTime - startTime) / (gameState.maxLossPerNode * gameState.model.variables.size)
-    1.0 - normalizedLoss
+    gameState.loss(hypotheticalEndTime - startTime)
   }
 
   def sampleNextState(gameMove : GameMove,
@@ -134,15 +130,15 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
 
   val children = mutable.Map[GameMove, List[TreeNode]]()
   var visits = 0
-  var totalObservedReward : Double = 0
+  var totalObservedLoss : Double = 0
 
   def recursiveToString(level : Int): String = {
     "\t"*level+"{Node ["+
     "visits:"+visits+","+
     "delay:"+(stateSample.hypotheticalEndTime-stateSample.startTime)+","+
     "cost:$"+stateSample.gameState.cost+","+
-    "totalObservedReward:"+totalObservedReward+","+
-    "averageObservedReward:"+(totalObservedReward/visits)+"]"+
+    "totalObservedReward:"+totalObservedLoss+","+
+    "averageObservedReward:"+(totalObservedLoss/visits)+"]"+
     children.map(pair => {
       "\n"+"\t"*(level+1)+pair._1+" outcomes = [\n"+
       pair._2.map(_.recursiveToString(level+2)).mkString(",\n")+
@@ -154,25 +150,26 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
   def isNonTerminal : Boolean = !stateSample.terminal
 
   def mostVisitedAction() : GameMove = {
-    println(children.map(pair => pair._1+": "+pair._2.map(_.visits).sum+", reward "+(pair._2.map(_.totalObservedReward).sum / pair._2.map(_.visits).sum)).mkString("\n"))
+    println(children.map(pair => pair._1+": "+pair._2.map(_.visits).sum+", loss "+(pair._2.map(_.totalObservedLoss).sum / pair._2.map(_.visits).sum)).mkString("\n"))
 
     children.maxBy(_._2.map(_.visits).sum)._1
   }
 
-  def backpropReward(reward : Double) : Unit = {
-    totalObservedReward += reward
-    if (parent != null) parent.backpropReward(reward)
+  def backpropLoss(loss : Double) : Unit = {
+    totalObservedLoss += loss
+    if (parent != null) parent.backpropLoss(loss)
   }
 
   def backprop() = {
     if (isNonTerminal) throw new IllegalStateException("Shouldn't try to backprop from a non-terminal node")
-    backpropReward(stateSample.calculateReward())
+    backpropLoss(stateSample.calculateLoss())
   }
 
   def treePolicyStep(r : Random,
                      humanErrorDistribution : HumanErrorDistribution,
                      humanDelayDistribution : HumanDelayDistribution) : TreeNode = {
     val unvisitedMoves = legalMoves.filter(!children.contains(_))
+
 
     // First we use the UCT action maximizing score calculation to pick an action
 
@@ -189,19 +186,22 @@ case class TreeNode(stateSample : StateSample, legalMoves : List[GameMove], game
       }
       // Otherwise visit in order of least certainty about
       else {
-        unvisitedMoves.head
+        val stateMarginals = stateSample.gameState.model.marginals
+        unvisitedMoves.map{
+          case g : MakeHumanObservation => (g, stateMarginals(g.variable).maxBy(_._2)._2)
+        }.minBy(_._2)._1
       }
     } else {
       // Otherwise choose an action based on UCB1 multi-armed bandit formula
-      legalMoves.maxBy(move => {
+      legalMoves.minBy(move => {
         val observedOutcomes = children(move)
         // println("Size of children:"+children.size)
 
-        val sumRewardThisMove = observedOutcomes.map(_.totalObservedReward).sum
+        val sumLossThisMove = observedOutcomes.map(_.totalObservedLoss).sum
         val sumVisitsThisMove = observedOutcomes.map(_.visits).sum
 
         // Calculate score according to UCB1 formula
-        val score = (sumRewardThisMove / (sumVisitsThisMove + 1)) + Math.sqrt(K * Math.log(visits) / (sumVisitsThisMove + 1))
+        val score = (sumLossThisMove / (sumVisitsThisMove + 1)) - Math.sqrt(K * Math.log(visits) / (sumVisitsThisMove + 1))
         // println("Score for "+move+" with this node visits "+visits+", move size:"+observedOutcomes.size+", moveVisits "+sumVisitsThisMove+", moveReward "+sumRewardThisMove+": "+score)
         score
       })
