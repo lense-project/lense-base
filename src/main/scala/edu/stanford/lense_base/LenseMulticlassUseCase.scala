@@ -1,9 +1,15 @@
 package edu.stanford.lense_base
 
+import java.io.FileInputStream
+
 import edu.stanford.lense_base.graph.{NodeType, Graph, GraphNode}
 import edu.stanford.lense_base.humancompute.HumanComputeUnit
 import edu.stanford.lense_base.models._
 import edu.stanford.lense_base.server.{MulticlassTrainingQuestion, MulticlassQuestion, TrainingQuestion}
+import org.yaml.snakeyaml.Yaml
+
+import scala.collection.mutable.ListBuffer
+import scala.reflect.io.File
 
 /**
  * Created by keenon on 5/7/15.
@@ -24,17 +30,19 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
    *
    * @return
    */
-  def getHumanTrainingExamples : List[(Input, String, String)] = List()
+  def getHumanTrainingExamples : List[(Input, String, String)]
 
   override def encodeModelWithValuesAsTSV(model : Model, values : Map[ModelVariable, String]) : String = {
-    model.variables.head.payload.toString+"\t"+values(model.variables.head)+model.getHumanObservationsForVariable(model.variables.head).map(triple => {
+    model.variables.head.payload.toString+"\t"+values(model.variables.head)+"\t"+model.getHumanObservationsForVariable(model.variables.head).map(triple => {
       triple._1+","+triple._2.getName+","+triple._3
     }).mkString("\t")
   }
 
-  override def humanTrainingExamples : List[TrainingQuestion] = getHumanTrainingExamples.map(triple => {
-    MulticlassTrainingQuestion(getHumanQuestion(triple._1), labelTypes.toList.map(getHumanVersionOfLabel), getHumanVersionOfLabel(triple._2), triple._3)
-  })
+  override def humanTrainingExamples : List[TrainingQuestion] = {
+    getHumanTrainingExamples.map(triple => {
+      MulticlassTrainingQuestion(getHumanQuestion(triple._1), labelTypes.toList.map(getHumanVersionOfLabel), getHumanVersionOfLabel(triple._2), triple._3)
+    })
+  }
 
   /**
    * This function takes an Input
@@ -67,4 +75,5 @@ abstract class LenseMulticlassUseCase[Input] extends LenseUseCase[Input,String]{
   }
 
   override def getCorrectLabel(variable : ModelVariable, goldOutput: String): String = goldOutput
+
 }

@@ -12,6 +12,11 @@ html, body {
     padding: 1.0em;
 }
 
+.thumb {
+    height: 100px;
+    text-align: center;
+}
+
 .info {
     background-color: beige;
     margin: 0.5em;
@@ -24,6 +29,16 @@ html, body {
 
 .info:empty {
     display: none;
+}
+
+.review {
+    background-color: beige;
+    margin: 0.5em;
+    padding-left: 1.0em;
+    padding-top: 1.0em;
+    padding-bottom: 1.0em;
+    border: 2px solid black;
+    border-radius: 5px;
 }
 
 .upperright {

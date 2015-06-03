@@ -1,0 +1,38 @@
+%The sentiment user tutorial
+%hardly needs explaining, but there you go
+---
+introduction: "Identifying movie stars in images"
+cheat-sheet: "<ul>
+                <li>
+                  <b>Anderson Cooper</b>:<br>
+                  <center>
+                    <img src='http://farm4.static.flickr.com/3052/2936758243_702709d37f.jpg' class='thumb'>
+                  </center>
+                </li>
+                <li>
+                  <b>Miley Cyrus</b>:<br>
+                  <center>
+                    <img src='http://img1.wikia.nocookie.net/__cb20140315161650/disney/images/1/13/2013-miley-cyrus.jpg' class='thumb'>
+                  </center>
+                </li>
+                <li>
+                  <b>Scarlet Johannson</b>:<br>
+                  <center>
+                    <img src='http://www.ew.com/sites/default/files/i/2013/09/04/Scarlett-Johansson.jpg' class='thumb'>
+                  </center>
+                </li>
+                <li>
+                  <b>Daniel Craig</b>:<br>
+                  <center>
+                    <img src='http://ia.media-imdb.com/images/M/MV5BMjEzMjk4NDU4MF5BMl5BanBnXkFtZTcwMDMyNjQzMg@@._V1_SX214_CR0,0,214,317_AL_.jpg' class='thumb'>
+                  </center>
+                </li>
+              </ul>"
+examples:
+  - photo: "http://farm1.static.flickr.com/27/102923498_4685e849eb_o.jpg"
+    correctTag: "Anderson Cooper"
+    comment: "Look at the people on the cheat sheet to figure which of them is in this picture."
+
+  - photo: "http://farm1.static.flickr.com/105/306944741_67d3a3667a_o.jpg"
+    correctTag: "Anderson Cooper"
+    comment: "Sometimes there will be other people in the photo. Just pick the appropriate celebrity."

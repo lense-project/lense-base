@@ -33,6 +33,7 @@ $(function () {
 
     var inQuery = false
     var timeouts = 0
+    var use3Digits = false
 
     // Setup submit form
 
@@ -104,24 +105,40 @@ $(function () {
                 content.html("Took too long answering query. Server revoked. Waiting for next question to answer.");
             }
             if (json['bonus'] !== undefined) {
-                var roundedBonus = Math.round(json.bonus * 1000) / 1000;
-                var bonusString = "$"+roundedBonus;
-                if (bonusString.length === 3) {
-                    bonus.html(bonusString+"000");
-                }
-                else if (bonusString.length === 4) {
-                    bonus.html(bonusString+"00");
-                }
-                else if (bonusString.length === 5) {
-                    bonus.html(bonusString+"0");
+                if (use3Digits) {
+                    var roundedBonus = Math.round(json.bonus * 1000) / 1000;
+                    var bonusString = "$"+roundedBonus;
+                    if (bonusString.length === 3) {
+                        bonus.html(bonusString+"000");
+                    }
+                    else if (bonusString.length === 4) {
+                        bonus.html(bonusString+"00");
+                    }
+                    else if (bonusString.length === 5) {
+                        bonus.html(bonusString+"0");
+                    }
+                    else {
+                        bonus.html(bonusString);
+                    }
                 }
                 else {
-                    bonus.html(bonusString);
+                    var roundedBonus = Math.round(json.bonus * 100) / 100;
+                    var bonusString = "$"+roundedBonus;
+                    if (bonusString.length === 3) {
+                        bonus.html(bonusString+"00");
+                    }
+                    else if (bonusString.length === 4) {
+                        bonus.html(bonusString+"0");
+                    }
+                    else {
+                        bonus.html(bonusString);
+                    }
                 }
 
                 // Create animating bonus
                 var bonusDiv = $('<div/>', {class: "bonus-ping"});
-                bonusDiv.html("+0.25&#162;");
+                // bonusDiv.html("+0.25&#162;");
+                bonusDiv.html("+$0.01");
                 $("body").append(bonusDiv);
                 bonusDiv.animate({
                     top: "0px",
@@ -422,7 +439,7 @@ $(function () {
     }
     else {
         ready.click(function() {
-            bonus.html("$1.00");
+            bonus.html("$5.00");
 
             var instructions = $("#instructions");
             var instructionsHeader = $("#instructions-header");

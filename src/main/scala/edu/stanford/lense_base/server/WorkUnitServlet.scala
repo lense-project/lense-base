@@ -435,8 +435,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   }
 
   def retainer : Double = {
-    // TODO: This needs to be set in a flag someplace
-    1.00
+    MTurkConfig.retainerCost
   }
 
   // Gets the estimated required time to perform this task, in milliseconds
@@ -460,7 +459,7 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
   // Get the cost
   override def cost: Double = {
     // TODO: this needs to be set in a flag someplace
-    0.0025
+    MTurkConfig.turkerCost
   }
 
   // Milliseconds that this worker is expected to remain on call before being paid
@@ -482,8 +481,8 @@ class HCUClient extends AtmosphereClient with HumanComputeUnit {
 
       new Thread(new Runnable {
         override def run(): Unit = {
-          // 10s timeout
-          Thread.sleep(10000)
+          // set timeout
+          Thread.sleep(MTurkConfig.timeoutSeconds * 1000)
           if (!workUnit.promise.isCompleted) {
             // Timeout the work
             workUnit.revoke()

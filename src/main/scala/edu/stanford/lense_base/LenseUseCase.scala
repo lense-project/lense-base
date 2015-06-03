@@ -7,7 +7,7 @@ import edu.stanford.lense_base.gameplaying._
 import edu.stanford.lense_base.graph.{GraphNode, GraphStream, Graph}
 import edu.stanford.lense_base.humancompute._
 import edu.stanford.lense_base.models._
-import edu.stanford.lense_base.mturk.HITCreator
+import edu.stanford.lense_base.mturk.{MTurkConfig, HITCreator}
 import edu.stanford.lense_base.server._
 
 import scala.collection.mutable
@@ -42,7 +42,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
   def makeHITAndWaitFor(numberOfHumans: Int) : String = {
     System.err.println("Creating "+numberOfHumans+" MTurk HITs...")
-    val hitId = HITCreator.createHIT(1.00, numberOfHumans)
+    val hitId = HITCreator.createHIT(MTurkConfig.retainerCost, numberOfHumans)
 
     // Disable waiting for additional connections, just seems to piss off workers...
     System.err.println("Waiting for " + 1 + " to connect...")
@@ -61,6 +61,20 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
     }
     // Add budget as initial budget
     lenseEngine.budget.addBudget(budget)
+
+    // Add training questions
+
+    RealHumanHCUPool.trainingQuestions = {
+      if (humanTrainingIntroduction.length > 0) {
+        List(IntroductionTrainingQuestion(humanTrainingIntroduction))
+      }
+      else List()
+    } ++ {
+      if (humanCheatSheet.length > 0) {
+        List(TrainingCheatSheet(humanCheatSheet))
+      }
+      else List()
+    } ++ humanTrainingExamples
   }
 
   def humanErrorDistribution : HumanErrorDistribution
@@ -174,18 +188,6 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
    * @return
    */
   def humanCheatSheet: String = ""
-
-  RealHumanHCUPool.trainingQuestions = {
-    if (humanTrainingIntroduction.length > 0) {
-      List(IntroductionTrainingQuestion(humanTrainingIntroduction))
-    }
-    else List()
-  } ++ {
-    if (humanCheatSheet.length > 0) {
-      List(TrainingCheatSheet(humanCheatSheet))
-    }
-    else List()
-  } ++ humanTrainingExamples
 
   /**
    * An opportunity to provide a new game player, besides the default
