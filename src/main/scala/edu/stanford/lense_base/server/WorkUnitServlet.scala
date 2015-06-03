@@ -121,15 +121,27 @@ object WorkUnitServlet {
       val state: MTurkDBState = MTurkDatabase.getWorker(workerId)
       println("Granting bonus of: " + state.outstandingBonus)
       if (state.outstandingBonus > 0) {
-        try {
-          // Do the approval
-          WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing " + state.queriesAnswered + " real-time tasks")
-          // Reset all info on this worker
-          MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
-        }
-        catch {
-          case t: Throwable => t.printStackTrace()
-        }
+        new Thread(new Runnable {
+          override def run(): Unit = {
+            var granted = false
+            while (!granted) {
+              try {
+                // Do the approval
+                WorkUnitServlet.service.grantBonus(state.workerId, state.outstandingBonus, assignmentId, "Earned while completing " + state.queriesAnswered + " real-time tasks")
+                // Reset all info on this worker
+                MTurkDatabase.updateOrCreateWorker(MTurkDBState(workerId, 0, 0L, 0.0, currentlyConnected = false, ""))
+                granted = true
+              }
+              catch {
+                case t: Throwable => {
+                  t.printStackTrace()
+                  System.err.println("Sleeping for another 15 seconds before trying again...")
+                  Thread.sleep(15*1000)
+                }
+              }
+            }
+          }
+        }).start()
       }
     }
   }
