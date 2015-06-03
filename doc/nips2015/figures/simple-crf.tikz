@@ -8,10 +8,16 @@
 \begin{tikzpicture}
 
 % Hidden nodes
-   \node[style=node, scale=0.8] (h1) at (0,0) {$h_1$};
-   \node[style=node, scale=0.8, right= 0.5cm of h1] (h2) {$h_2$};
-   \node[style=node, scale=0.8, right= 0.5cm of h2] (h3) {$h_3$};
-   \node[scale=0.8, right= 0.5cm of h3] (h4) {$\ldots$};
+   \node[style=node, scale=0.7] (h1) at (0,0) {$h_1$};
+   \node[style=node, scale=0.7, right= 0.5cm of h1] (h2) {$h_2$};
+   \node[style=node, scale=0.7, right= 0.5cm of h2] (h3) {$h_3$};
+   \node[style=node, scale=0.7, right= 0.5cm of h3] (h4) {$h_4$};
+   \node[scale=0.8, right= 0.5cm of h4] (h5) {$\ldots$};
+
+   \node[above=0.25cm of h1] (A){soup};
+   \node[above=0.25cm of h2] (A){on};
+   \node[above=0.25cm of h3] (A){George};
+   \node[above=0.25cm of h4] (A){str.};
 
    \draw[-latex] (h1) -- (h2);
    \draw[-latex] (h2) -- (h3);

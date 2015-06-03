@@ -2,7 +2,7 @@ package edu.stanford.lense_base.examples
 
 import java.io.FileInputStream
 
-import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
@@ -23,7 +23,7 @@ import scala.util.Random
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
   lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
-  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(672, 1000)
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(565, 1000)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
@@ -187,6 +187,8 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
     (introText, cheatSheet, list.toList)
   }
+
+  override def gamePlayer : GamePlayer = new MCTSGamePlayer(humanErrorDistribution, humanDelayDistribution)
 }
 
 object SentimentUseCase extends App {
