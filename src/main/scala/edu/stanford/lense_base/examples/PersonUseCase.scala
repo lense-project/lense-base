@@ -6,7 +6,7 @@ import java.net.URL
 import edu.stanford.lense_base.gameplaying.{ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base._
-import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, HumanErrorDistribution, ClippedGaussianHumanDelayDistribution, HumanDelayDistribution}
+import edu.stanford.lense_base.humancompute._
 import edu.stanford.lense_base.models.{Model, LogisticExternalModelStream, ModelStream, ModelVariable}
 import org.yaml.snakeyaml.Yaml
 
@@ -105,8 +105,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   override def getHumanVersionOfLabel(label: String): String = label
 
   lazy val rand = new Random()
-  override def humanDelayDistribution: HumanDelayDistribution = ClippedGaussianHumanDelayDistribution(4000, 2000, rand)
-  override def humanErrorDistribution: HumanErrorDistribution = EpsilonRandomErrorDistribution(0.1, rand)
+  override def humanDelayDistribution: HumanDelayDistribution = ObservedHumanDelayDistribution("data/person_recognition/human_latency_data.txt", rand)
+  override def humanErrorDistribution: HumanErrorDistribution = ObservedErrorDistribution("data/person_recognition/context", "data/person_recognition/confusion.csv", rand)
 
   override def useCaseReportSubpath : String = "celebrity"
 
@@ -173,7 +173,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   override def budget: Double = 20.0
 
   def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
-    variable.payload.asInstanceOf[PersonImage].url
+    variable.payload.asInstanceOf[PersonImage].toString()
   }
 }
 
@@ -211,11 +211,11 @@ object PersonUseCase {
   def main(args: Array[String]) {
     val personUseCase = new PersonUseCase()
 
-    val poolSize = 1
+    val poolSize = 4
     // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
-    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-    // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
+    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
+    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
+    personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)
   }
 }
