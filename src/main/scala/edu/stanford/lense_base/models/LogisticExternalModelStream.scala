@@ -24,6 +24,8 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
    */
   def getFeatures(input: Input): Map[String, Double]
 
+  def getSigma : Double = 0.2
+
   /**
    * Do prediction over the univariate output distribution
    * @param input the input object
@@ -80,7 +82,7 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
       // Turn on per-iteration convergence updates
       classifierFactory.setVerbose(true)
       // Large amount of smoothing
-      classifierFactory.setSigma(0.1)
+      classifierFactory.setSigma(getSigma)
       // Build a classifier
       classifier = classifierFactory.trainClassifier(rvfDataset) // , null, new LogPrior()
       classifierFactory.notifyAll()

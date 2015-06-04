@@ -31,6 +31,9 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   override def labelTypes: List[String] = celebrities
 
+  // The null class for during analysis
+  override def defaultClass : String = "Miley Cyrus"
+
   // Sets up the model we'll be using
 
   val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution, labelTypes) {
@@ -40,6 +43,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
       }).toMap
       features
     }
+
+    override def getSigma : Double = 0.05
 
     /**
      * Defines the possible output values of the model
@@ -152,7 +157,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty + cost
+    uncertainty*5 + cost
   }
 
   /**
@@ -212,10 +217,10 @@ object PersonUseCase {
     val personUseCase = new PersonUseCase()
 
     val poolSize = 4
-    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
-    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-    personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
+    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
+    // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)
   }
 }
