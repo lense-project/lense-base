@@ -19,9 +19,9 @@
 %how much redundancy to ask for?  Has no one done this?}
 
 It is a point of pride that modern AI systems require no human intervention.
-However, many of the datasets required to enable these ``no human intervention'' systems represent thousands of hours of labor~\cite{AMR}\cite{ImageNET}, and supervised methods (which consistently produce the best results) would not be possible without these datasets.
+However, many of the datasets required to enable these ``no human intervention'' systems represent thousands of hours of labor \cite{AMR}\cite{ImageNET}, and supervised methods (which consistently produce the best results) would not be possible without these datasets.
 
-This paper proposes that there is another way to distribute the same human intervention in machine learning tasks, to achieve better results faster: {\em use the humans at test time}, and either dramatically reduce or eliminate the creation of training sets all together. We show that it is possible to produce classifications with accuracies of $> 90$ F1 within a few seconds for less than it would cost to get noisy offline labels for the same data.
+This paper proposes that there is another way to distribute the same human intervention in machine learning tasks, to achieve better results faster: {\em use the humans at test time}, and either dramatically reduce or eliminate the creation of training sets all together. We show that latencies within a few seconds and accuracies of $> 90$ F1 are achievable under this regime, for less than it would cost to get noisy offline labels for the same data.
 
 This is not to be confused with Active Learning, where a large static pool of unlabeled examples is assumed and the goal is to learn a high quality classifier as cheaply as possible. In Active Learning human-intervention is still only used during a training period, and then the classifier is sent out to make decisions without human intervention. The setting we propose involves actually designing a classifier to decide when to ask humans about their (noisy) opinion on labels {\em at test time}, and gets to integrate their responses before making decisions, within some reasonable time constraint for returning a response (a few seconds).
 
