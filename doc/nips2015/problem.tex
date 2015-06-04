@@ -1,6 +1,14 @@
 \section{Problem setup}
 \label{sec:model}
 
+\begin{figure}[t]
+  \begin{centering}
+  \includegraphics[width=1.0\textwidth]{figures/intro-banner.pdf}
+  \end{centering}
+  \caption{A figure showing an example of the Active Querying setting: Semantic slotfilling for Tweets during a disaster. We are interested in the tweet \textit{``Soup on George str.\ \#Katrina.''} The system first runs a pre-trained model, discovers that the token ``George'' is ambiguous, and then asks a human for a label. The human label is returned in a few seconds, incorporated into the model, and the model then decides it has enough information to turn in a classification.}
+\label{fig:crf}
+\end{figure}
+
 \pldone{I'd start out with the overarching problem setting \emph{independent} of our approach.
   Since this is a novel setting, let's make it objective; you don't have to use Bayesian decision theory
   to solve it.
@@ -56,14 +64,6 @@ In our running example of identifying actionable items from Twitter messages, th
 \pldone{need a concrete example of what $\tau_\sigma$ is; a small example with actual labels;
 in general, not sure if you want to use measurements here
 }{restricted measurements to be at the label level, also concrete example now}
-
-\begin{figure}[t]
-  \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/intro-banner.pdf}
-  \end{centering}
-  \caption{A figure showing an example of the Active Querying setting: Semantic slotfilling for Tweets during a disaster. We are interested in the tweet \textit{``Soup on George str.\ \#Katrina.''} The system first runs a pre-trained model, discovers that the token ``George'' is ambiguous, and then asks a human for a label. The human label is returned in a few seconds, incorporated into the model, and the model then decides it has enough information to turn in a classification.}
-\label{fig:crf}
-\end{figure}
 
 %Conventionally, we are given a training dataset $\sD = \{\bx_i, \by_i\}$ and can learn $\theta$ by optimizing the convex log-likelihood objective $\sL(\theta) = \sum_{t=1}^T \log \p(\by\oft{t} \given \bx\oft{t})$.
 %In our setting, however, we do not observe the gold labels $\by$. 
