@@ -3,7 +3,7 @@ package edu.stanford.lense_base.examples
 import java.io.{FileWriter, BufferedWriter, File}
 
 import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, SamplingLookaheadOneHeuristic, GamePlayer}
-import edu.stanford.lense_base.humancompute.{ConfusionMatrixErrorDistribution, ObservedHumanDelayDistribution}
+import edu.stanford.lense_base.humancompute.{ObservedErrorDistribution, ConfusionMatrixErrorDistribution, ObservedHumanDelayDistribution}
 
 /**
  * Created by keenon on 5/28/15.
@@ -18,7 +18,7 @@ class NERUseCase2Class extends NERUseCase {
 
   override def useCaseReportSubpath : String = "ner2class"
 
-  override lazy val humanErrorDistribution = ConfusionMatrixErrorDistribution("data/ner/human_confusion_2class.csv", random)
+  override lazy val humanErrorDistribution = ObservedErrorDistribution("data/ner/context", "data/ner/human_confusion_2class.csv", random)
   override lazy val humanDelayDistribution = ObservedHumanDelayDistribution("data/ner/human_latency_data.txt", random)
 
   override def budget: Double = 200.00
@@ -35,7 +35,7 @@ class NERUseCase2Class extends NERUseCase {
     expectedErrors + 10*cost
   }
 
-  override def gamePlayer : GamePlayer = new MCTSGamePlayer(humanErrorDistribution,humanDelayDistribution)
+  override def gamePlayer : GamePlayer = new SamplingLookaheadOneHeuristic(humanErrorDistribution,humanDelayDistribution)
 }
 
 object NERUseCase2Class extends App {
@@ -64,8 +64,8 @@ object NERUseCase2Class extends App {
   dumpData(nerUseCase.trainSet, "train_data")
 
   val poolSize = 4
-  nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, "artificial_human")
-  // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 1, useRealHumans = true) // 1 query baseline
+  // nerUseCase.testWithArtificialHumans(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, "artificial_human")
+  nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 1) // 1 query baseline
   // nerUseCase.testBaselineForAllHuman(nerUseCase.data, nerUseCase.devSet, nerUseCase.humanErrorDistribution, nerUseCase.humanDelayDistribution, 0.0025, poolSize, 3, useRealHumans = true) // 3 query baseline
   // nerUseCase.testBaselineForOfflineLabeling(nerUseCase.data, nerUseCase.devSet)
   // nerUseCase.testWithRealHumans(nerUseCase.data, nerUseCase.devSet, poolSize)

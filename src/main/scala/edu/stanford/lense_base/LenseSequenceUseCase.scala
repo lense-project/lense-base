@@ -183,4 +183,9 @@ abstract class LenseSequenceUseCase extends LenseUseCase[List[String],List[Strin
       println("Classified an empty graph")
     }
   }
+
+  def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
+    val pair = variable.payload.asInstanceOf[(List[String], Int)]
+    pair._1(pair._2)
+  }
 }

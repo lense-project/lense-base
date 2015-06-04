@@ -3,10 +3,10 @@ package edu.stanford.lense_base.examples
 import java.io.FileInputStream
 
 import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, ThresholdHeuristic, GamePlayer}
-import edu.stanford.lense_base.humancompute.{EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
+import edu.stanford.lense_base.humancompute.{ObservedErrorDistribution, EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
-import edu.stanford.lense_base.models.{UnivariateExternalModelStream, LogisticExternalModelStream, ModelStream, ModelVariable}
+import edu.stanford.lense_base.models._
 import edu.stanford.nlp.word2vec.Word2VecLoader
 import org.yaml.snakeyaml.Yaml
 
@@ -23,7 +23,7 @@ import scala.util.Random
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
   lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
-  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(565, 1000)
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(673, 1000)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
@@ -92,7 +92,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     "Please label this <b>movie review</b> as either <b>positive</b> or <b>negative</b>: <br><br><b>Movie Review:</b><div class='review'>"+input+"</div>"
   }
 
-  /**
+  /**context!!
    * A way to define the loss function for you system. mostLikelyGuesses is a list of all the nodes being chosen on,
    * with their corresponding most likely label, and the probability the model assigns to the label.
    *
@@ -105,7 +105,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty + cost*2
+    uncertainty + cost*3
   }
 
   override val maxLossPerNode : Double = {
@@ -123,7 +123,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   override def budget: Double = 100.0
 
   lazy val random = new Random()
-  lazy val humanErrorDistribution = EpsilonRandomErrorDistribution(0.3, random)
+  lazy val humanErrorDistribution = ObservedErrorDistribution("data/sentiment/context", "data/sentiment/confusion.csv", random)
   lazy val humanDelayDistribution = ClippedGaussianHumanDelayDistribution(2000, 500, random)
 
   // Reads positive and negative reviews in equal amounts from the given path, up to limitSize,
@@ -189,14 +189,18 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   }
 
   override def gamePlayer : GamePlayer = new MCTSGamePlayer(humanErrorDistribution, humanDelayDistribution)
+
+  def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
+    variable.payload.asInstanceOf[String]
+  }
 }
 
 object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
-  val poolSize = 1
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
-  sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
+  val poolSize = 4
+  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1, useRealHumans = true) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
   // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, poolSize)
