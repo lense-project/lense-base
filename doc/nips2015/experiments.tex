@@ -144,7 +144,7 @@ The thing to note is that although accuraccy rates remain high for both approach
 
 \subsection{Facial Identification Evaluation}
 
-The Facial Identification dataset is a constructed subset of a dataset of online photos of celebrities\todo{Princeton something-or-other}. The task we evaluate on is a 4-way facial recognition task, choosing from \{Anderson Cooper, Daniel Craig, Scarlet Johansson, Miley Cyrus\}, starting with 1 training example per person. We use the last layer of an 11-layer AlexNet trained on ImageNet as input embeddings to featurize each of the images.
+The Facial Identification task we investigate uses a constructed subset of a dataset of online photos of celebrities\todo{Princeton something-or-other}. The task we evaluate on is a 4-way facial recognition task, choosing from one of four celebrities \{Anderson Cooper, Daniel Craig, Scarlet Johansson, Miley Cyrus\}, starting with 1 training example per person. We use the last layer of an 11-layer AlexNet trained on ImageNet as input embeddings to featurize each of the images.
 
 \begin{center}
 \begin{tabular}{ | l | r | r | r | r | r | }
@@ -154,7 +154,7 @@ The Facial Identification dataset is a constructed subset of a dataset of online
     Human 3-query baseline & 1865 ms & 3.0 & 88.44 \\ \hline
     Offline baseline & n/a & n/a & 87.43 \\ \hline
     Threshold baseline & TODO & TODO & TODO \\ \hline
-    \textbf{MCTS} & 961 ms & 1.06 & 88.45 \\ \hline
+    \textbf{MCTS} & 2042 ms & 1.06 & 88.45 \\ \hline
 \end{tabular}
 \end{center}
 
