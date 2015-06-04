@@ -1,0 +1,9 @@
+set nokey
+set terminal png medium
+set output "results/ner2class/artificial_human/queries_per_token_plot/queries_per_token_vs_time/queries_per_token_vs_time.png"
+set title 'queries per token vs time'
+set xlabel 'time'
+set ylabel 'queries per token'
+plot 'results/ner2class/artificial_human/queries_per_token_plot/queries_per_token_vs_time/0.dat' with lines, \
+'results/ner2class/artificial_human/queries_per_token_plot/queries_per_token_vs_time/1.dat' with lines, \
+'results/ner2class/artificial_human/queries_per_token_plot/queries_per_token_vs_time/2.dat' with lines

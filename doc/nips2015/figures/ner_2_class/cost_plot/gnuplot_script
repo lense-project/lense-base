@@ -1,0 +1,9 @@
+set nokey
+set terminal pdf
+set output "cost_vs_time.pdf"
+set title 'human requests vs time'
+set xlabel 'time'
+set ylabel 'human requests (floating avg)'
+plot '1-human.dat' with lines, \
+'3-human.dat' with lines, \
+'lense.dat' with lines
