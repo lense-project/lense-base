@@ -10,50 +10,73 @@ For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}
 where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
 
 The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ldots q_m \in \{1, \ldots, n\}$, where $n$ is the size of the output $\by\oft{t}$.
-As a simplification, let $Q\oft{t}$ be constructed by picking one query at a time:
+To keep things tractable, let $Q\oft{t}$ be constructed by picking one query at a time:
 given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
 \begin{align}
   q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
 \end{align}
-where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query and returning the current prediction.
+where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query, and returning the current prediction.
 
 We can not yet optimize \equationref{one-step-q} because we do not observe $\by\oft t$ or $\tau\oft t$ ahead of time.
 Instead, we propose to optimize the expected loss under our model, {\em given the responses $\bz$ received when making the decision}.
-For example, if we must choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$,  
-\begin{align*}
+For example, if we choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$ we can optimize the following expression:
+\begin{align}
   q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
-  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)].
-\end{align*}
+  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
+\end{align}
 The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
 
-Let $\sT$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
-Each node $n \in \sN$ has a type $\sctype(n)$ that is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square).
+\begin{figure}
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/game-tree.pdf}
+  \hfill
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/lookahead-one.pdf}
+  \caption{Monte Carlo tree search}
+\label{fig:mcts}
+\end{figure}
 
-As described in \sectionref{model}, we would like to select and schedule several requests for labels to maximize our accuracy on predictions while trading off the cost and response time. 
-We view the problem in the Bayesian decision theoretic setting: what is the optimal behavioral policy under our current beliefs?
-The delay in the information we receive from label requests requires us to reason about time and the possible interactions between the responses we will receive.
-In this section, we describe how these interactions can be described using an expectimax tree.
-However, evaluating the optimal policy from the expectimax tree is intractable.
-We propose a Monte Carlo search based algorithm to efficiently approximate the optimal policy.
+\paragraph{Expectimin trees and optimal policies.}
+Let $\sT(\sN)$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
+Each node $n \in \sN$ has a type $n.\sctype$ which is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square) and has children $n.\scchildren \subset \sN$.
+Additionally, nodes of type $\scvalue$ have a value $n.\scvalue$.
+The value of a node can be easily computed recursively: 
+\begin{align*}
+  \scvalue(n) &=
+  \begin{cases}
+    \min_{n'\in n.\scchildren} \scvalue(n') & \textrm{if}~n.\sctype = \scmin \\
+    \E_{n'\sim n.\scchildren}[\scvalue(n')] & \textrm{if}~n.\sctype = \scexpect \\
+    n.\scvalue & \textrm{if}~n.\sctype = \scvalue
+  \end{cases}.
+\end{align*}
+Additionally, an expectimin policy $\pi^*$ at a $\scmin$ node returns the child with the minimum value: $\pi^*(n) = \argmin_{n' \in n.\scchildren} \scvalue(n')$.
+As a concrete example, consider the expectimin tree in \figureref{mcts}. The value of the root node $n_1^0$ is,
+\begin{align*}
+  \scvalue(n_1^0) &= \min_{n_1^0.n_i^1} \E_{n_1^0.n_i^1.n_j^2} \left[\min_{n_1^0.n_i^1.n_j^2.n_k^3} \E_{n_1^0.n_i^1.n_j^2.n_k^3.n_l^4} \left[n_1^0.n_i^1.n_j^2.n_k^3.n_l^4.\scvalue \right] \right].
+\end{align*}
+
+\paragraph{Choosing queries $q_m$ with an expectimax tree.}
+Let us now formalize our decision problem as an expectimin tree, $\sT$.
+Let the root of $\sT$ be $\scroot$, with children $\{\query(1), \ldots, \query(n), \wait{}, \turnin{}\}$.
+The nodes $\wait$ and $\query(q)$ have type $\scexpect$ for $q \in \{1, \ldots, n\}$, while $\turnin$ has type $\scvalue$.
+Furthermore, $\turnin.\scvalue$ can be computed using.
+
+
+%As described in \sectionref{model}, we would like to select and schedule several requests for labels to maximize our accuracy on predictions while trading off the cost and response time. 
+%We view the problem in the Bayesian decision theoretic setting: what is the optimal behavioral policy under our current beliefs?
+%The delay in the information we receive from label requests requires us to reason about time and the possible interactions between the responses we will receive.
+%In this section, we describe how these interactions can be described using an expectimax tree.
+%However, evaluating the optimal policy from the expectimax tree is intractable.
+%We propose a Monte Carlo search based algorithm to efficiently approximate the optimal policy.
 
 % Input and output to the section
 % input: model, examples.
 % output: behavior policy
 
-\begin{figure}
-  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/game-tree.pdf}
-  \hfill
-  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/lookahead-one.pdf}
-  \caption{Monte Carlo tree search}
-\label{fig:mcts}
-\end{figure}
-
 For each input example $\bx$, we construct an expectimax tree (\figureref{mcts} left) as follows: 
 \begin{itemize}
   \item The game alternates between our agent (max nodes) and the environment (expectation nodes).
   \item The state keeps track of the current time, the responses received so far ($z_1, \ldots, z_m$) and responses in flight.
-  \item At each max node, the agent can make an additional request ($\request(r)$, where $r \in \{1, \ldots, n\}$), wait for an in-flight request to return ($\wait$)\footnote{Note that we have restricted our agent to not be able to wait arbitrary amounts of time, and rather just wait till the next possible action.} or turn in its the best guess ($\turnin$).
-  \item When an $\request(r)$ action is made, the environment samples a response $z_r$ under the current model, $z_r \sim \p(\cdot \given \bx, z_1, \dots z_n)$, and delay $\tau_r$, but the agent does not get to observe these, yet.
+  \item At each max node, the agent can make an additional request ($\query(r)$, where $r \in \{1, \ldots, n\}$), wait for an in-flight request to return ($\wait$)\footnote{Note that we have restricted our agent to not be able to wait arbitrary amounts of time, and rather just wait till the next possible action.} or turn in its the best guess ($\turnin$).
+  \item When an $\query(r)$ action is made, the environment samples a response $z_r$ under the current model, $z_r \sim \p(\cdot \given \bx, z_1, \dots z_n)$, and delay $\tau_r$, but the agent does not get to observe these, yet.
   \item When a $\wait$ action is made, the environment returns the nearest response, $r$, and advances time to $\tau_r$ from when the request was made.
   \item When the agent takes the $\turnin$ action, it receives a reward equal to the expected loss under the current state:
       \begin{align*}
@@ -80,7 +103,7 @@ The expected utility of the expectimax-optimal action minimizes the one-step los
 %Let us study the behavior for a single request, we can evaluate the expected cost for each possible label to measure, as well as not labeling anything.
 As a move towards tractability, we only consider one step lookaheads: given a number of requests in flight, we only try to place a single query optimally (\figureref{mcts} right). 
 
-\paragraph{Efficient Monte Carlo approximation}
+\paragraph{Efficient Monte Carlo approximation.}
 
 Even with the one-step lookahead, the number of possible responses states grows exponentially with the number of queries in the tree.
 Furthermore, modeling time requires us to model an infinite number of children.
