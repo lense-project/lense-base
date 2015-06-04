@@ -1,19 +1,28 @@
 package edu.stanford.lense_base.examples
 
 import java.io.FileInputStream
+import java.util.Properties
 
-import edu.stanford.lense_base.gameplaying.{MCTSGamePlayer, ThresholdHeuristic, GamePlayer}
+import edu.stanford.lense_base.gameplaying.{SamplingLookaheadOneHeuristic, MCTSGamePlayer, ThresholdHeuristic, GamePlayer}
 import edu.stanford.lense_base.humancompute.{ObservedErrorDistribution, EpsilonRandomErrorDistribution, ClippedGaussianHumanDelayDistribution}
 import edu.stanford.lense_base.LenseMulticlassUseCase
 import edu.stanford.lense_base.graph.GraphNode
 import edu.stanford.lense_base.models._
+import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation
+import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations
+import edu.stanford.nlp.pipeline.{Annotation, StanfordCoreNLP}
+import edu.stanford.nlp.sentiment.SentimentCoreAnnotations
+import edu.stanford.nlp.util.CoreMap
 import edu.stanford.nlp.word2vec.Word2VecLoader
 import org.yaml.snakeyaml.Yaml
 
 import scala.collection.mutable.ListBuffer
+import scala.collection.mutable
 import scala.io.Source
 import scala.reflect.io.File
 import scala.util.Random
+
+import scala.collection.JavaConversions._
 
 /**
  * Created by keenon on 5/20/15.
@@ -22,13 +31,13 @@ import scala.util.Random
  */
 class SentimentUseCase extends LenseMulticlassUseCase[String] {
   lazy val trainSet : List[(String,String)] = loadData("data/sentiment/aclImdb/train").take(20)
-  lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test")
-  lazy val testSet : List[(String,String)] = fullTestSet.take(1000).slice(673, 1000)
+  lazy val fullTestSet : List[(String,String)] = loadData("data/sentiment/aclImdb/test") ++ loadData("data/sentiment/aclImdb/train").filter(p => !trainSet.contains(p))
+  lazy val testSet : List[(String,String)] = fullTestSet.take(1800)
   lazy val devSet : List[(String,String)] = fullTestSet.filter(!testSet.contains(_)).take(400)
 
   lazy val word2vec : java.util.Map[String, Array[Double]] = try {
-    // Word2VecLoader.loadData("data/google-300.ser.gz")
-    new java.util.HashMap[String, Array[Double]]()
+    Word2VecLoader.loadData("data/wordvectors/glove300.ser.gz")
+    // new java.util.HashMap[String, Array[Double]]()
   } catch {
     case e : Throwable =>
       // Couldn't load word vectors
@@ -37,6 +46,14 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
       // return an empty map
       new java.util.HashMap[String, Array[Double]]()
   }
+
+  lazy val coreNLP : StanfordCoreNLP = {
+    val props = new Properties()
+    props.setProperty("annotators", "tokenize, ssplit, pos, lemma, parse, sentiment")
+    new StanfordCoreNLP(props)
+  }
+
+  val useSocherEmbeddings = true
 
   override def labelTypes: List[String] = List("POS", "NEG")
 
@@ -52,12 +69,36 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
   override def initialTrainingData : List[(String, String)] = trainSet
 
   lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution, labelTypes) {
+
+    val socherEmbeddingsCache = mutable.Map[String, Map[String, Double]]()
     override def getFeatures(input: String): Map[String, Double] = {
+      val embeddingFeatures = if (useSocherEmbeddings) {
+        if (!socherEmbeddingsCache.contains(input)) {
+          val annotation: Annotation = new Annotation(input)
+          coreNLP.annotate(annotation)
+          val sentences = annotation.get(classOf[SentencesAnnotation])
+          val embeddings = ListBuffer[Double]()
+          embeddings.sizeHint(25)
+          for (i <- 0 to 24) embeddings.append(0.0)
+
+          for (sentence <- sentences) {
+            val tree = sentence.get(classOf[SentimentCoreAnnotations.SentimentAnnotatedTree])
+            val predictions = RNNCoreAnnotations.getNodeVector(tree)
+            for (i <- 0 to 24) embeddings.set(i, embeddings.get(i) + predictions.get(i))
+          }
+          socherEmbeddingsCache.put(input, embeddings.zipWithIndex.map(pair => "emb:" + pair._2 -> pair._1).toMap)
+        }
+        socherEmbeddingsCache(input)
+      }
+      else {
+        Map[String,Double]()
+      }
+
       // Stupid bag of words features...
       val tokens = input.split(" ")
       val unigrams = tokens.map(tok => (tok, 1.0)).toMap
       val bigrams = (0 to tokens.size - 2).map(i => (tokens(i) + " "+ tokens(i+1), 1.0)).toMap
-      val basicFeatures = unigrams ++ bigrams
+      val basicFeatures = unigrams ++ bigrams ++ embeddingFeatures
 
       // Also normalized word embedding for whole document
       val embedding = new Array[Double](300)
@@ -73,7 +114,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
       val normalized = embedding.map(_ / Math.sqrt(squareSum))
 
       if (squareSum > 0) {
-        (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap // ++ basicFeatures
+        (0 to normalized.length-1).map(i => "e" + i -> normalized(i)).toMap ++ basicFeatures
       }
       else {
         basicFeatures
@@ -105,7 +146,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty + cost*3
+    uncertainty + cost*1.5
   }
 
   override val maxLossPerNode : Double = {
@@ -188,7 +229,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     (introText, cheatSheet, list.toList)
   }
 
-  override def gamePlayer : GamePlayer = new MCTSGamePlayer(humanErrorDistribution, humanDelayDistribution)
+  override def gamePlayer : GamePlayer = new SamplingLookaheadOneHeuristic(humanErrorDistribution, humanDelayDistribution)
 
   def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
     variable.payload.asInstanceOf[String]
@@ -199,9 +240,9 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 4
-  // sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
-  sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
+  // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)
   // sentimentUseCase.testWithRealHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, poolSize)
 }
