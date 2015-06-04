@@ -1,73 +1,152 @@
-\section{Choosing when and what to query}
+\section{Algorithm: choosing when and what to query}
 \label{sec:async}
 
 % Restate our goal
-As described in \sectionref{model},
-we would like to develop an algorithm that can select and schedule several requests for labels, $R\oft t = \{r_1\oft t, \ldots, r_m\oft t\}$, to maximize our accuracy on predictions, $\ell(\by\oft t, \byt\oft t)$, while trading off the cost and response time, $\tau\oft t$. 
-\todo{connective}
+We now return to task of minimizing the objective in \equationref{objective}.
+For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}$ to minimize the single-step loss:
 \begin{align*}
-  \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(R\oft{t}, \tau\oft{t}),
+  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
 \end{align*}
-where $C$ is a given cost function.
+where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
+
+The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ldots q_m \in \{1, \ldots, n\}$, where $n$ is the size of the output $\by\oft{t}$.
+To keep things tractable, let $Q\oft{t}$ be constructed by picking one query at a time:
+given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
+\begin{align}
+  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
+\end{align}
+where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query, and returning the current prediction.
+
+We can not yet optimize \equationref{one-step-q} because we do not observe $\by\oft t$ or $\tau\oft t$ ahead of time.
+Instead, we propose to optimize the expected loss under our model, {\em given the responses $\bz$ received when making the decision}.
+For example, if we choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$ we can optimize the following expression:
+\begin{align}
+  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
+  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
+\end{align}
+The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
 
 \begin{figure}
-  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/mcts.pdf}
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/game-tree.pdf}
   \hfill
-  \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/mcts_simple.pdf}
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/lookahead-one.pdf}
   \caption{Monte Carlo tree search}
 \label{fig:mcts}
 \end{figure}
 
-We cast the problem in the Bayesian decision theoretic framework using an expectimax game tree.
-The game alternates between our agent (max nodes) and the environment (expectation nodes).
-The state keeps track of time, responses received so far and responses in flight.
-At each max node, the agent can make an additional request ($\request(r)$, where $r \in \{1, \ldots, n\}$), wait for an in-flight request to return ($\wait$)\footnote{Note that we have restricted our agent to not be able to wait arbitrary amounts of time, and rather just wait till the next possible action.}
-or turn in its the best guess ($\turnin$).
-When an $\request(r)$ action is made, the environment samples a response $z_r$ under the current model, $z_r \sim \p(\cdot \given \bx, z_1, \dots z_n)$, and delay $\tau_r$, but the agent does not get to observe these, yet.
-When a $\wait$ action is made, the environment returns the nearest response, $r$, and advances time by $\tau_r$\expand.
-When the agent takes the $\turnin$ action, it receives a reward equal to the expected loss under the current state:
+\paragraph{Expectimin trees and optimal policies.}
+Let $\sT(\sN)$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
+Each node $n \in \sN$ has a type $n.\sctype$ which is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square) and has children $n.\scchildren \subset \sN$.
+Additionally, nodes of type $\scvalue$ have a value $n.\scvalue$.
+The value of a node can be easily computed recursively: 
 \begin{align*}
-  \hat\sL &= \E_{\by \sim \p(\cdot \given \bx, \bz)}[\ell(\by, \byt) + C(R, \tau)],
-\end{align*}
-where $\bz = z_1, \dots z_m$ are the responses received when turning in, $R$ is the set of all requests that were made, and $\tau$ is the current time.
-
-The expected utility of a node, $p$, can be computed recursively:
-\begin{align*}
-  U(p) &= 
+  \scvalue(n) &=
   \begin{cases}
-    \max\{ U(c) | c \in \textrm{children}(p) \} & \textrm{if $p$ is a max node} \\
-    \sum_{c \in \textrm{children}(p)} p(c) * U(c) & \textrm{if $p$ is a expectation node}.
-  \end{cases}
+    \min_{n'\in n.\scchildren} \scvalue(n') & \textrm{if}~n.\sctype = \scmin \\
+    \E_{n'\sim n.\scchildren}[\scvalue(n')] & \textrm{if}~n.\sctype = \scexpect \\
+    n.\scvalue & \textrm{if}~n.\sctype = \scvalue
+  \end{cases}.
 \end{align*}
-The expectimax policy for behavior is to simply choose the optimal action at the root node: $\pi^* = \argmax_{c \in \textrm{children}(\textrm{root})} U(c)$.
+Additionally, an expectimin policy $\pi^*$ at a $\scmin$ node returns the child with the minimum value: $\pi^*(n) = \argmin_{n' \in n.\scchildren} \scvalue(n')$.
+As a concrete example, consider the expectimin tree in \figureref{mcts}. The value of the root node $n_1^0$ is,
+\begin{align*}
+  \scvalue(n_1^0) &= \min_{n_1^0.n_i^1} \E_{n_1^0.n_i^1.n_j^2} \left[\min_{n_1^0.n_i^1.n_j^2.n_k^3} \E_{n_1^0.n_i^1.n_j^2.n_k^3.n_l^4} \left[n_1^0.n_i^1.n_j^2.n_k^3.n_l^4.\scvalue \right] \right].
+\end{align*}
 
-\paragraph{Behavior}
-Consider the example in \figureref{game-tree}.
-\todo{make less abstract}
+\paragraph{Choosing queries $q_m$ with an expectimax tree.}
+Let us now formalize our decision problem as an expectimin tree, $\sT$.
+The nodes of the tree need to encapsulate as current state, the current time, $t$, the list of queries pending responses $Q = \{(q_1, t_1), \ldots, (q_m, t_m)\}$, where $q_i$ are the queries and $t_i$ is the time at which the query responds (we will compute an expectation over this quantity) and the received responses $Z = \{z_1, \ldots, z_l\}$.
+Without loss of generality, assume that $Q$ is sorted so that $t_1$ is closest in time to $t$.
+Let the root of $\sT$ be the $\min$ node $\scchoose(t, Q, Z)$, 
+with children $\scchoose(t, Q, Z).\turnin$, $\scchoose(t, Q, Z).\wait$ and $\scchoose(t, Q, Z).\query(q)$ for $q \in [n]$.
+$\scchoose(t, Q, Z).\turnin$ is a $\scvalue$ node with value equal to the expected loss of making a prediction in the current state:
+\[
+\scchoose(t, Q, Z).\turnin.\scvalue 
+= \E_{\by \sim \p(\cdot \given \bx, Z)}[\ell(\by, \byt)] + C(Q, t).
+\]
+$\scchoose(t, Q, Z).\wait$ is an $\scexpect$ node children $\{\scchoose(t', Q', Z') | t' = t_1, Q' = Q \setminus (q_1, t_1) Z' = Z \union {z_{l+1}} \forall z_{l+1} \in [L]\}$.
+Intuitively, choosing the $\wait$ node waits for the next response by advancing time and updating the query and response states.
+Finally,
+$\scchoose(t, Q, Z).\query(q)$ is an $\scexpect$ node that results in children 
+$\{\scchoose(t, Q', Z) | Q' = Q \union (q, t'), t' = t + \tau_q, \tau_q \sim \Gamma\}$: the $\query$ node places a new query and its expected time of response to $Q$. 
 
+\figureref{mcts} shows a simplified tree ignoring time constructed with a single query in flight; the root node is $\scchoose(\cdot, \{(q_1, t_1)\}, \{\})$. The branch on the left shows the expansion of the game tree along the child that chooses to query immediately, while the branch on the right considers the case where we wait to receive the first response ($z_1$) before querying ($q_2$).
+In the latter scenario, we may choose not to query again if the response we receive provides enough information.
 
-Let us study the behavior for a single request, we can evaluate the expected cost for each possible label to measure, as well as not labeling anything.
+%As described in \sectionref{model}, we would like to select and schedule several requests for labels to maximize our accuracy on predictions while trading off the cost and response time. 
+%We view the problem in the Bayesian decision theoretic setting: what is the optimal behavioral policy under our current beliefs?
+%The delay in the information we receive from label requests requires us to reason about time and the possible interactions between the responses we will receive.
+%In this section, we describe how these interactions can be described using an expectimax tree.
+%However, evaluating the optimal policy from the expectimax tree is intractable.
+%We propose a Monte Carlo search based algorithm to efficiently approximate the optimal policy.
 
-\paragraph{Efficient approximations}
+\paragraph{Efficient Monte Carlo approximation.}
 
-However, because of time, each expectation node has an infinite number of children.
-We resolve this problem by estimating value in expectation, using features, inspiration Dyna-2. \todo{more details!}
+In order to compute the exact expectimax policy, we would need to integrate over an infinite number of states because of time. 
+Independent of time, the number of possible responses states grows exponentially with the number of queries in the tree, making any form of exact inference intractable.
+As a reasonable heuristic, we use a Monte Carlo based approximation to estimate the value of a state, as described in \algorithmref{mcvts}.
+The algorithm is an adaptation of the popular Monte Carlo tree search algorithm\needcite{} that augments the UCT decision heuristic by using a linear value approximation: $\scvalue^f(n) = \rho^\top \sigma(n)$, where $\rho$ are learned parameters and $\sigma$ are features of the state. 
 
-Only one action per time step.
-Model time as discrete. Introduce features for states.
-Stress that this is really novel in the active learning community.
+Briefly, Monte Carlo tree search estimates values of $\scexpect$ nodes by sampling its children.
+The UCT decision heuristic treats each $\scmin$ node as a bandit problem and discovers the child with minimum value.
+However, $\sT$ contains an infinite number of $\scmin$ nodes corresponding to each point in time. 
+Intuitively, we expect that the value of these $\scmin$ nodes are highly correlated and should share information.
+As a separate insight, our model should give us a lot of information about the value of different queries through the marginals which can again help prevent the unnecessary sampling of poor arms.
+We capture these two pieces of information by approximating the value of a state with a linear function, $\scvalue^f(n)$. 
+A typical choice for the features $\sigma(n)$ are the label marginals and time.
 
-\pl{Instead of writing down equations,
+%We propose using a variant of the Monte Carlo tree search algorithm\needcite{} \algorithmref{value} that featurizes state.
+%Monte Carlo tree search using the UCT algorithm requires each action to be sampled at least once.
+%However, each action requires an additional marginal inference step, making sampling expensive.
+%We use computed marginals as features to estimate value of each action without ever sampling that action.
+%
+%In the active learning setting, our model gives us a lot of information about what to query, and we should use it.
+%We incorporate the models marginals and time into features and use it to query.
+%Instead of storing values in the expectimax nodes, we compute it using a linear value function, $V(s) = \theta^\top \phi(s)$.
+%This is similar to approach followed in Dyna-2.
+%Algorithm X shows you what to do.
+
+\begin{algorithm}
+%  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%  \renewcommand{\algorithmicensure}{\textbf{Output:}}
+\caption{Monte Carlo tree search with value approximation}
+\label{algo:mcvts}
+  \begin{algorithmic}[1]
+    \Function{monteCarloValue}{node $n$}
+    \If{$n.\sctype = \scmin$}
+      \State $n' \gets \argmin_{n' \in n.\scchildren} \frac{\scvalue^f(n')}{N(n')} + c \sqrt{\frac{2 \ln n.\scvisits}{n'.\scvisits}}$.
+      \Comment Choose child using UCT
+      \State $v \gets $ \Call{monteCarloValue}{$n'$}
+      \State $\theta \gets \theta + \alpha (\scvalue^f(n') - v)\phi(n')$
+      \Comment Update value approximation
+      \State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
+      \State \Return $v$
+    \ElsIf {$n.\sctype = \scexpect$}
+      \State $n' \sim n.\scchildren$
+      \Comment Sample a child
+      \State \Return \Call{monteCarloValue}{$n'$}
+    \ElsIf {$n.\sctype = \scvalue$}
+      \State \Return $n.\scvalue$
+    \EndIf
+    \EndFunction{}
+    \Function{$\scvalue^f$}{node $n$}
+      \State \Return $\theta^\top \phi(n)$
+      \Comment Linear function approximation
+    \EndFunction{}
+  \end{algorithmic}
+\end{algorithm}
+
+\pldone{Instead of writing down equations,
 cast this as a game tree from the beginning with actions, possible feedback, etc.
 Draw a nice example.
 Then expected utility, expectimax policy, etc. should be conceptually obvious.
-}
+}{Lots of game trees!}
 
 % -- EVERYTHING BELOW THIS IS DEAD TO ME. --
 % Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
-% When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmax_{\by} \p(\by \given \bx)$.
+% When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmin_{\by} \p(\by \given \bx)$.
 % If we performed the measurement operator $\sigma$ and received a measurement $\tau$,
-% then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$.
+% then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmin_{\by} p(\by \given \bx, \tau)$.
 % Intuitively, if we had perfect feedback, observing $\tau$ would provide use more information, reducing our risk.
 % However, taking measurements has an associated cost, $C(\sigma)$, a function of time and money that the designer must choose.
 % There is also a possibility that the measurement does not return a value (because of a timeout).
@@ -106,7 +185,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %     \STATE Set $p_\theta(\tau \given \bx) \gets p_\theta(\tau \given y_\sigma, \bx) p_\theta(y_\sigma \given \bx)$.
 %     \STATE Initialize $u \gets (0, \dots, 0)$.
 %     \FORALL{$i \in [L]$}
-%     \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
+%     \STATE Compute $\byt = \argmin_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
 %     \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau = i, \sigma)$ for $j \in [n]$ using marginal inference.
 %     \STATE Update $u[i] \gets \p(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
 %     \ENDFOR
@@ -151,7 +230,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %       \STATE Set $\pi(\tau_n) \gets \p(\tau_n \given \bx, \tau_{1:n-1}\oft{t}, \sigma_{1:n})$.
 %       \STATE Initialize $u\oft{t} \gets (0, \dots, 0)$.
 %       \FORALL{$\tau_n \in [L]$}
-%       \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$ using MAP inference.
+%       \STATE Compute $\byt = \argmin_{\by} p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$ using MAP inference.
 %       \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau_{1:n}, \sigma_{1:n})$ for $j \in [n]$ using marginal inference.
 %       \STATE Update $u\oft{t}[\tau_n] \gets \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
 %       \ENDFOR
@@ -161,7 +240,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %   \end{algorithmic}
 % \end{algorithm}
 % 
-% For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmax U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
+% For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmin U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
 % \todo{(arun): BAD NOTATION! The subscripts refer to members of $\Sigma$, but also the sequence of measurements.}
 % 
 % \pl{I guess the particle filter is out of date;

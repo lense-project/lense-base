@@ -1,0 +1,125 @@
+
+\section{Introduction}
+
+%\begin{epigraph}
+%``It ain't what you don't know that gets you into trouble.\\
+%It's what you know for sure that just ain't so.'' \\
+%-- Mark Twain
+%\end{epigraph}
+
+% \pl{well-motivated, but could be more shorter/more direct; need to make the two regimes crystal clear}
+% \pl{I think want to stress the fact that in a lot of cases,
+% we have no labeled data (people might be used to thinking of Google and Big Data);
+% actually, I think it'd be more engaging to start out with the scenario:
+% imagine you're a company (non-profit?) and want to do [something with social good] but have no data
+% (but not get into details).
+%What are your options?
+%}
+%\pl{Do we want to mention the fact that crowds are also noisy and it'd be nice to figure out adaptively
+%how much redundancy to ask for?  Has no one done this?}
+
+It is a point of pride that modern AI systems require no human intervention.
+However, many of the datasets required to enable these ``no human intervention'' systems represent thousands of hours of labor \cite{AMR}\cite{ImageNET}, and supervised methods (which consistently produce the best results) would not be possible without these datasets.
+
+This paper proposes that there is another way to distribute the same human intervention in machine learning tasks, to achieve better results faster: {\em use the humans at test time}, and either dramatically reduce or eliminate the creation of training sets all together. We show that latencies within a few seconds and accuracies of $> 90$ F1 are achievable under this regime, for less than it would cost to get noisy offline labels for the same data.
+
+This is not to be confused with Active Learning, where a large static pool of unlabeled examples is assumed and the goal is to learn a high quality classifier as cheaply as possible. In Active Learning human-intervention is still only used during a training period, and then the classifier is sent out to make decisions without human intervention. The setting we propose involves actually designing a classifier to decide when to ask humans about their (noisy) opinion on labels {\em at test time}, and gets to integrate their responses before making decisions, within some reasonable time constraint for returning a response (a few seconds).
+
+Using humans to power ``artificial artificial intelligence'' in real time (without any machine learning) is a well explored concept. It is possible to design interfaces that summon crowd workers within seconds at any hour of the day \todo{cite bernstein}, and get responses to queries with latencies in the 2-5 second range.
+
+\textbf{[K: I'm not sure I like this paragraph...]} These real-time crowd techniques exist because they are well motivated in practice.
+For the small business, machine learning techniques that presuppose ``Big Data'' remain out of reach.
+Even if the funds were available to undergo a massive data labeling effort, there is rarely enough unlabeled data available.
+These human only approaches are a viable alternative in the intermediate term for these businesses, although costs don't scale well.
+
+We assume a constant stream of data that needs labels {\em now}.
+We also assume the existence of a crowd, and a classifier.
+Our classifier can query the crowd in real-time when the model is unsure, integrate the responses of the crowd to improve real-time classification accuracy, and learn on the crowd responses to improve performance on future input.
+This results in a system that provides users high quality responses in real-time while starting with {\em no training data}.
+It also significantly outperforms the human only approaches on both cost and accuracy.
+
+In this paper, we explicitly address three main challenges that arise in this new regime: keeping costs low, guaranteeing low latency and maximizing accuracy. To achieve this, we assume the existence of a loss function that trades off these three quantities, and apply Bayesian decision theory to minimize this loss in expectation.
+% \pl{say three resources that we need to tradeoff, explain briefly}
+
+% Cost and Low-latency
+We focus on structured classification problems using conditional exponential families, a general model class that has been used to \todo{citefest}. In such a model, we are given an input, $\bx$, and must predict a number of labels $\by = y_1, \ldots y_n$.
+
+We treat crowd workers as a resource that can provide noisy measurements of some subset of the labels.
+Under time and budget constraints, we must optimize over which labels to query when. 
+Often, several queries are required on a particular label because of annotator errors by the crowdworker, while at other times it is better to distribute queries across labels.
+Similarly, observing a label from one worker lets us decide better which label to query next, but we might not have to time to wait for the response.
+
+We propose an active classification approach using Bayesian decision theory that is able to make these complex behavioral decisions.
+This quickly leads to an intractable optimization problem that grows exponentially in complexity with the number of label queries we might ask on a single example.
+We propose a novel approximation based on Monte Carlo tree search that retains the behavior of the original Bayesian approach while being computationally tractable.
+
+\todo{(arun): We should make the distinction with active learning much stronger since that's what everyone thinks we're doing. I've moved the related work section to the latter parts because I feel like it's easier to compare our work with existing work given our model.} 
+
+Finally, in practice, labels from crowd workers are often inaccurate.
+We use the measurements framework of Liang et.\ al\cite{liang09measurements} to incorporate noisy responses from crowdworkers in our model.
+Having an accurate estimate of the error rates for crowd workers is essential to accurately predicting how many queries are required.
+Prior work\findcite{unsupervised crowd labeling} uses inter-annotator agreement to predict per-user error rates in an unsupervised manner. 
+The online nature of our task limits the number of responses we have on the same label.
+Instead, we learn the error rates in an unsupervised fashion using online EM, which also allows us to incorporate unlabeled data.
+\pl{measurements should come earlier in the framework - what kind of measurements can we get?}
+
+% Experiments
+We evaluate our system on four different tasks: named entity recognition, information extraction from user generated content, image classification and sentiment classification on tweets.
+We show that by querying crowdworkers at classification time, we can significantly outperform a system trained on fully labeled data, for a fraction of the cost of the baseline of asking crowdworkers for labels for each example, as well as the system trained on fully labeled past data.
+On X of the Y tasks, we produce a classifier comparable with the state of the art while obtaining a much smaller subset of the training labels noisily from the crowd. 
+In fact, we are comparable with state of the art-ish with a handful of the training labels.
+An open-source implementation of our system will be made available.
+
+% Recent work has shown that it is possible to use real-time on-demand workers to power everything from AI-complete email clients~\cite{kokkalis2013emailvalet} to real-time activity surveillance and classification~\cite{lasecki2013real}.
+% These purely crowd-based solutions are prohibitively expensive at scale.
+% Powering the crowd-based email client \textit{EmailValet}~\cite{kokkalis2013emailvalet} for a single end user for a year costs over \$400.
+% 
+% These systems typically work by ``pooling'' on-demand workers from high latency job-posting platforms like Amazon Mechanical Turk or CrowdFlower on a website designed by the system architect~\cite{lasecki2011real}.
+%  The ``pooling'' process can take several minutes, but once in place the workers can be queried at very low latencies by pushing requests to their web-browsers.
+%  This pool of workers can demonstrate high rates of turnover, and unreliability amongst individual annotators.
+% 
+% Existing systems query this pool directly, allowing for annotator noise by incorporating consensus building systems like voting and chat.
+% 
+% 
+% Active classification~\cite{greiner2002learning}, a close sibling of active learning, is a setting in which a classifier is allowed to query for more information, at some cost, before turning in classifications.
+%  This active classifier is intended to reduce its need for costly, slow human labels over time by learning from past observations.
+%  We propose to adapt the active classification framework to the pooled-worker setting to query this pool more cheaply, accurately, and quickly, without sacrificing the advantages live of crowd-powered interfaces.
+% 
+% Previous work in online active learning (which is closely related to what we're proposing) has focused on multi-class classification (\cite{chu2011unbiased},~\cite{agarwal2013selective},~\cite{cheng2013feedback},~\cite{vzliobaite2011active},~\cite{helmbold1997some}).
+%  Multi-class classification is an insufficiently rich primitive to handle many of the tasks that crowd-workers are enabling in existing systems, like information extraction or object detection.
+%  Instead, we will build our platform around arbitrary log-linear markov network classification, where we assume it is possible to query workers for opinions on individual nodes.
+%  Thus each ``active classification'' in our proposed setting is instantiate with a markov network and involves using model priors trained on previously seen data to choose to query the worker-pool for opinions about nodes, and then returning a classification informed by those opinions.
+% 
+% 
+% This setting poses several distinct challenges that have not been sufficiently addressed in previous literature.
+%  We need to be sensitive to time delays, returning results at least as quickly as the pure-crowd baseline we intend to improve upon.
+%  We also need to be sensitive to inaccurate oracles.
+%  These two criteria, in the pooled-worker setting, means that we need an active classifier who is able to hide latencies of redundant queries by launching them \textit{asynchronously}.
+%  This leads to the two challenges we will address in this paper, which can both be clustered under \textit{optimal asynchronous behavior}: we need to be able to handle the decision to ask for another query or turn in existing results in the presence of ``in-flight requests,'' which can fail due to worker turnover, where our loss term is sensitive to time delay.
+%  We draw inspiration from work in Bayesian Active Learning to tackle these problems.
+
+\pl{Here's how I think about this (each item is like a paragraph):
+  \begin{itemize}
+    \item Setting: want to deploy a system (give example), but start with zero examples.
+      Traditional paradigm is gather data (e.g., via crowdsourcing) and then train model.
+      Provocative thought: can we deploy it immediately?
+      Related work: crowdsourcing work is concerned about gathering a dataset or deploy, and only uses ML to clean up.
+      Active learning: about choosing examples from a pool, only for training not online/test.
+    \item High-level solution and its properties (describe the setup):
+      our system takes in latency tolerance, a desired error rate, and a budget (actually two of these).
+      Takes in stream of \emph{test} examples;
+      it queries crowd as necessary about parts of the input to gather more confident
+      and answers.
+      It makes requests asynchronously, and requests are coming back whenever.
+      As it learns, query the crowd less and less (show plot of this later in paper!)
+    \item Technical solution:
+      we use Bayesian decision-theoretic framework to model possible outcomes.
+      Inference is intractable, use Monte Carlo Tree Search (new!)
+      Show that different behaviors emerge from the principle.
+      For example, if low latency requirement, then make many asynchronous requests;
+      otherwise, delay to get more information.
+    \item Experiments: run on face recognition, NER, and get 95\% accuracy
+      with XXX reduction in cost at a latency of XXX seconds.
+  \end{itemize}
+}
+

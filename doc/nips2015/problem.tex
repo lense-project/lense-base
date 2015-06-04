@@ -16,15 +16,18 @@ After making some number of requests, our system must return a prediction, $\byt
 Our goal is to maximize accuracy trading off cost and latency as specified by a given objective function.
 
 More formally, suppose the output $\by\oft{t}$ has $n$ parts: $\by\oft{t} = y\oft{t}_1, \dots, y\oft{t}_n$.
-Let $r\oft{t} \in \{1, \ldots, n\}$ be a request for the label $y\oft{t}_r$,
-let $R\oft{t} = \{r\oft{t}_1, \dots, r\oft{t}_m\}$ be a set of requests made on the $t$-th input and
+Let $q\oft{t} \in \{1, \ldots, n\}$ be a request for the label $y\oft{t}_q$,
+let $Q\oft{t} = (q\oft{t}_1, \dots, q\oft{t}_m)$ be a sequence of queries made on the $t$-th input and
 let $\tau\oft{t}$ be the time taken to make the prediction $\byt\oft{t}$. 
 We would like to minimize the cumulative misclassification loss, 
 following objective:
-\begin{align*}
-  \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(R\oft{t}, \tau\oft{t}),
-\end{align*}
+\begin{align}
+  \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}), \label{eqn:objective}
+\end{align}
 where $\ell$ is a given loss function, e.g.\ the Hamming loss, and $C$ is a given cost function.
+\ac{Concern: by using the cumulative loss, is there an expectation that we will ``model'' input and optimize for the future?}
+
+We now describe our choice of models for prediction, human error and latencies and return to optimizing \equationref{objective} in \sectionref{async}.
 
 % A general model family - conditional exponential models
 % Incorporating feedback as "measurements" as per Percy
@@ -56,9 +59,9 @@ in general, not sure if you want to use measurements here
 
 \begin{figure}[t]
   \begin{centering}
-  \includegraphics[width=0.5\textwidth]{figures/simple-crf.pdf}
+  \includegraphics[width=1.0\textwidth]{figures/intro-banner.pdf}
   \end{centering}
-  \caption{A conditional random field \todo{(arun): make a CRF and show what happens when measurements are added.}}
+  \caption{A figure showing an example of the Active Querying setting: Semantic slotfilling for Tweets during a disaster. We are interested in the tweet \textit{``Soup on George str.\ \#Katrina.''} The system first runs a pre-trained model, discovers that the token ``George'' is ambiguous, and then asks a human for a label. The human label is returned in a few seconds, incorporated into the model, and the model then decides it has enough information to turn in a classification.}
 \label{fig:crf}
 \end{figure}
 
@@ -69,10 +72,10 @@ in general, not sure if you want to use measurements here
 %let $\by_\sigma \subseteq \by$ be the subset of labels queried.
 
 \paragraph{Human error model}
-We also model the responses, $z_r$, with an exponential measurement model:
+We also model the responses, $z_q$, with an exponential measurement model:
 \begin{align*}
-  p(z_r \given x, y) 
-  &\propto \exp \left( \omega^\top\psi(\bx, y_r, z_r) \right),
+  p(z_q \given x, y) 
+  &\propto \exp \left( \omega^\top\psi(\bx, y_q, z_q) \right),
 \end{align*}
 where $\omega$ and $\psi$ are extra parameters and features for the human error model. 
 %The choice of an exponential model allows us to simply include measurements as an additional factor.
@@ -80,7 +83,7 @@ where $\omega$ and $\psi$ are extra parameters and features for the human error 
 A simple human error model is to return the true label with probability $1-\epsilon$ and a random label otherwise.
 In our running example, some classes, e.g.\ $\textsc{none}$, are more easily identified than others: in this setting human responses can be modeled to be sampled from a confusion matrix.
 
-Finally, we model delay to be drawn from a Gamma distribution: $\tau_r \sim \Gamma$\footnote{We assume that the response delays are independent of the input and which label is being queried, though the model can easily be generalized to this setting.}.
+Finally, we model delay to be drawn from a Gamma distribution: $\tau_q \sim \Gamma$\footnote{We assume that the response delays are independent of the input and which label is being queried, though the model can easily be generalized to this setting.}.
 The total time taken on a prediction, $\tau$, depends not only on how many requests are made, but also when they are scheduled.
 We study the problem of how to best schedule multiple requests in \sectionref{async}.
 
@@ -91,13 +94,13 @@ We study the problem of how to best schedule multiple requests in \sectionref{as
 %      \begin{bmatrix}
 %        1 - \e \\ \e
 %      \end{bmatrix} &
-%  \phi'(\tau_r, \by_r, \bx) &=
+%  \phi'(\tau_q, \by_q, \bx) &=
 %    \begin{bmatrix}
-%      \BI[\tau_r = y_r] \\
-%      \BI[\tau_r \neq y_r]
+%      \BI[\tau_q = y_q] \\
+%      \BI[\tau_q \neq y_q]
 %    \end{bmatrix}.
 %\end{align*}
-%Independently, we model the time each measurement takes, $D_r$.
+%Independently, we model the time each measurement takes, $D_q$.
 %We revisit the problem of learning the error distribution of labelers in \sectionref{human-error}.
 
 Next, we describe how we use our models to predict labels and learn from partial feedback.

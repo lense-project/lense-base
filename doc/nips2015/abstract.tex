@@ -1,17 +1,14 @@
 \begin{abstract}
 % V1
 % Recent work in real-time crowd-powered products has demonstrated the possibility of using human ``crowd workers'' to power live, low latency products that accomplish AI complete tasks. Human-only solutions remain expensive, and do not scale into production. We propose a \textit{active classification} approach to dramatically reduce the scaling cost of such systems, backed by a pool of unreliable crowd-workers. In order to achieve this, we investigate \textit{asynchronous active classification}, where multiple requests can be simultaneously ``in-flight.'' This paper analyzes the \textit{asynchronous requests problem} of how to behave optimally in the presence of asynchronous oracle queries that have not yet returned, and the \textit{optimal stopping problem} of when a classification is ``good enough'' in such a setting. Our solutions to these problems enable a system that shows dramatic improvement over the human-only, machine-only, and baseline human-machine hybrid alternatives in the cost-delay-accuracy tradeoff surface.
-  \pl{open with the typical setting - crowdsourcing to collect dataset, use supervised learning to learn;
-    then propose solution; currently, this seems too much aimed at the crowdsourcing community
-    rather than ML
-  }
-For the practitioner, supervised learning is largely a solved problem.
-Yet, adoption remains limited because the deployment of a learning system requires extremely accurate classifiers: mistakes cost business.
-Accuracy can be improved by training on additional labeled data, perhaps collected through crowdsourcing, however, this is expensive and time consuming.
-Unclear when data is enough.
-We propose an approach to query the crowd in real-time when our model is unsure and learn on the crowd responses to improve on future input.
-We explicitly tradeoff three key resources: time, money and accuracy by casting the problem as a game tree.
-The resulting system provides high quality responses in real-time while starting {\em with no training data}: we have 90\% F1 on all the tasks.
+% With sufficient labeled data and research effort, supervised learning has been applied in performance critical domains.
+% Yet, often logistical/financial constraints mean that data can only be collected and labeled in the presence of a working system, or that insufficient data can be collected to achieve performance requirements.
+We propose a crowd/machine learning hybrid approach to apply supervised learning in performance critical domains where ``cold start'' barriers exist: we allow our model to query the crowd in real-time {\em at test time}, and learn from the crowd responses online to improve performance and reduce costs on future inputs.
+%Querying humans in real time introduces latency, noise, and cost into the system, which must be minimized.
+Querying humans introduces latency, noise, and cost into the system, which must be minimized.
+We explicitly manage these three key objectives by casting the problem as a Bayesian decision theoretic control problem, and drawing on techniques from game-playing literature for real-time solutions.
+The resulting system provides high quality responses in real-time while starting {\em with no training data\/}: we have achieve $> 90\%$ F1 on the three tasks studied at a low cost, despite noisy crowd worker performance.
+% outperform baselines?
 \end{abstract}
 
 % V1
