@@ -27,12 +27,12 @@ More formally, suppose the output $\by\oft{t}$ has $n$ parts: $\by\oft{t} = y\of
 Let $q\oft{t} \in \{1, \ldots, n\}$ be a request for the label $y\oft{t}_q$,
 let $Q\oft{t} = (q\oft{t}_1, \dots, q\oft{t}_m)$ be a sequence of queries made on the $t$-th input and
 let $\tau\oft{t}$ be the time taken to make the prediction $\byt\oft{t}$. 
-We would like to minimize the cumulative misclassification loss, 
+We would like to minimize the cumulative loss, 
 following objective:
 \begin{align}
-  \sL &= \sum_{t=1}^T \ell(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}), \label{eqn:objective}
+  \sL &= \sum_{t=1}^T \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}), \label{eqn:objective}
 \end{align}
-where $\ell$ is a given loss function, e.g.\ the Hamming loss, and $C$ is a given cost function.
+where $\ell_{\rmclass}$ is a given misclassification loss function, e.g.\ the Hamming loss, and $C$ is a given cost function.
 \ac{Concern: by using the cumulative loss, is there an expectation that we will ``model'' input and optimize for the future?}
 
 We now describe our choice of models for prediction, human error and latencies and return to optimizing \equationref{objective} in \sectionref{async}.
@@ -59,7 +59,8 @@ $\phi(\bx, \by)$ are arbitrary features of the input and labels and
 $A(\theta; \bx)$ is the conditional log-normalizer.
 We assume that the model has low treewidth (e.g.\ $\phi$ factorizes over the labels $\by$) or otherwise admits efficient marginal computation.
 
-In our running example of identifying actionable items from Twitter messages, the model is a linear-chain conditional random field (\figureref{crf}). The input is the sequence of words in the tweet, the output is a label in the set $\{\textsc{none}, \textsc{food-source},  \textsc{food-request}, \dots\}$. Marginal inference can be efficiently computed using the Viterbi algorithm.
+\figureref{crf} describes the example from \sectionref{intro} about identifying resources 
+from Twitter messages. The model is a linear-chain conditional random field, the input is the sequence of words in the tweet and the output is a label in the set $\{\textsc{none}, \textsc{resource},  \textsc{location}, \textsc{person}\}$. Marginal inference can be efficiently computed using the Viterbi algorithm.
 
 \pldone{need a concrete example of what $\tau_\sigma$ is; a small example with actual labels;
 in general, not sure if you want to use measurements here
