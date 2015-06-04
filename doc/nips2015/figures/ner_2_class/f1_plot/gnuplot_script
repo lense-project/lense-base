@@ -1,0 +1,10 @@
+set nokey
+set terminal pdf
+set output "f1_vs_time.pdf"
+set title 'f1 vs time'
+set xlabel 'time'
+set ylabel 'f1'
+plot 'human-1.dat' with lines, \
+'human-3.dat' with lines, \
+'offline.dat' with lines, \
+'lense.dat' with lines

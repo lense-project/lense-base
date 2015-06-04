@@ -1,0 +1,22 @@
+set nokey
+set terminal png medium
+set output "results/ner2class/offline_baseline/machine_f1_plot/machine_f1_vs_time/machine_f1_vs_time.png"
+set title 'machine_f1 vs time'
+set xlabel 'time'
+set ylabel 'machine_f1'
+set arrow from 80.0,0.6409495548961422 to 80.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 120.0,0.6409495548961422 to 120.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 160.0,0.6409495548961422 to 160.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 240.0,0.6409495548961422 to 240.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 320.0,0.6409495548961422 to 320.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 400.0,0.6409495548961422 to 400.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 480.0,0.6409495548961422 to 480.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 560.0,0.6409495548961422 to 560.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 640.0,0.6409495548961422 to 640.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 720.0,0.6409495548961422 to 720.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 800.0,0.6409495548961422 to 800.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 880.0,0.6409495548961422 to 880.0,0.7584097859327217 nohead lc rgb 'purple'
+set arrow from 960.0,0.6409495548961422 to 960.0,0.7584097859327217 nohead lc rgb 'purple'
+plot 'results/ner2class/offline_baseline/machine_f1_plot/machine_f1_vs_time/0.dat' with lines, \
+'results/ner2class/offline_baseline/machine_f1_plot/machine_f1_vs_time/1.dat' with lines, \
+'results/ner2class/offline_baseline/machine_f1_plot/machine_f1_vs_time/2.dat' with lines

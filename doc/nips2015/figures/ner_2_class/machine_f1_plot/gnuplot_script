@@ -1,0 +1,8 @@
+set nokey
+set terminal pdf
+set output "machine_f1_vs_time.pdf"
+set title 'f1 on dev. vs time'
+set xlabel 'time'
+set ylabel 'f1'
+plot 'lense.dat' with lines, \
+'offline.dat' with lines
