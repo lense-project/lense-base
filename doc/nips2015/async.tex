@@ -2,6 +2,33 @@
 \label{sec:async}
 
 % Restate our goal
+We now return to task of minimizing the objective in \equationref{objective}.
+For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}$ to minimize the single-step loss:
+\begin{align*}
+  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
+\end{align*}
+where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
+
+The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ldots q_m \in \{1, \ldots, n\}$, where $n$ is the size of the output $\by\oft{t}$.
+As a simplification, let $Q\oft{t}$ be constructed by picking one query at a time:
+given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
+\begin{align}
+  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
+\end{align}
+where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query and returning the current prediction.
+
+We can not yet optimize \equationref{one-step-q} because we do not observe $\by\oft t$ or $\tau\oft t$ ahead of time.
+Instead, we propose to optimize the expected loss under our model, {\em given the responses $\bz$ received when making the decision}.
+For example, if we must choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$,  
+\begin{align*}
+  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
+  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)].
+\end{align*}
+The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
+
+Let $\sT$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
+Each node $n \in \sN$ has a type $\sctype(n)$ that is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square).
+
 As described in \sectionref{model}, we would like to select and schedule several requests for labels to maximize our accuracy on predictions while trading off the cost and response time. 
 We view the problem in the Bayesian decision theoretic setting: what is the optimal behavioral policy under our current beliefs?
 The delay in the information we receive from label requests requires us to reason about time and the possible interactions between the responses we will receive.
@@ -43,7 +70,7 @@ The expected utility of a node, $p$, can be computed recursively:
     \sum_{c \in \textrm{children}(p)} p(c) * U(c) & \textrm{if $p$ is a expectation node}.
   \end{cases}
 \end{align*}
-The expectimax policy for behavior is to simply choose the optimal action at the root node: $\pi^* = \argmax_{c \in \textrm{children}(\textrm{root})} U(c)$.
+The expectimax policy for behavior is to simply choose the optimal action at the root node: $\pi^* = \argmin_{c \in \textrm{children}(\textrm{root})} U(c)$.
 The expected utility of the expectimax-optimal action minimizes the one-step loss of our objective.
 
 %\paragraph{Behavior}
@@ -89,7 +116,7 @@ Algorithm X shows you what to do.
     \Function{sampleValue}{$s$}
     \If{$s$ is max node}
       \Comment Choose child with UCT policy
-      \State $c \gets \argmax_{c} \frac{Q(c)}{N(c)} + c \sqrt{\frac{2 \ln N(p)}{N(c)}}$.
+      \State $c \gets \argmin_{c} \frac{Q(c)}{N(c)} + c \sqrt{\frac{2 \ln N(p)}{N(c)}}$.
       \State $v \gets $ \Call{sample value}{$s$}
       \Comment Update $Q(c)$
       \State $\theta \gets \theta + \alpha (Q(c) - v)\phi(s)$.
@@ -113,9 +140,9 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 
 % -- EVERYTHING BELOW THIS IS DEAD TO ME. --
 % Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
-% When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmax_{\by} \p(\by \given \bx)$.
+% When presented with an example $\bx$ to label, our system estimates a loss of $\E_{p(\by \given \bx)}[\ell(\by, \byt)]$, where $\byt = \argmin_{\by} \p(\by \given \bx)$.
 % If we performed the measurement operator $\sigma$ and received a measurement $\tau$,
-% then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmax_{\by} p(\by \given \bx, \tau)$.
+% then our expected loss would be $\E_{p(\by \given \bx, \tau)}[\ell(\by, \byt(\tau))]$, where $\byt(\tau) = \argmin_{\by} p(\by \given \bx, \tau)$.
 % Intuitively, if we had perfect feedback, observing $\tau$ would provide use more information, reducing our risk.
 % However, taking measurements has an associated cost, $C(\sigma)$, a function of time and money that the designer must choose.
 % There is also a possibility that the measurement does not return a value (because of a timeout).
@@ -154,7 +181,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %     \STATE Set $p_\theta(\tau \given \bx) \gets p_\theta(\tau \given y_\sigma, \bx) p_\theta(y_\sigma \given \bx)$.
 %     \STATE Initialize $u \gets (0, \dots, 0)$.
 %     \FORALL{$i \in [L]$}
-%     \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
+%     \STATE Compute $\byt = \argmin_{\by} p_\theta(\by \given \bx, \tau = i, \sigma)$ using marginal inference.
 %     \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau = i, \sigma)$ for $j \in [n]$ using marginal inference.
 %     \STATE Update $u[i] \gets \p(\tau = i \given \bx) \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
 %     \ENDFOR
@@ -199,7 +226,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %       \STATE Set $\pi(\tau_n) \gets \p(\tau_n \given \bx, \tau_{1:n-1}\oft{t}, \sigma_{1:n})$.
 %       \STATE Initialize $u\oft{t} \gets (0, \dots, 0)$.
 %       \FORALL{$\tau_n \in [L]$}
-%       \STATE Compute $\byt = \argmax_{\by} p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$ using MAP inference.
+%       \STATE Compute $\byt = \argmin_{\by} p_\theta(\by \given \bx, \tau_{1:n}, \sigma_{1:n})$ using MAP inference.
 %       \STATE Compute $p(y_j) = p_\theta(\by_j \given \bx, \tau_{1:n}, \sigma_{1:n})$ for $j \in [n]$ using marginal inference.
 %       \STATE Update $u\oft{t}[\tau_n] \gets \E_{p(y_j)}[\ell(y_j, \yt_j)]$.
 %       \ENDFOR
@@ -209,7 +236,7 @@ Then expected utility, expectimax policy, etc. should be conceptually obvious.
 %   \end{algorithmic}
 % \end{algorithm}
 % 
-% For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmax U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
+% For each measurement, we compute the operator maximizing the expected utility $\sigma_n^* = \argmin U(\sigma_n \given \sigma_{1:n-1})$ until we reach a $\sigma_n^* = \sigma_0$.
 % \todo{(arun): BAD NOTATION! The subscripts refer to members of $\Sigma$, but also the sequence of measurements.}
 % 
 % \pl{I guess the particle filter is out of date;
