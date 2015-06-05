@@ -18,7 +18,7 @@ In many situations, one wishes to build a new system---e.g., to do Twitter infor
 opinion, but one simply lacks the resources to follow either the pure ML or pure crowdsourcing road.
 
 % Our proposal: on the job training setting, related work
-In this paper, we propose a new framework for \emph{on-the-job training} \citep{lasecki2013real},
+In this paper, we propose a new framework for \emph{on-the-job learning} \citep{lasecki2013real},
 in which we produce high quality results from the start without requring a trained model.
 When a new input arrives,
 the system asynchronously queries the crowd on \emph{parts} of the input it is
@@ -37,7 +37,7 @@ and cannot maintain high accuracy independent of the number of data instances se
 
 % Bayesian decision theory: technical solution
 To determine which queries to make,
-we model on-the-job training as a stochastic game based on a CRF prediction model.
+we model on-the-job learning as a stochastic game based on a CRF prediction model.
 We use Bayesian decision theory to tradeoff latency, cost, and accuracy in a principled manner.
 If we desire high accuracy, we must incur the cost of having more redundant labels
 to offset the noisy responses.  If we desire low latency, then we should issue queries
