@@ -34,6 +34,7 @@ Formally, given input $\bx$ and queries $\bq = (q_1, \dots, q_k)$ issued at time
 we define a distribution over the output $\by$, responses $\br = (r_1, \dots, r_k)$
 and response times $\bt = (t_1, \dots, t_k)$ as follows:
 \begin{align}
+  \label{eqn:dynamics}
 %p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid \bx, \by, q_i) \ptime(t_i \mid \bx, \by, q_i, s_i).
 p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid \by, q_i) \ptime(t_i \mid s_i).
 \end{align}
@@ -82,6 +83,7 @@ The second is a penalty of $\weightmoney$ for spending $m$ cents per each of $k$
 and $\weighttime$ for taking $t$ units of time.
 Formally, the utility is defined as follows:
 \begin{align}
+  \label{eqn:utility}
   U_t(\bq, \bs, \br, \bt) &\eqdef F(p(\by \given \bx, \bq, \bs, \br[t], \bt)) - (\weightmoney m k + \weighttime t), \\
   F(q) &= \E_{q(\by)}[\accuracy(\arg\max_{\by'} q(\by'))].
 \end{align}
@@ -130,7 +132,34 @@ the successor state incorporates $r_{j^*}$ and $t_{j^*}$ and advances time from 
 Technically, the optimal strategy might be to wait for an intermediate amount of time before $t_{j^*}$,
 so our restriction to considering decisions only at response times is an approximation.
 
-\pl{add example}
+The following example shows one path over the states of the game tree corresponding to \figureref{piano-roll}(left),
+where the system takes action $q_2 = 4$ (labeling \nl{str.}) and then the crowd responds
+at time $1.7$ with $r_2 = \scloc$ (note that $q_1$ is still pending):
+\begin{center}
+\begin{tabular}{|ll|}
+  \hline $\now = 1$ & \\
+  \hline
+  $q_1 = 3$         & $q_2 = \emptyset$ \\
+  $r_1 = \emptyset$ & $r_2 = \emptyset$ \\
+  \hline
+\end{tabular}
+$\stackrel{\text{\small system}}{\implies}$
+\begin{tabular}{|ll|}
+  \hline $\now = 1$ & \\
+  \hline
+  $q_1 = 3$         & $q_2 = 4$ \\
+  $r_1 = \emptyset$ & $r_2 = \emptyset$ \\
+  \hline
+\end{tabular}
+$\stackrel{\text{\small crowd}}{\implies}$
+\begin{tabular}{|ll|}
+  \hline $\now = 1.7$ & \\
+  \hline
+  $q_1 = 3$         & $q_2 = 4$ \\
+  $r_1 = \emptyset$ & $r_2 = \text{\scloc}$ \\
+  \hline
+\end{tabular}
+\end{center}
 
 %\paragraph{Prediction model.}
 % PL: form isn't relevant here since later we use other types of models anyway

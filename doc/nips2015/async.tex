@@ -87,18 +87,23 @@ Computing the optimal policy is intractable, especially because of the addition 
 We propose an approximate algorithm that combines ideas from both TD learning
 \citep{sutton1988learning} and Monte Carlo Tree Search (MCTS)
 \citep{kocsis2006bandit}, which have been successful in game playing.
-Our algorithm (\algorithmref{mcvts})
-that uses the UCT decision rule of MCTS but with a linear value approximation:
-$\scvalue^f(s) = w \cdot \psi(s)$,
-where $\psi$ are features of the state $s$ and $w$ are learned weights.
+Our algorithm
+that uses the UCT decision rule of MCTS but instead of estimating a separate value for each node,
+we use a parametrized value function to share information across nodes:
+$V(s) = w \cdot \psi(s)$, where $\psi$ are features of the state $s$ and $w$ are learned weights.
+\algorithmref{mcvts} gives the pseudocode of our approach:
+On the system's turn, we choose the action that maximizes
+the sum of two terms: the first corresponding to the estimated value (exploitation),
+and the second depending on the number of visits (exploration).
+On the crowd's turn, we sample from distribution given by the simulation dynamics model.
 
-Briefly, Monte Carlo tree search estimates values of $\scexpect$ nodes by sampling its children.
-The UCT decision heuristic treats each $\scmin$ node as a bandit problem and discovers the child with minimum value.
-However, $\sT$ contains an infinite number of $\scmin$ nodes corresponding to each point in time. 
-Intuitively, we expect that the value of these $\scmin$ nodes are highly correlated and should share information.
-As a separate insight, our model should give us a lot of information about the value of different queries through the marginals which can again help prevent the unnecessary sampling of poor arms.
-We capture these two pieces of information by approximating the value of a state with a linear function, $\scvalue^f(n)$. 
-A typical choice for the features $\sigma(n)$ are the label marginals and time.
+%Briefly, Monte Carlo tree search estimates values of $\scexpect$ nodes by sampling its children.
+%The UCT decision heuristic treats each $\scmin$ node as a bandit problem and discovers the child with minimum value.
+%However, $\sT$ contains an infinite number of $\scmin$ nodes corresponding to each point in time. 
+%Intuitively, we expect that the value of these $\scmin$ nodes are highly correlated and should share information.
+%As a separate insight, our model should give us a lot of information about the value of different queries through the marginals which can again help prevent the unnecessary sampling of poor arms.
+%We capture these two pieces of information by approximating the value of a state with a linear function, $\scvalue^f(n)$. 
+%A typical choice for the features $\sigma(n)$ are the label marginals and time.
 
 %We propose using a variant of the Monte Carlo tree search algorithm\needcite{} \algorithmref{value} that featurizes state.
 %Monte Carlo tree search using the UCT algorithm requires each action to be sampled at least once.
@@ -114,38 +119,39 @@ A typical choice for the features $\sigma(n)$ are the label marginals and time.
 \begin{algorithm}
 %  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 %  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-\caption{Monte Carlo tree search with value approximation}
+\caption{Approximating the value with TD learning and MCTS}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
-    \Function{monteCarloValue}{node $n$}
-    \If{$n.\sctype = \scmin$}
-      \State $n' \gets \argmin_{n' \in n.\scchildren} \frac{\scvalue^f(n')}{N(n')} + c \sqrt{\frac{2 \ln n.\scvisits}{n'.\scvisits}}$.
+    \Function{monteCarloValue}{state $s$}
+    \If{\text{system's turn}}
+    \State $s' \gets \argmax_{s'} \left\{w \cdot \psi(s') + c \sqrt{\frac{\log N(s)}{N(s')}} \right\}$
       \Comment Choose child using UCT
-      \State $v \gets $ \Call{monteCarloValue}{$n'$}
-      \State $\theta \gets \theta + \alpha (\scvalue^f(n') - v)\phi(n')$
-      \Comment Update value approximation
-      \State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
+      \State $v \gets $\Call{monteCarloValue}{$s'$}
+      \State $w \gets w + \alpha (v - w \cdot \psi(s')) \psi(s')$
+      \Comment Update value function approximation
+      \State increment $N(s)$ and $N(s')$
+      %\State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
       \State \Return $v$
-    \ElsIf {$n.\sctype = \scexpect$}
-      \State $n' \sim n.\scchildren$
+    \ElsIf{crowd's turn}
+      \State $s'$ drawn based on (\ref{eqn:dynamics})
       \Comment Sample a child
       \State \Return \Call{monteCarloValue}{$n'$}
-    \ElsIf {$n.\sctype = \scvalue$}
-      \State \Return $n.\scvalue$
+    \ElsIf{leaf node}
+    \State \Return utility $U$ of $s$ according to (\ref{eqn:utility})
     \EndIf
     \EndFunction{}
-    \Function{$\scvalue^f$}{node $n$}
-      \State \Return $\theta^\top \phi(n)$
-      \Comment Linear function approximation
-    \EndFunction{}
+    %\Function{$\scvalue^f$}{node $n$}
+      %\State \Return $\theta^\top \phi(n)$
+      %\Comment Linear function approximation
+    %\EndFunction{}
   \end{algorithmic}
 \end{algorithm}
 
-\pldone{Instead of writing down equations,
-cast this as a game tree from the beginning with actions, possible feedback, etc.
-Draw a nice example.
-Then expected utility, expectimax policy, etc. should be conceptually obvious.
-}{Lots of game trees!}
+%\pldone{Instead of writing down equations,
+%cast this as a game tree from the beginning with actions, possible feedback, etc.
+%Draw a nice example.
+%Then expected utility, expectimax policy, etc. should be conceptually obvious.
+%}{Lots of game trees!}
 
 % -- EVERYTHING BELOW THIS IS DEAD TO ME. --
 % Let $\ell(\by, \byt)$ be the loss incurred when if $\by$ is labeled $\byt$.
