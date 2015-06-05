@@ -16,11 +16,11 @@ The \emph{value} of the game is the maximum expected utility:
 \end{align}
 and the \emph{optimal policy} is to choose the action $q$ that attains $V^*$.
 Let's look at the example more intuitively:
-querying one of the end positions ($q = 1$ or $q = 3$),
-is less informative than choosing the middle position ($q = 2$),
+querying one of the end positions ($q = 1$ or $q = 4$),
+is less informative than choosing the middle positions ($q = 2$ or $q = 3$),
 assuming the model propagates information between adjacent positions.
 Indeed, the expected utilities with a uniform distribution over $r$
-are $0.7$, $0.8$, and $0.7$, respectively, and so $q = 2$ is the optimal action.
+are $0.7$, $0.8$, $0.8$, and $0.7$, respectively, and so both $q = 2$ and $q = 3$ are optimal actions.
 
 Note that computing the $V^*$ is only \emph{simulating} possible futures,
 not actually querying the crowd.  The simulation is based on the transition
@@ -134,7 +134,8 @@ so our restriction to considering decisions only at response times is an approxi
 
 The following example shows one path over the states of the game tree corresponding to \figureref{piano-roll}~(left),
 where the system takes action $q_2 = 4$ (labeling \nl{str.}) and then the crowd responds
-at time $1.7$ with $r_2 = \scloc$ (note that $q_1$ is still pending):
+at time $1.7$ with $r_2 = \scloc$.
+Note that the response $r_1$ for $q_1 = 3$ (\nl{George}) is still pending.
 \begin{center}
 \begin{tabular}{|ll|}
   \hline $\now = 1$ & \\

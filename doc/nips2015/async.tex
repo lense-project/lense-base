@@ -124,10 +124,10 @@ On the crowd's turn, we sample from distribution given by the simulation dynamic
   \begin{algorithmic}[1]
     \Function{monteCarloValue}{state $s$}
     \If{\text{system's turn}}
-    \State $s' \gets \argmax_{s'} \left\{w \cdot \psi(s') + c \sqrt{\frac{\log N(s)}{N(s')}} \right\}$
+    \State $s' \gets \argmax_{s'} \left\{V(s') + c \sqrt{\frac{\log N(s)}{N(s')}} \right\}$
       \Comment Choose child using UCT
       \State $v \gets $\Call{monteCarloValue}{$s'$}
-      \State $w \gets w + \alpha (v - w \cdot \psi(s')) \psi(s')$
+      \State $w \gets w + \alpha (v - V(s')) \nabla_w V(s')$
       \Comment Update value function approximation
       \State increment $N(s)$ and $N(s')$
       %\State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
