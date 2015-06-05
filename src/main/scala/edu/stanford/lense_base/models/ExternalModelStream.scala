@@ -4,6 +4,7 @@ import edu.stanford.lense_base.humancompute.HumanErrorDistribution
 import edu.stanford.lense_base.util.CaseClassEq
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
  * Created by keenon on 5/29/15.
@@ -26,6 +27,8 @@ abstract class ExternalModelStream[Input](humanErrorDistribution : HumanErrorDis
    */
   def trainExternalModel(inputOutputPairs : Iterable[(Input,Map[ModelVariable,String])]) : Double
 
+  def devSet : List[(ExternalModel[Input], Map[ExternalModelVariable, String])] = List()
+
   /**
    * This takes care of the KNN tuning on the external model.
    *
@@ -35,8 +38,50 @@ abstract class ExternalModelStream[Input](humanErrorDistribution : HumanErrorDis
   def tunedPrior(externalModel : ExternalModel[Input]) : Map[ExternalModelVariable,Map[String,Double]] = {
     rawPrior(externalModel).map(raw => {
       val rawDistribution = raw._2
-      // TODO: Average over K nearest neighbors
-      (raw._1, rawDistribution)
+
+      val useKNNSmoothing = true
+      if (useKNNSmoothing) {
+        // Find K nearest neighbors
+        val K = 15
+        val M = 1.0
+
+        def sqrDist(map1 : Map[String,Double], map2 : Map[String,Double]) : Double = {
+          var dist = 0.0
+          for (p <- map1) {
+            val v = map2(p._1)
+            dist += Math.pow(v - p._2, 2.0)
+          }
+          dist
+        }
+
+        val kNearest = ListBuffer[(Map[String,Double],String)]()
+        var maxDistance = Double.PositiveInfinity
+        for (pair <- knnList) {
+          val dist = sqrDist(pair._1, rawDistribution)
+
+          if (kNearest.size < K) {
+            kNearest.append(pair)
+          }
+          else if (dist < maxDistance) {
+            val worstCandidate = kNearest.maxBy(p => sqrDist(p._1, rawDistribution))
+            kNearest.-=(worstCandidate)
+            kNearest.append(pair)
+            maxDistance = kNearest.map(p => sqrDist(p._1, rawDistribution)).max
+          }
+        }
+
+        val map = mutable.Map[String,Double]()
+        for (cl <- raw._1.possibleValues) map.put(cl, M)
+        for (pair <- kNearest) map.put(pair._2, map.getOrElse(pair._2, 0.0) + 1.0)
+
+        val sum = map.map(_._2).sum
+        val tunedDistribution = map.map(pair => (pair._1, pair._2 / sum)).toMap
+
+        (raw._1, tunedDistribution)
+      }
+      else {
+        (raw._1, rawDistribution)
+      }
     })
   }
 
@@ -48,9 +93,16 @@ abstract class ExternalModelStream[Input](humanErrorDistribution : HumanErrorDis
    */
   override def learn(models: Iterable[Model]): Double = {
     val loss = trainExternalModel(models.map(m => (m.asInstanceOf[ExternalModel[Input]].getInput, m.map)))
-    val rawPriors = models.flatMap(m => rawPrior(m.asInstanceOf[ExternalModel[Input]]))
-    // TODO: This should probably be on a separate tuning set, rather than the training set
-    knnList = rawPriors.map(pair => (pair._2, pair._1.m.map(pair._1))).toList
+
+    val dev = devSet
+    if (dev.size > 0) {
+      knnList = dev.flatMap(m => {
+        val prior = rawPrior(m._1)
+        prior.map(p => {
+          (p._2, m._2(p._1))
+        })
+      })
+    }
     loss
   }
 

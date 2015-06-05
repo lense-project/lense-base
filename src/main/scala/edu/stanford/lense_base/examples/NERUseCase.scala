@@ -35,7 +35,7 @@ abstract class NERUseCase extends LenseSequenceUseCase {
   lazy val allData : List[(List[String],List[String])] = {
     random.shuffle(loadNER.filter(!_._2.exists(tok => !legalTokens.contains(tok))))
   }
-  lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000).slice(167, 1000)
+  lazy val data : List[(List[String],List[String])] = allData.filter(_._1.size < 15).take(1000)
   lazy val trainSet : List[(List[String],List[String])] = allData.filter(d => !data.contains(d)).take(40) // .take(400)
   lazy val devSet : List[(List[String],List[String])] = allData.filter(d => !(data.contains(d) || trainSet.contains(d))).take(100) // .take(400)
 

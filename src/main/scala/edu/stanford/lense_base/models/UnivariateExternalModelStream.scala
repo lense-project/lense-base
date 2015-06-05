@@ -29,6 +29,14 @@ abstract class UnivariateExternalModelStream[Input](humanErrorDistribution : Hum
    */
   def train(inputOutputPairs : Iterable[(Input, String)]): Double
 
+  def devPairs : List[(Input, String)] = List()
+
+  override def devSet : List[(ExternalModel[Input], Map[ExternalModelVariable, String])] = devPairs.map(pair => {
+    val m = newModelForInput(pair._1)
+    val key = Map(m.variables.head.asInstanceOf[ExternalModelVariable] -> pair._2)
+    (m, key)
+  })
+
   /**
    * Creates a new model in this model stream for a given input
    *

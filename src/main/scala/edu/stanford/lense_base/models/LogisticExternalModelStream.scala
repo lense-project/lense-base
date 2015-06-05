@@ -64,6 +64,8 @@ abstract class LogisticExternalModelStream[Input](humanErrorDistribution : Human
       if (inputOutputPairs.count(_._2 == cl) == 0) return 0.0
     }
 
+    System.err.println("Training on "+inputOutputPairs.size)
+
     val rvfDataset : RVFDataset[String, String] = new RVFDataset[String,String]()
 
     inputOutputPairs.foreach(pair => {

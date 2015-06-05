@@ -131,25 +131,33 @@ case class ObservedErrorDistribution(replayFolder : String, confusionPath : Stri
     })
   }
 
-  lazy val contextToValueMap : Map[String, ListBuffer[String]] = {
+  lazy val contextToValueMap : mutable.Map[String, ListBuffer[String]] = {
     val map = mutable.Map[String,ListBuffer[String]]()
     val f = new File(replayFolder)
-    for (file <- f.list()) {
-      println("Attempting to load replayable data from "+file)
-      addContextFromFile(map, replayFolder+"/"+file)
+    if (f.exists()) {
+      for (file <- f.list()) {
+        println("Attempting to load replayable data from " + file)
+        addContextFromFile(map, replayFolder + "/" + file)
+      }
     }
-    map.toMap
+    map
   }
 
   val confusionMatrixDistribution = ConfusionMatrixErrorDistribution(confusionPath, rand)
 
   def guessGivenContext(context : String, correct : String, possibleValues : List[String]) : String = {
-    if (contextToValueMap.contains(context)) {
-      val list = contextToValueMap(context)
-      list(rand.nextInt(list.size))
-    }
-    else {
-      confusionMatrixDistribution.guess(correct, possibleValues)
+    contextToValueMap.synchronized {
+      if (contextToValueMap.contains(context)) {
+        val list = contextToValueMap(context)
+        val resultIndex = rand.nextInt(list.size)
+        val result = list(resultIndex)
+        list.remove(resultIndex)
+        if (list.size == 0) contextToValueMap.remove(context)
+        result
+      }
+      else {
+        confusionMatrixDistribution.guess(correct, possibleValues)
+      }
     }
   }
 
