@@ -29,34 +29,57 @@
     \pl{no '$\dots$', since $q_1 = 2$ has to refer to second position}
     \pl{maybe switch all examples to 'on George str.' or some other
     3 word phrase}
+    \pl{left justify $x$ and write '$x_1$: on', '$x_2$: George', '$x_3$: str.', so that $q_i$'s match up;
+    same with NONE, LOCATION, LOCATION}
+    \pl{we should replace LNP with NLP!}
+    \pl{also, I just utilities here are highly misleading;
+      they should reflect the loss on the entire utterance having gotten $y_q = r$,
+      not answering a specific query;
+      let's replace them with $[0.8, 0.5, 0.8], [0.8, 0.8, 0.8], [0.8, 0.5, 0.8]$ (reverse positions 1 and 2 for the NLP ordering) (see text for why)
+    }
   }
 \label{fig:piano-roll}
 \end{figure}
 
-% PL: need to define the task!
+% Define structured prediction
 Consider a structured prediction problem from input $\bx = (x_1, \dots, x_n)$ to output $\by = (y_1, \dots, y_n)$.
 For example, for named-entity recognition on tweets,
 $\bx$ is a sequence of words in the tweet (e.g., \nl{on George str.})
 and $\by$ is the corresponding sequence of tags (e.g., \scnone{} \scloc{} \scloc{}).
 The full set of tags of \scper{}, \scloc{}, \scres{}, and \scnone{}.
 
-In the \emph{on-the-job training} setting,
-inputs arrive in a stream.  On each input $\bx$,
-we can issue queries $q_1, q_2, \dots$ to the crowd to obtain tags (potentially more than once)
-for any subset of the positions in $\bx$.
+% Basic setting
+In the \emph{on-the-job training} setting, inputs arrive in a stream.
+On each input $\bx$,
+we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain tags
+(potentially more than once)
+for any positions in $\bx$.
 The responses $r_1, r_2, \dots$ come back asynchronously,
-which are incorporated into the model.
+which are incorporated into our current prediction model $p_\theta$.
 \figureref{piano-roll}(left) shows one possible outcome:
-we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$.
-When we have sufficient confidence, we return the most likely prediction $\hat \by$.
-We must make a prediction on each example,
-and we are evaluated on accuracy $\text{acc}(\by, \hat\by)$
-against the true tag sequence $\by$.
-Note that $\by$ is never observed; the only feedback is via the responses.
-In addition, this feedback is used to update the model.
-Each query $q_i$ is also associated with a time $t_i$ between query and response
-and an amount of money $m_i$ that the query cost.
-Our goal is to choose the queries, maximize accuracy, minimize latency and cost.
+we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$;
+in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
+When we have sufficient confidence about the entire output,
+we return the most likely prediction $\hat \by$ under the model.
+Each query $q_i$ takes $t_i$ seconds between query and response and costs $m_i$ cents.
+Our goal is to choose queries to maximize accuracy, minimize latency and cost.
+
+% More intuition / connections
+We make several remarks about this setting:
+First, we must make a prediction $\hat \by$ on each input $\bx$ in the stream,
+unlike in active learning, where we are only interested in the pool or stream of examples
+for the purposes of building a good model.
+% PL: though active learning will query hard examples too
+Second, we evaluate on accuracy $\text{acc}(\by, \hat\by)$ against the true tag sequence $\by$
+(on named-entity recognition, this is the F$_1$ metric),
+but $\by$ is never actually observed---the only feedback is via the responses,
+like in partial monitoring games \citep{cesabianchi06regret}.
+Therefore, we must make enough queries to garner sufficient confidence
+(something we can't do in partial monitoring games)
+on each example from the beginning.
+Finally, the responses are used to update the prediction model, like in online learning.
+This allows the number of queries needed (and thus cost and latency) to decrease over time
+without compromising accuracy.
 
 %We receive a stream of inputs $\bx\oft1, \bx\oft2, \ldots, \bx\oft N$ with corresponding {\em unobserved\/} true output $\by\oft1, \by\oft2, \ldots, \by\oft N$ that we would like to predict.
 
