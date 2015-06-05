@@ -13,16 +13,16 @@ There are two roads to an accurate AI system today:
 (i) gather a huge amount of labeled training data \citep{deng2009imagenet} and do supervised learning \citep{krizhevsky2012imagenet};
 or (ii) use crowdsourcing to directly perform the task \citep{bernstein2010soylent,kokkalis2013emailvalet}.
 However, both solutions require non-trivial amounts of time and money.
-In many situations, one wishes to build a new system---e.g., to do Twitter information extractor
+In many situations, one wishes to build a new system --- e.g., to do Twitter information extraction
 \citep{li2012twiner} to aid in disaster relief efforts or monitor public
-opinion, but one simply lacks the resources to follow either the pure ML or pure crowdsourcing road.
+opinion --- but one simply lacks the resources to follow either the pure ML or pure crowdsourcing road.
 
 % Our proposal: on the job training setting, related work
 In this paper, we propose a new framework for \emph{on-the-job learning} \citep{lasecki2013real},
 in which we produce high quality results from the start without requring a trained model.
 When a new input arrives,
-the system asynchronously queries the crowd on \emph{parts} of the input it is
-uncertain about and makes a prediction after accruing enough evidence.
+the system can choose to asynchronously query the crowd on \emph{parts} of the input it is
+uncertain about. After collecting enough evidence the system makes a prediction.
 The goal is to maintain high accuracy by initially using the crowd as a crutch,
 but gradually becoming more self-sufficient as the model improves.
 While active learning \citep{settles2010active} and active classification \citep{gao2011active}
