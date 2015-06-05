@@ -1,9 +1,28 @@
 \section{Experiments}
 \label{sec:experiments}
 
+% === Other stuff.
+
+In this section, we empirically evaluate our approach on three tasks. 
+While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
+
+\paragraph{Baselines.}
+We evaluated the following four methods on each dataset:
+\begin{enumerate}
+  \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
+  \item {\bf Offline baseline}:
+    Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
+    This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
+  \item {\bf Entropic threshold}: Uses a heuristic on-the-job learning agent to make predictions. 
+    The agent queries any labels that it estimates to have a marginal probability below a threshold $k = 0.88$. % \footnote{We found $k = 0.88$ to give the best results on our datasets.}
+    Instead of computing the expected marginals over the responses to queries in flight, the agent simply reduces the uncertainty by a factor of $0.3$ and makes multiple requests until the threshold is crossed. Predictions are made using MLE on the model given responses.
+    The agent does not reason about time and makes all its queries at the very beginning.
+  \item {\bf LENSE:} Our full system as described in \sectionref{model}.
+\end{enumerate}
+
 % === Figures
 \begin{table}[t]
-  \begin{tabular}{l p{0.4\textwidth} p{0.4\textwidth} r r r}
+  \begin{tabular}{l p{0.35\textwidth} p{0.35\textwidth} r r r}
     {\bf Dataset (Examples)} & {\bf Task and notes} & {\bf Features} \\ \hline
   {\bf NER (1000)}     & 
     We evaluate on a simplified version of CoNLL-2003 NER task\tablefootnote{\href{http://www.cnts.ua.ac.be/conll2003/ner/}{http://www.cnts.ua.ac.be/conll2003/ner/}}, a sequence labeling problem over English sentences. 
@@ -24,6 +43,21 @@
   \caption{Datasets used in this paper and number of examples we evaluate on.}
 \label{tbl:dataset}
 \end{table}
+
+
+To initialize parameters for the model-based methods, we used a burn-in period of 40 examples which were used to get labels on everything. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
+We do not update parameters for the delay and response models online.
+
+\paragraph{Implementation and crowdsourcing setup.}
+We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
+The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
+We paid Workers \$1.0 to join the retainer pool and an additional \$0.01 per query.
+Worker response times were generally in the range of 3-6 seconds for NER, 10-15 seconds for Sentiment, and 2-4 seconds for Faces.
+
+When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
+To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
+During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
+Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
 
 \begin{table}[t]
 %% NER 
@@ -52,7 +86,7 @@
     %\textbf{LENSE} 
     & 961 ms & \textbf{1.06} & 88.45 \\   %\hline
 \end{tabular}
-\caption{Results on NER and Sentiment tasks comparing latencies, queries per token and performance metrics (Precision, Recall and \fone{} for NER and accuracy for Sentiment).}
+\caption{Results on NER and Face tasks comparing latencies, queries per token and performance metrics (Precision, Recall and \fone{} for NER and accuracy for Face).}
 \label{tbl:results}
 \end{table}
 
@@ -71,39 +105,6 @@
     \end{minipage}%
 \end{table}
 
-% === Other stuff.
-
-In this section, we empirically evaluate our approach on three tasks. 
-While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
-
-\paragraph{Baselines.}
-We evaluated the following four methods on each dataset:
-\begin{enumerate}
-  \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
-  \item {\bf Offline baseline}:
-    Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
-    This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
-  \item {\bf Entropic threshold}: Uses a heuristic on-the-job learning agent to make predictions. 
-    The agent queries any labels that it estimates to have a marginal probability below a threshold $k = 0.88$. % \footnote{We found $k = 0.88$ to give the best results on our datasets.}
-    Instead of computing the expected marginals over the responses to queries in flight, the agent simply reduces the uncertainty by a factor of $0.3$ and makes multiple requests until the threshold is crossed. Predictions are made using MLE on the model given responses.
-    The agent does not reason about time and makes all its queries at the very beginning.
-  \item {\bf LENSE:} Our full system as described in \sectionref{async}.
-\end{enumerate}
-
-To initialize parameters for the model-based methods, we used a burn-in period of 40 examples which were used to get labels on everything. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
-We do not update parameters for the delay and response models online.
-
-\paragraph{Implementation and crowdsourcing setup.}
-We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
-The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
-We paid Workers \$1.0 to join the retainer pool and an additional \$0.01 per query.
-Worker response times were generally in the range of 3-6 seconds for NER, 10-15 seconds for Sentiment, and 2-4 seconds for Faces.
-
-When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
-To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
-During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
-Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
-
 % DETAILS
 % Anecdotally, we also report a range of results on 5 complete runs of our system using {\em real live crowd workers}, recruited at test time, over the first 150 sentences of our dataset. The results exhibit high variance based on worker quality.
 %
@@ -118,7 +119,7 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 %Filtering workers while running, or inferring separate error models for each worker, would clearly deliver substantial gains in reliability over a system that assumes uniform quality. We leave this to future work.
 
 \paragraph{Summary of results.}
-\tableref{results} summarizes the performance of the methods on the three tasks.
+\tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
 On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 3-4.
 For the latter two tasks, both on-the-job learning methods, entropic threshold baseline and LENSE, perform comparably.
