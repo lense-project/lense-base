@@ -32,6 +32,8 @@ default: all.bib
 	bibtex paper
 run:
 	go paper.pdf
+deploy:
+	scp paper.pdf jamie:/u/apache/htdocs/pliang/lense.pdf
 
 split: $(OUTPUT).pdf
 	pdfjam --paper letterpaper --outfile main.pdf $(OUTPUT).pdf 1-9
