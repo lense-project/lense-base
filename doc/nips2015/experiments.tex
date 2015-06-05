@@ -142,6 +142,7 @@ The simple heuristic adopted by the entropic threshold baseline is sufficient to
 %\paragraph{Does the model respect accuracy preferences?} 
 \figureref{ner-running-f1} tracks the performance and cost of LENSE over time on the NER task.
 LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
+On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the entropic threshold baseline with fewer queries by waiting for responses before making another query.
 
 % == DEV F1
 %We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
@@ -154,10 +155,7 @@ LENSE is not only able  to consistently outperform other baselines, but the cost
 
 %We note that although our model is receiving supervisition signal at roughly 1/15 the rate of a fully observed online learning scenario\footnote{this calculation assumes ``fully observed'' is approximated by 3 human labels per example}, we track roughly parallel to the fully supervised line.
 
-\paragraph{Trading off time.}
-On the NER task, we find that LENSE produces more accurate results than the entropic threshold baseline despite querying for fewer labels. It does so by recognizing that, in some situations, waiting for the response of a query can allow it to do better\reword.
-
-\paragraph{In the limit, would LENSE still need crowd supervision?}
+%\paragraph{In the limit, would LENSE still need crowd supervision?}
 While on-the-job training allows us to deploy quickly and ensure good results, we would like to eventually operate without crowd supervision.
 %In order to do so, we must ensure that our model has the capacity to keep learning from the crowd.
 \figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{bigrams} and \textsc{rnn} (as described in \tableref{datasets}).
@@ -167,16 +165,17 @@ On the other hand, using richer features (\textsc{rnn}) the model is able to lea
 %This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
 Note that even when the model capacity is limited, LENSE is able to guarantee a consistent, high level of performance.
 
-\paragraph{When does LENSE query?}
-During the initial stages of learning for the NER task, LENSE made multiple queries on all tokens.
-After a few examples, though, LENSE focused its queries on unseen entity tokens.
-Consider the following example taken from our run logs: \textit{``U.S.\ says still committed to Cuba migration pacts''}.
-%For example, after seeing \ac{600} examples, 
-The model has already seen {\it U.S.\/} and predicts that it is a \scloc{} with 97\% probability.
-On the other hand, having never seen the token {\it Cuba\/} before, the model starts with a belief that {\it Cuba\/} is 59\% \scper, 37\% \scloc{} and 3\% \scnone.
-It immediately fires off two queries about {\it Cuba\/} and waits 4 seconds for both responses to return \scloc{}.
-The model now believes that {\it Cuba\/} is \scloc{} with 95\% probability and returns its prediction.
-This demonstrates that using the model allows LENSE to focus supervision to where it is needed.
+% -- CUT
+%\paragraph{When does LENSE query?}
+%During the initial stages of learning for the NER task, LENSE made multiple queries on all tokens.
+%After a few examples, though, LENSE focused its queries on unseen entity tokens.
+%Consider the following example taken from our run logs: \textit{``U.S.\ says still committed to Cuba migration pacts''}.
+%%For example, after seeing \ac{600} examples, 
+%The model has already seen {\it U.S.\/} and predicts that it is a \scloc{} with 97\% probability.
+%On the other hand, having never seen the token {\it Cuba\/} before, the model starts with a belief that {\it Cuba\/} is 59\% \scper, 37\% \scloc{} and 3\% \scnone.
+%It immediately fires off two queries about {\it Cuba\/} and waits 4 seconds for both responses to return \scloc{}.
+%The model now believes that {\it Cuba\/} is \scloc{} with 95\% probability and returns its prediction.
+%This demonstrates that using the model allows LENSE to focus supervision to where it is needed.
 
 
 % \paragraph{Are we learning a good model?}
