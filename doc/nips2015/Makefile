@@ -26,8 +26,12 @@ bib: paper.tex all.bib $(SECTIONS)
 	$(LATEX) $< 
 	mv $(subst .tex,.pdf,$<) $(OUTPUT).pdf
 
+# Simple thing that just works
+default: all.bib
+	pdflatex paper
+	bibtex paper
 run:
-	go $(OUTPUT).pdf
+	go paper.pdf
 
 split: $(OUTPUT).pdf
 	pdfjam --paper letterpaper --outfile main.pdf $(OUTPUT).pdf 1-9
