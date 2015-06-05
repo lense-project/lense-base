@@ -6,9 +6,6 @@
   \includegraphics[width=1.0\textwidth]{figures/intro-banner.pdf}
   \end{centering}
   \caption{
-    \pl{change $z_1$ to $r_1$}
-    \pl{actually draw a CRF: there should only be nodes for $y_1, \dots, y_5$;
-    the $x$'s should be technically one node, but you can just ignore it}
     Named entity recognition on tweets in on-the-job training.
     %(1) The system first runs a
 %pre-trained model, discovers that the token ``George'' is ambiguous, and then
@@ -21,22 +18,11 @@
 
 \begin{figure}[t]
   \begin{centering}
-  \includegraphics[width=0.49\textwidth]{figures/piano-roll.pdf}
+  \includegraphics[width=0.56\textwidth]{figures/piano-roll.pdf}
   \hfill
- \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}
+ \includegraphics[width=0.43\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}
   \end{centering}
   \caption{
-    \pl{no '$\dots$', since $q_1 = 2$ has to refer to second position}
-    \pl{maybe switch all examples to 'on George str.' or some other
-    3 word phrase}
-    \pl{left justify $x$ and write '$x_1$: on', '$x_2$: George', '$x_3$: str.', so that $q_i$'s match up;
-    same with NONE, LOCATION, LOCATION}
-    \pl{we should replace LNP with NLP!}
-    \pl{also, I just utilities here are highly misleading;
-      they should reflect the loss on the entire utterance having gotten $y_q = r$,
-      not answering a specific query;
-      let's replace them with $[0.8, 0.5, 0.8], [0.8, 0.8, 0.8], [0.8, 0.5, 0.8]$ (reverse positions 1 and 2 for the NLP ordering) (see text for why)
-    }
   }
 \label{fig:piano-roll}
 \end{figure}

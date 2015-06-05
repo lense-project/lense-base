@@ -33,12 +33,12 @@
 %% NER 
 {\bf Named Entity Recongition} \\
 \begin{tabular}{l r r r r r}
-    \textbf{System} & \textbf{Time/token} & \textbf{Requests/token} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \hline
-    Human 1-query baseline & 664 ms & 1.0 & 66.38 & 89.58 & 76.15 \\ %\hline
-    Human 3-query baseline & 1495 ms & 3.0 & 92.79 & 89.56 & 91.58 \\ %\hline
-    Human 5-query baseline & 3887 ms & 5.0 & 98.25 & 92.33 & 95.20 \\ %\hline
-    Offline baseline & n/a & n/a & 62.38 & 69.76 & 65.86 \\ %\hline
-    Entropic threshold & 1523 ms & 0.65 & 91.74 & 90.90 & 91.33 \\ %\hline
+    \textbf{System} & \textbf{Time/tok} & \textbf{Reqs./tok} & \textbf{P} & \textbf{R} & \textbf{F$_1$} \\ \hline
+    1-vote & 664 ms & 1.0 & 66.38 & 89.58 & 76.15 \\ %\hline
+    3-vote & 1495 ms & 3.0 & 92.79 & 89.56 & 91.58 \\ %\hline
+    5-vote & 3887 ms & 5.0 & 98.25 & 92.33 & 95.20 \\ %\hline
+    Offline & n/a & n/a & 62.38 & 69.76 & 65.86 \\ %\hline
+    Entropic & 1523 ms & 0.65 & 91.74 & 90.90 & 91.33 \\ %\hline
     \textbf{LENSE} & 3368 ms & \textbf{0.62} & \textbf{94.32} & \textbf{93.16} & \textbf{93.73} \\ %\hline
 \end{tabular}
 
@@ -46,26 +46,27 @@
 {\bf Sentiment Analysis}\\
 \begin{tabular}{l  r  r  r  r}
     %\hline
-    \textbf{System} & \textbf{Time/example} & \textbf{Requests/example} & \textbf{Accuracy} \\ \hline
-    Human 1-query baseline & 1791 ms & 1.0 & 90.79 \\ %\hline
-    Human 3-query baseline & 2478 ms & 3.0 & 92.20 \\ %\hline
-    Offline baseline - Bigrams & n/a & n/a & 70.03 \\ %\hline
-    \textbf{Entropic threshold - Bigrams} & 2059 ms & \textbf{1.44} & \textbf{93.80} \\ %\hline
-    \textbf{LENSE - Bigrams} & 2853 ms & 1.83 & \textbf{93.80} \\% \hline
-    Offline baseline - RNN & n/a & n/a & 85.03 \\ %\hline
-    \textbf{Entropic threshold - RNN} & 1479 ms & \textbf{0.95} & \textbf{93.34} \\ %\hline
-    LENSE - RNN & 1926 ms & 1.48 & 93.18 \\ %\hline
+    \textbf{System} & \textbf{Time/ex} & \textbf{Reqs./ex} & \textbf{Acc.} \\ \hline
+    1-vote & 1791 ms & 1.0 & 90.79 \\ %\hline
+    3-vote & 2478 ms & 3.0 & 92.20 \\ %\hline
+%Bigrams: \\
+    %Offline & n/a & n/a & 70.03 \\ %\hline
+    %\textbf{Entropic} & 2059 ms & \textbf{1.44} & \textbf{93.80} \\ %\hline
+    %\textbf{LENSE} & 2853 ms & 1.83 & \textbf{93.80} \\% \hline
+    Offline & n/a & n/a & 85.03 \\ %\hline
+    \textbf{Entropic} & 1479 ms & \textbf{0.95} & \textbf{93.34} \\ %\hline
+    LENSE & 1926 ms & 1.48 & 93.18 \\ %\hline
 \end{tabular}
 
 %% Faces
 {\bf Face Identification}\\
 \begin{tabular}{l  r  r  r  r  r}
     %\hline
-    \textbf{System} & \textbf{Time/example} & \textbf{Requests/example} & \textbf{Accuracy} \\ \hline
-    Human 1-query baseline & 1414 ms & 1.0 & 87.75 \\ %\hline
-    Human 3-query baseline & 1865 ms & 3.0 & 88.44 \\ %\hline
-    Offline baseline & n/a & n/a & 87.43 \\    %\hline
-    Entropic threshold & 1121 ms & 1.12 & \textbf{91.53} \\ %\hline
+    \textbf{System} & \textbf{Time/ex} & \textbf{Reqs./ex} & \textbf{Acc.} \\ \hline
+    1-vote & 1414 ms & 1.0 & 87.75 \\ %\hline
+    3-vote & 1865 ms & 3.0 & 88.44 \\ %\hline
+    Offline & n/a & n/a & 87.43 \\    %\hline
+    Entropic & 1121 ms & 1.12 & \textbf{91.53} \\ %\hline
     \textbf{LENSE} & 961 ms & \textbf{1.06} & 88.45 \\   %\hline
 \end{tabular}
   \caption{Top: Results on {\bf NER}, Middle: Results on {\bf Sentiment}, Bottom: Results on {\bf Faces}}
