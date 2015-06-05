@@ -11,7 +11,9 @@
 
 \begin{figure}[t]
   \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/piano-roll.pdf}
+  \includegraphics[width=0.49\textwidth]{figures/piano-roll.pdf}
+  \hfill
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}
   \end{centering}
   \caption{}
 \label{fig:piano-roll}
@@ -27,11 +29,12 @@ By querying the crowd queries $\bq = (q_1, q_2)$, we are not only able to produc
 
 Of course, querying the crowd also incurs a cost for the queries as well as a time delay, $t$: $C(\bq, t)$.
 In general, we want to maximize our accuracy by making queries while trading off the cost and time delay introduced.
-We cast this problem in the Bayesian decision theoretic framework: our objective is to maximize our expected utility under our current model,
-$\p(\by \given \bx, \br)$:
-\begin{align*}
-  u &= \E_{\by \sim \p(\cdot \given \bx, \br)}[1 - \ell(\by, \byt) + C(\bq, t)].
-\end{align*}
+
+% We cast this problem in the Bayesian decision theoretic framework: our objective is to maximize our expected utility under our current model,
+% $\p(\by \given \bx, \br)$:
+% \begin{align*}
+%   u &= \E_{\by \sim \p(\cdot \given \bx, \br)}[1 - \ell(\by, \byt) + C(\bq, t)].
+% \end{align*}
 
 \ac{Probably should talk more about training.}
 
