@@ -57,17 +57,18 @@
 \end{table}
 
 \begin{table}[t]
+    \begin{minipage}[t]{.49\textwidth}
+  \includegraphics[width=\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
+  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{bigram} features, the model does not have the capacity to predict at our desired accuracy and must query the crowd. With more complex \textsc{rnn} features, the model learns and queries the crowd less over time.}
+        \label{fig:sentiment-tradeoff}
+    \end{minipage}
+    \qquad
     \begin{minipage}[t]{.49\textwidth }
         \input{table-sentiment}
         \caption{Results on the Sentiment task comparing latency, queries per example and accuracy.}
         \label{tbl:sentiment-results}
         \vfill
     \end{minipage}%
-    \begin{minipage}[t]{.49\textwidth}
-  \includegraphics[width=\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
-  \captionof{figure}{Queries per example over time for the LENSE on Sentiment. With simple \textsc{bigram} features, the model does not have the capacity to predict at our desired accuracy and must query the crowd. With more complex \textsc{rnn} features, the model learns and queries the crowd less over time.}
-        \label{fig:sentiment-tradeoff}
-    \end{minipage}
 \end{table}
 
 % === Other stuff.
