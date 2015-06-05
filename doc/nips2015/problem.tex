@@ -61,7 +61,8 @@ we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scl
 in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
 When we have sufficient confidence about the entire output,
 we return the most likely prediction $\hat \by$ under the model.
-Each query $q_i$ takes $t_i$ seconds between query and response and costs $m_i$ cents.
+Each query $q_i$ is issued at time $s_i$ and the response comes back at time $t_i$.
+Assume that each query costs $m$ cents.
 Our goal is to choose queries to maximize accuracy, minimize latency and cost.
 
 % More intuition / connections
@@ -70,7 +71,7 @@ First, we must make a prediction $\hat \by$ on each input $\bx$ in the stream,
 unlike in active learning, where we are only interested in the pool or stream of examples
 for the purposes of building a good model.
 % PL: though active learning will query hard examples too
-Second, we evaluate on accuracy $\text{acc}(\by, \hat\by)$ against the true tag sequence $\by$
+Second, we evaluate on accuracy $\accuracy(\by, \byt)$ against the true tag sequence $\by$
 (on named-entity recognition, this is the F$_1$ metric),
 but $\by$ is never actually observed---the only feedback is via the responses,
 like in partial monitoring games \citep{cesabianchi06regret}.
