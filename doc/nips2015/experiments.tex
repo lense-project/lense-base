@@ -1,9 +1,10 @@
 \section{Experiments}
 \label{sec:experiments}
 
-\begin{table}[ht]
-  \begin{tabular}{l p{0.3\textwidth} p{0.3\textwidth} r r r}
-    {\bf Dataset} & {\bf Task and notes} & {\bf Features} & {\bf Init.} & {\bf Test} \\ \hline
+% === Figures
+\begin{table}[s]
+  \begin{tabular}{l p{0.4\textwidth} p{0.4\textwidth} r r r}
+    {\bf Dataset} & {\bf Task and notes} & {\bf Features} &  {\bf Examples} \\ \hline
   {\bf NER}     & 
     We evaluate on a simplified version of CoNLL-2003 NER task\tablefootnote{\href{http://www.cnts.ua.ac.be/conll2003/ner/}{http://www.cnts.ua.ac.be/conll2003/ner/}}, a sequence labeling problem over English sentences. 
     We only consider the three entity tags corresponding to persons ($\textsc{per}$), locations ($\textsc{loc}$) or others ($\textsc{o}$)\tablefootnote{%
@@ -11,21 +12,21 @@
     &
     We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes.
     &
-  40 & 1000 \\
+  1000 \\
   {\bf Sentiment} & 
     We evaluate on a subset of the Stanford sentiment dataset\cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
     &
     We used two feature sets, the first (\textsc{bigrams}) containing only word unigrams and bigrams, and the second (\textsc{rnn}) that also contained sentence vector embeddings from~\cite{socher2013recursive}.
     &  
-  20 & 1800 \\
+  1800 \\
   {\bf Face} & 
   We evaluate on a celebrity face classification task\tablefootnote{\todo{}}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
     &
     We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings.
     & 
-  40 & 1784 
+  1784 
 \end{tabular}
-  \caption{Dataset used in this paper: we use a small number of elements }
+  \caption{Datasets used in this paper and number of examples we evaluate on.}
 \label{tbl:dataset}
 %\end{table}
 %\begin{table}[hb]
@@ -49,7 +50,7 @@
     Human 1-query baseline & 1791 ms & 1.0 & 90.79 \\ %\hline
     Human 3-query baseline & 2478 ms & 3.0 & 92.20 \\ %\hline
     Offline baseline - Bigrams & n/a & n/a & 70.03 \\ %\hline
-    \textbf{Entropic threshold - Bigrams} & 2059 ms & \textbf{1.44} & 93.80 \\ %\hline
+    \textbf{Entropic threshold - Bigrams} & 2059 ms & \textbf{1.44} & \textbf{93.80} \\ %\hline
     \textbf{LENSE - Bigrams} & 2853 ms & 1.83 & \textbf{93.80} \\% \hline
     Offline baseline - RNN & n/a & n/a & 85.03 \\ %\hline
     \textbf{Entropic threshold - RNN} & 1479 ms & \textbf{0.95} & \textbf{93.34} \\ %\hline
@@ -68,29 +69,53 @@
     \textbf{LENSE} & 961 ms & \textbf{1.06} & 88.45 \\   %\hline
 \end{tabular}
   \caption{Top: Results on {\bf NER}, Middle: Results on {\bf Sentiment}, Bottom: Results on {\bf Faces}}
+  \label{tbl:results}
 \end{table}
+\begin{figure}[t]
+  \begin{centering}
+  \includegraphics[width=0.3\textwidth]{figures/ner_2_class/f1_plot/f1_vs_time.pdf}
+  \includegraphics[width=0.3\textwidth]{figures/ner_2_class/cost_plot/cost_vs_time.pdf}
+  \includegraphics[width=0.3\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
+  \end{centering}
+  \caption{A figure showing the comparative \fone vs time of several real-time regimes. The purple line is our system, costing just 0.65 queries per token. The green line is the 3-vote human baseline, costing 3 queries per token. The red line is the 1-vote baseline. The blue line is the performance of our classifier on its own, if we didn't allow it to query humans, and only gave it gold labels after classification in order to train.
+           A figure showing the number of queries required by our system, the 1 and 3 human query baselines over time.
+           A figure showing that increasing model capacity with richer distributional features (red line) enables the model to reduce costs further over time, compared with a simpler bag-of-words model with less representational capacity (green line).}
+%\label{fig:ner-running-f1}
+%\label{fig:ner-cost}
+%\label{fig:sentiment-tradeoff}
+\end{figure}
 
-In this section, we empirically evaluate our approach on three datasets (\tableref{dataset}) and observe various tradeoffs on the loss function.
 
-Each dataset set was evaluated against the following four regimes:
+% === Other stuff.
+
+In this section, we empirically evaluate our approach on three tasks. 
+While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines,
+
+\paragraph{Methods.}
+Each dataset set was evaluated against the following four methods:
 \begin{enumerate}
   \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
-  \item {\bf Offline baseline}: The best possible offline system, without querying during classification. Trains on gold labels for all the examples seen so far, then returns MLE for $\hat{y}$.
-  \item {\bf Entropic threshold}: A heuristic agent that can make queries on $x$ based entropy thresholds: the agent queries any labels that it estimates have a marginal risk above a threshold of $0 < k < 1$, where we used $k = 0.88$, which was chosen by cross-validation. The agent discounts risk on nodes with queries in-flight by a heuristic multiple $j < 1$ determined by the human error model. This agent does not do any lookahead marginal inference or simulation.
+  \item {\bf Offline baseline}:
+    Uses a classifier that trains on the gold output for all examples seen so far, then returns the MLE as a prediction.
+    This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
+  \item {\bf Entropic threshold}: A heuristic agent that can make queries to the crowd based on entropy thresholds: the agent queries any labels that it estimates have a marginal risk above a threshold of $0 < k < 1$. We used $k = 0.88$, which was chosen by cross-validation.
+    Instead of computing the expected marginals after a response, the agent simply discounts risk on nodes with queries in-flight by a heuristic multiple $j < 1$ determined by the human error model \ac{KEENON: how is $j$ computed?}.
+    This agent does not reason about time and sends all its queries in the very beginning.
   \item {\bf LENSE:} Our full system as described in \sectionref{async}.
 \end{enumerate}
 
-To initialize the model used in the offline baseline we used parameters learned using a small handful of examples (listed under the Init.\ column of \tableref{dataset}). This is to provide a fighting chance.
+To initialize parameters for the model-based methods, we used a burn-in period of 40 examples which were used to get labels on everything. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
+We did not update parameters for the delay and response models online.
 
-\paragraph{Implementation and crowdsouring setup}
+\paragraph{Implementation and crowdsourcing setup.}
+We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
+To minimize systematic errors due to misunderstanding the task,
+the workers were given a short tutorial on each task before joining the pool. 
+Workers were paid \$1.0 to join the retainer pool, and an additional \$0.01 for each response they gave.
+We found that worker response times are generally in the range of 3-6 seconds for the NER task, 10-15 seconds for sentiment, and 2-4 seconds for the faces.
 
-We implemented our system using Amazon Mechanical Turk.
-Using the retainer model of ~\cite{bernstein2011crowds}, we are able to create a ``pool'' of Turkers paid a retainer to keep a browser tab open and respond at a moments notice.
-The Turkers are given a short tutorial on the task before joining the pool, to minimize systematic error due to misunderstanding.
-We find that Turker response times are generally in the range of 3-6 seconds for the NER task, 10-15 seconds for sentiment, and 2-4 seconds for the faces.
-
-When running experiments, we found that the results exhibited a high variance based on worker quality, fluctuating on the NER task between 87 and 96 F1, depending on workers.
-To control for the variance in worker quality across our evaluations of different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
+When running experiments, we found that the results exhibited a high variance based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
+To control for the variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
 During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
 Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
 
@@ -107,70 +132,59 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 %
 %Filtering workers while running, or inferring separate error models for each worker, would clearly deliver substantial gains in reliability over a system that assumes uniform quality. We leave this to future work.
 
-On all 3 datasets, we found that on-the-job learning is able to outperform machine and human-only comparisons on both performance and cost. On the NER task, we achieve F$_1$ of $93.7$ at roughly 1/6 the cost of achieving the same result using the human-only approach. On the sentiment and faces datasets, where there is no multi-variable structure for our system to exploit, the results are less pronounced, but we still reduce costs for comparable accuracy by 1/3 to 1/4.
+\paragraph{Summary of results.}
+\tableref{results} summarizes the performance of the methods on the three tasks.
+On all 3 datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
+On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, there are fewer queries to chose from, but we are still able to reduce costs for comparable accuracy by a factor of 3-4.
 
-\paragraph{Does the model respect accuracy preferences?} 
-We refer to \figureref{ner-running-f1}.
-The plot demonstrates that LENSE is able to consistently outperform other regimes at every data-scale.
-LENSE delivers this performance regardless of the performance of the underlying model.
+%\paragraph{Does the model respect accuracy preferences?} 
+\figureref{ner-running-f1} demonstrates that LENSE is able to consistently outperform other baselines.
+This should not be surprising because we use crowd supervision.
+However, as shown in \figureref{ner-running-f1}, we are able to steadily reduce the number of queries by a factor of 2 over time.
 
-\begin{figure}[t]
-  \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/ner_2_class/f1_plot/f1_vs_time.pdf}
-  \end{centering}
-  \caption{A figure showing the comparative F1 vs time of several real-time regimes. The purple line is our system, costing just 0.65 queries per token. The green line is the 3-vote human baseline, costing 3 queries per token. The red line is the 1-vote baseline. The blue line is the performance of our classifier on its own, if we didn't allow it to query humans, and only gave it gold labels after classification in order to train.}
-\label{fig:ner-running-f1}
-\end{figure}
+% == DEV F1
+%We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
+%Compared to the offline baseline, which sees perfect labels on all examples, LENSE observed labels on only \ac{KEENON: fix this number: 600} words. For a comparable number of tokens, the offline baseline has an \fone of \ac{KEENON: fix: 63\%}.
 
-\paragraph{In the limit do we still need the crowd?}
-We refer to \figureref{sentiment-tradeoff}.
-We report results under two different sets of features for the sentiment task: \{unigrams, bigrams\}, and \{unigrams, bigrams, Socher et al recursive sentence embeddings\todo{cite}\}.
-Given less model capacity, using only unigram and bigram features, our model soon saturates and must compensate for lack of represenational capacity with higher costs.
-With richer embedding features, the model takes longer to learn, but eventually is able to reduce costs while maintaining accuracy preferences.
-This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
-
-\paragraph{Does LENSE exploit structure?}
-First see \figureref{ner-cost}.
-The jagged noise in the floating average of the cost plot is a sign that the system is taking advantage of the model to turn in {\em many classifications without human intervention}.
-Behavioral analysis reveals the model is also taking advantage of the structure of queries to redistributed human effort to maximize accuracy.
-As a representative example of this querying behavior from the evaluation set, take observed behavior when tagging the sentence:
-
-\begin{center}
-\textit{``U.S.\ says still committed to Cuba migration pacts.''}
-\end{center}
-
-The system, having never seen the token before, starts with a belief that Cuba is 59\% Person, 37\% Location, and 3\% None. The system knows already, from previously learned examples, that ``U.S.'' is a Location with 97\% probability. It immediately fires off two queries about ``Cuba,'' and waits 4 seconds for both responses to return Location. It now believes that ``Cuba'' is a Location with 95\% probability, and decides to turn in its current guess. This guess is added to the training set, and the model is updated.
-
-\begin{figure}[t]
-  \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/ner_2_class/cost_plot/cost_vs_time.pdf}
-  \end{centering}
-  \caption{A figure showing the number of queries required by our system, the 1 and 3 human query baselines over time.}
-\label{fig:ner-cost}
-\end{figure}
-
-\paragraph{Are we learning a good model?}
-We receive very noisy and sparse supervision.
-Despite this, to reduce the costs in the future, our system must learn to generalize well.
-We refer to \figureref{ner-dev-f1}.
-We note that although our model is receiving supervisition signal at roughly 1/15 the rate of a fully observed online learning scenario\footnote{this calculation assumes ``fully observed'' is approximated by 3 human labels per example}, we track roughly parallel to the fully supervised line.
-
-\begin{figure}[t]
-  \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/ner_2_class/machine_f1_plot/machine_f1_vs_time.pdf}
-  \end{centering}
-  \caption{A figure showing the relationship between the classifier we train, and one trained on gold labeled data. Evaluation is on a held out dev set. Note that our classifier learns more slowly because we are handing it a noisy approximation to train on, but the classifier narrows the gap as it gets more data.}
-\label{fig:ner-dev-f1}
-\end{figure}
-
-\begin{figure}[t]
-  \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
-  \end{centering}
-  \caption{A figure showing that increasing model capacity with richer distributional features (red line) enables the model to reduce costs further over time, compared with a simpler bag-of-words model with less representational capacity (green line).}
-\label{fig:sentiment-tradeoff}
-\end{figure}
-
-\paragraph{Why is the Entropic threshold system so much better on sentiment and faces?}
+% === Compare with entropic threshold
+%\paragraph{Why is the Entropic threshold system so much better on sentiment and faces?}
 LENSE exploits structure in the model when querying, and so outperforms the Entropic threshold in the presence of structure (see NER task results).
 However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the Entropic threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
+
+%We note that although our model is receiving supervisition signal at roughly 1/15 the rate of a fully observed online learning scenario\footnote{this calculation assumes ``fully observed'' is approximated by 3 human labels per example}, we track roughly parallel to the fully supervised line.
+
+\paragraph{In the limit do we still need the crowd?}
+While on-the-job training allows us to deploy quickly and ensure good results, we would like to eventually perform without crowd supervision.
+%In order to do so, we must ensure that our model has the capacity to keep learning from the crowd.
+\figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{bigrams} and \textsc{rnn} (as described in \tableref{datasets}).
+With the simpler feature set (\textsc{bigrams}) 
+the model saturates early and we must compensate for our lack in representational capacity with more queries to the crowd.
+On the other hand, using the richer features (\textsc{rnn}) the model learns from the crowd's supervision and reduces costs.
+This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
+It is important to note that even when the model capacity is limited, LENSE is able to guarantee a consistent, high level of performance.
+
+\paragraph{When does LENSE query?}
+During the initial stages of learning for the NER task, we observed that LENSE made multiple queries on all tokens.
+The number of such queries quickly dropped and instead, LENSE focused on querying new unseen entity tokens.
+Consider the following example taken from our run logs: \textit{``U.S.\ says still committed to Cuba migration pacts''}.
+%For example, after seeing \ac{600} examples, 
+The system, having never seen the token ``Cuba'' before, starts with a belief that ``Cuba'' is 59\% \scper, 37\% \scloc{} and 3\% \scnone.
+The model has already seen ``U.S.'' and predicts that it is a \scloc{} with 97\% probability.
+It immediately fires off two queries about ``Cuba'', and waits 4 seconds for both responses to return \scloc{}.
+The model now believes that ``Cuba'' is \scloc{} with 95\% probability, and decides to turn in its current guess.
+
+% \paragraph{Are we learning a good model?}
+% We receive very noisy and sparse supervision.
+% Despite this, to reduce the costs in the future, our system must learn to generalize well.
+% We refer to \figureref{ner-dev-f1}.
+% We note that although our model is receiving supervisition signal at roughly 1/15 the rate of a fully observed online learning scenario\footnote{this calculation assumes ``fully observed'' is approximated by 3 human labels per example}, we track roughly parallel to the fully supervised line.
+
+% Held out figure for space concerns.
+%\begin{figure}[t]
+%  \begin{centering}
+%  \includegraphics[width=1.0\textwidth]{figures/ner_2_class/machine_f1_plot/machine_f1_vs_time.pdf}
+%  \end{centering}
+%  \caption{A figure showing the relationship between the classifier we train, and one trained on gold labeled data. Evaluation is on a held out dev set. Note that our classifier learns more slowly because we are handing it a noisy approximation to train on, but the classifier narrows the gap as it gets more data.}
+%\label{fig:ner-dev-f1}
+%\end{figure}
+
