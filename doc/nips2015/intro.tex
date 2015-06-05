@@ -1,3 +1,9 @@
+\begin{epigraph}
+``Poor is the pupil who does not surpass his master.''\\
+-- Leonardo da Vinci
+\end{epigraph}
+
+
 \section{Introduction}
 \label{sec:intro}
 
@@ -13,7 +19,7 @@ opinion, but one simply lacks the resources to follow either the pure ML or pure
 
 % Our proposal: on the job training setting, related work
 In this paper, we propose a new framework for \emph{on-the-job training} \citep{lasecki2013real},
-in which we deploy an untrained model from the start.
+in which we produce high quality results from the start without requring a trained model.
 When a new input arrives,
 the system asynchronously queries the crowd on \emph{parts} of the input it is
 uncertain about and makes a prediction after accruing enough evidence.
@@ -27,7 +33,7 @@ While online learning \citep{cesabianchi06prediction} and
 online active learning \citep{helmbold1997some,sculley2007online,chu2011unbiased}
 improve the model during test time,
 they do not actively seek new information \emph{prior} to making a prediction,
-and cannot maintain high accuracy.
+and cannot maintain high accuracy independent of the number of data instances seen so far.
 
 % Bayesian decision theory: technical solution
 To determine which queries to make,
@@ -45,9 +51,9 @@ and Monte Carlo tree search \citep{kocsis2006bandit} to approximate it.
 % Experiments.
 We implemented and evaluated our system on three different tasks: named-entity
 recognition, sentiment classification, and image classification.
-We obtain an average accuracy of 93\%,
-which corresponds to a 6--7 fold reduction in cost over the pure crowdsourcing approach
-with a comparable a latency of 2-6 seconds per classification.
+We beat human performance on each, 
+with a 3-7 fold reduction in cost over the pure crowdsourcing approach 
+that achieves comparable accuracies and latencies.
 Compared to pure ML approaches, we obtain substantially higher accuracy.
 An open-source implementation of our system, dubbed LENSE for ``Learning from Expensive Noisy Slow Experts'' is available at
 \href{http://anonymo.us}{http://anonymo.us}.
