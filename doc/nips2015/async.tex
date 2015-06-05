@@ -1,78 +1,78 @@
-\section{Algorithm: choosing when and what to query}
-\label{sec:async}
-
-% Restate our goal
-We now return to task of minimizing the objective in \equationref{objective}.
-For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}$ to minimize the single-step loss:
-\begin{align*}
-  \ell\oft{t} &= \min_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}) \\
-  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
-\end{align*}
-where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
-
-The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ldots q_m \in \{1, \ldots, n\}$, where $n$ is the size of the output $\by\oft{t}$.
-To keep things tractable, let $Q\oft{t}$ be constructed by picking one query at a time:
-given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
-\begin{align}
-  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
-\end{align}
-where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query, and returning the current prediction.
-
-We can not yet optimize \equationref{one-step-q} because we do not observe $\by\oft t$ or $\tau\oft t$ ahead of time.
-Instead, we propose to optimize the expected loss under our model, {\em given the responses $\bz$ received when making the decision}.
-For example, if we choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$ we can optimize the following expression:
-\begin{align}
-  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
-  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell_{\rmclass}(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
-\end{align}
-The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
-
-\begin{figure}
- \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/game-tree.pdf}
-  \hfill
- \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/lookahead-one.pdf}
-  \caption{Monte Carlo tree search}
-\label{fig:mcts}
-\end{figure}
-
-\paragraph{Expectimin trees and optimal policies.}
-Let $\sT(\sN)$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
-Each node $n \in \sN$ has a type $n.\sctype$ which is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square) and has children $n.\scchildren \subset \sN$.
-Additionally, nodes of type $\scvalue$ have a value $n.\scvalue$.
-The value of a node can be easily computed recursively: 
-\begin{align*}
-  \scvalue(n) &=
-  \begin{cases}
-    \min_{n'\in n.\scchildren} \scvalue(n') & \textrm{if}~n.\sctype = \scmin \\
-    \E_{n'\sim n.\scchildren}[\scvalue(n')] & \textrm{if}~n.\sctype = \scexpect \\
-    n.\scvalue & \textrm{if}~n.\sctype = \scvalue
-  \end{cases}.
-\end{align*}
-Additionally, an expectimin policy $\pi^*$ at a $\scmin$ node returns the child with the minimum value: $\pi^*(n) = \argmin_{n' \in n.\scchildren} \scvalue(n')$.
-As a concrete example, consider the expectimin tree in \figureref{mcts}. The value of the root node $n_1^0$ is,
-\begin{align*}
-  \scvalue(n_1^0) &= \min_{n_1^0.n_i^1} \E_{n_1^0.n_i^1.n_j^2} \left[\min_{n_1^0.n_i^1.n_j^2.n_k^3} \E_{n_1^0.n_i^1.n_j^2.n_k^3.n_l^4} \left[n_1^0.n_i^1.n_j^2.n_k^3.n_l^4.\scvalue \right] \right].
-\end{align*}
-
-\paragraph{Choosing queries $q_m$ with an expectimax tree.}
-Let us now formalize our decision problem as an expectimin tree, $\sT$.
-The nodes of the tree need to encapsulate as current state, the current time, $t$, the list of queries pending responses $Q = \{(q_1, t_1), \ldots, (q_m, t_m)\}$, where $q_i$ are the queries and $t_i$ is the time at which the query responds (we will compute an expectation over this quantity) and the received responses $Z = \{z_1, \ldots, z_l\}$.
-Without loss of generality, assume that $Q$ is sorted so that $t_1$ is closest in time to $t$.
-Let the root of $\sT$ be the $\min$ node $\scchoose(t, Q, Z)$, 
-with children $\scchoose(t, Q, Z).\turnin$, $\scchoose(t, Q, Z).\wait$ and $\scchoose(t, Q, Z).\query(q)$ for $q \in [n]$.
-$\scchoose(t, Q, Z).\turnin$ is a $\scvalue$ node with value equal to the expected loss of making a prediction in the current state:
-\[
-\scchoose(t, Q, Z).\turnin.\scvalue 
-= \E_{\by \sim \p(\cdot \given \bx, Z)}[\ell_{\rmclass}(\by, \byt)] + C(Q, t).
-\]
-$\scchoose(t, Q, Z).\wait$ is an $\scexpect$ node children $\{\scchoose(t', Q', Z') | t' = t_1, Q' = Q \setminus (q_1, t_1) Z' = Z \union {z_{l+1}} \forall z_{l+1} \in [L]\}$.
-Intuitively, choosing the $\wait$ node waits for the next response by advancing time and updating the query and response states.
-Finally,
-$\scchoose(t, Q, Z).\query(q)$ is an $\scexpect$ node that results in children 
-$\{\scchoose(t, Q', Z) | Q' = Q \union (q, t'), t' = t + \tau_q, \tau_q \sim \Gamma\}$: the $\query$ node places a new query and its expected time of response to $Q$. 
-
-\figureref{mcts} shows a simplified tree ignoring time constructed with a single query in flight; the root node is $\scchoose(\cdot, \{(q_1, t_1)\}, \{\})$. The branch on the left shows the expansion of the game tree along the child that chooses to query immediately, while the branch on the right considers the case where we wait to receive the first response ($z_1$) before querying ($q_2$).
-In the latter scenario, we may choose not to query again if the response we receive provides enough information.
+%\section{Algorithm: choosing when and what to query}
+%\label{sec:async}
+%
+%% Restate our goal
+%We now return to task of minimizing the objective in \equationref{objective}.
+%For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}$ to minimize the single-step loss:
+%\begin{align*}
+%  \ell\oft{t} &= \min_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}) \\
+%  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
+%\end{align*}
+%where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
+%
+%The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ldots q_m \in \{1, \ldots, n\}$, where $n$ is the size of the output $\by\oft{t}$.
+%To keep things tractable, let $Q\oft{t}$ be constructed by picking one query at a time:
+%given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
+%\begin{align}
+%  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
+%\end{align}
+%where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query, and returning the current prediction.
+%
+%We can not yet optimize \equationref{one-step-q} because we do not observe $\by\oft t$ or $\tau\oft t$ ahead of time.
+%Instead, we propose to optimize the expected loss under our model, {\em given the responses $\bz$ received when making the decision}.
+%For example, if we choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$ we can optimize the following expression:
+%\begin{align}
+%  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
+%  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell_{\rmclass}(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
+%\end{align}
+%The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
+%
+%\begin{figure}
+% \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/game-tree.pdf}
+%  \hfill
+% \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/lookahead-one.pdf}
+%  \caption{Monte Carlo tree search}
+%\label{fig:mcts}
+%\end{figure}
+%
+%\paragraph{Expectimin trees and optimal policies.}
+%Let $\sT(\sN)$ be a expectimin tree with nodes $\sN$ (\figureref{mcts}).
+%Each node $n \in \sN$ has a type $n.\sctype$ which is one of $\scmin$ (represented with inverted triangles), $\scexpect$ (represented with circles) or $\scvalue$ (represented with a square) and has children $n.\scchildren \subset \sN$.
+%Additionally, nodes of type $\scvalue$ have a value $n.\scvalue$.
+%The value of a node can be easily computed recursively: 
+%\begin{align*}
+%  \scvalue(n) &=
+%  \begin{cases}
+%    \min_{n'\in n.\scchildren} \scvalue(n') & \textrm{if}~n.\sctype = \scmin \\
+%    \E_{n'\sim n.\scchildren}[\scvalue(n')] & \textrm{if}~n.\sctype = \scexpect \\
+%    n.\scvalue & \textrm{if}~n.\sctype = \scvalue
+%  \end{cases}.
+%\end{align*}
+%Additionally, an expectimin policy $\pi^*$ at a $\scmin$ node returns the child with the minimum value: $\pi^*(n) = \argmin_{n' \in n.\scchildren} \scvalue(n')$.
+%As a concrete example, consider the expectimin tree in \figureref{mcts}. The value of the root node $n_1^0$ is,
+%\begin{align*}
+%  \scvalue(n_1^0) &= \min_{n_1^0.n_i^1} \E_{n_1^0.n_i^1.n_j^2} \left[\min_{n_1^0.n_i^1.n_j^2.n_k^3} \E_{n_1^0.n_i^1.n_j^2.n_k^3.n_l^4} \left[n_1^0.n_i^1.n_j^2.n_k^3.n_l^4.\scvalue \right] \right].
+%\end{align*}
+%
+%\paragraph{Choosing queries $q_m$ with an expectimax tree.}
+%Let us now formalize our decision problem as an expectimin tree, $\sT$.
+%The nodes of the tree need to encapsulate as current state, the current time, $t$, the list of queries pending responses $Q = \{(q_1, t_1), \ldots, (q_m, t_m)\}$, where $q_i$ are the queries and $t_i$ is the time at which the query responds (we will compute an expectation over this quantity) and the received responses $Z = \{z_1, \ldots, z_l\}$.
+%Without loss of generality, assume that $Q$ is sorted so that $t_1$ is closest in time to $t$.
+%Let the root of $\sT$ be the $\min$ node $\scchoose(t, Q, Z)$, 
+%with children $\scchoose(t, Q, Z).\turnin$, $\scchoose(t, Q, Z).\wait$ and $\scchoose(t, Q, Z).\query(q)$ for $q \in [n]$.
+%$\scchoose(t, Q, Z).\turnin$ is a $\scvalue$ node with value equal to the expected loss of making a prediction in the current state:
+%\[
+%\scchoose(t, Q, Z).\turnin.\scvalue 
+%= \E_{\by \sim \p(\cdot \given \bx, Z)}[\ell_{\rmclass}(\by, \byt)] + C(Q, t).
+%\]
+%$\scchoose(t, Q, Z).\wait$ is an $\scexpect$ node children $\{\scchoose(t', Q', Z') | t' = t_1, Q' = Q \setminus (q_1, t_1) Z' = Z \union {z_{l+1}} \forall z_{l+1} \in [L]\}$.
+%Intuitively, choosing the $\wait$ node waits for the next response by advancing time and updating the query and response states.
+%Finally,
+%$\scchoose(t, Q, Z).\query(q)$ is an $\scexpect$ node that results in children 
+%$\{\scchoose(t, Q', Z) | Q' = Q \union (q, t'), t' = t + \tau_q, \tau_q \sim \Gamma\}$: the $\query$ node places a new query and its expected time of response to $Q$. 
+%
+%\figureref{mcts} shows a simplified tree ignoring time constructed with a single query in flight; the root node is $\scchoose(\cdot, \{(q_1, t_1)\}, \{\})$. The branch on the left shows the expansion of the game tree along the child that chooses to query immediately, while the branch on the right considers the case where we wait to receive the first response ($z_1$) before querying ($q_2$).
+%In the latter scenario, we may choose not to query again if the response we receive provides enough information.
 
 %As described in \sectionref{model}, we would like to select and schedule several requests for labels to maximize our accuracy on predictions while trading off the cost and response time. 
 %We view the problem in the Bayesian decision theoretic setting: what is the optimal behavioral policy under our current beliefs?
@@ -83,10 +83,14 @@ In the latter scenario, we may choose not to query again if the response we rece
 
 \paragraph{Efficient Monte Carlo approximation.}
 
-In order to compute the exact expectimax policy, we would need to integrate over an infinite number of states because of time. 
-Independent of time, the number of possible responses states grows exponentially with the number of queries in the tree, making any form of exact inference intractable.
-As a reasonable heuristic, we use a Monte Carlo based approximation to estimate the value of a state, as described in \algorithmref{mcvts}.
-The algorithm is an adaptation of the popular Monte Carlo tree search algorithm\needcite{} that augments the UCT decision heuristic by using a linear value approximation: $\scvalue^f(n) = \rho^\top \sigma(n)$, where $\rho$ are learned parameters and $\sigma$ are features of the state. 
+Computing the optimal policy is intractable, especially because of the addition of continuous time.
+We propose an approximate algorithm that combines ideas from both TD learning
+\citep{sutton1988learning} and Monte Carlo Tree Search (MCTS)
+\citep{kocsis2006bandit}, which have been successful in game playing.
+Our algorithm (\algorithmref{mcvts})
+that uses the UCT decision rule of MCTS but with a linear value approximation:
+$\scvalue^f(s) = w \cdot \psi(s)$,
+where $\psi$ are features of the state $s$ and $w$ are learned weights.
 
 Briefly, Monte Carlo tree search estimates values of $\scexpect$ nodes by sampling its children.
 The UCT decision heuristic treats each $\scmin$ node as a bandit problem and discovers the child with minimum value.

@@ -78,7 +78,7 @@ through various conditioning and marginalization operations.
 We now define the utility of the game at time $t$, which consists of two terms:
 The first is the expected accuracy of the MAP estimate according to the model's best guess of $\by$ at time $t$;
 for zero-one accuracy, this would be simply the probability of the MAP.
-The second is a penalty of $\weightmoney$ for spending $m$ cents per $k$ queries
+The second is a penalty of $\weightmoney$ for spending $m$ cents per each of $k$ queries
 and $\weighttime$ for taking $t$ units of time.
 Formally, the utility is defined as follows:
 \begin{align}
@@ -91,7 +91,46 @@ Importantly, we are only conditioning on the responses $\br[t]$ that are availab
 
 Having defined the simulation dynamics and utility, we can now define the full game tree,
 which is an extension of our initial example in \figureref{piano-roll}(right).
-\pl{TODO}
+The technical challenge here is to incorporate the modeling of continuous time
+into a traditionally discrete game tree.
+A naive approach might be to discretize time and treat each level of the game
+tree as a time step, but this discretization is inefficient.
+Our strategy is to consider only represent game states corresponding to pivotal times $t$
+and model waiting times as random actions played by the crowd.
+%\citep{guo2009continuous}
+
+% Game state, abstract goal
+More formally, a \emph{game state} $s = (\now, \bq, \bs, \br, \bt)$
+consists of the current time $t$, the queries $\bq$ issued at time $\bs$,
+responses $\br$ that have be received at time $\bt$.
+We assume that all queries $q_1, \dots, q_{k-1}$ have been issued,
+but the last query $q_k$ has yet to be;
+and some subset of responses in $r_1, \dots, r_{k-1}$ have been received,
+and the rest are ``in flight.''
+We focus on the problem of deciding (i) what to query ($q_k$)
+and (ii) when to query ($s_k$) to maximize expected utility
+at some future $\deadline$ (see \figureref{piano-roll}(left) for reference).
+Recall the intuition: if $\deadline$ is near, then we would want to sample
+many things in parallel; otherwise, we should operate more sequentially,
+which provides more adaptivity.
+
+% Describe game tree
+At each state $s$ in the game tree where it's the system's turn,
+we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new)
+or wait until ($q_k = \emptyset$);
+the successor state simply incorporates $q_k$.
+If it's the crowd's turn,
+then we sample the time of the first ``in flight'' response along with its value.
+Formally, let $F = \{ 1 \le j \le k-1 : q_j \neq \emptyset \wedge r_j = \emptyset \}$ be the ``in flight'' queries.
+Sample $t_j$ according to the time delay model for each $j \in F$
+and take the earliest event $j^* = \arg\min_{j \in F} t_j$;
+the actual response $r_{j^*}$ is drawn independently from the dynamics model conditioned on the queries and responses
+in the state $s$;
+the successor state incorporates $r_{j^*}$ and $t_{j^*}$ and advances time from $\now$ to $t_{j^*}$.
+Technically, the optimal strategy might be to wait for an intermediate amount of time before $t_{j^*}$,
+so our restriction to considering decisions only at response times is an approximation.
+
+\pl{add example}
 
 %\paragraph{Prediction model.}
 % PL: form isn't relevant here since later we use other types of models anyway
