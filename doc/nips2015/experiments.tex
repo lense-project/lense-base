@@ -76,7 +76,7 @@ Each dataset set was evaluated against the following four regimes:
 \begin{enumerate}
   \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
   \item {\bf Offline baseline}: The best possible offline system, without querying during classification. Trains on gold labels for all the examples seen so far, then returns MLE for $\hat{y}$.
-  \item {\bf Entropic threshold}: A heuristic agent that can make queries on $x$ based entropy thresholds: the agent queries any labels that it estimates have a marginal risk above a threshold of $0 < k < 1$, where we used $k = 0.88$, which was chosen by cross-validation. The agent discounts risk on nodes with queries in-flight by a heuristic multiple $j < 1$ determined by the human error model. This agent does not do any marginal inference.
+  \item {\bf Entropic threshold}: A heuristic agent that can make queries on $x$ based entropy thresholds: the agent queries any labels that it estimates have a marginal risk above a threshold of $0 < k < 1$, where we used $k = 0.88$, which was chosen by cross-validation. The agent discounts risk on nodes with queries in-flight by a heuristic multiple $j < 1$ determined by the human error model. This agent does not do any lookahead marginal inference or simulation.
   \item {\bf LENSE:} Our full system as described in \sectionref{async}.
 \end{enumerate}
 
@@ -170,3 +170,7 @@ We note that although our model is receiving supervisition signal at roughly 1/1
   \caption{A figure showing that increasing model capacity with richer distributional features (red line) enables the model to reduce costs further over time, compared with a simpler bag-of-words model with less representational capacity (green line).}
 \label{fig:sentiment-tradeoff}
 \end{figure}
+
+\paragraph{Why is the Entropic threshold system so much better on sentiment and faces?}
+LENSE exploits structure in the model when querying, and so outperforms the Entropic threshold in the presence of structure (see NER task results).
+However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the Entropic threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
