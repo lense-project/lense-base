@@ -11,7 +11,9 @@
 
 \begin{figure}[t]
   \begin{centering}
-  \includegraphics[width=1.0\textwidth]{figures/piano-roll.pdf}
+  \includegraphics[width=0.49\textwidth]{figures/piano-roll.pdf}
+  \hfill
+ \includegraphics[width=0.49\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}
   \end{centering}
   \caption{}
 \label{fig:piano-roll}
@@ -23,21 +25,18 @@ Initially, our model is uncertain about both ``George'' and ``str''.
 We first query the crowd for a label on ``George'' ($q_1$) and then for a label on ``str'' ($q_2$). 
 After some time, the crowd responds with the label \scloc{} on both ``George'' ($r_1$) and ``str'' ($r_2$).
 At this point, the model is confident in its labeling, and we can turn in its prediction $\byt$.
-By querying the crowd, our model is able to produce a more accurate output, but we incur a cost for the queries as well as a time delay, $t$.
+By querying the crowd queries $\bq = (q_1, q_2)$, we are not only able to produce a more accurate output, but can also use the responses $\br = (r_1, r_2)$ to train a better model.
 
-We would like to reason about the trade offs between accuracy, time and cost in a Bayesian decision theoretic framework.
-Suppose the true output for the input $\bx$ was $\by$.
-Let the (unobserved) reward at each step be the accuracy, $1 - \ell(\by, \byt)$.
-Our utility is then 
-\begin{align*}
-u &= 1 - \ell(\by, \byt) + C(Q, t),
-\end{align*}
-where $Q = (q_1, q_2)$ is the sequence of queries made on the example and $t$ is the time so far.
+Of course, querying the crowd also incurs a cost for the queries as well as a time delay, $t$: $C(\bq, t)$.
+In general, we want to maximize our accuracy by making queries while trading off the cost and time delay introduced.
 
-We do not get to observe the labels $\by$, so instead our objective is to maximize our expected utility under our model:
-\begin{align*}
-  u &= \E_{\by \sim \p}[1 - \ell(\by, \byt) + C(Q, t)].
-\end{align*}
+% We cast this problem in the Bayesian decision theoretic framework: our objective is to maximize our expected utility under our current model,
+% $\p(\by \given \bx, \br)$:
+% \begin{align*}
+%   u &= \E_{\by \sim \p(\cdot \given \bx, \br)}[1 - \ell(\by, \byt) + C(\bq, t)].
+% \end{align*}
+
+\ac{Probably should talk more about training.}
 
 %We receive a stream of inputs $\bx\oft1, \bx\oft2, \ldots, \bx\oft N$ with corresponding {\em unobserved\/} true output $\by\oft1, \by\oft2, \ldots, \by\oft N$ that we would like to predict.
 %For each input $\bx$, we may query the crowd several times. Let $Q = \{q_1, \ldots, q_m\}$ be the set of queries.
