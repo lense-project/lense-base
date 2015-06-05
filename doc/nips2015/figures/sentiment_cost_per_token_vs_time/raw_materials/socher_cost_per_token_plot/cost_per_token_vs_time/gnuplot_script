@@ -1,0 +1,8 @@
+set nokey
+set terminal png medium
+set output "results/sentiment/artificial_human/cost_per_token_plot/cost_per_token_vs_time/cost_per_token_vs_time.png"
+set title 'cost per token vs time'
+set xlabel 'time'
+set ylabel 'cost per token'
+plot 'rich-features.dat' with lines, \
+    'light-features.dat' with lines

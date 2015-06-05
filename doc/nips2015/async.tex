@@ -5,7 +5,8 @@
 We now return to task of minimizing the objective in \equationref{objective}.
 For a single input $\bx\oft t$, we must optimize over a set of queries $Q\oft{t}$ to minimize the single-step loss:
 \begin{align*}
-  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
+  \ell\oft{t} &= \min_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}) \\
+  Q\oftt{t}{*} &= \argmin_{Q\oft{t}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C(Q\oft{t}, \tau\oft{t}),
 \end{align*}
 where $\byt\oft t = \argmin_{\by} \p(\by \given \bx \oft t, \bz\oft t)$ is the MAP estimate given responses $\bz\oft t$ and $\tau\oft t$ is the time taken to execute the queries.
 
@@ -13,7 +14,7 @@ The choice of $Q\oft{t}$ can be reduced to a sequence of queries: $q_1, q_2, \ld
 To keep things tractable, let $Q\oft{t}$ be constructed by picking one query at a time:
 given that we have already made queries $q_1, \ldots, q_{m-1}$, we choose the next query $q_m$ to optimize the loss,
 \begin{align}
-  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
+  q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} \ell_{\rmclass}(\by\oft{t}, \byt\oft{t}) + C((q_1, \ldots, q_m), \tau(q_1, \ldots, q_m)), \label{eqn:one-step-q}
 \end{align}
 where we have extended the domain of $q_m$ to include the symbol $\emptyset$ that denotes {\em not\/} making a query, and returning the current prediction.
 
@@ -22,7 +23,7 @@ Instead, we propose to optimize the expected loss under our model, {\em given th
 For example, if we choose $q_m$ before receiving responses from the previous queries $q_{1:m-1}$ we can optimize the following expression:
 \begin{align}
   q_m^* &= \argmin_{q_m \in \{\emptyset, 1, \ldots n\}} 
-  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
+  \E_{z_1, z_2, \ldots, z_{m}}[\E_{\by \sim \p(\cdot \given \bx\oft t, z_1, \ldots z_m)}[\ell_{\rmclass}(\by, \byt\oft{t})]] + \E_{\tau}[C((q_1, \ldots, q_m), \tau)]. \label{eqn:cumbersome}
 \end{align}
 The expressions to choose $q_m$ after waiting for some responses are cumbersome, but can be easily represented using an expectimin tree.
 
@@ -62,7 +63,7 @@ with children $\scchoose(t, Q, Z).\turnin$, $\scchoose(t, Q, Z).\wait$ and $\scc
 $\scchoose(t, Q, Z).\turnin$ is a $\scvalue$ node with value equal to the expected loss of making a prediction in the current state:
 \[
 \scchoose(t, Q, Z).\turnin.\scvalue 
-= \E_{\by \sim \p(\cdot \given \bx, Z)}[\ell(\by, \byt)] + C(Q, t).
+= \E_{\by \sim \p(\cdot \given \bx, Z)}[\ell_{\rmclass}(\by, \byt)] + C(Q, t).
 \]
 $\scchoose(t, Q, Z).\wait$ is an $\scexpect$ node children $\{\scchoose(t', Q', Z') | t' = t_1, Q' = Q \setminus (q_1, t_1) Z' = Z \union {z_{l+1}} \forall z_{l+1} \in [L]\}$.
 Intuitively, choosing the $\wait$ node waits for the next response by advancing time and updating the query and response states.

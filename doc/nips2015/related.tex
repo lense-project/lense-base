@@ -1,33 +1,30 @@
 \section{Related Work}
 \label{sec:related}
 
-\todo{(arun): This section is currently a whole page long! We need to cut somewhere}
-
-Our work brings together ideas from the active classification and learning literature as well as literature on collective intelligence systems from the human computer interaction community.
-Our focus has been to address the practically relevant questions that arise at the watershed of these two fields: how to optimally classify instances in {\em real-time} allowing {\em queries} to {\em noisy oracles}. 
+Our work brings together ideas from active learning, active classification and collective intelligence systems (crowdsourcing).
+%the active classification and learning literature as well as literature on collective intelligence systems from the human computer interaction community.
+%Our focus has been to address the practically relevant questions that arise at the watershed of these two fields: how to optimally classify instances in {\em real-time} allowing {\em queries} to {\em noisy oracles}. 
 In this section, we review prior work and situate our own work within the literature.
+%We also contrast our system with the popular active learning and active classification literature.
 
-\paragraph{Active learning and active classification}
-In the traditional active learning setup, we are provided a large pool of unlabeled instances from which we must chose a subset to label. The goal is to pick a subset that minimizes the risk of the classifier obtained by training on that subset. 
-Active learning has also been studied in the so-called streaming setting~\cite{agarwal2013selective,cheng2013feedback,chu2011unbiased,helmbold1997some,vzliobaite2011active} where the pool of examples is divided into smaller chunks; the most useful instances within each chunk are chosen to be labeled.
-In either case, such a pool of examples is not available in our setting and we must make querying decisions sequentially on each input, i.e.\ at test time.
-Our decision criteria is no longer which instance is optimal to label, but whether (partially) labeling an instance is worth the cost or not.
+\paragraph{Active learning and classification.}
+Active learning\footnote{We refer the readers to~\cite{settles2010active} for a survey of active learning methods and variants.} is a popular approach to minimize the labeled data required to train a classifier. 
+Several authors in the active learning community have considered using crowd workers as a noisy oracle~\cite{yan2011active,vijayanarasimhan2014large}.
+However, active learning optimizes over the choice of a subset of a pool of unlabeled that minimizes the risk of the classifier obtained by training on that subset. 
+In contrast, on-the-job learning does not get to observe unlabeled data, is allowed to query at test time and must minimize the risk of that example (while trading off cost and latency).
 
-Active classification~\cite{greiner2002learning} also makes decisions at test time, but tries to find the {\em most informative feature} to measure.
+Closely related is active classification~\cite{greiner2002learning,chai2004test,esmeir2007anytime} which asks what is the {\em most informative feature\/} to measure at test time.
 One could view our measurements as high-informative features, however our work differs in two respects: we never get to actually observe the true labels and our system is evaluated on regret as opposed to classifier risk.
-Greiner et al.~\cite{greiner2002learning} study the theoretical properties of active classification with the PAC framework.
-Chai et al.~\cite{chai2004test} and Esmeir et al.~\cite{esmeir2007anytime} propose algorithms for active classification in the context of naive Bayes and decision trees respectively. Both algorithms rely on having a fully labeled dataset which is used to learn when certain features should be queried.
+Existing active classification algorithms rely on having a fully labeled dataset which is used to learn when certain features should be queried.
 
-Despite the differences highlighted above, literature on active learning and active classification is very relevant because of the application of Bayesian decision theory to graphical models. 
-Settles et al.~\cite{settles2008analysis} compare different utility choices when querying for complete labels for a CRF sequence model.
+%Settles et al.~\cite{settles2008analysis} compare different utility choices when querying for complete labels for a CRF sequence model.
 There is little existing work on querying a subset of the labels within a single structured output problem.
 Angeli et al.~\cite{angeli2014combining} identify instances to label within a cluster of examples in a distantly supervised setting. While this choice was a subset of the labels in the graphical model, interactions between other labels in cluster were not considered.
-Liang et al.~\cite{liang09measurements} introduced the measurement framework and studied the problem of active selection of measurements. However, the measurements considered were aggregated across the dataset (e.g.\ the expected proportion of a label), rather than label measurements within an instance.
+Liang et al.~\cite{liang09measurements} introduced the measurement framework and studied the problem of active selection of measurements in the active learning setting. 
+%However, the measurements considered were aggregated across the dataset (e.g.\ the expected proportion of a label), rather than label measurements within an instance.
+\pldone{well, within an example in some sense is a special case and the easy part, so you shouldn't use this as the contrast}{hopefully contrasting with active learning is sufficient for measurments?}
 
-\pl{well, within an example in some sense is a special case and the easy part, so you shouldn't use this as the contrast}
-
-Finally, existing work~\cite{donmez2008proactive,golovin2010near,yan2011active,vijayanarasimhan2014large} has considered choosing measurements from multiple noisy oracles with heterogeneous costs.
-We refer the reader to \cite{settles2010active} for a survey of active learning and its variants.
+%We refer the reader to \cite{settles2010active} for a survey of active learning and its variants.
 
 
 % This is more of a UI sort of thing, not really useful to us.
@@ -50,13 +47,13 @@ We refer the reader to \cite{settles2010active} for a survey of active learning 
 % Bayesian priors we use not.
 %Finally Bayesian active learning (\cite{golovin2010near},~\cite{tong2000active}) allows us to incorporate a Bayesian prior over our data, and we'll use this as a foundation for our approach to solving the asynchronous behavior problem.
 
-\paragraph{Collective intelligence systems}
-
+\paragraph{Collective intelligence systems.}
 Using crowd workers to assist labeling tasks is an area of active research within the HCI community.
-\textit{Flock}~\cite{chengflock} first crowdsources the identification of features for an image classification task, and then asks the crowd to annotate examples.
-Our work seeks to make the second step more cost-effective by only querying the crowd when needed.
-In another line of work, \textit{TurKontrol}~\cite{peng2010decision} models individual crowd worker reliability to optimize the number of human votes needed to achieve confident consensus using a POMDP.
-We also model the reliability of workers though using an unsupervised model, similar to \findcite{crowd em}.
+\textit{Flock}~\cite{cheng2015flock} first crowdsources the identification of features for an image classification task, and then asks the crowd to annotate examples.
+The system learns to classify images using a decision tree based on the features identified by the crowd.
+As a consequence, the system always relies on humans to provide features and there is no transfer of knowledge from humans to a machine learning model as in on-the-job training.
+In another line of work, \textit{TurKontrol}~\cite{dai2010decision} models individual crowd worker reliability to optimize the number of human votes needed to achieve confident consensus using a POMDP\@.
+%We also model the reliability of workers though using an unsupervised model, similar to \findcite{crowd em}.
 Finally, recent work has studied how to support real-time behavior with crowd workers~\cite{bernstein2011crowds,lasecki2013real} by hiring workers ``on retainer''.
 We use the same retainer model to maintain a pool of real-time crowd workers with low response times.
 
@@ -67,9 +64,20 @@ We use the same retainer model to maintain a pool of real-time crowd workers wit
 %Empirical studies have shown that this is an effective method for managing complex workflows \cite{peng2011artificial}.
 %Our work follows \cite{peng2010decision} in that we apply Decision Theory to the problem of when to query the crowd, but we train a model to take over for the workers over time, and we handle the additional real time response constraint.
 
-\paragraph{Partial monitoring games}
-\noteb{This bullet point is actually to motivate that our problem is theoretically feasible.}
-Our evaluation metric is unique in the active learning space in that consider a loss we do not observe because we never receive true labels.
-By treating the measurements as partial feedback, our work can be theoretically modeled as a partial monitoring game\cite{cesabianchi06regret} and, in particular, an instance of the label-efficient learning problem\cite{cesabianchi05minimizing}.
-Cesa-Bianchi et al.~\cite{cesabianchi06regret} show that in the online setting, the regret of a partial monitoring game is lower bounded by $O(T^{2/3})$, where $T$ is the number of examples seen. They also provide an algorithm that meets this bound: use the current model to pick the best label and query for complete labels at random with a small probability to update your model.
-These guarantees provide theoretical foundation for our work.
+\ac{I omitted partial monitoring games because it seems to be covered in the algo section.}
+%\paragraph{Partial monitoring games.}
+%\noteb{This bullet point is actually to motivate that our problem is theoretically feasible.}
+%Our evaluation metric is unique in the active learning space in that consider a loss we do not observe because we never receive true labels.
+%By treating the measurements as partial feedback, our work can be theoretically modeled as a partial monitoring game\cite{cesabianchi06regret} and, in particular, an instance of the label-efficient learning problem\cite{cesabianchi05minimizing}.
+%Cesa-Bianchi et al.~\cite{cesabianchi06regret} show that in the online setting, the regret of a partial monitoring game is lower bounded by $O(T^{2/3})$, where $T$ is the number of examples seen. They also provide an algorithm that meets this bound: use the current model to pick the best label and query for complete labels at random with a small probability to update your model.
+%These guarantees provide theoretical foundation for our work.
+
+% We already discussed expectimin trees in the relevant section.
+%\paragraph{Expectimin trees and game playing}
+%Monte Carlo based search methods~\cite{browne2012monte} are a common solution for finding a policy for an expectimin tree. 
+%Our usage is slightly different in that we do not need to explore infinite depth.
+%Monte Carlo tree search can be extended to continuous state spaces using progressive widening.
+%However, because so much information is shared across time, we propose a slight modification of the Dyna-2\cite{silver2008sample} algorithm which proposes features for a linear state value function.
+%we do not use separate local features because our  
+%- Using state has been explored in Dyna-2 - we do not use a separate set of local features because the state space isn't sufficiently different.
+
