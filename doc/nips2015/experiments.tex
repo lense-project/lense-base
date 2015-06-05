@@ -89,33 +89,33 @@
 % === Other stuff.
 
 In this section, we empirically evaluate our approach on three tasks. 
-While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines,
+While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
 
-\paragraph{Methods.}
-Each dataset set was evaluated against the following four methods:
+\paragraph{Baselines.}
+We evaluated the following four methods on each dataset:
 \begin{enumerate}
   \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
   \item {\bf Offline baseline}:
-    Uses a classifier that trains on the gold output for all examples seen so far, then returns the MLE as a prediction.
+    Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
     This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
-  \item {\bf Entropic threshold}: A heuristic agent that can make queries to the crowd based on entropy thresholds: the agent queries any labels that it estimates have a marginal risk above a threshold of $0 < k < 1$. We used $k = 0.88$, which was chosen by cross-validation.
-    Instead of computing the expected marginals after a response, the agent simply discounts risk on nodes with queries in-flight by a heuristic multiple $j < 1$ determined by the human error model \ac{KEENON: how is $j$ computed?}.
-    This agent does not reason about time and sends all its queries in the very beginning.
+  \item {\bf Entropic threshold}: Uses a heuristic on-the-job learning agent to make predictions. 
+    The agent queries any labels that it estimates to have a marginal probability below a threshold $k = 0.88$. % \footnote{We found $k = 0.88$ to give the best results on our datasets.}
+    Instead of computing the expected marginals over the responses to queries in flight, the agent simply reduces the uncertainty by a factor of $0.3$ and makes multiple requests until the threshold is crossed. Predictions are made using MLE on the model given responses.
+    The agent does not reason about time and makes all its queries at the very beginning.
   \item {\bf LENSE:} Our full system as described in \sectionref{async}.
 \end{enumerate}
 
 To initialize parameters for the model-based methods, we used a burn-in period of 40 examples which were used to get labels on everything. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
-We did not update parameters for the delay and response models online.
+We do not update parameters for the delay and response models online.
 
 \paragraph{Implementation and crowdsourcing setup.}
 We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
-To minimize systematic errors due to misunderstanding the task,
-the workers were given a short tutorial on each task before joining the pool. 
-Workers were paid \$1.0 to join the retainer pool, and an additional \$0.01 for each response they gave.
-We found that worker response times are generally in the range of 3-6 seconds for the NER task, 10-15 seconds for sentiment, and 2-4 seconds for the faces.
+The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
+We paid Workers \$1.0 to join the retainer pool and an additional \$0.01 per query.
+Worker response times were generally in the range of 3-6 seconds for NER, 10-15 seconds for Sentiment, and 2-4 seconds for Faces.
 
-When running experiments, we found that the results exhibited a high variance based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
-To control for the variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
+When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
+To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
 During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
 Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
 
@@ -134,13 +134,15 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 
 \paragraph{Summary of results.}
 \tableref{results} summarizes the performance of the methods on the three tasks.
-On all 3 datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, there are fewer queries to chose from, but we are still able to reduce costs for comparable accuracy by a factor of 3-4.
+On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
+On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 3-4.
+For the latter two tasks, both on-the-job learning methods, entropic threshold baseline and LENSE, perform comparably.
+The simple heuristic adopted by the entropic threshold baseline is sufficient to reason about expected marginals on both these tasks because they are single label prediction tasks which do not involve any interactions between labels.
 
 %\paragraph{Does the model respect accuracy preferences?} 
-\figureref{ner-running-f1} demonstrates that LENSE is able to consistently outperform other baselines.
-This should not be surprising because we use crowd supervision.
-However, as shown in \figureref{ner-running-f1}, we are able to steadily reduce the number of queries by a factor of 2 over time.
+\figureref{ner-running-f1} tracks the performance and cost of LENSE over time on the NER task.
+LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
+On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the entropic threshold baseline with fewer queries by waiting for responses before making another query.
 
 % == DEV F1
 %We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
@@ -148,30 +150,33 @@ However, as shown in \figureref{ner-running-f1}, we are able to steadily reduce 
 
 % === Compare with entropic threshold
 %\paragraph{Why is the Entropic threshold system so much better on sentiment and faces?}
-LENSE exploits structure in the model when querying, and so outperforms the Entropic threshold in the presence of structure (see NER task results).
-However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the Entropic threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
+%LENSE exploits structure in the model when querying, and so outperforms the Entropic threshold in the presence of structure (see NER task results).
+%However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the Entropic threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
 
 %We note that although our model is receiving supervisition signal at roughly 1/15 the rate of a fully observed online learning scenario\footnote{this calculation assumes ``fully observed'' is approximated by 3 human labels per example}, we track roughly parallel to the fully supervised line.
 
-\paragraph{In the limit do we still need the crowd?}
-While on-the-job training allows us to deploy quickly and ensure good results, we would like to eventually perform without crowd supervision.
+%\paragraph{In the limit, would LENSE still need crowd supervision?}
+While on-the-job training allows us to deploy quickly and ensure good results, we would like to eventually operate without crowd supervision.
 %In order to do so, we must ensure that our model has the capacity to keep learning from the crowd.
 \figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{bigrams} and \textsc{rnn} (as described in \tableref{datasets}).
-With the simpler feature set (\textsc{bigrams}) 
-the model saturates early and we must compensate for our lack in representational capacity with more queries to the crowd.
-On the other hand, using the richer features (\textsc{rnn}) the model learns from the crowd's supervision and reduces costs.
-This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
-It is important to note that even when the model capacity is limited, LENSE is able to guarantee a consistent, high level of performance.
+With simpler features (\textsc{bigrams}),
+the model saturates early and we will continue to need to query to the crowd to achieve our accuracy target (as specified by the loss function).
+On the other hand, using richer features (\textsc{rnn}) the model is able to learn from the crowd and the amount of supervision needed reduces over time.
+%This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
+Note that even when the model capacity is limited, LENSE is able to guarantee a consistent, high level of performance.
 
-\paragraph{When does LENSE query?}
-During the initial stages of learning for the NER task, we observed that LENSE made multiple queries on all tokens.
-The number of such queries quickly dropped and instead, LENSE focused on querying new unseen entity tokens.
-Consider the following example taken from our run logs: \textit{``U.S.\ says still committed to Cuba migration pacts''}.
-%For example, after seeing \ac{600} examples, 
-The system, having never seen the token ``Cuba'' before, starts with a belief that ``Cuba'' is 59\% \scper, 37\% \scloc{} and 3\% \scnone.
-The model has already seen ``U.S.'' and predicts that it is a \scloc{} with 97\% probability.
-It immediately fires off two queries about ``Cuba'', and waits 4 seconds for both responses to return \scloc{}.
-The model now believes that ``Cuba'' is \scloc{} with 95\% probability, and decides to turn in its current guess.
+% -- CUT
+%\paragraph{When does LENSE query?}
+%During the initial stages of learning for the NER task, LENSE made multiple queries on all tokens.
+%After a few examples, though, LENSE focused its queries on unseen entity tokens.
+%Consider the following example taken from our run logs: \textit{``U.S.\ says still committed to Cuba migration pacts''}.
+%%For example, after seeing \ac{600} examples, 
+%The model has already seen {\it U.S.\/} and predicts that it is a \scloc{} with 97\% probability.
+%On the other hand, having never seen the token {\it Cuba\/} before, the model starts with a belief that {\it Cuba\/} is 59\% \scper, 37\% \scloc{} and 3\% \scnone.
+%It immediately fires off two queries about {\it Cuba\/} and waits 4 seconds for both responses to return \scloc{}.
+%The model now believes that {\it Cuba\/} is \scloc{} with 95\% probability and returns its prediction.
+%This demonstrates that using the model allows LENSE to focus supervision to where it is needed.
+
 
 % \paragraph{Are we learning a good model?}
 % We receive very noisy and sparse supervision.
