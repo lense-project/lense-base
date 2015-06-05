@@ -16,21 +16,25 @@
 \label{fig:crf}
 \end{figure}
 
-\afterpage{\noindent\begin{figure}
-  \begin{centering}
-    \begin{subfigure}[b]{0.58\textwidth}
-      \includegraphics[width=\textwidth]{figures/piano-roll.pdf}
-      \caption{Structured predicition behavior over time}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.38\textwidth}
-      \includegraphics[width=\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}\\[1.7ex]
-      \caption{Single-query gametree}
-    \end{subfigure}
-  \end{centering}
-\label{fig:piano-roll}
-\caption{Example behavior while running structure prediction on the tweet ``Soup on George str.''}
-\end{figure}}
+%\afterpage{\noindent
+%\begin{figure}
+%  \begin{centering}
+%    \begin{subfigure}[b]{0.58\textwidth}
+%      \includegraphics[width=\textwidth]{figures/piano-roll.pdf}
+%      \caption{Structured prediction behavior over time}
+%    \end{subfigure}
+%    \hfill
+%    \begin{subfigure}[b]{0.38\textwidth}
+%      \includegraphics[width=\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}\\[1.7ex]
+%      \caption{Single-query game tree}
+%    \end{subfigure}
+%  \end{centering}
+%\caption{Example behavior while running structure prediction on the tweet ``Soup on George str.''
+%We omit the \scres{} from the game tree for visual clarity.
+%}
+%\label{fig:game-tree}
+%\end{figure}
+%}
 
 % Define structured prediction
 Consider a structured prediction problem from input $\bx = (x_1, \dots, x_n)$ to output $\by = (y_1, \dots, y_n)$.
@@ -47,7 +51,7 @@ we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain tags
 for any positions in $\bx$.
 The responses $r_1, r_2, \dots$ come back asynchronously,
 which are incorporated into our current prediction model $p_\theta$.
-\figureref{piano-roll}(left) shows one possible outcome:
+\figureref{piano-roll}~(left) shows one possible outcome:
 we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$;
 in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
 When we have sufficient confidence about the entire output,
