@@ -88,10 +88,10 @@ We propose an approximate algorithm that combines ideas from both TD learning
 \citep{sutton1988learning} and Monte Carlo Tree Search (MCTS)
 \citep{kocsis2006bandit}, which have been successful in game playing.
 Our algorithm
-that uses the UCT decision rule of MCTS but instead of estimating a separate value for each node,
+uses the UCT decision rule of MCTS but instead of estimating a separate value for each node,
 we use a parametrized value function to share information across nodes:
 $V(s) = w \cdot \psi(s)$, where $\psi$ are features of the state $s$ and $w$ are learned weights.
-\algorithmref{mcvts} gives the pseudocode of our approach:
+\algorithmref{mcvts} gives the pseudocode of our approach.
 On the system's turn, we choose the action that maximizes
 the sum of two terms: the first corresponding to the estimated value (exploitation),
 and the second depending on the number of visits (exploration).
@@ -135,7 +135,7 @@ On the crowd's turn, we sample from distribution given by the simulation dynamic
     \ElsIf{crowd's turn}
       \State $s'$ drawn based on (\ref{eqn:dynamics})
       \Comment Sample a child
-      \State \Return \Call{monteCarloValue}{$n'$}
+      \State \Return \Call{monteCarloValue}{$s'$}
     \ElsIf{leaf node}
     \State \Return utility $U$ of $s$ according to (\ref{eqn:utility})
     \EndIf
