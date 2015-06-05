@@ -237,7 +237,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
       mutableAnalysis.+=(fn(pair))
       i += 1
       if (i % 1 == 0) {
-        analyzeOutput(mutableAnalysis.toList, hcuPool, devPairs, mutableResultSet, saveTitle)
+        analyzeOutput(mutableAnalysis.toList, hcuPool, devPairs, mutableResultSet, saveTitle, quickUpdate = (i % 100 != 0))
       }
       if (i % 50 == 0) {
         analyzeConfidence(goldPairs, saveTitle, i)
@@ -766,7 +766,7 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
   }
 
   // Prints some outputs to stdout that are the result of analysis
-  private def analyzeOutput(l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)], hcuPool : HCUPool, goldPairs : List[(Input, Output)], mutableResultSet : mutable.ListBuffer[ResultSet], outputPath : String = "default") : Unit = {
+  private def analyzeOutput(l : List[(Model, Map[ModelVariable, String], Map[ModelVariable, String], PredictionSummary)], hcuPool : HCUPool, goldPairs : List[(Input, Output)], mutableResultSet : mutable.ListBuffer[ResultSet], outputPath : String = "default", quickUpdate : Boolean = false) : Unit = {
     var correct = 0.0
     var incorrect = 0.0
 
@@ -886,13 +886,14 @@ abstract class LenseUseCase[Input <: Any, Output <: Any] {
 
     // Record performance over time
 
-    val machinePerformance = analyzeClassifierPerformance(goldPairs)
+    val machinePerformance = if (quickUpdate) (0.0, 0.0, 0.0) else analyzeClassifierPerformance(goldPairs)
     val machinePrecision = machinePerformance._1
     val machineRecall = machinePerformance._2
     val machineF1 = machinePerformance._3
 
     def nanSafe(d : Double) = if (d.isNaN) 0.0 else d
     mutableResultSet += ResultSet(nanSafe(mainPrecision), nanSafe(mainRecall), nanSafe(mainF1), nanSafe(machinePrecision), nanSafe(machineRecall), nanSafe(machineF1))
+    if (quickUpdate) return
 
     // Print the actual output guess and gold
 

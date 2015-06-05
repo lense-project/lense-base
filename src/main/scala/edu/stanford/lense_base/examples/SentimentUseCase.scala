@@ -1,6 +1,6 @@
 package edu.stanford.lense_base.examples
 
-import java.io.FileInputStream
+import java.io.{BufferedWriter, FileWriter, FileInputStream}
 import java.util.Properties
 
 import edu.stanford.lense_base.gameplaying.{SamplingLookaheadOneHeuristic, MCTSGamePlayer, ThresholdHeuristic, GamePlayer}
@@ -53,7 +53,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     new StanfordCoreNLP(props)
   }
 
-  val useSocherEmbeddings = true
+  val useSocherEmbeddings = false
 
   override def labelTypes: List[String] = List("POS", "NEG")
 
@@ -68,12 +68,36 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
 
   override def initialTrainingData : List[(String, String)] = trainSet
 
+  val sentimentDevSet = devSet
+
   lazy val logisticModelStream : ModelStream = new LogisticExternalModelStream[String](humanErrorDistribution, labelTypes) {
+    override def devPairs = sentimentDevSet
 
     val socherEmbeddingsCache = mutable.Map[String, Map[String, Double]]()
+
+    def initializeEmbeddingsCache() = {
+      for (line <- Source.fromFile("data/sentiment/socher_cache.txt").getLines()) {
+        val parts = line.split("\t")
+        if (parts.size > 1) {
+          try {
+            val input = parts(0)
+            val features = parts.slice(1, parts.size).zipWithIndex.map(pair => "emb" + pair._2 -> java.lang.Double.parseDouble(pair._1)).toMap
+            socherEmbeddingsCache.put(input, features)
+          }
+          catch {
+            case e : Throwable => System.err.println("Failed to parse Socher cache line: "+line)
+          }
+        }
+      }
+      println("Recovered "+socherEmbeddingsCache.size+" embeddings")
+    }
+
+    initializeEmbeddingsCache()
+
     override def getFeatures(input: String): Map[String, Double] = {
       val embeddingFeatures = if (useSocherEmbeddings) {
         if (!socherEmbeddingsCache.contains(input)) {
+          println("Parsing: "+input)
           val annotation: Annotation = new Annotation(input)
           coreNLP.annotate(annotation)
           val sentences = annotation.get(classOf[SentencesAnnotation])
@@ -87,6 +111,25 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
             for (i <- 0 to 24) embeddings.set(i, embeddings.get(i) + predictions.get(i))
           }
           socherEmbeddingsCache.put(input, embeddings.zipWithIndex.map(pair => "emb:" + pair._2 -> pair._1).toMap)
+
+          this.synchronized {
+            val bw = new BufferedWriter(new FileWriter("data/sentiment/socher_cache.txt"))
+
+            System.out.println("Flushing Socher embeddings to cache...")
+
+            for (pair <- socherEmbeddingsCache) {
+              bw.write(pair._1)
+              bw.write("\t")
+              val doubles = pair._2.toList.sortBy(_._2).map(_._2)
+              for (d <- doubles) {
+                bw.write(""+d)
+                bw.write("\t")
+              }
+              bw.write("\n")
+            }
+
+            bw.close()
+          }
         }
         socherEmbeddingsCache(input)
       }
@@ -146,7 +189,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
    */
   override def lossFunction(mostLikelyGuesses: List[(ModelVariable, String, Double)], cost: Double, ms: Long): Double = {
     val uncertainty = 1 - mostLikelyGuesses(0)._3
-    uncertainty + cost*1.5
+    uncertainty + cost*1.0
   }
 
   override val maxLossPerNode : Double = {
@@ -229,7 +272,7 @@ class SentimentUseCase extends LenseMulticlassUseCase[String] {
     (introText, cheatSheet, list.toList)
   }
 
-  override def gamePlayer : GamePlayer = new SamplingLookaheadOneHeuristic(humanErrorDistribution, humanDelayDistribution)
+  override def gamePlayer : GamePlayer = ThresholdHeuristic // new SamplingLookaheadOneHeuristic(humanErrorDistribution, humanDelayDistribution)
 
   def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
     variable.payload.asInstanceOf[String]
@@ -240,7 +283,7 @@ object SentimentUseCase extends App {
   val sentimentUseCase = new SentimentUseCase()
 
   val poolSize = 4
-  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+  sentimentUseCase.testWithArtificialHumans(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human_threshold_log_reg")
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
   // sentimentUseCase.testBaselineForAllHuman(sentimentUseCase.testSet, sentimentUseCase.devSet, sentimentUseCase.humanErrorDistribution, sentimentUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
   // sentimentUseCase.testBaselineForOfflineLabeling(sentimentUseCase.testSet, sentimentUseCase.devSet)

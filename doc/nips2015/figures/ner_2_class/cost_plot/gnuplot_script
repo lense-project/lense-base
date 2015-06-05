@@ -1,9 +1,8 @@
-set nokey
-set terminal pdf
+set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 7 size 3in,2in
 set output "cost_vs_time.pdf"
-set title 'human requests vs time'
-set xlabel 'time'
-set ylabel 'human requests (floating avg)'
-plot '1-human.dat' with lines, \
-'3-human.dat' with lines, \
-'lense.dat' with lines
+set yrange [0:5]
+set xlabel 'Time'
+set ylabel 'Human requests (floating avg)'
+plot '1-human.dat' with lines title '1 vote baseline', \
+'3-human.dat' with lines title '3 vote baseline', \
+'lense.dat' with lines title 'LENSE'

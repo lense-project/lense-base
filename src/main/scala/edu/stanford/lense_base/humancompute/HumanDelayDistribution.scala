@@ -26,3 +26,7 @@ case class ClippedGaussianHumanDelayDistribution(mean : Int, std : Int, rand : R
   override def sampleDelay(): Int = mean + Math.round(rand.nextGaussian() * std).asInstanceOf[Int]
 }
 
+case class FakeFastDelay() extends HumanDelayDistribution {
+  override def sampleDelay(): Int = 500
+}
+
