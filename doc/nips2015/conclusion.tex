@@ -1,17 +1,12 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We demonstrate a practical system to navigate the cost-delay-accuracy tradeoff surface by \textit{asynchronous active classification}.
- This system highlights the potential value of making the crowd available to machine-learning classifiers at test time, and we hope inspires further research in this promising direction.
+We have introduced a new framework to deploy a learning system that uses crowd supervision to train a model {\em on-the-job}.
+We addressed the problem of deciding what supervision to ask the crowd for by modeling the problem as a stochastic game played by the model and the crowd. 
+Using Monte Carlo tree search to approximate the optimal policy, we have built a system, LENSE, that is able to trade off time and money for accuracy.
+We have shown that learning on-the-job can achieve comparable accuracies to asking humans without. 
 
-Much of the research effort associated with demonstrating this system was ``plumbing,'' writing and debugging large pieces of logistical code for marshaling and managing the humans and machine learning algorithms in an asynchronous fashion.
-We have published an easily extensible and customizable base for further work in on-the-job learning, which we call LENSE (Learning from Expensive, Noisy, Slow Experts) at \url{www.anonymo.us}, that we hope reduces the logistical burden for future research.
-
-\section{Future Work}
-
-\begin{itemize}
-  \item Arbitrary measurements.
-  \item Careful model probability tuning.
-  \item Methods for producing stochastic accuracy guarantees.
-\end{itemize}
+An increasing number of problems that challenge AI today involve interactive tasks that are not suitable to conventional dataset collection, for example, dialogue or question answering.
+We envision on-the-job training as enabling these tasks.
+Of course, there are many problems for which it is hard to ask turkers to give labels. Future work: ask for partial supervision through the measurements framework.
 
