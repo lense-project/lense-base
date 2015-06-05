@@ -25,8 +25,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   lazy val dataSet = rand.shuffle(getCelebritiesSet(celebrities).map(p => (p, p.name)))
 
-  lazy val trainSet : List[(PersonImage,String)] = celebrities.map(celeb => dataSet.filter(_._1.name == celeb).head)
-  lazy val devSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d)).take(50)
+  lazy val trainSet : List[(PersonImage,String)] = celebrities.flatMap(celeb => dataSet.filter(_._1.name == celeb).take(10))
+  lazy val devSet : List[(PersonImage,String)] = dataSet.filter(d => !trainSet.contains(d)).take(100)
   lazy val testSet : List[(PersonImage,String)] = dataSet.filter(d => !(trainSet.contains(d) || devSet.contains(d)))
 
   override def labelTypes: List[String] = celebrities
@@ -36,7 +36,10 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
 
   // Sets up the model we'll be using
 
+  val personDevSet = devSet
   val logisticModelStream : ModelStream = new LogisticExternalModelStream[PersonImage](humanErrorDistribution, labelTypes) {
+    override def devPairs = personDevSet
+
     override def getFeatures(input: PersonImage): Map[String, Double] = {
       val features = input.embedding.zipWithIndex.map(pair => {
         "nn:"+pair._2 -> pair._1
@@ -44,7 +47,7 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
       features
     }
 
-    override def getSigma : Double = 0.05
+    override def getSigma : Double = 0.5
 
     /**
      * Defines the possible output values of the model
@@ -110,8 +113,11 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   override def getHumanVersionOfLabel(label: String): String = label
 
   lazy val rand = new Random()
-  override def humanDelayDistribution: HumanDelayDistribution = ObservedHumanDelayDistribution("data/person_recognition/human_latency_data.txt", rand)
-  override def humanErrorDistribution: HumanErrorDistribution = ObservedErrorDistribution("data/person_recognition/context", "data/person_recognition/confusion.csv", rand)
+  // override def humanDelayDistribution: HumanDelayDistribution = ObservedHumanDelayDistribution("data/person_recognition/human_latency_data.txt", rand)
+  override def humanDelayDistribution: HumanDelayDistribution = FakeFastDelay()
+  // override def humanErrorDistribution: HumanErrorDistribution = ObservedErrorDistribution("data/person_recognition/context", "data/person_recognition/confusion.csv", rand)
+  override def humanErrorDistribution: HumanErrorDistribution = ConfusionMatrixErrorDistribution("data/person_recognition/confusion.csv", rand)
+  // override def humanErrorDistribution: HumanErrorDistribution = EpsilonRandomErrorDistribution(0.1, rand)
 
   override def useCaseReportSubpath : String = "celebrity"
 
@@ -180,6 +186,8 @@ class PersonUseCase extends LenseMulticlassUseCase[PersonImage] {
   def getContextForHumanErrorReplay(variable : ModelVariable, model : Model) : String = {
     variable.payload.asInstanceOf[PersonImage].toString()
   }
+
+  // override def gamePlayer : GamePlayer = ThresholdHeuristic
 }
 
 case class PersonImage(name : String, index : Int, url : String) {
@@ -217,9 +225,9 @@ object PersonUseCase {
     val personUseCase = new PersonUseCase()
 
     val poolSize = 4
-    personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
+    // personUseCase.testWithArtificialHumans(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, "artificial_human")
     // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 1) // 1 query baseline
-    // personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 3) // 3 query baseline
+    personUseCase.testBaselineForAllHuman(personUseCase.testSet, personUseCase.devSet, personUseCase.humanErrorDistribution, personUseCase.humanDelayDistribution, 0.01, poolSize, 2) // 3 query baseline
     // personUseCase.testBaselineForOfflineLabeling(personUseCase.testSet, personUseCase.devSet)
     // personUseCase.testWithRealHumans(personUseCase.testSet, personUseCase.devSet, poolSize)
   }
