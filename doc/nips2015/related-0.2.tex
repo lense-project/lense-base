@@ -5,30 +5,30 @@ The on-the-job learning setting brings together two orthogonal ideas: \textbf{1)
 
 \paragraph{1) Learning classifiers in the presence of streaming optionally observed data:}
 
-Online Active learning\footnote{We refer the readers to~\cite{settles2010active} for a survey of active learning methods and variants.} is a popular approach to minimize the labeled data required to train a classifier in the presence of data that can only be observed {\em without noise after classification} at some cost.
-Several authors in the active learning community have considered using crowd workers as a noisy oracle~\cite{donmez2008proactive,golovin2010near,yan2011active,vijayanarasimhan2014large}.
-Although we also use crowd workers, on-the-job learning is allowed to query at test time and must trade off cost, latency and accuracy while doing so, and does not get to observe noiseless data.
+Online Active learning\footnote{We refer the readers to~\cite{settles2010active} for a survey of active learning methods and variants.} is a popular approach to minimize the labeled data required to train a classifier. It assumes data that can be optionally observed at some cost, {\em after} classification.
+Several authors have considered using crowd workers as a noisy oracle for Online Active Learning~\cite{donmez2008proactive,golovin2010near,yan2011active,vijayanarasimhan2014large}.
+On-the-job learning differs from Online Active Classification because it allows to querying {\em before} classification and must trade off cost, latency and accuracy while doing so.
 
-There is little existing work on querying a subset of the labels within a single structured output problem.
-Angeli et al.~\cite{angeli2014combining} identify instances to label within a cluster of examples in a distantly supervised setting. While this choice was a subset of the labels in the graphical model, interactions between other labels in cluster were not considered.
+Making partial observations on structures is an important part of on-the-job learning, and has been explored in the past:
+Angeli et al.~\cite{angeli2014combining} identify instances to label within a cluster of examples in a distantly supervised setting.
 Liang et al.~\cite{liang09measurements} introduced the measurement framework and studied the problem of active selection of measurements in the active learning setting.
 
 \paragraph{2) Querying oracles during classification for additional certainty:}
 
 Active classification~\cite{greiner2002learning,chai2004test,esmeir2007anytime} asks what is the {\em most informative feature\/} to measure at test time.
 Existing active classification algorithms rely on having a fully labeled dataset which is used to learn a static policy for when certain features should be queried, which does not change at test time.
-One could view our queries as high-informative features, however our work differs in two respects: we never get to actually observe the true labels, and our system improves itself at test time by learning a stronger model.
+On-the-job learning differs from Active Classification in two respects: true labels are {\em never} observed, and our system must improve itself at test time by learning a stronger model and recomputing policy.
 
 Using crowd workers to assist labeling tasks is an area of active research within the HCI community.
-\textit{Flock}~\cite{cheng2015flock} first crowdsources the identification of features for an image classification task, and then asks the crowd to annotate examples.
-The system learns to classify images using a decision tree based on the features identified by the crowd.
-As a consequence, the system always relies on humans to provide features and there is no transfer of knowledge from humans to a machine learning model as in on-the-job training.
+\textit{Flock}~\cite{cheng2015flock} first crowdsources the identification of features for an image classification task, and then asks the crowd to annotate these features so it can learn a decision tree.
+As a consequence, the system always relies on humans to provide features, and cannot hope to reach the limit case where humans are no longer needed, as in on-the-job learning.
 In another line of work, \textit{TurKontrol}~\cite{dai2010decision} models individual crowd worker reliability to optimize the number of human votes needed to achieve confident consensus using a POMDP\@.
 
 \paragraph{Combining 1 \& 2:}
 
-\todo{Spot check this. This is probably the wrong pitch here?}
-\textit{Legion AR}~\cite{lasecki2013real} is the only system that the authors are aware of that makes a serious effort to combine querying during test time with a model that is learning in an online fashion. While groundbreaking, Legion AR did not reach the full potential of the setting. It makes no effort to use noisy queries to directly update beliefs, instead relying on a ``query-intermediate'' system to perform a max-vote to get data that is then treated as noiseless. This means that Legion AR is unable to perform the kinds of adaptive gameplaying that we demonstrate to be successful in structured prediction: instead it chooses to either accept or reject its model hypothesis, and in the rejection case to receive expensive over-labeled data as ground truth.
+\textit{Legion AR}~\cite{lasecki2013real} provided a ground-breaking example of an on-the-job task: Learning to perform real-time activity classification with HMMs and crowd-workers.
+However, the authors do not address the exciting machine learning problems presented by the on-the-job setting.
+We aim to provide the analysis of on-the-job learning as a broader setting in this paper.
 
 %This work tries to relax the traditional assumptions in active learning that the oracle is infallible and has no economic cost.
 %Some of this work is directly motivated by applications to crowd-sourcing platforms that we investigate.
