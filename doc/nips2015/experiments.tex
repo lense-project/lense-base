@@ -18,7 +18,7 @@
     We used two feature sets, the first (\textsc{bigrams}) containing only word unigrams and bigrams, and the second (\textsc{rnn}) that also contained sentence vector embeddings from~\cite{socher2013recursive}.
     &  
   20 & 1800 \\
-  {\bf Faces} & 
+  {\bf Face} & 
   We evaluate on a celebrity face classification task\tablefootnote{\todo{}}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
     &
     We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings.
@@ -30,7 +30,7 @@
 %\end{table}
 %\begin{table}[hb]
 %% NER 
-{\bf NER} \\
+{\bf Named Entity Recongition} \\
 \begin{tabular}{l r r r r r}
     \textbf{System} & \textbf{Time/token} & \textbf{Requests/token} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} \\ \hline
     Human 1-query baseline & 664 ms & 1.0 & 66.38 & 89.58 & 76.15 \\ %\hline
@@ -42,7 +42,7 @@
 \end{tabular}
 
 %% Sentimemnt
-{\bf Sentiment}\\
+{\bf Sentiment Analysis}\\
 \begin{tabular}{l  r  r  r  r}
     %\hline
     \textbf{System} & \textbf{Time/example} & \textbf{Requests/example} & \textbf{Accuracy} \\ \hline
@@ -57,7 +57,7 @@
 \end{tabular}
 
 %% Faces
-{\bf Faces}\\
+{\bf Face Identification}\\
 \begin{tabular}{l  r  r  r  r  r}
     %\hline
     \textbf{System} & \textbf{Time/example} & \textbf{Requests/example} & \textbf{Accuracy} \\ \hline
