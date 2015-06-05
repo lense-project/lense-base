@@ -1,8 +1,8 @@
-set nokey
-set terminal pdf
+set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 7 size 3in,2in
+set key right bottom
 set output "machine_f1_vs_time.pdf"
-set title 'f1 on dev. vs time'
 set xlabel 'time'
 set ylabel 'f1'
-plot 'lense.dat' with lines, \
-'offline.dat' with lines
+set yrange [0:1]
+plot 'lense.dat' with lines title 'LENSE model', \
+'offline.dat' with lines dashtype 3 title 'Model with gold training data'

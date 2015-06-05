@@ -1,10 +1,9 @@
-set nokey
-set terminal pdf
+set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 7 size 3in,2in
+set key right bottom
 set output "f1_vs_time.pdf"
-set title 'f1 vs time'
-set xlabel 'time'
-set ylabel 'f1'
-plot 'human-1.dat' with lines, \
-'human-3.dat' with lines, \
-'offline.dat' with lines, \
-'lense.dat' with lines
+set xlabel 'Time'
+set ylabel 'F1'
+plot 'human-1.dat' with lines dashtype 7 title '1 vote baseline', \
+'human-3.dat' with lines dashtype 3 title '3 votes baseline', \
+'offline.dat' with lines dashtype 5 title 'offline baseline', \
+'lense.dat' with lines dashtype 1 title 'LENSE'
