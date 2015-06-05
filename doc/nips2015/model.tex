@@ -6,7 +6,7 @@ The central technical challenge in on-the-job training
 is to determine which queries $q_1, q_2, \dots$ to issue on an input $\bx$
 any example and when.  For this, we appeal to Bayesian decision theory.
 We define a stochastic game with two players, the system and the crowd.
-To get started, consider the simplified game tree in \figureref{piano-roll}(right).
+To get started, consider the simplified game tree in \figureref{piano-roll}~(right).
 At the root, the system chooses an query $q \in \{1, \dots, n\}$ to label a position,
 and then the crowd responds with $r \in \{ \scper{}, \scloc{}, \scnone{} \}$.
 Each leaf of the game tree represent a \emph{utility} $U(q, r)$ of that outcome.
@@ -92,7 +92,7 @@ Importantly, we are only conditioning on the responses $\br[t]$ that are availab
 \paragraph{Putting it together.}
 
 Having defined the simulation dynamics and utility, we can now define the full game tree,
-which is an extension of our initial example in \figureref{piano-roll}(right).
+which is an extension of our initial example in \figureref{piano-roll}~(right).
 The technical challenge here is to incorporate the modeling of continuous time
 into a traditionally discrete game tree.
 A naive approach might be to discretize time and treat each level of the game
@@ -111,7 +111,7 @@ and some subset of responses in $r_1, \dots, r_{k-1}$ have been received,
 and the rest are ``in flight.''
 We focus on the problem of deciding (i) what to query ($q_k$)
 and (ii) when to query ($s_k$) to maximize expected utility
-at some future $\deadline$ (see \figureref{piano-roll}(left) for reference).
+at some future $\deadline$ (see \figureref{piano-roll}~(left) for reference).
 Recall the intuition: if $\deadline$ is near, then we would want to sample
 many things in parallel; otherwise, we should operate more sequentially,
 which provides more adaptivity.
@@ -132,7 +132,7 @@ the successor state incorporates $r_{j^*}$ and $t_{j^*}$ and advances time from 
 Technically, the optimal strategy might be to wait for an intermediate amount of time before $t_{j^*}$,
 so our restriction to considering decisions only at response times is an approximation.
 
-The following example shows one path over the states of the game tree corresponding to \figureref{piano-roll}(left),
+The following example shows one path over the states of the game tree corresponding to \figureref{piano-roll}~(left),
 where the system takes action $q_2 = 4$ (labeling \nl{str.}) and then the crowd responds
 at time $1.7$ with $r_2 = \scloc$ (note that $q_1$ is still pending):
 \begin{center}
