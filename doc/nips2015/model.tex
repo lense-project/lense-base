@@ -2,7 +2,11 @@
 \label{sec:model}
 
 The central problem is to determine which queries $q_1, q_2, \dots$ to issue on
-any example and when.  We create a stochastic game where ...
+any example and when.  For this, we appeal to Bayesian decision theory.
+We create a stochastic game with two players, the system and the crowd.
+As a simple example, consider \figureref{piano-roll}.
+The system chooses an query $q \in \{1, \dots, n\}$,
+and the crowd responds with $r \in \{ \scper{}, \scloc{}, \scnone{} \}$.
 
 %In this section, we describe how we model output predictions and query responses.
 % A general model family - conditional exponential models
