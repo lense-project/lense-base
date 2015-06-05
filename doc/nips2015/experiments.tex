@@ -4,7 +4,7 @@
 % === Other stuff.
 
 In this section, we empirically evaluate our approach on three tasks. 
-While on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
+While the on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
 
 \paragraph{Baselines.}
 We evaluated the following four methods on each dataset:
@@ -31,12 +31,12 @@ We evaluated the following four methods on each dataset:
     &
     We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes. \\
   {\bf Sentiment (1800)} & 
-    We evaluate on a subset of the Stanford sentiment dataset\cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
+    We evaluate on a subset of the Stanford sentiment dataset \cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
     &
     We used two feature sets, the first (\textsc{bigrams}) containing only word unigrams and bigrams, and the second (\textsc{rnn}) that also contained sentence vector embeddings from~\cite{socher2013recursive}.
     \\
   {\bf Face (1784)} & 
-  We evaluate on a celebrity face classification task\cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
+  We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
     &
     We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings.
 \end{tabular}
