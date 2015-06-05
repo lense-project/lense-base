@@ -1,4 +1,4 @@
-set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 7 size 3in,2in
+set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 8 size 3in,2in
 set key right bottom
 set output "machine_f1_vs_time.pdf"
 set xlabel 'time'

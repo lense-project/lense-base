@@ -1,4 +1,4 @@
-set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 7 size 3in,2in
+set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 8 size 3in,2in
 set output "cost_per_token_vs_time.pdf"
 set xlabel 'Time'
 set ylabel 'Queries per token'
