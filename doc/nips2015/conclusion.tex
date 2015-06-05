@@ -1,12 +1,20 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have introduced a new framework to deploy a learning system that uses crowd supervision to train a model {\em on-the-job}.
-We addressed the problem of deciding what supervision to ask the crowd for by modeling the problem as a stochastic game played by the model and the crowd. 
-Using Monte Carlo tree search to approximate the optimal policy, we have built a system, LENSE, that is able to trade off time and money for accuracy.
-We have shown that learning on-the-job can achieve comparable accuracies to asking humans without. 
+We have introduced a new framework that learns from (noisy) crowds \emph{on-the-job}
+to maintain high accuracy, and reducing cost significantly over time.
+The technical core of our approach is modeling the on-the-job setting
+as a stochastic game and using ideas from game playing to approximate the optimal policy.
+%We addressed the problem of deciding what supervision to ask the crowd for by
+%modeling the problem as a stochastic game played by the model and the crowd. 
+%Using Monte Carlo tree search to approximate the optimal policy,
+We have built a system, LENSE, %, that is able to trade off time and money for accuracy.
+which obtains significant cost reductions over a pure crowd approach
+and significant accuracy improvements over a pure ML approach.
+%We have shown that learning on-the-job can achieve comparable accuracies to
+%asking humans without. 
 
-An increasing number of problems that challenge AI today involve interactive tasks that are not suitable to conventional dataset collection, for example, dialogue or question answering.
-We envision on-the-job training as enabling these tasks.
-Of course, there are many problems for which it is hard to ask turkers to give labels. Future work: ask for partial supervision through the measurements framework.
-
+% PL: not needed
+%An increasing number of problems that challenge AI today involve interactive tasks that are not suitable to conventional dataset collection, for example, dialogue or question answering.
+%We envision on-the-job training as enabling these tasks.
+%Of course, there are many problems for which it is hard to ask turkers to give labels. Future work: ask for partial supervision through the measurements framework.
