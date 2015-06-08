@@ -18,13 +18,13 @@ class EmailUseCase extends LenseMulticlassUseCase[(Email, Int)] {
   override def labelTypes: List[String] = List("YES", "NO")
 
   override def getHumanQuestion(input: (Email, Int)): String = {
-    "Does this sentence look like we should add it to a todo-list?<br>"+
+    "Does this sentence look like we should add it to a todo-list?<br><span class='content'>"+
     input._1.sentences.zipWithIndex.map(p => {
       if (p._2 == input._2) {
         "<span class='focus'>"+p._1.toString+"</span>"
       }
       else p._1.toString
-    })
+    }).mkString("")+"</span>"
   }
 
   /**

@@ -17,7 +17,7 @@ import scala.collection.JavaConversions._
  * A stupid little case class to hold all the emails we care to handle, along with useful annotations
  */
 case class Email(body : String, title : String, to : List[String], from : String, id : BigInt) {
-  val annotation: Annotation = AnnotationClient.annotate(title+"\n"+body)
+  val annotation: Annotation = AnnotationClient.annotate(body)
   val sentences: List[CoreMap] = annotation.get(classOf[CoreAnnotations.SentencesAnnotation]).toList
 
   val todos: ListBuffer[String] = ListBuffer[String]()

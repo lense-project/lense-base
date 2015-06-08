@@ -16,10 +16,17 @@ object MyDoEmailRequestor {
   val POST_EMAILS_URL = "http://powerful-brook-4751.herokuapp.com/mydo/ai/post_email_items/"
 
   def main(args : Array[String]) : Unit = {
-    val emails = retrieveEmails()
-    for (email <- emails) {
-      parseEmail(email)
-    }
+    new Thread(new Runnable {
+      override def run(): Unit = {
+        while (true) {
+          val emails = retrieveEmails()
+          for (email <- emails) {
+            parseEmail(email)
+          }
+          Thread.sleep(1000)
+        }
+      }
+    }).start()
   }
 
   def retrieveEmails() : List[Map[String,Any]] = {
