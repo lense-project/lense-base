@@ -6,7 +6,7 @@
   \includegraphics[width=1.0\textwidth]{figures/intro-banner.pdf}
   \end{centering}
   \caption{
-    Named entity recognition on tweets in on-the-job training.
+    Named entity recognition on tweets in on-the-job learning.
     %(1) The system first runs a
 %pre-trained model, discovers that the token ``George'' is ambiguous, and then
 %asks a human for a label. The human label is returned in a few seconds,
@@ -44,14 +44,14 @@ and $\by$ is the corresponding sequence of tags (e.g., \scnone{} \scloc{} \scloc
 The full set of tags of \scper{}, \scloc{}, \scres{}, and \scnone{}.
 
 % Basic setting
-In the \emph{on-the-job training} setting, inputs arrive in a stream.
+In the \emph{on-the-job learning} setting, inputs arrive in a stream.
 On each input $\bx$,
 we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain tags
 (potentially more than once)
 for any positions in $\bx$.
 The responses $r_1, r_2, \dots$ come back asynchronously,
 which are incorporated into our current prediction model $p_\theta$.
-\figureref{piano-roll}~(left) shows one possible outcome:
+\figureref{game-tree}~(left) shows one possible outcome:
 we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$;
 in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
 When we have sufficient confidence about the entire output,
@@ -66,7 +66,7 @@ First, we must make a prediction $\hat \by$ on each input $\bx$ in the stream,
 unlike in active learning, where we are only interested in the pool or stream of examples
 for the purposes of building a good model.
 % PL: though active learning will query hard examples too
-Second, we evaluate on accuracy $\accuracy(\by, \byt)$ against the true tag sequence $\by$
+Second, we evaluate on $\accuracy(\by, \byt)$ against the true tag sequence $\by$
 (on named-entity recognition, this is the F$_1$ metric),
 but $\by$ is never actually observed---the only feedback is via the responses,
 like in partial monitoring games \citep{cesabianchi06regret}.

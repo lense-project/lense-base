@@ -2,12 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b41974d8-3a73-4489-bb1b-fb044baa9608" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/nips2015/plots/f1_vs_time.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/nips2015/plots/machine_f1_vs_time.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/doc/nips2015/plots/queries_per_token_vs_time.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/figures/ner_2_class/f1_plot/f1_vs_time.pdf" afterPath="$PROJECT_DIR$/doc/nips2015/figures/ner_2_class/f1_plot/f1_vs_time.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/async.tex" afterPath="$PROJECT_DIR$/doc/nips2015/async.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/experiments.tex" afterPath="$PROJECT_DIR$/doc/nips2015/experiments.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/figures/ner_2_class/f1_plot/gnuplot_script" afterPath="$PROJECT_DIR$/doc/nips2015/figures/ner_2_class/f1_plot/gnuplot_script" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/intro.tex" afterPath="$PROJECT_DIR$/doc/nips2015/intro.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules/lense-base.iml" afterPath="$PROJECT_DIR$/.idea/modules/lense-base.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/model.tex" afterPath="$PROJECT_DIR$/doc/nips2015/model.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/paper.tex" afterPath="$PROJECT_DIR$/doc/nips2015/paper.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/problem.tex" afterPath="$PROJECT_DIR$/doc/nips2015/problem.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/nips2015/related-0.2.tex" afterPath="$PROJECT_DIR$/doc/nips2015/related-0.2.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="lense-base.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -44,7 +49,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+              <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -64,7 +69,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase2Class.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="48" column="20" selection-start-line="48" selection-start-column="20" selection-end-line="48" selection-end-column="20" />
+              <caret line="49" column="20" selection-start-line="49" selection-start-column="20" selection-end-line="49" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -83,8 +88,8 @@
       <file leaf-file-name="LookaheadOneHeuristic.scala" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/LookaheadOneHeuristic.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49632353">
-              <caret line="51" column="32" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.7444853">
+              <caret line="63" column="36" selection-start-line="63" selection-start-column="36" selection-end-line="63" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -94,7 +99,7 @@
         <entry file="file://$PROJECT_DIR$/doc/nips2015/paper.tex">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+              <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -191,6 +196,13 @@
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
   </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="Bundled (Maven 3)" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="MavenProjectNavigator">
     <treeState />
   </component>
@@ -224,6 +236,9 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -561,10 +576,6 @@
               <option name="myItemId" value="doc" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nips2015" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -582,9 +593,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -602,7 +610,7 @@
     <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="FullScreen" value="false" />
+    <property name="FullScreen" value="true" />
     <property name="last_opened_file_path" value="/big2/nlp/javanlp" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="last_directory_selection" value="$PROJECT_DIR$/src/main/java/org/eclipse/jetty" />
@@ -628,192 +636,6 @@
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="edu.stanford.lense_base.mturk" />
     </key>
-  </component>
-  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
-    <UpdatedFiles>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Updated from server" />
-        <option name="myStatusName" value="Changed on server" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="CHANGED_ON_SERVER" />
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Updated" />
-          <option name="myStatusName" value="Changed" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="UPDATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/modules/lense-base.iml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/scala_compiler.xml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/.idea/workspace.xml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/build.sbt</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/Makefile</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/abstract.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/all.bib</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/async.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/conclusion.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/experiments.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/figures/scabby-diag.sty</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/figures/simple-crf.tikz</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/human-error.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/intro.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/macros.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/paper.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/problem.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/related.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/java/com/github/keenon/minimalml/GNUPlot.java</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/lense-webapp/index.html</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/lense-webapp/main.js</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/lense-webapp/style.css</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/resources/tutorials/ner-2-class.yaml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseEngine.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseMulticlassUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseSequenceUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/CraigslistUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase2Class.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase4Class.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/PersonUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/SentimentUseCase.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/GamePlayer.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/MCTSGamePlayer.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/NQuestionBaseline.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/ThresholdHeuristic.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/graph/GraphStream.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/HumanErrorDistribution.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/humancompute/WorkUnit.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/ExternalModelStream.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/GraphicalModelStream.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/LogisticExternalModelStream.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/models/ModelStream.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/mturk/HITCreator.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/JettyStandalone.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/server/WorkUnitServlet.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/nlp/word2vec/Word2VecLoader.java</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/models/EMTest.scala</PATH>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Created" />
-          <option name="myStatusName" value="Created" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="CREATED" />
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/email/raw.txt</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/ner/context/guess-1-sparse-108.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/ner/context/guess-2-267.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/ner/context/guess-3-166.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/ner/context/guess-7.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/person_recognition/confusion.csv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/person_recognition/context/guess-1-323.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/person_recognition/context/guess-1-343.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/person_recognition/human_latency_data.txt</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/confusion.csv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-1-272.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-1-442.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-272-565.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-443-672.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-565-706.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/data/sentiment/context/guess-673-912.tsv</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/async-old.tex</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/figures/mcts.tikz</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/figures/mcts_simple.tikz</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/plots/f1_vs_time.png</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/plots/machine_f1_vs_time.png</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/doc/nips2015/plots/queries_per_token_vs_time.png</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/evaluations.txt</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/resources/tutorials/people.yaml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/resources/tutorials/sentiment.yaml</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/SamplingLookaheadOneHeuristic.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/mturk/MTurkConfig.scala</PATH>
-          <PATH vcs="Git" revision="">$PROJECT_DIR$/src/test/scala/edu/stanford/lense_base/models/LogisticTest.scala</PATH>
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Deleted" />
-          <option name="myStatusName" value="Deleted" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="true" />
-          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
-        </FILE-GROUP>
-        <FILE-GROUP>
-          <option name="myUpdateName" value="Restored" />
-          <option name="myStatusName" value="Will be restored" />
-          <option name="mySupportsDeletion" value="false" />
-          <option name="myCanBeAbsent" value="false" />
-          <option name="myId" value="RESTORED" />
-        </FILE-GROUP>
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Modified" />
-        <option name="myStatusName" value="Modified" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MODIFIED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Skipped" />
-        <option name="myStatusName" value="Skipped" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SKIPPED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with conflicts" />
-        <option name="myStatusName" value="Will be merged with conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_CONFLICTS" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with tree conflicts" />
-        <option name="myStatusName" value="Merged with tree conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged with property conflicts" />
-        <option name="myStatusName" value="Will be merged with property conflicts" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Merged" />
-        <option name="myStatusName" value="Will be merged" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="MERGED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Not in repository" />
-        <option name="myStatusName" value="Not in repository" />
-        <option name="mySupportsDeletion" value="true" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="UNKNOWN" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally added" />
-        <option name="myStatusName" value="Locally added" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_ADDED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Locally removed" />
-        <option name="myStatusName" value="Locally removed" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="LOCALLY_REMOVED" />
-      </FILE-GROUP>
-      <FILE-GROUP>
-        <option name="myUpdateName" value="Switched" />
-        <option name="myStatusName" value="Switched" />
-        <option name="mySupportsDeletion" value="false" />
-        <option name="myCanBeAbsent" value="false" />
-        <option name="myId" value="SWITCHED" />
-      </FILE-GROUP>
-    </UpdatedFiles>
   </component>
   <component name="RunManager" selected="Application.SentimentUseCase">
     <configuration default="false" name="NERUseCase2Class" type="Application" factoryName="Application" temporary="true">
@@ -1132,7 +954,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="1432083610288" />
+        <entry key="$PROJECT_DIR$" value="1433383423000" />
       </map>
     </option>
   </component>
@@ -1148,11 +970,12 @@
       <updated>1432254058164</updated>
       <workItem from="1432254616748" duration="182000" />
       <workItem from="1432254815978" duration="2806000" />
+      <workItem from="1433790747736" duration="100000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2992000" />
+    <option name="totallyTimeSpent" value="3247000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1440" height="900" extended-state="0" />
@@ -1175,10 +998,10 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28125" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32996634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.37631887" sideWeight="0.49969825" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.37631887" sideWeight="0.49969825" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32839224" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1192,16 +1015,16 @@
     <layout-to-restore>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20870535" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34248078" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1299,13 +1122,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/summary.txt">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="12" column="29" selection-start-line="12" selection-start-column="29" selection-end-line="12" selection-end-column="29" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/doc/nips2015/intro.tex">
@@ -1405,23 +1228,23 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/ner/human_confusion_data_no_org.csv">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.16375546">
           <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
         </state>
       </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/ner/human_confusion_data.csv">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="3" column="9" selection-start-line="3" selection-start-column="9" selection-end-line="3" selection-end-column="9" />
         </state>
-      </provider>
-      <provider selected="true" editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/CraigslistUseCase.scala">
@@ -1509,13 +1332,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data/ner/human_confusion_2class.csv">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.094736844">
           <caret line="3" column="12" selection-start-line="3" selection-start-column="12" selection-end-line="3" selection-end-column="12" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_super_agressive/confusion_nodetype_0.csv">
@@ -1526,13 +1349,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_super_agressive/summary.txt">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.344828">
           <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_med_low_aggressive/tuning/iteration_50_tuning/iteration_50_tuning.png">
@@ -1541,13 +1364,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/imperfect-run-logs.txt">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="677" column="11" selection-start-line="677" selection-start-column="11" selection-end-line="677" selection-end-column="11" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/tuning/iteration_50_tuning/iteration_50_tuning.png">
@@ -1556,13 +1379,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_low_agressive/summary.txt">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.344828">
           <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_low_agressive/confusion_nodetype_0.csv">
@@ -1573,13 +1396,13 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_med_low_aggressive/summary.txt">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-11.896552">
           <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human_med_low_aggressive/confusion_nodetype_0.csv">
@@ -1590,23 +1413,23 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/confusion_nodetype_0.csv">
+      <provider selected="true" editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
         </state>
       </provider>
-      <provider selected="true" editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/doc/nips2015/intro.tex">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="11" column="68" selection-start-line="11" selection-start-column="68" selection-end-line="11" selection-end-column="68" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/doc/nips2015/problem.tex">
@@ -1626,7 +1449,7 @@
       </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1634,7 +1457,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase2Class.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="48" column="20" selection-start-line="48" selection-start-column="20" selection-end-line="48" selection-end-column="20" />
+          <caret line="49" column="20" selection-start-line="49" selection-start-column="20" selection-end-line="49" selection-end-column="20" />
           <folding />
         </state>
       </provider>
@@ -1642,7 +1465,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/examples/NERUseCase.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="40" column="0" selection-start-line="40" selection-start-column="0" selection-end-line="40" selection-end-column="0" />
+          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1656,24 +1479,24 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/LenseUseCase.scala">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="54" column="21" selection-start-line="54" selection-start-column="21" selection-end-line="54" selection-end-column="21" />
           <folding />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/summary.txt">
       <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
         <state />
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results/ner/artificial_human/summary.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.44210526">
           <caret line="14" column="29" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
         </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/ThresholdHeuristic.scala">
@@ -1686,8 +1509,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/edu/stanford/lense_base/gameplaying/LookaheadOneHeuristic.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49632353">
-          <caret line="51" column="32" selection-start-line="51" selection-start-column="32" selection-end-line="51" selection-end-column="32" />
+        <state vertical-scroll-proportion="0.7444853">
+          <caret line="63" column="36" selection-start-line="63" selection-start-column="36" selection-end-line="63" selection-end-column="36" />
           <folding />
         </state>
       </provider>

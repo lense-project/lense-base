@@ -5,5 +5,5 @@ set xlabel 'Time'
 set ylabel 'F1'
 plot 'human-1.dat' with lines dashtype 7 title '1 vote baseline', \
 'human-3.dat' with lines dashtype 3 title '3 votes baseline', \
-'offline.dat' with lines dashtype 5 title 'offline baseline', \
+'offline.dat' with lines dashtype 5 title 'online learning', \
 'lense.dat' with lines dashtype 1 title 'LENSE'

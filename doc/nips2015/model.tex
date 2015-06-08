@@ -22,18 +22,18 @@ We omit the \scres{} from the game tree for visual clarity.
 % Define game top-down
 The central technical challenge in on-the-job training
 is to determine which queries $q_1, q_2, \dots$ to issue on an input $\bx$
-any example and when.  For this, we appeal to Bayesian decision theory.
+and when. For this, we appeal to Bayesian decision theory.
 We define a stochastic game with two players, the system and the crowd.
 To get started, consider the simplified game tree in \figureref{game-tree}~(right).
 At the root, the system chooses an query $q \in \{1, \dots, n\}$ to label a position,
-and then the crowd responds with $r \in \{ \scper{}, \scloc{}, \scnone{} \}$.
-Each leaf of the game tree represent a \emph{utility} $U(q, r)$ of that outcome.
+and then the crowd responds with $r \in \{ \scper{}, \scloc{}, \scres{}, \scnone{} \}$.
+Each leaf of the game tree represents the \emph{utility} $U(q, r)$ of that outcome.
 The \emph{value} of the game is the maximum expected utility:
 \begin{align}
   V^* = \max_q \E_{p(r \mid \bx, q)}[U(q, r)],
 \end{align}
 and the \emph{optimal policy} is to choose the action $q$ that attains $V^*$.
-Let's look at the example more intuitively:
+Let us look at the example more intuitively:
 querying one of the end positions ($q = 1$ or $q = 4$),
 is less informative than choosing the middle positions ($q = 2$ or $q = 3$),
 assuming the model propagates information between adjacent positions.
@@ -58,14 +58,14 @@ p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_
 \end{align}
 The three components are as follows:
 First, $\p(\by \given \bx)$ is the \emph{prediction model},
-which in our case is a standard linear-chain CRF.
+which, in our case, is a standard linear-chain CRF.
 Second, $\presp(r \given \by, q)$ is the \emph{response model},
 which governs the crowd's probability of producing a response $r$ to a given a query when the true answer is $\by$.
 Ideally, this would be $1$ iff $r = y_q$, but the crowd is noisy,
 so we base $\presp$ off of an estimated confusion matrix over labels.
 Finally, $\ptime(t \given s)$ is the \emph{time delay model},
 which governs how long a given query $q$ will take.
-While in reality $t$ depends on many factors including the input $\bx$,
+While, in reality, $t$ depends on many factors including the input $\bx$,
 we let $t - s$ be a Gamma distribution with globally fixed parameters.
 
 % Doing things with the model
@@ -96,7 +96,7 @@ The simulation dynamics model defines the transition probabilities of the game
 through various conditioning and marginalization operations.
 We now define the utility of the game at time $t$, which consists of two terms:
 The first is the expected accuracy of the MAP estimate according to the model's best guess of $\by$ at time $t$;
-for zero-one accuracy, this would be simply the probability of the MAP.
+for zero-one accuracy, this would simply be the probability of the MAP.
 The second is a penalty of $\weightmoney$ for spending $m$ cents per each of $k$ queries
 and $\weighttime$ for taking $t$ units of time.
 Formally, the utility is defined as follows:
@@ -130,16 +130,16 @@ and the rest are ``in flight.''
 We focus on the problem of deciding (i) what to query ($q_k$)
 and (ii) when to query ($s_k$) to maximize expected utility
 at some future $\deadline$ (see \figureref{game-tree}~(left) for reference).
-Recall the intuition: if $\deadline$ is near, then we would want to sample
-many things in parallel; otherwise, we should operate more sequentially,
-which provides more adaptivity.
+Recall the intuition: if $\deadline$ is near, then we would want to query
+many labels in parallel; otherwise, we should operate more sequentially,
+so as to be more adaptive.
 
 % Describe game tree
-At each state $s$ in the game tree where it's the system's turn,
+At each state $s$ in the game tree in which it is the system's turn,
 we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new)
 or wait until ($q_k = \emptyset$);
 the successor state simply incorporates $q_k$.
-If it's the crowd's turn,
+If it is the crowd's turn,
 then we sample the time of the first ``in flight'' response along with its value.
 Formally, let $F = \{ 1 \le j \le k-1 : q_j \neq \emptyset \wedge r_j = \emptyset \}$ be the ``in flight'' queries.
 Sample $t_j$ according to the time delay model for each $j \in F$
