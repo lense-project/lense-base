@@ -1,5 +1,7 @@
 package edu.stanford.lense_base.server
 
+import java.io.File
+
 import org.apache.commons.logging.impl.NoOpLog
 import org.apache.log4j.Level
 import org.apache.log4j.spi.NOPLogger
@@ -109,26 +111,28 @@ class JettyStandalone(webapp : String) {
   http.setIdleTimeout(30000)
   server.addConnector(http)
 
-  val sslContextFactory = new SslContextFactory()
-  sslContextFactory.setKeyStorePath(KEYSTORE_LOCATION)
-  sslContextFactory.setKeyStorePassword(KEYSTORE_PASS)
-  sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA",
-    "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
-    "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
-    "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
-    "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
-    "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA")
+  if (new File(KEYSTORE_LOCATION).exists()) {
+    val sslContextFactory = new SslContextFactory()
+    sslContextFactory.setKeyStorePath(KEYSTORE_LOCATION)
+    sslContextFactory.setKeyStorePassword(KEYSTORE_PASS)
+    sslContextFactory.setExcludeCipherSuites("SSL_RSA_WITH_DES_CBC_SHA",
+      "SSL_DHE_RSA_WITH_DES_CBC_SHA", "SSL_DHE_DSS_WITH_DES_CBC_SHA",
+      "SSL_RSA_EXPORT_WITH_RC4_40_MD5",
+      "SSL_RSA_EXPORT_WITH_DES40_CBC_SHA",
+      "SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA",
+      "SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA")
 
-  // SSL HTTP Configuration
-  val https_config = new HttpConfiguration(http_config)
-  https_config.addCustomizer(new SecureRequestCustomizer())
+    // SSL HTTP Configuration
+    val https_config = new HttpConfiguration(http_config)
+    https_config.addCustomizer(new SecureRequestCustomizer())
 
-  // SSL Connector
-  val sslConnector = new ServerConnector(server,
-    new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-    new HttpConnectionFactory(https_config))
-  sslConnector.setPort(securePort)
-  server.addConnector(sslConnector)
+    // SSL Connector
+    val sslConnector = new ServerConnector(server,
+      new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+      new HttpConnectionFactory(https_config))
+    sslConnector.setPort(securePort)
+    server.addConnector(sslConnector)
+  }
 
   val context: WebAppContext = new WebAppContext(webapp, "/")
   context.setServer(server)

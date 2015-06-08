@@ -20,6 +20,8 @@ libraryDependencies += "org.eclipse.jetty.websocket" % "websocket-server" % "9.2
 
 libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.3.0.RC1" // RC1
 
+libraryDependencies += "org.json4s" %% "json4s-native" % "3.3.0.RC1"
+
 libraryDependencies += "org.scalatra" %% "scalatra" % "2.4.0.RC1"
 
 libraryDependencies += "org.atmosphere" % "atmosphere-runtime" % "2.2.0"
@@ -51,6 +53,8 @@ libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2"
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" classifier "models"
+
+libraryDependencies +=  "org.scalaj" %% "scalaj-http" % "1.1.4"
 
 // This seems to be necessary for specs2
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
