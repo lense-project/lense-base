@@ -11,7 +11,7 @@ import org.json4s.native.JsonMethods._
  * Periodically connects to the MyDo email update service. Will pipe emails through the parsing process to extract any
  * useful todo items
  */
-object MyDoEmailRequestor {
+object MyDoEmailUseCase {
   val GET_EMAILS_URL = "http://powerful-brook-4751.herokuapp.com/mydo/ai/get_emails/"
   val POST_EMAILS_URL = "http://powerful-brook-4751.herokuapp.com/mydo/ai/post_email_items/"
 
