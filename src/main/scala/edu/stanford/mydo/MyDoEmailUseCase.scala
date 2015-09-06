@@ -19,8 +19,11 @@ object MyDoEmailUseCase {
     new Thread(new Runnable {
       override def run(): Unit = {
         while (true) {
+          println("Retrieving emails...")
           val emails = retrieveEmails()
+          println("Retrieved emails")
           for (email <- emails) {
+            println("Parsing email")
             parseEmail(email)
           }
           Thread.sleep(1000)

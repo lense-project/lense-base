@@ -30,16 +30,41 @@ object TodoExtractor {
     u
   }
 
+  val flags = Set(
+    "could you",
+    "would you",
+    "would you mind",
+    "it would be awesome if",
+    "you should",
+    "I need you to",
+    "Don't forget to"
+  )
+
   def extractTodos(email : Email) : List[String] = {
     for (sentence <- email.sentences) {
       val dependencies: SemanticGraph = sentence.get(classOf[SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation])
       val p: SemgrexPattern = SemgrexPattern.compile("({}=head >aux {}=could >nsubj {lemma:you}=you)")
       val m: SemgrexMatcher = p.matcher(dependencies)
+
+      var mayContainTodos = true
+      /*
       while (m.find) {
         val word: IndexedWord = m.getNode("head")
+        mayContainTodos = true
+      }
+
+      for (flag <- flags) {
+        if (sentence.toString.contains(flag)) {
+          mayContainTodos = true
+        }
+      }
+      */
+
+      if (mayContainTodos) {
+        // email.todos.+=(clipSentence(sentence, word.index - 1))
         val toInclude = Await.result(emailUseCase.getOutput((email, email.sentences.indexOf(sentence))).future, 1000 days) == "YES"
         if (toInclude) {
-          email.todos.+=(clipSentence(sentence, word.index - 1))
+          email.todos.+=(sentence.toString)
         }
       }
 

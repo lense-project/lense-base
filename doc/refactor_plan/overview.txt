@@ -1,0 +1,38 @@
+Keenon's rough notes about a refactor:
+
+Key ideas:
+    - Service based architecture
+    - C/C++/CUDA accelerate key components
+    - Scala/Java based servers for handling humans
+    - Web-based interface to interface with standalone LENSE service (including billing)
+        - This means much more complicated logic around delivering tutorials, etc. Should probably rewrite frontend in Dart.
+    - Divide out game playing and human querying, so we can multiplex a single human querying setup
+    - Simple JSON based REST interface for query-response
+
+*********
+Components:
+*********
+
+Human Interface Server (Java/Scala):
+    - Manages main website
+    - Accepts new account requests
+    - Handles billing
+    - Handles creating new streams, either from presets or from structures
+    - Dispatches secret IDs, etc.
+    - Receives requests
+        -> Make prediction
+        -> Prepay - bill account
+    - Collects crowd-worker pools
+    - Manages interface with crowd-workers
+        -> This should be collaborative, and workers should see who else is working on the task at hand
+        -> Workers should see consensus developing
+        -> Game-like effects would be good, bonuses for being a loyal worker, etc
+        -> Effects to ensure quality somehow
+
+Game Playing Service (C/C++/CUDA):
+    - Creates and saves the models for different model streams
+    - Runs CUDA accelerated SGD learning, handles hot-swaps
+    - Runs CUDA accelerated MCTS
+    - Supports several model types:
+        -> Logistic regression
+        -> Linear chain CRF
