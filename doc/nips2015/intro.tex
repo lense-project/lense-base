@@ -15,9 +15,10 @@ AI accuracy is limited by the size of the labeled data available, and attempts t
 Crowdsourcing techniques, by contrast, can use redundant voting to achieve arbitrary accuracies, and require no up-front data labelling, but marginal costs are large compared to AI, and decision delays can exceed tens of seconds \citep{bernstein2010soylent,kokkalis2013emailvalet}.
 
 % Our proposal: on the job training setting, related work
-In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{live} system from pure crowdsourcing towards pure AI.
+In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{live} system from pure crowdsourcing toward, in the limit, unassisted AI.
 On-the-job learning allows a deployed AI system to query crowd workers \emph{prior to} making each decision.
-This presents the challenge of how to optimally balance the cost and delay of an additional query against the benefit of more confidence when making decisions, and we formalize this and present heuristic solutions.
+This presents the challenge of how to balance the cost and delay of an additional query against the benefit of more confidence when making decisions.
+We formalize this challenge and present heuristic solutions.
 Querying humans (or choosing not to) when making decisions allows on-the-job learning to avoid the up-front cost of data labelling and achieve the arbitrary accuracy of crowdsourcing, all while slowly reducing the marginal cost of decisions toward zero as the AI system's model learns from crowd responses and reduces its reliance on human assistance.
 
 % To related work?
