@@ -9,13 +9,15 @@
 
 % Setting: want to deploy system without training examples
 % Existing solutions: pure ML, pure crowd
-Modern artificial intelligence (AI) and crowdsourcing techniques both promise to enable the mass production of accurate decisions, but the two methods have very different strengths.
-AI is able to produce decisions with zero marginal cost and millisecond delay, but most production quality systems are built using supervised training (e.g. \citep{krizhevsky2012imagenet}) and require massive (and expensive, e.g. \citep{deng2009imagenet}) up-front data labelling efforts.
+Modern artificial intelligence (AI) and crowdsourcing techniques can both rapidly provide classifications like ``what's shown in the picture?'' at scale \citep{deng2009imagenet,krizhevsky2012imagenet}.
+Further, both methods have been used to power consumer facing products that require intelligent classifications \emph{in real time} \cite{bigham2010vizwiz,guha2015user}.
+However, the two methods have very different strengths.
+AI is able to produce classifications with zero marginal cost and millisecond delay, but most production quality systems are built using supervised training (e.g. \citep{krizhevsky2012imagenet}) and require massive (and expensive, e.g. \citep{deng2009imagenet}) up-front data labelling efforts.
 AI accuracy is limited by the size of the labeled data available, and attempts to increase system accuracy by labeling additional data suffer from diminishing returns, compounding the up-front expense required to achieve high accuracy.
-Crowdsourcing techniques, by contrast, can use redundant voting to achieve arbitrary accuracies, and require no up-front data labelling, but marginal costs are large compared to AI, and decision delays can exceed tens of seconds \citep{bernstein2010soylent,kokkalis2013emailvalet}.
+Real-time crowdsourcing techniques (GUIs for classification operated by humans), by contrast, can use redundant voting to achieve arbitrary accuracies, and require no up-front data labelling, but marginal costs are large compared to AI, and classification delays can exceed tens of seconds \citep{bernstein2010soylent,kokkalis2013emailvalet}.
 
 % Our proposal: on the job training setting, related work
-In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{live} system from pure crowdsourcing toward, in the limit, unassisted AI.
+In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{live} system (potentially being used to power a consumer facing product) from pure crowdsourcing toward, in the limit, unassisted AI.
 On-the-job learning allows a deployed AI system to query crowd workers \emph{prior to} making each decision.
 This presents the challenge of how to balance the cost and delay of an additional query against the benefit of more confidence when making decisions.
 We formalize this challenge and present heuristic solutions.
