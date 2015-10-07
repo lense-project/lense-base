@@ -9,19 +9,21 @@
 
 % Setting: want to deploy system without training examples
 % Existing solutions: pure ML, pure crowd
-Modern artificial intelligence (AI) and crowdsourcing techniques can both rapidly provide classifications like ``what's shown in the picture?'' at scale \citep{deng2009imagenet,krizhevsky2012imagenet}.
-Further, both methods have been used to power consumer facing products that require intelligent classifications \emph{in real time} \cite{bigham2010vizwiz,guha2015user}.
-However, the two methods have very different strengths.
-AI is able to produce classifications with zero marginal cost and millisecond delay, but most production quality systems are built using supervised training (e.g. \citep{krizhevsky2012imagenet}) and require massive (and expensive, e.g. \citep{deng2009imagenet}) up-front data labelling efforts.
-AI accuracy is limited by the size of the labeled data available, and attempts to increase system accuracy by labeling additional data suffer from diminishing returns, compounding the up-front expense required to achieve high accuracy.
-Real-time crowdsourcing techniques (GUIs for classification operated by humans), by contrast, can use redundant voting to achieve arbitrary accuracies, and require no up-front data labelling, but marginal costs are large compared to AI, and classification delays can exceed tens of seconds \citep{bernstein2010soylent,kokkalis2013emailvalet}.
+Modern machine learning (ML) and crowdsourcing techniques can both solve the problem of
+providing classifications for questions like ``what's shown in the picture?'' at scale \citep{deng2009imagenet,krizhevsky2012imagenet}.
+% Both methods have been used to power consumer facing products that require intelligent classifications \emph{in real time} \cite{bigham2010vizwiz,guha2015user}.
+From the perspective of an application developer who needs a solution to this problem, the two approaches have very different strengths.
+ML is able to produce classifications with zero marginal cost and millisecond delay, but production quality systems are almost always built using supervised training (e.g. \citep{krizhevsky2012imagenet}) which require massive and expensive (e.g. \citep{deng2009imagenet}) up-front data labelling efforts.
+ML accuracy is limited by the size of the labeled data available, and attempts to increase system accuracy by labeling additional data suffer from diminishing returns.
+Real-time crowdsourcing techniques, by contrast, can use redundant voting to achieve arbitrary accuracies, and require no up-front data labelling, but marginal costs are large compared to ML, and classification delays can exceed tens of seconds \citep{bernstein2010soylent,kokkalis2013emailvalet}.
 
 % Our proposal: on the job training setting, related work
-In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{live} system (potentially being used to power a consumer facing product) from pure crowdsourcing toward, in the limit, unassisted AI.
-On-the-job learning allows a deployed AI system to query crowd workers \emph{prior to} making each decision.
-This presents the challenge of how to balance the cost and delay of an additional query against the benefit of more confidence when making decisions.
+In this paper, we propose a new framework called \emph{on-the-job learning} (formalizing and generalizing ideas first implemented in \citep{lasecki2013real}), in which we smoothly transition a \emph{deployed} system from pure crowdsourcing toward unassisted ML.
+Our goal is to deliver the best of both worlds for the application developer: a high-accuracy, low latency system with no expensive up-front labelling and a decreasing marginal cost of classification.
+The on-the-job learning setting makes this possible by letting a deployed ML system query crowd workers \emph{prior to} making each classification.
+This presents the challenge of how to balance the cost and delay of an additional query against the benefit of more confidence when making classifications.
 We formalize this challenge and present heuristic solutions.
-Querying humans (or choosing not to) when making decisions allows on-the-job learning to avoid the up-front cost of data labelling and achieve the arbitrary accuracy of crowdsourcing, all while slowly reducing the marginal cost of decisions toward zero as the AI system's model learns from crowd responses and reduces its reliance on human assistance.
+Querying humans (or choosing not to) when making classifications allows on-the-job learning to avoid the up-front cost of data labelling and achieve the arbitrary accuracy of crowdsourcing, all while slowly reducing the marginal cost of decisions toward zero as the ML system's model learns from crowd responses and reduces its reliance on human assistance.
 
 % To related work?
 %While active learning \citep{settles2010active} and active classification \citep{gao2011active} also query a subset of the labels strategically,
@@ -40,13 +42,13 @@ It can query as many times as it likes, but must return a set of labels as quick
 We use Bayesian decision theory to tradeoff latency, cost, and accuracy in a principled manner.
 If we desire high accuracy, we must incur the cost of having more redundant labels to offset the noisy human responses. 
 If we desire low latency, then we should issue queries in parallel, whereas if latency is not a factor, we should issue queries sequentially in order to be more adaptive.
-Computing an optimal move is intractable, so we employ an approximation based on a new combination of TD learning \citep{sutton1988learning} and Monte Carlo tree search \citep{kocsis2006bandit}.
+Computing an optimal policy is intractable, so we employ an approximation based on a new combination of TD learning \citep{sutton1988learning} and Monte Carlo tree search \citep{kocsis2006bandit}.
 
 % Experiments.
 We implemented and evaluated our system on three different tasks: named-entity recognition, sentiment classification, and image classification.
-We achieve a 3-7 fold reduction in cost over the pure crowdsourcing approach that achieves comparable accuracies and latencies.
+In each experiment we achieve a 3-7 fold reduction in cost over the pure crowdsourcing approach that achieves comparable accuracies and latencies.
 We substantially beat the performance of single vote crowd worker opinions on each task, while costing less or comparable amounts.
-Compared to pure ML approaches that see labeled training data but are not allowed to query workers at test time, we (unsurprisingly) obtain much higher accuracy, though at a small additional average cost per example.
+Compared to pure ML approaches that see labeled training data but are not allowed to query workers at test time, we (unsurprisingly, as we have humans at test time) obtain much higher accuracy, though at a small additional average cost per example.
 An open-source implementation of our system, dubbed LENSE for ``Learning from Expensive Noisy Slow Experts'' is available at
 \href{http://www.github.com/lense-project/lense-base}{http://www.github.com/lense-project/lense-base}.
 

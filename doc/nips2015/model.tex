@@ -20,14 +20,15 @@ We omit the \scres{} from the game tree for visual clarity.
 \end{figure}
 
 % Define game top-down
-The central technical challenge in on-the-job training
-is to determine which queries $q_1, q_2, \dots$ to issue on an input $\bx$
-and when. For this, we appeal to Bayesian decision theory.
 We define a stochastic game with two players, the system and the crowd.
-To get started, consider the simplified game tree in \figureref{game-tree}~(right).
-At the root, the system chooses an query $q \in \{1, \dots, n\}$ to label a position,
-and then the crowd responds with $r \in \{ \scper{}, \scloc{}, \scres{}, \scnone{} \}$.
-Each leaf of the game tree represents the \emph{utility} $U(q, r)$ of that outcome.
+The system gets ``woken up'' every time something in the environment changes, and is allowed to make a move.
+The game starts with a $\bx$ arriving in need of a label, and the system must make a decision.
+Possible decisions are TURN\_IN, WAIT, and launching a query $q_0$ on one of the variables $\by_i$.
+If the system decides to TURN\_IN, the best guess $P_{\theta}(\bx|\by)$
+
+The central technical challenge in on-the-job training
+is to determine what decision to take when woken up. For this, we appeal to Bayesian decision theory.
+
 The \emph{value} of the game is the maximum expected utility:
 \begin{align}
   V^* = \max_q \E_{p(r \mid \bx, q)}[U(q, r)],

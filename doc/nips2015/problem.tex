@@ -37,28 +37,34 @@
 %}
 
 % Define structured prediction
-Consider a structured prediction problem from input $\bx = (x_1, \dots, x_n)$ to output $\by = (y_1, \dots, y_n)$.
-For example, for named-entity recognition on tweets,
-$\bx$ is a sequence of words in the tweet (e.g., \nl{on George str.})
-and $\by$ is the corresponding sequence of tags (e.g., \scnone{} \scloc{} \scloc{}).
-The full set of tags of \scper{}, \scloc{}, \scres{}, and \scnone{}.
+
+As a motivating example, imagine an automated trading firm.
+To the consternation of our hypothetical firm, a news article comes out describing how every time an Anne Hathaway (actress) movie is released, all the positive sentiment co-occurring in documents with ``Hathaway" tokens leads to a bump in the Berkshire Hathaway (investment firm) stock price.
+To their embarrassment, the firm realizes that their algorithms are partially responsible for this phenomenon.
+As a fix, they decide they need to deploy a system to do named entity recognition to disambiguate between tokens referring to \scper{}, companies \todo{}, and \scnone{}.
+They'd like very high accuracy and rapid labelling times, but without first labeling a large quantity of historical data. They're willing to pay some money for increased real-time accuracy, but they wouldn't like to be paying forever.
+They decide to turn to \emph{on-the-job learning}.
+
+Consider a structured prediction problem from input $\bx = (x_1, \dots, x_n)$ to output $\by = (y_1, \dots, y_n)$,
+where it is possible to query humans about their noisy opinions of the value of any $y_i \in \by$
+at the expense of some money and time.
+For our firm running NER, $\bx$ is a sequence of words in the newswire (e.g., \nl{Hathaway smiles on red carpet})
+and $\by$ is the corresponding sequence of tags (e.g., \scper{} \scnone{} \scnone{} \scnone{}).
 
 % Basic setting
 In the \emph{on-the-job learning} setting, inputs arrive in a stream.
-On each input $\bx$,
-we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain tags
-(potentially more than once)
-for any positions in $\bx$.
-The responses $r_1, r_2, \dots$ come back asynchronously,
-which are incorporated into our current prediction model $p_\theta$.
-\figureref{game-tree}~(left) shows one possible outcome:
-we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$;
-in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
-When we have sufficient confidence about the entire output,
-we return the most likely prediction $\hat \by$ under the model.
-Each query $q_i$ is issued at time $s_i$ and the response comes back at time $t_i$.
-Assume that each query costs $m$ cents.
-Our goal is to choose queries to maximize accuracy, minimize latency and cost.
+On each input $\bx$, we can make queries $q_1, q_2, \dots$ to the crowd about tokens $y_i \in \by$.
+The responses $r_1, r_2, \dots$ come back with some delay after their corresponding query was made.
+Once we integrate those responses into our beliefs, we return our MAP estimate of $\hat \by$, and the game ends.
+
+We could model this as a synchronous sequential decision game, where the game player can choose to make a single query $q_j$, then must wait for the response $r_j$, and then can play again.
+This approach, though simple, fails to take advantage of the possibility of querying multiple crowd workers in parallel, and thus fails to hide much of the latency of their responses.
+Instead, we allow the system to play \emph{asynchronously}, which means after issuing a query $q_j$, the system is immediately asked what it would like to do next, and may choose to issue query $q_{j+1}$.
+In order to receive one of the response $r_j, r_{j+1}, \dots$, the system must explicitly choose to wait for the next event in the game, which puts the player to sleep until the next event takes place.
+This means many gameplay decisions are made with queries ``in-flight,'' which increases decision making complexity, but allows the system to dramatically reduce classification latency by issuing multiple queries simultaneously.
+
+% We model this as a game played with the system and a crowd, where the goal of the system is to maximize utility, and the goal of the crowd to try to be helpful, but occasionally make mistakes.
+% We model this as a \emph{system-initiative} game, which means it is always the turn of the system to make another move (with no time delay between moves) unless the system explicitly decides to wait, in which case the crowd may make a single response (and incur some delay) before the system gets to play again.
 
 % More intuition / connections
 We make several remarks about this setting:
