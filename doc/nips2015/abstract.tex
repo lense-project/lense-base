@@ -4,9 +4,10 @@ We describe an ``on-the-job'' classification system, where as queries arrive, we
 As the model improves over time, the reliance on crowdsourcing queries decreases. 
 We cast our setting as a stochastic game based on Bayesian decision theory, which allows us to balance latency, cost, and accuracy objectives in a principled way.
 Computing the optimal policy is intractable, so we develop an approximation based on Monte Carlo Tree Search.
+We tested our approach across three tasks---named-entity recognition, sentiment classification,
+and image classification.
 On the named-entity recognition task, we obtained a 6-7 fold reduction in cost compared to human classification, which requires multiple human votes to achieve the same level of accuracy.
 We also achieve a 17\% F1 improvement over taking a single human vote as the answer to each query, and a 28\% F1 improvement over an online learning classifier that cannot query humans.
-
 %Learning with little or no data is an important but understudied problem.
 %For most tasks, the current paradigm of first collecting a training dataset and then training a classifier requires a substantial amount of data to be labeled to train a very accurate classifier.
 %We propose a  that redistributes the same human effort to achieve
