@@ -162,10 +162,10 @@ We see this happen \todo{example!}
 \section{Game playing.}
 \label{sec:game-playing}
 
-In \sectionref{model} we modeled on-the-job learning as a stochastic game played by the system, and defined a reasonable model of the environment and utility for the system to maximize.
-We now turn to the problem of finding a policy that maximizes the expected utility, which is, of course, intractable due to the large state space and continuous time\reword.
-We propose an approximate Monte Carlo algorithm based on Monte Carlo tree search with progressive widening (to handle continuous time) and TD-learning (to handle the large state space).
-
+In \sectionref{model} we modeled on-the-job learning as a stochastic game played between the system and the crowd, and defined a reasonable model of the environment and utility for the system to maximize.
+We now turn to the problem of actually finding a policy that maximizes the expected utility,
+which is, of course, intractable because of the large state space.
+We propose an approximate Monte Carlo algorithm to find this policy. 
 
 %Having defined the simulation dynamics and utility, we can now define the full game tree,
 %which is an extension of our initial example in \figureref{game-tree}~(right).
@@ -178,37 +178,43 @@ We propose an approximate Monte Carlo algorithm based on Monte Carlo tree search
 %%\citep{guo2009continuous}
 
 % Game state, abstract goal
-First, we begin by describing how the system simulates the game.
-Formally, a \emph{game state} $s = (\now, \bq, \bs, \br, \bt)$
-consists of the current time $t$, the queries $\bq$ issued at time $\bs$,
-responses $\br$ that have be received at time $\bt$.
-We assume that all queries $q_1, \dots, q_{k-1}$ have been issued,
-but the last query $q_k$ has yet to be;
-and some subset of responses in $r_1, \dots, r_{k-1}$ have been received,
-and the rest are ``in flight.''
-We focus on the problem of deciding (i) what to query ($q_k$)
-and (ii) when to query ($s_k$) to maximize expected utility
-at some future $\deadline$ (see \figureref{game-tree}~(left) for reference).
-Recall the intuition: if $\deadline$ is near, then we would want to query
-many labels in parallel; otherwise, we should operate more sequentially,
-so as to be more adaptive.
-
+\paragraph{Game tree.}
+First, however, we must define the full game tree that the system will explore, i.e.\ the states, actions and transitions.
+Formally, a \emph{game state} $\sigma = (\now, \bq, \bs, \br, \bt)$
+consists of the current time $\now$, the queries $\bq = (q_1, \ldots, q_{k-1})$ issued at times $\bs = (s_1, \ldots, s_{k-1})$ and
+the responses $\br = (r_1, \ldots, r_{k-1})$ that will be received at times $\bt = (t_1, \ldots, t_{k-1})$.
+Note that some or all of $\br[\now]$ may be $\emptyset$ because those responses have not yet been received.
+%We assume that all queries $q_1, \dots, q_{k-1}$ have been issued,
+%but the last query $q_k$ has yet to be;
+%and some subset of responses in $r_1, \dots, r_{k-1}$ have been received,
+%and the rest are ``in flight.''
+%We focus on the problem of deciding (i) what to query ($q_k$)
+%and (ii) when to query ($s_k$) to maximize expected utility
+%at some future $\deadline$ (see \figureref{game-tree}~(left) for reference).
+%Recall the intuition: if $\deadline$ is near, then we would want to query
+%many labels in parallel; otherwise, we should operate more sequentially,
+%so as to be more adaptive.
 % Describe game tree
-At each state $s$ in the game tree in which it is the system's turn,
-we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new)
-or wait until ($q_k = \emptyset$);
-the successor state simply incorporates $q_k$.
-If it is the crowd's turn,
-then we sample the time of the first ``in flight'' response along with its value.
-Formally, let $F = \{ 1 \le j \le k-1 : q_j \neq \emptyset \wedge r_j = \emptyset \}$ be the ``in flight'' queries.
-Sample $t_j$ according to the time delay model for each $j \in F$
-and take the earliest event $j^* = \arg\min_{j \in F} t_j$;
-the actual response $r_{j^*}$ is drawn independently from the dynamics model conditioned on the queries and responses
-in the state $s$;
-the successor state incorporates $r_{j^*}$ and $t_{j^*}$ and advances time from $\now$ to $t_{j^*}$.
-Technically, the optimal strategy might be to wait for an intermediate amount of time before $t_{j^*}$,
-so our restriction to considering decisions only at response times is an approximation.
+During the system's turn, 
+we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new),
+wait for a response ($q_k = \acwait$) or return the best answer incorporating the responses received thus far ($q_k = \acret$).
+The successor state simply incorporates $q_k$: when the $q_k \in \{1, \ldots n\}$ then the issue time $s_k$, the response $r_k$ and response time $t_k$ are sampled from the environment model (\equationref{dynamics}).
+During the crowd's turn (i.e.\ after the system chooses to wait),
+the current time of the state is advanced to the time of the next in-flight response: $\now$ is set to $\min \{ t_j \given t_j > \now \}$.
+%If it is the crowd's turn,
+%then we sample the time of the first ``in flight'' response along with its value.
+%Formally, let $F = \{ 1 \le j \le k-1 : q_j \neq \emptyset \wedge r_j = \emptyset \}$ be the ``in flight'' queries.
+%Sample $t_j$ according to the time delay model for each $j \in F$
+%and take the earliest event $j^* = \arg\min_{j \in F} t_j$;
+%the actual response $r_{j^*}$ is drawn independently from the dynamics model conditioned on the queries and responses
+%in the state $s$;
+%the successor state incorporates $r_{j^*}$ and $t_{j^*}$ and advances time from $\now$ to $t_{j^*}$.
 
+% ARUN: This should be covered when we talk about our game model itself, which introduces the wait action and hence this restriction.
+% Technically, the optimal strategy might be to wait for an intermediate amount of time before $t_{j^*}$,
+% so our restriction to considering decisions only at response times is an approximation.
+
+\todo{Improve example}
 The following example shows one path over the states of the game tree corresponding to \figureref{game-tree}~(left),
 where the system takes action $q_2 = 4$ (labeling \nl{str.}) and then the crowd responds
 at time $1.7$ with $r_2 = \scloc$.

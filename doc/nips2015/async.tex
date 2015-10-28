@@ -1,18 +1,37 @@
 \paragraph{Efficient Monte Carlo approximation.}
 
-Computing the optimal policy is intractable, especially because of continuous time.
-We propose an approximate algorithm that combines ideas from both TD learning
-\citep{sutton1988learning} and Monte Carlo Tree Search (MCTS)
-\citep{kocsis2006bandit}, which have been successful in game playing.
-Our algorithm
-uses the UCT decision rule of MCTS but instead of estimating a separate value for each node,
-we use a parametrized value function to share information across nodes:
-$V(s) = w \cdot \psi(s)$, where $\psi$ are features of the state $s$ and $w$ are learned weights.
-\algorithmref{mcvts} gives the pseudocode of our approach.
-On the system's turn, we choose the action that maximizes
-the sum of two terms: the first corresponding to the estimated value (exploitation),
-and the second depending on the number of visits (exploration).
-On the crowd's turn, we sample from distribution given by the simulation dynamics model.
+We now turn to finding an approximately optimal policy.
+Our algorithm (\algorithmref{mcvts}) combines ideas from Monte Carlo tree search~\citep{kocsis2006bandit} to systematically explore the state space and TD-learning~\citep{sutton1988learning} to share statistics across game states.
+Finally, we incorporate progressive widening~\citep{coulom2007computing} to deal with the challenge of a large state space that includes continuous variables (time).
+
+\todo{Are more details about the algorithm required?}
+The value of each state is obtained a linear value function: $V(\sigma) = w\cdot \psi(\sigma)$ where $w$ are learned weights and $\psi$ is a featurization of the state space.
+When simulating the system's turn, the next state (and hence action) is chosen using the upper confidence tree (UCT) decision rule that trades off maximizing the value of the next state (exploitation) with the number of visits (exploration).
+When simulating the crowd's turn, make a stochastic choice of next state as described above. 
+To handle the unbounded fanout during the crowd's turn, we use progressive widening  
+that maintains a current set of ``active'' or ``explored'' states, which is gradually grown with time. 
+When the game terminates, the weights of the value function, $w$ are updated using a TD-update from TD-learning.
+\todo{Include progressive widening in algorithm box}.
+
+\paragraph{Learning.}
+Having addressed the problem of inferring when to make queries to human beings, we now discuss how that data can be incorporated to learning new parameters for the actual prediction model, $p_\theta(\by \given \bx)$.
+We assume that the final responses given by the system are accurate and use them to create training data for the system.
+Note that in the on-the-job setting, the algorithm can never fully trust its labeled data since it only ever sees noisy responses from the crowd.
+While it is possible for the algorithm to be falsely confident in its faulty predictions due to repeated mistakes from the crowd, we do not actually find this to be a problem in practice.
+
+% Computing the optimal policy is intractable, especially because of continuous time.
+% We propose an approximate algorithm that combines ideas from both TD learning
+%  and Monte Carlo Tree Search (MCTS)
+% , which have been successful in game playing.
+% Our algorithm
+% uses the UCT decision rule of MCTS but instead of estimating a separate value for each node,
+% we use a parametrized value function to share information across nodes:
+% $V(s) = w \cdot \psi(s)$, where $\psi$ are features of the state $s$ and $w$ are learned weights.
+% \algorithmref{mcvts} gives the pseudocode of our approach.
+% On the system's turn, we choose the action that maximizes
+% the sum of two terms: the first corresponding to the estimated value (exploitation),
+% and the second depending on the number of visits (exploration).
+% On the crowd's turn, we sample from distribution given by the simulation dynamics model.
 
 %Briefly, Monte Carlo tree search estimates values of $\scexpect$ nodes by sampling its children.
 %The UCT decision heuristic treats each $\scmin$ node as a bandit problem and discovers the child with minimum value.
