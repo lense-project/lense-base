@@ -57,7 +57,7 @@ Worker response times were generally in the range of 3-6 seconds for NER, 10-15 
 When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
 To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
 During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
-Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
+Neither LENSE nor the threshold needed more than 3 queries on a single label.
 
 \begin{table}[t]
 %% NER 
@@ -80,7 +80,7 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
         % Online 
         & n/a & n/a & 87.43 \\    %\hline
     Threshold & \textbf{414 ms} & 0.61 & TODO & TODO & 88.27
-        % Entropic 
+        % threshold 
         & 1121 ms & 1.12 & \textbf{91.53} \\ %\hline
     \textbf{LENSE} & 724 ms & \textbf{0.44} & TODO & TODO & \textbf{88.45} 
     %\textbf{LENSE} 
@@ -122,8 +122,8 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
 On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 3-4.
-For the latter two tasks, both on-the-job learning methods, entropic threshold baseline and LENSE, perform comparably.
-The simple heuristic adopted by the entropic threshold baseline is sufficient to reason about expected marginals on both these tasks because they are single label prediction tasks which do not involve any interactions between labels.
+For the latter two tasks, both on-the-job learning methods, threshold baseline and LENSE, perform comparably.
+The simple heuristic adopted by the threshold baseline is sufficient to reason about expected marginals on both these tasks because they are single label prediction tasks which do not involve any interactions between labels.
 
 \begin{figure}[t]
   \centering
@@ -140,13 +140,13 @@ The simple heuristic adopted by the entropic threshold baseline is sufficient to
 %\paragraph{Does the model respect accuracy preferences?} 
 \figureref{ner-f1} tracks the performance and cost of LENSE over time on the NER task.
 LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
-On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the entropic threshold baseline with fewer queries by waiting for responses before making another query.
+On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the threshold baseline with fewer queries by waiting for responses before making another query.
 
 % == DEV F1
 %We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
 %Compared to the offline baseline, which sees perfect labels on all examples, LENSE observed labels on only \ac{KEENON: fix this number: 600} words. For a comparable number of tokens, the offline baseline has an \fone of \ac{KEENON: fix: 63\%}.
 
-% === Compare with entropic threshold
+% === Compare with threshold
 %\paragraph{Why is the threshold system so much better on sentiment and faces?}
 %LENSE exploits structure in the model when querying, and so outperforms the threshold in the presence of structure (see NER task results).
 %However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
