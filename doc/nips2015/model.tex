@@ -111,54 +111,75 @@ Formally, the utility is defined as follows:
   U_\tau(\bq, \bs, \br, \bt) &\eqdef F(p(\by \given \bx, \bq, \bs, \br[\tau], \bt)) - (k \weightmoney + \tau \weighttime), \\
   F(q) &= \E_{q(\by)}[\accuracy(\arg\max_{\by'} q(\by'))].
 \end{align}
+
+\equationref{utility} is related to \equationref{value} by considering the utility at the time of the last request, $\tmax = \max\{t_1, \ldots, t_k\}$: $U(\bq, \bs, \br) = \E_{\bt}[U_{\tmax}(\bq, \bs, \br, \bt)]$.
+In practice, we actually consider the utility at the earlier of $\tmax$ and a specified time limit to respond, $\deadline$.
+
 %Importantly, we are only conditioning on the responses $\br[t]$ that are available at time $t$.
 
 % Behavior!
 \paragraph{Behavior.}
-If we had already made one query $q_1$ and gotten a response $r_1$,
+Let's look at typical behavior that we expect the model and utility to capture.
+Firstly, because the system wants to maximize the accuracy while minimizing the number of queries, it will prioritize asking queries that provide the most information.
+For example,
+in the model in \figureref{game-tree}, the model, a linear-chain CRF, propagates information between adjacent labels. 
+Thus, querying one of the middle positions ($q = 2$ or $q = 3$) can be more informative than one of the end positions ($q = 1$ or $q = 4$).
+Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions. \todo{This is a really lame example with poor intuition.}
+
+We also expect the system to be able to use queries judiciously when the cost per query, $\weightmoney$, is much larger than the cost per unit time, $\weighttime$.
+For example,
+if we had already made one query $q_1$ and gotten a response $r_1$,
 we can incorporate the evidence, which will propagate through the CRF
 and inform the distribution over possible responses $r_2$ for the next query $q_2$:
 $p(r_2 \mid \bx, q_1, r_1, q_2)$.
+We see this happen \todo{example!}
 
-\todo{WEIRD}
-The temporal aspect of the model also allows for interesting possibilities
-and is important for handling asynchronous queries and responses.
-Suppose we made a query $q_1$ at time $s_1$ but have not yet gotten response $r_1$.
-We might still want to ask for various probabilities \emph{at time} $t$,
-which involves integrating over possible future responses $r_1$ and response times $t_1$.
-Formally, define $r_i[t]$ to be the response at time $t$, which is equal to $r_i$ if $t_i \le t$
-or $\emptyset$ if $t_i > t$.
-Then we could ask about the probability of a response $r_2$ at time $t$,
-which integrates over the possibility of having received $r_1$ or not:
-\begin{align}
-p(r_2[t] \mid \bx, q_1, q_2) = p(t_1 \le t \mid s_1) p(r_2[t] \mid \bx, q_1, r_1, q_2) + p(t_1 > t \mid s_1) p(r_2[t] \mid \bx, q_2).
-\end{align}
+%If we had already made one query $q_1$ and gotten a response $r_1$,
+%we can incorporate the evidence, which will propagate through the CRF
+%and inform the distribution over possible responses $r_2$ for the next query $q_2$:
+%$p(r_2 \mid \bx, q_1, r_1, q_2)$.
+%
+%\todo{WEIRD}
+%The temporal aspect of the model also allows for interesting possibilities
+%and is important for handling asynchronous queries and responses.
+%Suppose we made a query $q_1$ at time $s_1$ but have not yet gotten response $r_1$.
+%We might still want to ask for various probabilities \emph{at time} $t$,
+%which involves integrating over possible future responses $r_1$ and response times $t_1$.
+%Formally, define $r_i[t]$ to be the response at time $t$, which is equal to $r_i$ if $t_i \le t$
+%or $\emptyset$ if $t_i > t$.
+%Then we could ask about the probability of a response $r_2$ at time $t$,
+%which integrates over the possibility of having received $r_1$ or not:
+%\begin{align}
+%p(r_2[t] \mid \bx, q_1, q_2) = p(t_1 \le t \mid s_1) p(r_2[t] \mid \bx, q_1, r_1, q_2) + p(t_1 > t \mid s_1) p(r_2[t] \mid \bx, q_2).
+%\end{align}
+%
+%Let us revisit the example in \figureref{game-tree} by looking at the game tree on the right where the system turns in an answer after a single query.
+%The square leaf nodes store the value of obtaining responses for each query.
+%Intuitively, because the model (a linear-chain CRF) propagates information between adjacent labels, querying one of the end positions ($q = 1$ or $q = 4$) is less informative than the middle positions ($q = 2$ or $q = 3$).
+%Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions.
+%\todo{this is a bit of a lame example.}
 
-Let us revisit the example in \figureref{game-tree} by looking at the game tree on the right where the system turns in an answer after a single query.
-The square leaf nodes store the value of obtaining responses for each query.
-Intuitively, because the model (a linear-chain CRF) propagates information between adjacent labels, querying one of the end positions ($q = 1$ or $q = 4$) is less informative than the middle positions ($q = 2$ or $q = 3$).
-Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions.
-\todo{this is a bit of a lame example.}
+\section{Game playing.}
+\label{sec:game-playing}
 
-\paragraph{Efficient Monte-Carlo inference.}
-%\paragraph{Putting it together.}
+In \sectionref{model} we modeled on-the-job learning as a stochastic game played by the system, and defined a reasonable model of the environment and utility for the system to maximize.
+We now turn to the problem of finding a policy that maximizes the expected utility, which is, of course, intractable due to the large state space and continuous time\reword.
+We propose an approximate Monte Carlo algorithm based on Monte Carlo tree search with progressive widening (to handle continuous time) and TD-learning (to handle the large state space).
 
-% Talk more about how the game is played / simulated.
-% Talk more about how the game is optimized.
-\todo{Make simulation stuff an algorithm box.}
 
-Having defined the simulation dynamics and utility, we can now define the full game tree,
-which is an extension of our initial example in \figureref{game-tree}~(right).
-The technical challenge here is to incorporate the modeling of continuous time
-into a traditionally discrete game tree.
-A naive approach might be to discretize time and treat each level of the game
-tree as a time step, but this discretization is inefficient.
-Our strategy is to consider only represent game states corresponding to pivotal times $t$
-and model waiting times as random actions played by the crowd.
-%\citep{guo2009continuous}
+%Having defined the simulation dynamics and utility, we can now define the full game tree,
+%which is an extension of our initial example in \figureref{game-tree}~(right).
+%The technical challenge here is to incorporate the modeling of continuous time
+%into a traditionally discrete game tree.
+%A naive approach might be to discretize time and treat each level of the game
+%tree as a time step, but this discretization is inefficient.
+%Our strategy is to consider only represent game states corresponding to pivotal times $t$
+%and model waiting times as random actions played by the crowd.
+%%\citep{guo2009continuous}
 
 % Game state, abstract goal
-More formally, a \emph{game state} $s = (\now, \bq, \bs, \br, \bt)$
+First, we begin by describing how the system simulates the game.
+Formally, a \emph{game state} $s = (\now, \bq, \bs, \br, \bt)$
 consists of the current time $t$, the queries $\bq$ issued at time $\bs$,
 responses $\br$ that have be received at time $\bt$.
 We assume that all queries $q_1, \dots, q_{k-1}$ have been issued,
