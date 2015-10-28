@@ -37,7 +37,9 @@ The system may also choose
 the wait action ($q = \acwait$) to wait for the crowd to respond to any pending queries
 or
 the return action ($q = \acret$) to terminate the game and return its best estimate given responses received so.\footnote{When $q = \acwait$ or $q = \acret$, $y_q$ is not defined and is ignored.}
-When the wait action is chosen, the turn switches to the crowd, which provides a response $r$ to a pending query.
+The system takes as many turns in a row as it wants, before deciding to wait or turn in.
+When the wait action is chosen, the turn switches to the crowd, which provides a response $r$ to one pending query, and advances the game clock by a random amount (human query latency).
+The turn then immediately reverts back to the system.
 The key challenge is to determine which action the system should take during its turn.
 For this, we appeal to Bayesian decision theory.
 
@@ -88,7 +90,7 @@ First, $\p(\by \given \bx)$ is the \emph{prediction model} (e.g.\ a standard lin
 Second, $\presp(r \given y_q)$ is the \emph{response model} which describes the distribution of the crowd's response $r$ for a given a query $q$ when the true answer is $y_q$.
 %
 If the crowd workers were infallible we could define $\presp(r \given y_q)$ to be $1$ iff $r = y_q$, but annotation errors are typical in practice. 
-In our experiments, we model $\presp(r \given y_q)$ using an estimated confusion matrix.
+In our experiments, we model $\presp(r \given y_q)$ using $\presp(r \given y_q) = 0.7$ iff $r = y_q$\footnote{ We found the humans we hired were roughly 70\% accurate in our experiments}, and distribute the remaining probability for $r$ uniformly.
 %
 Finally, $\ptime(t \given s)$ is the \emph{time delay model}, which governs how long a given query $q$ will take. While, in reality, $t$ depends on many factors including the input, in the interest of simplicity we assume $t - s$ to be drawn from a gamma distribution with globally fixed parameters.\footnote{
 Of course, both $\presp$ and $\ptime$ can easily be extended to depend arbitrarily on the input $\bx$.}
