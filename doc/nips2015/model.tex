@@ -36,12 +36,31 @@ During the system's turn, the system may choose an action $q \in \{1, \ldots, n\
 The system may also choose 
 the wait action ($q = \acwait$) to wait for the crowd to respond to any pending queries
 or
-the return action ($q = \acret$) to terminate the game and return its best estimate given responses received so.\footnote{When $q = \acwait$ or $q = \acret$, $y_q$ is not defined and is ignored.}
+the return action ($q = \acret$) to terminate the game and return its best estimate given responses received thus far.\footnote{When $q = \acwait$ or $q = \acret$, $y_q$ is not defined and is ignored.}
 The system can take as many turns in a row as it wants, before deciding to wait or turn in.
-When the wait action is chosen, the turn switches to the crowd, which provides a response $r$ to one pending query, and advances the game clock by a random amount (human query latency).
+When the wait action is chosen, the turn switches to the crowd, which provides a response $r$ to one pending query, and advances the game clock by the time taken for the crowd to respond.
 The turn then immediately reverts back to the system.
-The key challenge is to determine which action the system should take during its turn.
-For this, we appeal to Bayesian decision theory.
+When the game ends (the system chooses the return action), the system evaluates a utility that depends on the accuracy of its prediction given any responses it had collected, the number of queries issued and the total time taken.
+The key challenge is to determine which actions the system should take to maximize its expected utility at the end of the game.
+
+\paragraph{Game tree.}
+Let us now formalize the game tree in terms of its states, actions, transitions and rewards.
+The \emph{game state} $\sigma = (\now, \bq, \bs, \br, \bt)$
+consists of the current time $\now$, the queries $\bq = (q_1, \ldots, q_{k-1})$ that have been issued at times $\bs = (s_1, \ldots, s_{k-1})$ and
+the responses $\br = (r_1, \ldots, r_{k-1})$ that have been received at times $\bt = (t_1, \ldots, t_{k-1})$.
+For notational simplicity, we assume that some or all of $\br$ and $\bt$ can be $\emptyset$ if the corresponding responses have not been received by time $\now$ and are ignored if such is the case.
+%Note that some or all of $\br[\now]$ may be $\emptyset$ because those responses have not yet been received.
+
+During the system's turn, 
+we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new),
+wait for a response ($q_k = \acwait$) or return the best answer incorporating the responses received thus far ($q_k = \acret$).
+The successor state simply incorporates $q_k$: when the $q_k \in \{1, \ldots n\}$ then the issue time $s_k$ is set to $\now$, the response $r_k$ and response time $t_k$ are set to $\emptyset$.
+If it is the crowd's turn (i.e.\ after the system chooses to wait), we sample the time of the first in-flight response along with its value. Let $F = \{1 \le j \le k-1 \given q_j \neq \varnothing \wedge r_j = \emptyset \}$. 
+We sample response times conditioned on $t'_j > \now$, pick the smallest. Set $t_j \gets t'_j$.
+When the system chooses to return an answer, then it receives a score determined by the utility at that point $U_{\now}()$.
+
+
+
 
 % How is the game played? maximizing utility under the model, which will be subsequently.
 Under Bayesian decision theory, the \emph{optimal choice} of actions $\bq = (q_1, \ldots, q_k)$ for the system is the set of actions that attain the maximum expected utility (i.e.\ value) for the game:
@@ -51,6 +70,10 @@ V^* = \max_{\bq} \E_{p(\br \mid \bx, \bq)}[U(\bq, \br)],
 \end{align}
 where $\br = (r_1, \ldots, r_k)$ are the responses to the queries, $p(\br \mid \bx, \bq)$ is the system's model of the environment and $U(\bq, \br)$ is the utility which captures the cost of making the queries and the accuracy of the predictions given the responses. 
 We will define these latter two quantities next.
+
+
+
+
 %We will define these latter two quantities after looking at the example below:
 
 %The \emph{value} of the game is the maximum expected utility:
@@ -180,29 +203,6 @@ We propose an approximate Monte Carlo algorithm to find this policy.
 %%\citep{guo2009continuous}
 
 % Game state, abstract goal
-\paragraph{Game tree.}
-First, however, we must define the full game tree that the system will explore, i.e.\ the states, actions and transitions.
-Formally, a \emph{game state} $\sigma = (\now, \bq, \bs, \br, \bt)$
-consists of the current time $\now$, the queries $\bq = (q_1, \ldots, q_{k-1})$ issued at times $\bs = (s_1, \ldots, s_{k-1})$ and
-the responses $\br = (r_1, \ldots, r_{k-1})$ that will be received at times $\bt = (t_1, \ldots, t_{k-1})$.
-Note that some or all of $\br[\now]$ may be $\emptyset$ because those responses have not yet been received.
-%We assume that all queries $q_1, \dots, q_{k-1}$ have been issued,
-%but the last query $q_k$ has yet to be;
-%and some subset of responses in $r_1, \dots, r_{k-1}$ have been received,
-%and the rest are ``in flight.''
-%We focus on the problem of deciding (i) what to query ($q_k$)
-%and (ii) when to query ($s_k$) to maximize expected utility
-%at some future $\deadline$ (see \figureref{game-tree}~(left) for reference).
-%Recall the intuition: if $\deadline$ is near, then we would want to query
-%many labels in parallel; otherwise, we should operate more sequentially,
-%so as to be more adaptive.
-% Describe game tree
-During the system's turn, 
-we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new),
-wait for a response ($q_k = \acwait$) or return the best answer incorporating the responses received thus far ($q_k = \acret$).
-The successor state simply incorporates $q_k$: when the $q_k \in \{1, \ldots n\}$ then the issue time $s_k$, the response $r_k$ and response time $t_k$ are sampled from the environment model (\equationref{dynamics}).
-During the crowd's turn (i.e.\ after the system chooses to wait),
-the current time of the state is advanced to the time of the next in-flight response: $\now$ is set to $\min \{ t_j \given t_j > \now \}$.
 %If it is the crowd's turn,
 %then we sample the time of the first ``in flight'' response along with its value.
 %Formally, let $F = \{ 1 \le j \le k-1 : q_j \neq \emptyset \wedge r_j = \emptyset \}$ be the ``in flight'' queries.
