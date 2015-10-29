@@ -162,17 +162,18 @@ When conditioning on $\br$, we ignore responses that have not yet been received 
 Let's look at typical behavior that we expect the model and utility to capture.
 Firstly, because the system wants to maximize the accuracy while minimizing the number of queries, it will prioritize asking queries that provide the most information.
 For example,
-in the model in \figureref{game-tree}, the model, a linear-chain CRF, propagates information between adjacent labels. 
-Thus, querying one of the middle positions ($q = 2$ or $q = 3$) can be more informative than one of the end positions ($q = 1$ or $q = 4$).
-Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions. \todo{This is a really lame example with poor intuition.}
+in \figureref{game-tree}, getting the crowd to label on the token ``George'' provides information not only to its label, but also to the adjacent token ``str.''. Hence, the system prioritizes asking ``George'' over asking for ``str.''. \todo{Update figure, and have actual numbers here.}
 
-We also expect the system to be able to use queries judiciously when the cost per query, $\weightmoney$, is much larger than the cost per unit time, $\weighttime$.
-For example,
-if we had already made one query $q_1$ and gotten a response $r_1$,
-we can incorporate the evidence, which will propagate through the CRF
-and inform the distribution over possible responses $r_2$ for the next query $q_2$:
-$p(r_2 \mid \bx, q_1, r_1, q_2)$.
-We see this happen \todo{example!}
+%in the model in \figureref{game-tree}, the model, a linear-chain CRF, propagates information between adjacent labels. 
+%Thus, querying one of the middle positions ($q = 2$ or $q = 3$) can be more informative than one of the end positions ($q = 1$ or $q = 4$).
+%Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions. \todo{This is a really lame example with poor intuition.}
+
+Secondly, we expect the system to use queries judiciously when the cost per query, $\weightmoney$, is significant compared to the cost per unit time, $\weighttime$.
+Continuing with the previous example, when $\weightmoney = $ and $\weighttime = $, the system will prefer to wait for a response for the token ``George'' before asking a label for ``str.''.
+However, it will simultaneously ask for a label for ``Soup'' because the response from ``George'' is unlikely to affect the prediction for ``Soup''.
+\todo{make this happen!}
+
+\todo{Figurewise, we should have a figure that shows the change in probabilities of labels down the tree.}
 
 %If we had already made one query $q_1$ and gotten a response $r_1$,
 %we can incorporate the evidence, which will propagate through the CRF
