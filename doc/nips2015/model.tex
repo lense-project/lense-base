@@ -54,44 +54,56 @@ For notational simplicity, we assume that some or all of $\br$ and $\bt$ can be 
 During the system's turn,
 %we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new),
 %wait for a response ($q_k = \acwait$) or return the best answer incorporating the responses received thus far ($q_k = \acret$).
+when the system chooses a query $q_k$,
 the state is updated to $\sigma' = (\now, \bq', \bs', \br', \bt')$, where $\bq' = (q_1, \ldots, q_k)$, $\bs' = (s_1, \ldots, s_{k-1}, \now)$, $\br' = (r_1, \ldots, r_{k-1}, \emptyset)$ and $\bt' = (t_1, \ldots, t_{k-1}, \emptyset)$.
 If $q_k \in \{1, \ldots n\}$, then the system chooses another action from the new state $\sigma'$.
-If $q_k = \acwait$, the crowd makes a stochastic move from the state $\sigma'$.
-Finally, if $q_k = \acret$, the system returns its best guess of the labels using the current model and the labels it has received:
+If $q_k = \acwait$, the crowd makes a stochastic move from $\sigma'$.
+Finally, if $q_k = \acret$, the system returns its best guess of the labels using the responses it has received:
 $\hat\by \eqdef \argmax_{\by} p(\by \given \bx, \br)$,
-and receives a reward given the utility of the state $U(\sigma)$ (defined below) and the game ends. 
+and receives a reward given the utility of the state $U(\sigma)$ and the game ends. 
+Both the prediction model $p(\by \given \bx, \br)$ and the utility $U(\sigma)$ will be defined below.
 
-During the crowd's turn (i.e.\ after the system chooses $\acwait$), the crowd samples the next response to be received and its value using a \emph{response-time model} $\ptime(t \given s)$ and a \emph{response-model} $\presp(r \given y_q)$.\footnote{
-Of course, both $\ptime$ and $\presp$ can easily be extended to depend arbitrarily on the input $\bx$.} Let $F = \{1 \le j \le k-1 \given q_j \neq \acwait \wedge r_j = \emptyset \}$ be the set of in-flight requests.
-We select the next response $j^* \in F$ as follows: $j^* = \argmin_{j \in F} t'_j$ where $t'_j$ is sampled from the model: $t'_j \sim p(t'_j \given s_j, t'_j > \now)$.
+Let $F = \{1 \le j \le k-1 \given q_j \neq \acwait \wedge r_j = \emptyset \}$ be the set of in-flight requests.
+During the crowd's turn (i.e.\ after the system chooses $\acwait$), the crowd samples the next response to be received, $j^* \in F$, and its value using a \emph{response-time model} $\ptime(t \given s)$ and a \emph{response-model} $\presp(r \given y_q)$:\footnote{
+For simplicity, $\ptime$ and $\presp$ are shown here to be independent of the input $\bx$, but they can easily be extended to depend arbitrarily on the input $\bx$.\reword} 
+$j^* = \argmin_{j \in F} t'_j$ where $t'_j$ is sampled from the model: $t'_j \sim p(t'_j \given s_j, t'_j > \now)$ for each $j \in F$. Finally, a response is sampled: $r'_{j^*} \sim \presp(r_{j^*} \given y_{q_{j^*}})$ and the state is updated to $\sigma' = (t_{j^*}, \bq, \bs, \br', \bt')$, where $\br' = (r_1, \ldots, r'_{j^*}, \ldots, r_k)$ and $\bt' = (t_1, \ldots, t'_{j^*}, \ldots, t_k)$.
 
-We must also define the utility function and the model of the environment, which we do next.
+Next, we define the utility and various models.
 
 \paragraph{Utility.}
 % Utility.
 % How is the game played? maximizing utility under the model, which will be subsequently.
 Under Bayesian decision theory, the \emph{optimal choice} for an action in state $\sigma$ is the one that attains the maximum expected utility (i.e.\ value) for the game starting at $\sigma$.
-In any state $\sigma$, the system can choose to return its best guess ($q_k = \acret$) that has a expected payout or utility:
-We now define the utility of the game at time $\tau$, which must trade off two things.
+The utility of an action is recursively defined based on the future reward:
+\begin{align*}
+  U(\sigma, q) &= 
+  \begin{cases}
+    U(\sigma) & q = \acret \\
+    U(\sigma') & q \in \{1, \ldots, n\} \\
+    \E_{j^*, r_{j^*}, t_{j^*}} U(\sigma') & q = \acwait
+  \end{cases}.
+\end{align*}
+
+When returning a response, the utility is trades off two things.
 The first is the accuracy of the MAP estimate according to the model's best guess of $\by$ incorporating all responses received by time $\tau$.
 The second is the cost of making queries: a (monetary) cost $\weightmoney$ per query made and penalty of $\weighttime$ per unit of time taken.
 Formally, the utility is defined as follows:
 \begin{align}
   \label{eqn:utility}
   U_\tau(\bq, \bs, \br, \bt) &\eqdef F(p(\by \given \bx, \bq, \bs, \br[\tau], \bt)) - (k \weightmoney + \tau \weighttime), \\
-  F(q) &= \E_{q(\by)}[\accuracy(\arg\max_{\by'} q(\by'))].
+  F(p) &= \E_{p(\by)}[\accuracy(\arg\max_{\by'} p(\by'))].
 \end{align}
 
-\equationref{utility} is related to \equationref{value} by considering the utility at the time of the last request, $\tmax = \max\{t_1, \ldots, t_k\}$: $U(\bq, \bs, \br) = \E_{\bt}[U_{\tmax}(\bq, \bs, \br, \bt)]$.
-In practice, we actually consider the utility at the earlier of $\tmax$ and a specified time limit to respond, $\deadline$.
-
-
-\begin{align}
-  \label{eqn:value}
-V^* = \max_{\bq} \E_{p(\br \mid \bx, \bq)}[U(\bq, \br)],
-\end{align}
-where $\br = (r_1, \ldots, r_k)$ are the responses to the queries, $p(\br \mid \bx, \bq)$ is the system's model of the environment and $U(\bq, \br)$ is the utility which captures the cost of making the queries and the accuracy of the predictions given the responses. 
-We will define these latter two quantities next.
+%\equationref{utility} is related to \equationref{value} by considering the utility at the time of the last request, $\tmax = \max\{t_1, \ldots, t_k\}$: $U(\bq, \bs, \br) = \E_{\bt}[U_{\tmax}(\bq, \bs, \br, \bt)]$.
+%In practice, we actually consider the utility at the earlier of $\tmax$ and a specified time limit to respond, $\deadline$.
+%
+%
+%\begin{align}
+%  \label{eqn:value}
+%V^* = \max_{\bq} \E_{p(\br \mid \bx, \bq)}[U(\bq, \br)],
+%\end{align}
+%where $\br = (r_1, \ldots, r_k)$ are the responses to the queries, $p(\br \mid \bx, \bq)$ is the system's model of the environment and $U(\bq, \br)$ is the utility which captures the cost of making the queries and the accuracy of the predictions given the responses. 
+%We will define these latter two quantities next.
 
 %We will define these latter two quantities after looking at the example below:
 
