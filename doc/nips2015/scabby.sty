@@ -30,7 +30,7 @@
 \newtoggle{definetheorems}
 \toggletrue{definetheorems}
 \DeclareOption{nodefinetheorems}{\togglefalse{definetheorems}}
-\ProcessOptions
+\ProcessOptions{}
 
 \providecommand{\Email}[1]{ \hfill \textsc{\small #1}}
 
@@ -199,13 +199,13 @@
 
 % Sectioning
 % Section macros
-\forcecommand[3]{\itemref}{\hyperref[#2:#3]{#1 \ref{#2:#3}}}
+\forcecommand[3]{\itemref}{\hyperref[#2:#3]{#1~\ref{#2:#3}}}
 \forcecommand[1]{\sectionref}{\itemref{Section}{sec}{#1}}
 \forcecommand[1]{\appendixref}{\itemref{Appendix}{app}{#1}}
 \forcecommand[1]{\algorithmref}{\itemref{Algorithm}{algo}{#1}}
 \forcecommand[1]{\figureref}{\itemref{Figure}{fig}{#1}}
 \forcecommand[1]{\tableref}{\itemref{Table}{tbl}{#1}}
-\forcecommand[1]{\equationref}{\hyperref[eqn:#1]{Equation \ref{eqn:#1}}}
+\forcecommand[1]{\equationref}{\hyperref[eqn:#1]{Equation~\ref{eqn:#1}}}
 
 \iftoggle{definetheorems}{
 \newtheorem{theorem}{Theorem}
@@ -285,6 +285,11 @@
 \forcecommand{\Sm} {\mathbb{S}}
 \forcecommand{\half} {\frac{1}{2}}
 
+% Logic
+\forcecommand{\band}{\wedge}
+\forcecommand{\bor}{\vee}
+
+
 % Calculus
 \forcecommand{\del}{\partial}
 \forcecommand{\ud}{\, \mathrm{d}}
@@ -295,12 +300,12 @@
 
 % Optimization
 \forcecommand{\mL} {\mathcal{L}}
-\forcecommand {\maximize} {\operatorname{maximize}}
-\forcecommand {\minimize} {\operatorname{minimize}}
-\forcecommand {\argmax} {\operatorname{\arg\,max}}
-\forcecommand {\argmin} {\operatorname{\arg\,min}}
-\forcecommand {\subjecto} {\operatorname{subject\ to}}
-\forcecommand {\Supp} {\operatorname{Supp}}
+\forcecommand{\maximize} {\operatorname{maximize}}
+\forcecommand{\minimize} {\operatorname{minimize}}
+\forcecommand{\argmax} {\operatorname{\arg\,max}}
+\forcecommand{\argmin} {\operatorname{\arg\,min}}
+\forcecommand{\subjecto} {\operatorname{subject\ to}}
+\forcecommand{\Supp} {\operatorname{Supp}}
 \forcecommand{\lone} {\ensuremath{\ell_1}}
 \forcecommand{\ltwo} {\ensuremath{\ell_2}}
 
@@ -318,7 +323,7 @@
 \forcecommand[1]{\tp}{^{\otimes#1}}
 \forcecommand{\KL}{\operatorname{KL}}
 \forcecommand[1]{\cspan}{\langle #1 \rangle}
-\providecommand {\rank} {\operatorname{rank}}
+\providecommand{\rank} {\operatorname{rank}}
 
 % Convex Geometry
 \forcecommand{\conv} {\operatorname{conv}}
@@ -332,7 +337,7 @@
 \forcecommand{\Mat} {\operatorname{Mat}}
 
 % Misc
-\forcecommand {\sgn} {\operatorname{sgn}}
+\forcecommand{\sgn} {\operatorname{sgn}}
 \forcecommand[1]{\oft}   {^{(#1)}}
 \forcecommand[2]{\oftt}   {^{(#1) #2}}
 \forcecommand[1]{\oneby} {\frac{1}{#1}}
