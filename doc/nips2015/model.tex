@@ -32,16 +32,22 @@ We omit the \scres{} from the game tree for visual clarity.
 % High-level what is the game?
 We model on-the-job learning as a stochastic game with two players: the system and the crowd.
 The game starts with the system receiving input $\bx$ and ends when the system turns in a set of labels $\by = (y_1, \ldots, y_n)$. 
-During the system's turn, the system may choose an action $q \in \{1, \ldots, n\}$ to ask the crowd to label $y_q$. 
+During the system's turn, the system may choose a query action $q \in \{1, \ldots, n\}$ to ask the crowd to label $y_q$. 
 The system may also choose 
 the wait action ($q = \acwait$) to wait for the crowd to respond to a pending query
 or
-the return action ($q = \acret$) to terminate the game and return its best estimate given responses received thus far.\footnote{When $q = \acwait$ or $q = \acret$, $y_q$ is not defined and is ignored.}
-The system can take as many turns in a row as it wants, before deciding to wait or turn in.
+the return action ($q = \acret$) to terminate the game and return its best estimate given responses received thus far.
+%\footnote{When $q = \acwait$ or $q = \acret$, $y_q$ is not defined and is ignored.}
+The system can make as many queries in a row (i.e.\ simultaneously) as it wants, before deciding to wait or turn in.\footnote{
+Note that this is limits the behavior of the system by ruling out the possibility of launching a query midway through waiting for the next response. However, we feel like this is a reasonable limitation that significantly simplifies the search space for the system.
+}
 When the wait action is chosen, the turn switches to the crowd, which provides a response $r$ to one pending query, and advances the game clock by the time taken for the crowd to respond.
 The turn then immediately reverts back to the system.
 When the game ends (the system chooses the return action), the system evaluates a utility that depends on the accuracy of its prediction given any responses it had collected, the number of queries issued and the total time taken.
-The key challenge is to determine which actions the system should take to maximize its expected utility at the end of the game.
+Intuitively, the system wants to choose query and wait actions so as to maximize its utility when it eventually turns in a response, further down the line.
+
+In the rest of this section, we describe the details of the game tree, our choice of utility and specify models for crowd responses, followed by a brief exploration of behavior admitted by our model.
+%The key challenge is to determine which actions the system should take to maximize its expected utility at the end of the game.
 
 \paragraph{Game tree.}
 Let us now formalize the game tree in terms of its states, actions, transitions and rewards.
@@ -54,45 +60,36 @@ For notational simplicity, we assume that some or all of $\br$ and $\bt$ can be 
 During the system's turn,
 %we query a position $q_k \in \{1, \dots, n\}$ (not necessarily new),
 %wait for a response ($q_k = \acwait$) or return the best answer incorporating the responses received thus far ($q_k = \acret$).
-when the system chooses a query $q_k$,
+when the system chooses an action $q_k$,
 the state is updated to $\sigma' = (\now, \bq', \bs', \br', \bt')$, where $\bq' = (q_1, \ldots, q_k)$, $\bs' = (s_1, \ldots, s_{k-1}, \now)$, $\br' = (r_1, \ldots, r_{k-1}, \emptyset)$ and $\bt' = (t_1, \ldots, t_{k-1}, \emptyset)$.
 If $q_k \in \{1, \ldots n\}$, then the system chooses another action from the new state $\sigma'$.
 If $q_k = \acwait$, the crowd makes a stochastic move from $\sigma'$.
-Finally, if $q_k = \acret$, the system returns its best guess of the labels using the responses it has received:
-$\hat\by \eqdef \argmax_{\by} p(\by \given \bx, \br)$,
-and receives a reward given the utility of the state $U(\sigma)$ and the game ends. 
-Both the prediction model $p(\by \given \bx, \br)$ and the utility $U(\sigma)$ will be defined below.
+Finally, if $q_k = \acret$, the game ends, and the system returns its best estimate of the labels using the responses it has received and
+%$\hat\by \eqdef \argmax_{\by} p(\by \given \bx, \br)$,
+obtains a utility $U(\sigma)$ (defined later).
+%Both the prediction model $p(\by \given \bx, \br)$ and the utility $U(\sigma)$ will be defined below.
 
 Let $F = \{1 \le j \le k-1 \given q_j \neq \acwait \wedge r_j = \emptyset \}$ be the set of in-flight requests.
-During the crowd's turn (i.e.\ after the system chooses $\acwait$), the crowd samples the next response to be received, $j^* \in F$, and its value using a \emph{response-time model} $\ptime(t \given s)$ and a \emph{response-model} $\presp(r \given y_q)$:\footnote{
-For simplicity, $\ptime$ and $\presp$ are shown here to be independent of the input $\bx$, but they can easily be extended to depend arbitrarily on the input $\bx$.\reword} 
-$j^* = \argmin_{j \in F} t'_j$ where $t'_j$ is sampled from the model: $t'_j \sim p(t'_j \given s_j, t'_j > \now)$ for each $j \in F$. Finally, a response is sampled: $r'_{j^*} \sim \presp(r_{j^*} \given y_{q_{j^*}})$ and the state is updated to $\sigma' = (t_{j^*}, \bq, \bs, \br', \bt')$, where $\br' = (r_1, \ldots, r'_{j^*}, \ldots, r_k)$ and $\bt' = (t_1, \ldots, t'_{j^*}, \ldots, t_k)$.
-
-Next, we define the utility and various models.
+During the crowd's turn (i.e.\ after the system chooses $\acwait$), the next response from the crowd, $j^* \in F$, is chosen: $j^* = \argmin_{j \in F} t'_j$ where $t'_j$ is sampled from the \emph{response-time model}, $t'_j \sim \ptime(t'_j \given s_j, t'_j > \now)$, for each $j \in F$. Finally, a response is sampled using a response model, $r'_{j^*} \sim p(r'_{j^*} \given \bx, \br)$, and the state is updated to $\sigma' = (t_{j^*}, \bq, \bs, \br', \bt')$, where $\br' = (r_1, \ldots, r'_{j^*}, \ldots, r_k)$ and $\bt' = (t_1, \ldots, t'_{j^*}, \ldots, t_k)$.
 
 \paragraph{Utility.}
 % Utility.
 % How is the game played? maximizing utility under the model, which will be subsequently.
-Under Bayesian decision theory, the \emph{optimal choice} for an action in state $\sigma$ is the one that attains the maximum expected utility (i.e.\ value) for the game starting at $\sigma$.
-The utility of an action is recursively defined based on the future reward:
-\begin{align*}
-  U(\sigma, q) &= 
-  \begin{cases}
-    U(\sigma) & q = \acret \\
-    U(\sigma') & q \in \{1, \ldots, n\} \\
-    \E_{j^*, r_{j^*}, t_{j^*}} U(\sigma') & q = \acwait
-  \end{cases}.
-\end{align*}
-
-When returning a response, the utility is trades off two things.
+Under Bayesian decision theory, the \emph{optimal choice} for an action in state $\sigma = (\now, \bq, \br, \bs, \bt)$ is the one that attains the maximum expected utility (i.e.\ value) for the game starting at $\sigma$.
+Recall that the system can return at any time, at which point it receives a utility is trades off two things.
 The first is the accuracy of the MAP estimate according to the model's best guess of $\by$ incorporating all responses received by time $\tau$.
 The second is the cost of making queries: a (monetary) cost $\weightmoney$ per query made and penalty of $\weighttime$ per unit of time taken.
-Formally, the utility is defined as follows:
+Formally, we define the utility to be:
 \begin{align}
   \label{eqn:utility}
-  U_\tau(\bq, \bs, \br, \bt) &\eqdef F(p(\by \given \bx, \bq, \bs, \br[\tau], \bt)) - (k \weightmoney + \tau \weighttime), \\
-  F(p) &= \E_{p(\by)}[\accuracy(\arg\max_{\by'} p(\by'))].
+  U(\sigma) &\eqdef F(p(\by \given \bx, \bq, \bs, \br, \bt)) - (k \weightmoney + \now \weighttime), \\
+  F(p) &= \E_{p(\by)}[\accuracy(\arg\max_{\by'} p(\by'))],
 \end{align}
+where $k$ is the number of queries, i.e.\ $|\{j \given q_j \in \{1, \ldots, n\}|$,
+$p(\by \given \bx, \bq, \bs, \br, \bt)$ is a prediction model that incorporates the crowd's responses.
+
+The utility of wait and return actions is computed by taking expectations over subsequent trajectories in the game tree. 
+This is intractable to compute exactly, so we propose an approximate algorithm in \sectionref{game-playing}.
 
 %\equationref{utility} is related to \equationref{value} by considering the utility at the time of the last request, $\tmax = \max\{t_1, \ldots, t_k\}$: $U(\bq, \bs, \br) = \E_{\bt}[U_{\tmax}(\bq, \bs, \br, \bt)]$.
 %In practice, we actually consider the utility at the earlier of $\tmax$ and a specified time limit to respond, $\deadline$.
@@ -131,27 +128,31 @@ Formally, the utility is defined as follows:
 % Start model.
 \paragraph{Environment model.}
 
-We now define the model of the environment that the agent uses.
+Our final component is a model of the environment (crowd).
 Given input $\bx$ and queries $\bq = (q_1, \dots, q_k)$ issued at times $\bs = (s_1, \dots, s_k)$,
 we define a distribution over the output $\by$, responses $\br = (r_1, \dots, r_k)$
 and response times $\bt = (t_1, \dots, t_k)$ as follows:
 \begin{align}
   \label{eqn:dynamics}
 %p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid \bx, \by, q_i) \ptime(t_i \mid \bx, \by, q_i, s_i).
-p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid y_{q_i}) \ptime(t_i \mid s_i).
+p(\by, \br, \bt \given \bx, \bq, \bs) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid y_{q_i}) \ptime(t_i \mid s_i).
 \end{align}
 The three components, specified by the user, are as follows:
 First, $\p(\by \given \bx)$ is the \emph{prediction model} (e.g.\ a standard linear-chain CRF).
-Second, $\presp(r \given y_q)$ is the \emph{response model} which describes the distribution of the crowd's response $r$ for a given a query $q$ when the true answer is $y_q$.
+Second, $\presp(r \given y_q)$ is the \emph{response model} which describes the distribution of the crowd's response $r$ for a given a query $q$ when the true answer is $y_q$.\footnote{
+Of course, $\ptime$ and $\presp$ can easily be extended to depend arbitrarily on the input $\bx$.} 
+
 %
 If the crowd workers were infallible we could define $\presp(r \given y_q)$ to be $1$ iff $r = y_q$, but annotation errors are typical in practice. 
-In our experiments, we model $\presp(r \given y_q)$ using $\presp(r \given y_q) = 0.7$ iff $r = y_q$\footnote{ We found the humans we hired were roughly 70\% accurate in our experiments}, and distribute the remaining probability for $r$ uniformly.
+In our experiments, we model $\presp(r \given y_q)$ using $\presp(r \given y_q) = 0.7$ iff $r = y_q$\footnote{We found the humans we hired were roughly 70\% accurate in our experiments}, and distribute the remaining probability for $r$ uniformly.
 %
-Finally, $\ptime(t \given s)$ is the \emph{time delay model}, which governs how long a given query $q$ will take. While, in reality, $t$ depends on many factors including the input, in the interest of simplicity we assume $t - s$ to be drawn from a gamma distribution with globally fixed parameters.We also define the \emph{response at time $\tau$}, $r[\tau]$, to be $r$ if $\tau > t$ and $\emptyset$ otherwise.
+% Finally, $\ptime(t \given s)$ is the \emph{time delay model}, which governs how long a given query $q$ will take. While, in reality, $t$ depends on many factors including the input, in the interest of simplicity we assume $t - s$ to be drawn from a gamma distribution with globally fixed parameters.We also define the \emph{response at time $\tau$}, $r[\tau]$, to be $r$ if $\tau > t$ and $\emptyset$ otherwise.
 
 % Doing things with the model
-Given this full model, we can compute $p(\br \mid \bx, \bq)$ simply by marginalizing out $\by$ and $\bt$ from \equationref{dynamics}.
-We can also compute the distribution over responses at a particular time $\tau$, $p(\br[\tau] \given \bx, \bq)$, where $\br[\tau] = (r_1[\tau], \ldots, r_k[\tau])$.
+Given this full model, we can compute $p(r' \mid \bx, \br, q)$ simply by marginalizing out $\by$ and $\bt$ from \equationref{dynamics}.
+When conditioning on $\br$, we ignore responses that have not yet been received (i.e.\ when $r_j = \emptyset$ for some $j$).
+%Given this full model, we can compute $p(\br \mid \bx, \bq)$ simply by marginalizing out $\by$ and $\bt$ from \equationref{dynamics}.
+%We can also compute the distribution over responses at a particular time $\tau$, $p(\br[\tau] \given \bx, \bq)$, where $\br[\tau] = (r_1[\tau], \ldots, r_k[\tau])$.
 % Describe the simplifications on how time is moved forward, with possibly an example
 
 %Importantly, we are only conditioning on the responses $\br[t]$ that are available at time $t$.
