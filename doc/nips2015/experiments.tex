@@ -14,7 +14,7 @@ We evaluated the following four methods on each dataset:
     Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
     This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
   \item {\bf Threshold baseline}: Uses the following heuristic:
-    For each label, $y_i$, the agent asks for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.88$. % \footnote{We found $0.88$ to give the best results on our datasets.}
+    For each label, $y_i$, the agent asks for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.98$. % \footnote{We found $0.88$ to give the best results on our datasets.}
     Instead of computing the expected marginals over the responses to queries in flight, the agent simply counts the in flight requests for a given variable, and reduces the uncertainty on that variable by a factor of $0.3$. The system continues launching requests until the threshold (adjusted by number of queries in flight) is crossed. Predictions are made using MLE on the model given responses.
     The agent does not reason about time and makes all its queries at the very beginning.
   \item {\bf LENSE:} Our full system as described in \sectionref{model}.
@@ -24,12 +24,12 @@ We evaluated the following four methods on each dataset:
 \begin{table}[t]
   \begin{tabular}{l p{0.35\textwidth} p{0.35\textwidth} r r r}
     {\bf Dataset (Examples)} & {\bf Task and notes} & {\bf Features} \\ \hline
-  {\bf NER (1000)}     & 
+  {\bf NER (657)}     & 
     We evaluate on a simplified version of CoNLL-2003 NER task\tablefootnote{\href{http://www.cnts.ua.ac.be/conll2003/ner/}{http://www.cnts.ua.ac.be/conll2003/ner/}}, a sequence labeling problem over English sentences. 
-    We only consider the three entity tags corresponding to persons, locations or others\tablefootnote{%
-    The original also includes the tags for organizations and miscellaneous, however the distinctions between these tags are technical, making it very difficult for non-expert crowd workers to provide accurate labels.}.
+    We only consider the four entity tags corresponding to persons, locations, organizations or others\tablefootnote{
+    The original also includes a tag for miscellaneous, however the definition for miscellaneos is complex, making it very difficult for non-expert crowd workers to provide accurate labels.}.
     &
-    We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes. \\
+    We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes, as well as word embeddings. \\
   {\bf Sentiment (1800)} & 
     We evaluate on a subset of the IMDB sentiment dataset \cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
     &
@@ -38,51 +38,50 @@ We evaluated the following four methods on each dataset:
   {\bf Face (1784)} & 
   We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
     &
-    We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings.
+    We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings, though we leave back-propagating into the net to future work.
 \end{tabular}
   \caption{Datasets used in this paper and number of examples we evaluate on.}
 \label{tbl:dataset}
 \end{table}
 
 
-To initialize parameters for the model-based methods, we used a burn-in period of 40 examples during which everything was labeled. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
-We do not update parameters for the delay and response models online.
+% To initialize parameters for the model-based methods, we used a burn-in period of 40 examples during which everything was labeled. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
+% We do not update parameters for the delay and response models online.
 
 \paragraph{Implementation and crowdsourcing setup.}
 We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
 The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
-We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query.
-Worker response times were generally in the range of 3-6 seconds for NER, 10-15 seconds for Sentiment, and 2-4 seconds for Faces.
+We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query (for NER, since response times were much faster, we paid \$0.005 per query).
+Worker response times were generally in the range of 0.5-6 seconds for NER, 10-15 seconds for Sentiment, and 1-4 seconds for Faces.
 
 When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
-To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
-During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
-Neither LENSE nor the threshold needed more than 3 queries on a single label.
+To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{These datasets are available in the code repository for this paper}.
+During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses.
 
 \begin{table}[t]
 %% NER 
-\begin{tabular}{l r r r r r | r r r r r}
-  \multicolumn{6}{c|}{Named Entity Recognition} & 
+\begin{tabular}{l r r r r r r | r r r r r}
+  \multicolumn{7}{c|}{Named Entity Recognition} & 
       \multicolumn{3}{c}{Face Identification} \\
-      \textbf{System} & \textbf{Latency} & \textbf{Qus./tok} & \textbf{P} & \textbf{R} & \textbf{F$_1$} 
+      \textbf{System} & \textbf{Delay/tok} & \textbf{Qus./tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
           & \textbf{Latency} & \textbf{Qus./ex} & \textbf{Acc.} 
     \\ \hline
-    1-vote & 467 ms & 1.0 & TODO & TODO & 80.20
+    1-vote & 467 ms & 1.0 & 90.2 & 78.8 & 71.5 & 80.2
       & %1-vote & 
       1414 ms & 1.0 & 87.75 \\ %\hline
-    3-vote & 750 ms & 3.0 & TODO & TODO & 85.41
+    3-vote & 750 ms & 3.0 & 93.6 & 85.1 & 74.5 & 85.4
         & %3-vote &
         1865 ms & 3.0 & 88.44 \\ %\hline
-    5-vote & 1350 ms & 5.0 & TODO & TODO & 87.33 
+    5-vote & 1350 ms & 5.0 & \textbf{95.5} & 87.7 & 78.7 & 87.3 
         & 
         -- & -- & -- \\ \hline
-    Online & n/a & n/a & TODO & TODO & 60.96
+    Online & n/a & n/a & 56.9 & 74.6 & 51.4 & 60.9
         % Online 
         & n/a & n/a & 87.43 \\    %\hline
-    Threshold & \textbf{414 ms} & 0.61 & TODO & TODO & 88.27
+    Threshold & \textbf{414 ms} & 0.61 & 95.2 & \textbf{89.8} & 79.8 & 88.3
         % threshold 
         & 1121 ms & 1.12 & \textbf{91.53} \\ %\hline
-    \textbf{LENSE} & 724 ms & \textbf{0.44} & TODO & TODO & \textbf{88.45} 
+    \textbf{LENSE} & 724 ms & \textbf{0.44} & 95.3 & 89.3 & \textbf{80.7} & \textbf{88.5} 
     %\textbf{LENSE} 
     & 961 ms & \textbf{1.06} & 88.45 \\   %\hline
 \end{tabular}
@@ -121,9 +120,8 @@ Neither LENSE nor the threshold needed more than 3 queries on a single label.
 \paragraph{Summary of results.}
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 3-4.
-For the latter two tasks, both on-the-job learning methods, threshold baseline and LENSE, perform comparably.
-The simple heuristic adopted by the threshold baseline is sufficient to reason about expected marginals on both these tasks because they are single label prediction tasks which do not involve any interactions between labels.
+On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving a slightly inferior result using the human-only 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 2-3.
+For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on.
 
 \begin{figure}[t]
   \centering

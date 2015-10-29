@@ -17,22 +17,22 @@ In many situations, one wishes to build a new system --- e.g., to do Twitter inf
 opinion --- but one simply lacks the resources to follow either the pure ML or pure crowdsourcing road.
 
 % Our proposal: on the job training setting, related work
-In this paper, we propose a new framework for \emph{on-the-job learning} \citep{lasecki2013real},
+In this paper, we propose a framework called \emph{on-the-job learning} (formalizing and extending ideas first implemented in \citep{lasecki2013real}),
 in which we produce high quality results from the start without requiring a trained model.
 When a new input arrives,
 the system can choose to asynchronously query the crowd on \emph{parts} of the input it is
-uncertain about. After collecting enough evidence the system makes a prediction.
+uncertain about (e.g. query about the label of a single token in a sentence). After collecting enough evidence the system makes a prediction.
 The goal is to maintain high accuracy by initially using the crowd as a crutch,
 but gradually becoming more self-sufficient as the model improves.
-While active learning \citep{settles2010active} and active classification \citep{gao2011active}
-also query a subset of the labels strategically,
-they deploy a static predictor in the end,
-whereas we improve the model during test time.
-While online learning \citep{cesabianchi06prediction} and
+This differs from online learning \citep{cesabianchi06prediction} and
 online active learning \citep{helmbold1997some,sculley2007online,chu2011unbiased}
-improve the model during test time,
+in that
 they do not actively seek new information \emph{prior} to making a prediction,
 and cannot maintain high accuracy independent of the number of data instances seen so far.
+While active classification \citep{gao2011active}
+also queries a subset of the labels strategically,
+it is based on a static policy, 
+whereas we improve the model during test time based on observed data.
 
 % Bayesian decision theory: technical solution
 To determine which queries to make,
@@ -55,7 +55,7 @@ with a 3--7 fold reduction in cost over the pure crowdsourcing approach
 that achieves comparable accuracies and latencies.
 Compared to pure ML approaches, we obtain substantially higher accuracy.
 An open-source implementation of our system, dubbed LENSE for ``Learning from Expensive Noisy Slow Experts'' is available at
-\href{http://www.github.com/lense-project/lense-base}{http://www.github.com/lense-project/lense-base}.
+\href{http://www.github.com/keenon/lense-service-platform}{http://www.github.com/keenon/lense-service-platform}.
 %\href{http://anonymo.us}{http://anonymo.us}.
 
 
