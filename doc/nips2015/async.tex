@@ -143,7 +143,6 @@ When simulating the crowd's turn, make a stochastic choice of next state as desc
 To handle the unbounded fanout during the crowd's turn, we use progressive widening  
 that maintains a current set of ``active'' or ``explored'' states, which is gradually grown with time. 
 %When the game terminates, the weights of the value function, $w$ are updated using a TD-update from TD-learning.
-\todo{Include progressive widening in algorithm box}.
 
 \paragraph{Learning.}
 Having addressed the problem of inferring when to make queries to human beings, we now discuss how that data can be incorporated to learning new parameters for the actual prediction model, $p_\theta(\by \given \bx)$.
@@ -187,7 +186,7 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
 \begin{algorithm}
 %  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 %  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-\caption{Approximating the value with TD learning and MCTS}
+\caption{Approximating the value with Progressive Widening and MCTS}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
     \Function{monteCarloValue}{state $s$}
@@ -195,14 +194,16 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
     \State $s' \gets \argmax_{s'} \left\{V(s') + c \sqrt{\frac{\log N(s)}{N(s')}} \right\}$
       \Comment Choose child using UCT
       \State $v \gets $\Call{monteCarloValue}{$s'$}
-      \State $w \gets w + \alpha (v - V(s')) \nabla_w V(s')$
-      \Comment Update value function approximation
       \State increment $N(s)$ and $N(s')$
       %\State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
       \State \Return $v$
     \ElsIf{crowd's turn}
-      \State $s'$ drawn based on (\ref{eqn:dynamics})
-      \Comment Sample a child
+	  \If{$\sqrt{|s\text{ visits}|} \geq |s\text{ children}|$}
+	  \Comment Constrict continuos samples using PW
+        \State $s'$ drawn based on (\ref{eqn:dynamics}) and added to $s$ children
+	  \Else
+        \State $s'$ sampled from set of already visited $s$ children based on (\ref{eqn:dynamics})
+	  \EndIf
       \State \Return \Call{monteCarloValue}{$s'$}
     \ElsIf{leaf node}
     \State \Return utility $U$ of $s$ according to (\ref{eqn:utility})

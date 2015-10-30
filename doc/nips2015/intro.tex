@@ -43,8 +43,8 @@ to offset the noisy responses.  If we desire low latency, then we should issue q
 in parallel, whereas if latency is not a factor, we should issue queries
 sequentially in order to be more adaptive.
 Computing the optimal policy is intractable,
-so we employ an approximation
-based on a new combination of TD learning \citep{sutton1988learning}
+so we develop an approximation
+based on a combination of progressive widening \citep{coulom2007computing}
 and Monte Carlo tree search \citep{kocsis2006bandit} to approximate it.
 
 % Experiments.
