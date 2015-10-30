@@ -54,7 +54,7 @@ Let us now formalize the game tree in terms of its states, actions, transitions 
 The \emph{game state} $\sigma = (\now, \bq, \bs, \br, \bt)$
 consists of the current time $\now$, the queries $\bq = (q_1, \ldots, q_{k-1})$ that have been issued at times $\bs = (s_1, \ldots, s_{k-1})$ and
 the responses $\br = (r_1, \ldots, r_{k-1})$ that have been received at times $\bt = (t_1, \ldots, t_{k-1})$.
-For notational simplicity, we assume that some or all of $\br$ and $\bt$ can be $\emptyset$ if the corresponding responses have not been received by time $\now$.
+For notational simplicity, let $r_j = \emptyset$ and $t_j = \emptyset$ iff the responses for the query $q_j$ have not been received by time $\now$.
 %Note that some or all of $\br[\now]$ may be $\emptyset$ because those responses have not yet been received.
 
 During the system's turn,
