@@ -33,10 +33,10 @@ We evaluated the following four methods on each dataset:
   {\bf Sentiment (1800)} & 
     We evaluate on a subset of the IMDB sentiment dataset \cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
     &
-    We used two feature sets, the first (\textsc{bigrams}) containing only word unigrams and bigrams, and the second (\textsc{rnn}) that also contained sentence vector embeddings from~\cite{socher2013recursive}.
+    We used two feature sets, the first (\textsc{unigrams}) containing only word unigrams, and the second (\textsc{rnn}) that also contains sentence vector embeddings from~\cite{socher2013recursive}.
     \\
   {\bf Face (1784)} & 
-  We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
+  We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson or Miley Cyrus.
     &
     We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings, though we leave back-propagating into the net to future work.
 \end{tabular}
@@ -92,7 +92,7 @@ During simulation we sample the worker responses and delays without replacement 
 \begin{table}[t]
     \begin{minipage}[t]{.49\textwidth}
   \includegraphics[width=\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
-  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{bigram} features, the model does not have the capacity to predict at our desired accuracy and must query the crowd. With more complex \textsc{rnn} features, the model learns and queries the crowd less over time.}
+  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{unigram} features, the model quickly learns it does not have the capacity to satisfy our desired confidence values and must query the crowd. With more complex \textsc{rnn} features, the model learns to be more confident and queries the crowd less over time.}
         \label{fig:sentiment-tradeoff}
     \end{minipage}
     \qquad
@@ -131,7 +131,7 @@ For the latter two tasks, both on-the-job learning methods perform less well tha
   \begin{subfigure}[b]{0.49\textwidth}
   \includegraphics[width=\textwidth]{figures/ner_2_class/cost_plot/cost_vs_time.pdf}
   \end{subfigure}
-  \caption{Comparing \fone{} and queries per token on the NER task. LENSE maintains high \fone{} scores by querying the crowd when it is unsure. As the model learns, it needs to query the crowd less.}
+  \caption{Comparing \fone{} and queries per token on the NER task over time. The left graph compares LENSE to online learning (which cannot query humans at test time). This highlights that LENSE maintains high \fone{} scores even with very small training set sizes, by falling back the crowd when it is unsure. The right graph compares query rate over time to 1-vote. This clearly shows that as the model learns, it needs to query the crowd less.}
 \label{fig:ner-f1}
 \end{figure}
 
@@ -154,8 +154,8 @@ On the NER task, we find that LENSE is able to trade off time to produce more ac
 %\paragraph{In the limit, would LENSE still need crowd supervision?}
 While on-the-job learning allows us to deploy quickly and ensure good results, we would like to eventually operate without crowd supervision.
 %In order to do so, we must ensure that our model has the capacity to keep learning from the crowd.
-\figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{bigrams} and \textsc{rnn} (as described in \tableref{dataset}).
-With simpler features (\textsc{bigrams}),
+\figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{unigrams} and \textsc{rnn} (as described in \tableref{dataset}).
+With simpler features (\textsc{unigrams}),
 the model saturates early and we will continue to need to query to the crowd to achieve our accuracy target (as specified by the loss function).
 On the other hand, using richer features (\textsc{rnn}) the model is able to learn from the crowd and the amount of supervision needed reduces over time.
 %This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.
