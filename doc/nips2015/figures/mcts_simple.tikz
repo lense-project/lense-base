@@ -54,6 +54,7 @@
   \draw[-latex] (h1-crowd1) -- (h1-resp2.north);
 
   \node[term] (h1-term) at ($(lvl3)!(hist1)!(lvl3x)$) {};
+  \node[right=0.1cm of h1-term] {0.47};
   \draw[-latex] (h1-resp1) -- node[right]{$\acret$} (h1-term);
 
   \node[sys] (h2-q1) at ($(lvl1)!(hist2)!(lvl1x)$) {};
@@ -69,6 +70,7 @@
   \draw[-latex] (h2-crowd1) -- node[left]{} (h2-resp2.north);
 
   \node[term] (h2-term) at ($(lvl4)!(hist2)!(lvl4x)$) {};
+  \node[right=0.1cm of h2-term] {0.27};
   \draw[-latex] (h2-resp1) -- node[right]{$\acret$} (h2-term);
 
   \node[sys, scale=0.5, left] (lg0) at ($(lvl01)!(hist2)!(lvl01x)$) {};
@@ -76,7 +78,7 @@
   \node[crowd, scale=0.5, left] (lg1) at ($(lvl02)!(hist2)!(lvl02x)$) {};
   \node[right] at (lg1) {\ $=$ crowd};
 
-  \node[right] (st0) at ($(lvl01)!(hist0)!(lvl01x)$) {$\sigma = [t, \bq, \bs, \br, \bt]$};
+  \node[right] (st0) at ($(lvl01)!(hist0)!(lvl01x)$) {$\sigma = [t_{\textrm{now}}, \bq, \bs, \br, \bt]$};
   \node[right] (st1) at ($(lvl0)!(hist0)!(lvl0x)$) {\small $[1, (3), (0), (\emptyset), (\emptyset)]$};
   \node[right] (st2) at ($(lvl2)!(hist0)!(lvl2x)$) {\small $[1.7, (3), (0), (1.7), (\textsc{loc})]$};
 
