@@ -1,0 +1,369 @@
+% scabby.sty - 
+%   All the little things you've always wanted.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{scabby}
+\typeout{Scabby: A bunch of little macros}
+
+%\RequirePackage{natbib}
+\RequirePackage{hyperref}
+\RequirePackage{url}
+%\RequirePackage{nameref}
+\RequirePackage{etoolbox}
+\RequirePackage{soul}
+\RequirePackage{mathtools}
+\RequirePackage{amsmath}
+\RequirePackage{amsthm}
+\RequirePackage{amssymb}
+\RequirePackage{latexsym}
+%\let\proof\relax
+%\let\endproof\relax
+
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+%\RequirePackage{algorithmicx}
+
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{xkeyval}
+
+\newtoggle{definetheorems}
+\toggletrue{definetheorems}
+\DeclareOption{nodefinetheorems}{\togglefalse{definetheorems}}
+\ProcessOptions{}
+
+\providecommand{\Email}[1]{ \hfill \textsc{\small #1}}
+
+\newcommand{\forcecommand}[3][0]{
+  \providecommand{#2}{}
+  \renewcommand{#2}[#1]{#3}
+}
+
+% Standard
+\forcecommand\sa{\ensuremath{\mathcal{a}}}
+\forcecommand\sd{\ensuremath{\mathcal{d}}}
+\forcecommand\se{\ensuremath{\mathcal{e}}}
+\forcecommand\sg{\ensuremath{\mathcal{g}}}
+\forcecommand\sh{\ensuremath{\mathcal{h}}}
+\forcecommand\siTwo{\ensuremath{\mathcal{i}}}
+\forcecommand\sj{\ensuremath{\mathcal{j}}}
+\forcecommand\sk{\ensuremath{\mathcal{k}}}
+\forcecommand\sm{\ensuremath{\mathcal{m}}}
+\forcecommand\sn{\ensuremath{\mathcal{n}}}
+\forcecommand\so{\ensuremath{\mathcal{o}}}
+\forcecommand\sq{\ensuremath{\mathcal{q}}}
+\forcecommand\sr{\ensuremath{\mathcal{r}}}
+\forcecommand\st{\ensuremath{\mathcal{t}}}
+\forcecommand\su{\ensuremath{\mathcal{u}}}
+\forcecommand\sv{\ensuremath{\mathcal{v}}}
+\forcecommand\sw{\ensuremath{\mathcal{w}}}
+\forcecommand\sx{\ensuremath{\mathcal{x}}}
+\forcecommand\sy{\ensuremath{\mathcal{y}}}
+\forcecommand\sz{\ensuremath{\mathcal{z}}}
+\forcecommand\sA{\ensuremath{\mathcal{A}}}
+\forcecommand\sB{\ensuremath{\mathcal{B}}}
+\forcecommand\sC{\ensuremath{\mathcal{C}}}
+\forcecommand\sD{\ensuremath{\mathcal{D}}}
+\forcecommand\sE{\ensuremath{\mathcal{E}}}
+\forcecommand\sF{\ensuremath{\mathcal{F}}}
+\forcecommand\sG{\ensuremath{\mathcal{G}}}
+\forcecommand\sH{\ensuremath{\mathcal{H}}}
+\forcecommand\sI{\ensuremath{\mathcal{I}}}
+\forcecommand\sJ{\ensuremath{\mathcal{J}}}
+\forcecommand\sK{\ensuremath{\mathcal{K}}}
+\forcecommand\sL{\ensuremath{\mathcal{L}}}
+\forcecommand\sM{\ensuremath{\mathcal{M}}}
+\forcecommand\sN{\ensuremath{\mathcal{N}}}
+\forcecommand\sO{\ensuremath{\mathcal{O}}}
+\forcecommand\sP{\ensuremath{\mathcal{P}}}
+\forcecommand\sQ{\ensuremath{\mathcal{Q}}}
+\forcecommand\sR{\ensuremath{\mathcal{R}}}
+\forcecommand\sS{\ensuremath{\mathcal{S}}}
+\forcecommand\sT{\ensuremath{\mathcal{T}}}
+\forcecommand\sU{\ensuremath{\mathcal{U}}}
+\forcecommand\sV{\ensuremath{\mathcal{V}}}
+\forcecommand\sW{\ensuremath{\mathcal{W}}}
+\forcecommand\sX{\ensuremath{\mathcal{X}}}
+\forcecommand\sY{\ensuremath{\mathcal{Y}}}
+\forcecommand\sZ{\ensuremath{\mathcal{Z}}}
+\forcecommand\ba{\ensuremath{\mathbf{a}}}
+\forcecommand\bb{\ensuremath{\mathbf{b}}}
+\forcecommand\bc{\ensuremath{\mathbf{c}}}
+\forcecommand\bd{\ensuremath{\mathbf{d}}}
+\forcecommand\be{\ensuremath{\mathbf{e}}}
+\forcecommand\bef{\ensuremath{\mathbf{f}}}
+\forcecommand\bg{\ensuremath{\mathbf{g}}}
+\forcecommand\bh{\ensuremath{\mathbf{h}}}
+\forcecommand\bi{\ensuremath{\mathbf{i}}}
+\forcecommand\bj{\ensuremath{\mathbf{j}}}
+\forcecommand\bk{\ensuremath{\mathbf{k}}}
+\forcecommand\bl{\ensuremath{\mathbf{l}}}
+\forcecommand\bn{\ensuremath{\mathbf{n}}}
+\forcecommand\bo{\ensuremath{\mathbf{o}}}
+\forcecommand\bp{\ensuremath{\mathbf{p}}}
+\forcecommand\bq{\ensuremath{\mathbf{q}}}
+\forcecommand\br{\ensuremath{\mathbf{r}}}
+\forcecommand\bs{\ensuremath{\mathbf{s}}}
+\forcecommand\bt{\ensuremath{\mathbf{t}}}
+\forcecommand\bu{\ensuremath{\mathbf{u}}}
+\forcecommand\bv{\ensuremath{\mathbf{v}}}
+\forcecommand\bw{\ensuremath{\mathbf{w}}}
+\forcecommand\bx{\ensuremath{\mathbf{x}}}
+\forcecommand\by{\ensuremath{\mathbf{y}}}
+\forcecommand\bz{\ensuremath{\mathbf{z}}}
+\forcecommand\bA{\ensuremath{\mathbf{A}}}
+\forcecommand\bB{\ensuremath{\mathbf{B}}}
+\forcecommand\bC{\ensuremath{\mathbf{C}}}
+\forcecommand\bD{\ensuremath{\mathbf{D}}}
+\forcecommand\bE{\ensuremath{\mathbf{E}}}
+\forcecommand\bF{\ensuremath{\mathbf{F}}}
+\forcecommand\bG{\ensuremath{\mathbf{G}}}
+\forcecommand\bH{\ensuremath{\mathbf{H}}}
+\forcecommand\bI{\ensuremath{\mathbf{I}}}
+\forcecommand\bJ{\ensuremath{\mathbf{J}}}
+\forcecommand\bK{\ensuremath{\mathbf{K}}}
+\forcecommand\bL{\ensuremath{\mathbf{L}}}
+\forcecommand\bM{\ensuremath{\mathbf{M}}}
+\forcecommand\bN{\ensuremath{\mathbf{N}}}
+\forcecommand\bO{\ensuremath{\mathbf{O}}}
+\forcecommand\bP{\ensuremath{\mathbf{P}}}
+\forcecommand\bQ{\ensuremath{\mathbf{Q}}}
+\forcecommand\bR{\ensuremath{\mathbf{R}}}
+\forcecommand\bS{\ensuremath{\mathbf{S}}}
+\forcecommand\bT{\ensuremath{\mathbf{T}}}
+\forcecommand\bU{\ensuremath{\mathbf{U}}}
+\forcecommand\bV{\ensuremath{\mathbf{V}}}
+\forcecommand\bW{\ensuremath{\mathbf{W}}}
+\forcecommand\bX{\ensuremath{\mathbf{X}}}
+\forcecommand\bY{\ensuremath{\mathbf{Y}}}
+\forcecommand\bZ{\ensuremath{\mathbf{Z}}}
+\forcecommand\Ba{\ensuremath{\mathbb{a}}}
+\forcecommand\Bb{\ensuremath{\mathbb{b}}}
+\forcecommand\Bc{\ensuremath{\mathbb{c}}}
+\forcecommand\Bd{\ensuremath{\mathbb{d}}}
+\forcecommand\Be{\ensuremath{\mathbb{e}}}
+\forcecommand\Bf{\ensuremath{\mathbb{f}}}
+\forcecommand\Bg{\ensuremath{\mathbb{g}}}
+\forcecommand\Bh{\ensuremath{\mathbb{h}}}
+\forcecommand\Bi{\ensuremath{\mathbb{i}}}
+\forcecommand\Bj{\ensuremath{\mathbb{j}}}
+\forcecommand\Bk{\ensuremath{\mathbb{k}}}
+\forcecommand\Bl{\ensuremath{\mathbb{l}}}
+\forcecommand\Bm{\ensuremath{\mathbb{m}}}
+\forcecommand\Bn{\ensuremath{\mathbb{n}}}
+\forcecommand\Bo{\ensuremath{\mathbb{o}}}
+\forcecommand\Bp{\ensuremath{\mathbb{p}}}
+\forcecommand\Bq{\ensuremath{\mathbb{q}}}
+\forcecommand\Br{\ensuremath{\mathbb{r}}}
+\forcecommand\Bs{\ensuremath{\mathbb{s}}}
+\forcecommand\Bt{\ensuremath{\mathbb{t}}}
+\forcecommand\Bu{\ensuremath{\mathbb{u}}}
+\forcecommand\Bv{\ensuremath{\mathbb{v}}}
+\forcecommand\Bw{\ensuremath{\mathbb{w}}}
+\forcecommand\Bx{\ensuremath{\mathbb{x}}}
+\forcecommand\By{\ensuremath{\mathbb{y}}}
+\forcecommand\Bz{\ensuremath{\mathbb{z}}}
+\forcecommand\BA{\ensuremath{\mathbb{A}}}
+\forcecommand\BB{\ensuremath{\mathbb{B}}}
+\forcecommand\BC{\ensuremath{\mathbb{C}}}
+\forcecommand\BD{\ensuremath{\mathbb{D}}}
+\forcecommand\BE{\ensuremath{\mathbb{E}}}
+\forcecommand\BF{\ensuremath{\mathbb{F}}}
+\forcecommand\BG{\ensuremath{\mathbb{G}}}
+\forcecommand\BH{\ensuremath{\mathbb{H}}}
+\forcecommand\BI{\ensuremath{\mathbb{I}}}
+\forcecommand\BJ{\ensuremath{\mathbb{J}}}
+\forcecommand\BK{\ensuremath{\mathbb{K}}}
+\forcecommand\BL{\ensuremath{\mathbb{L}}}
+\forcecommand\BM{\ensuremath{\mathbb{M}}}
+\forcecommand\BN{\ensuremath{\mathbb{N}}}
+\forcecommand\BO{\ensuremath{\mathbb{O}}}
+\forcecommand\BP{\ensuremath{\mathbb{P}}}
+\forcecommand\BQ{\ensuremath{\mathbb{Q}}}
+\forcecommand\BR{\ensuremath{\mathbb{R}}}
+\forcecommand\BS{\ensuremath{\mathbb{S}}}
+\forcecommand\BT{\ensuremath{\mathbb{T}}}
+\forcecommand\BU{\ensuremath{\mathbb{U}}}
+\forcecommand\BV{\ensuremath{\mathbb{V}}}
+\forcecommand\BW{\ensuremath{\mathbb{W}}}
+\forcecommand\BX{\ensuremath{\mathbb{X}}}
+\forcecommand\BY{\ensuremath{\mathbb{Y}}}
+\forcecommand\BZ{\ensuremath{\mathbb{Z}}}
+\forcecommand\balpha{\ensuremath{\mbox{\boldmath$\alpha$}}}
+\forcecommand\bbeta{\ensuremath{\mbox{\boldmath$\beta$}}}
+\forcecommand\btheta{\ensuremath{\mbox{\boldmath$\theta$}}}
+\forcecommand\bphi{\ensuremath{\mbox{\boldmath$\phi$}}}
+\forcecommand\bpi{\ensuremath{\mbox{\boldmath$\pi$}}}
+\forcecommand\bpsi{\ensuremath{\mbox{\boldmath$\psi$}}}
+\forcecommand\bmu{\ensuremath{\mbox{\boldmath$\mu$}}}
+
+% Sectioning
+% Section macros
+\forcecommand[3]{\itemref}{\hyperref[#2:#3]{#1~\ref{#2:#3}}}
+\forcecommand[1]{\sectionref}{\itemref{Section}{sec}{#1}}
+\forcecommand[1]{\appendixref}{\itemref{Appendix}{app}{#1}}
+\forcecommand[1]{\algorithmref}{\itemref{Algorithm}{algo}{#1}}
+\forcecommand[1]{\figureref}{\itemref{Figure}{fig}{#1}}
+\forcecommand[1]{\tableref}{\itemref{Table}{tbl}{#1}}
+\forcecommand[1]{\equationref}{\hyperref[eqn:#1]{Equation~\ref{eqn:#1}}}
+
+\iftoggle{definetheorems}{
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{theorem*}{Theorem}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{corollary*}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{property}{Property}
+\newtheorem*{definition*}{Definition}
+\newtheorem*{property*}{Property}
+\theoremstyle{plain}
+}{}
+
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{assumption*}{Assumption}
+\newtheorem{example}{Example}
+\newtheorem*{example*}{Example}
+\theoremstyle{plain}
+\@ifclassloaded{beamer}{}{
+\newtheorem*{note}{Note}
+\newtheorem*{note*}{Note}
+}
+
+\forcecommand[1]{\theoremref}{\itemref{Theorem}{thm}{#1}}
+\forcecommand[1]{\lemmaref}{\itemref{Lemma}{lem}{#1}}
+\forcecommand[1]{\corollaryref}{\itemref{Corollary}{cor}{#1}}
+\forcecommand[1]{\propertyref}{\itemref{Property}{prop}{#1}}
+\forcecommand[1]{\definitionref}{\itemref{Definition}{def}{#1}}
+\forcecommand[1]{\assumptionref}{\itemref{Assumption}{asm}{#1}}
+
+% Text
+\forcecommand[1]{\todo}{{\tiny \hl{\textsc{TODO:} #1}}}
+\forcecommand[1]{\comment}{ % Comments of equations
+  \text{\phantom{(#1)}} \tag{#1}
+}
+\forcecommand{\quirk}{{\tiny \hl{\textsc{Quirk}}}}
+
+% Editing notes
+\forcecommand[2]{\editnote}{\ensuremath{\underline{\textrm{#1}}_{\textrm{#2}}}}
+\forcecommand[1]{\editupnote}{\ensuremath{^{[\hl{\textrm{#1}}]}}}
+\forcecommand{\vague}{\editupnote{vague}}
+\forcecommand{\verify}{\editupnote{verify}}
+\forcecommand{\reword}{\editupnote{reword}}
+\forcecommand{\define}{\editupnote{define}}
+\forcecommand{\expand}{\editupnote{expand}}
+\forcecommand{\needcite}{\editupnote{citation needed}}
+\forcecommand[1]{\findcite}{\editupnote{find: #1}}
+\forcecommand[1]{\noteb}{{\tiny \hl{\textsc{NB:} #1}}}
+
+% Operators
+\providecommand{\union}{\cup}
+\providecommand{\intersect}{\cap}
+\providecommand{\Union}{\bigcup}
+\providecommand{\Intersect}{\bigcap}
+\providecommand{\eqdef}{\triangleq}
+
+\providecommand{\contains}{\ni}
+
+% Probability/Statistics
+\forcecommand{\E}   {\operatorname{\mathbb{E}}}
+\forcecommand{\I}   {\operatorname{\mathbb{I}}}
+\forcecommand{\Pr}  {\operatorname{\mathbb{P}}}
+\forcecommand{\Var} {\operatorname{Var}}
+\forcecommand{\Cov} {\operatorname{Cov}}
+\forcecommand{\given} {\mid}
+
+% Constants/etc.
+\forcecommand{\Re} {\mathbb{R}}
+\forcecommand{\Nn} {\mathbb{N}}
+\forcecommand{\Cm} {\mathbb{C}}
+\forcecommand{\Qm} {\mathbb{Q}}
+\forcecommand{\Sm} {\mathbb{S}}
+\forcecommand{\half} {\frac{1}{2}}
+
+% Logic
+\forcecommand{\band}{\wedge}
+\forcecommand{\bor}{\vee}
+
+
+% Calculus
+\forcecommand{\del}{\partial}
+\forcecommand{\ud}{\, \mathrm{d}}
+\forcecommand[2]{\diff} {\frac{\partial #1}{\, \partial #2}}
+\forcecommand[2]{\difff} {\frac{\partial^2}{\, \partial #1\, \partial #2}}
+\forcecommand[2]{\diffn} {\frac{\partial^{#2}}{\, \partial {#1}^{#2}}}
+\forcecommand{\grad}{\nabla}
+
+% Optimization
+\forcecommand{\mL} {\mathcal{L}}
+\forcecommand{\maximize} {\operatorname{maximize}}
+\forcecommand{\minimize} {\operatorname{minimize}}
+\forcecommand{\argmax} {\operatorname{\arg\,max}}
+\forcecommand{\argmin} {\operatorname{\arg\,min}}
+\forcecommand{\subjecto} {\operatorname{subject\ to}}
+\forcecommand{\Supp} {\operatorname{Supp}}
+\forcecommand{\lone} {\ensuremath{\ell_1}}
+\forcecommand{\ltwo} {\ensuremath{\ell_2}}
+
+% Linear Algebra
+\forcecommand{\hprod} {\circ} % Hadamard
+\forcecommand{\inv}{^{-1}}
+\forcecommand{\tinv}{^{-\top}}
+\forcecommand{\pinv} {^{\dagger}}
+\forcecommand{\pinvt} {^{\dagger \top}}
+\forcecommand[2]{\innerp}{\left\langle #1, #2 \right\rangle}
+\forcecommand{\diag}{\operatorname{diag}}
+\forcecommand{\triu}{\operatorname{triu}}
+\forcecommand{\trace}{\operatorname{tr}}
+\forcecommand{\Tr}{\operatorname{tr}}
+\forcecommand[1]{\tp}{^{\otimes#1}}
+\forcecommand{\KL}{\operatorname{KL}}
+\forcecommand[1]{\cspan}{\langle #1 \rangle}
+\providecommand{\rank} {\operatorname{rank}}
+
+% Convex Geometry
+\forcecommand{\conv} {\operatorname{conv}}
+\forcecommand{\dist} {\operatorname{dist}}
+\forcecommand{\cone} {\operatorname{cone}}
+\forcecommand{\psd} {\textrm{PSD}}
+
+% Algebra
+\forcecommand{\Ker} {\operatorname{Ker}}
+\forcecommand{\Col} {\operatorname{Col}}
+\forcecommand{\Mat} {\operatorname{Mat}}
+
+% Misc
+\forcecommand{\sgn} {\operatorname{sgn}}
+\forcecommand[1]{\oft}   {^{(#1)}}
+\forcecommand[2]{\oftt}   {^{(#1) #2}}
+\forcecommand[1]{\oneby} {\frac{1}{#1}}
+\forcecommand[1]{\bytwo} {\frac{#1}{2}}
+
+\forcecommand{\mM} {\mathcal{M}}
+\forcecommand[1]{\tuple} {\langle #1 \rangle}
+
+\forcecommand[1]{\vec} {\mathbf{#1}}
+\providecommand{\ones} {\vec{1}}
+\providecommand{\zeros} {\vec{0}}
+
+\forcecommand{\Range} {\operatorname{Range}}
+\forcecommand{\Domain} {\operatorname{Dom}}
+
+\forcecommand[2]{\LINEIF}{%
+    \STATE\algorithmicif\ {#1}\ \algorithmicthen\ {#2} \algorithmicend\ \algorithmicif%
+}
+\forcecommand[3]{\LINEIFELSE}{%
+\STATE\algorithmicif\ {#1}\ \algorithmicthen\ {#2} \algorithmicelse\ {#3} \algorithmicend\ \algorithmicif%
+}
+
+\newenvironment{epigraph}{%
+\par\hfill\itshape{}
+\begin{tabular}{@{}r}
+}{%
+\end{tabular}
+}
+
