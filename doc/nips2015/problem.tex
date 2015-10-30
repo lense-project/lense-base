@@ -40,20 +40,22 @@
 Consider a structured prediction problem from input $\bx = (x_1, \dots, x_n)$ to output $\by = (y_1, \dots, y_n)$.
 For example, for named-entity recognition (NER) on tweets,
 $\bx$ is a sequence of words in the tweet (e.g., \nl{on George str.})
-and $\by$ is the corresponding sequence of tags (e.g., \scnone{} \scloc{} \scloc{}).
-The full set of tags of \scper{}, \scloc{}, \scres{}, and \scnone{}.
+and $\by$ is the corresponding sequence of labels (e.g., \scnone{} \scloc{} \scloc{}).
+The full set of labels of \scper{}, \scloc{}, \scres{}, and \scnone{}.
 
 % Basic setting
 In the \emph{on-the-job learning} setting, inputs arrive in a stream.
 On each input $\bx$,
-we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain tags
+we make zero or more queries $q_1, q_2, \dots$ on the crowd to obtain labels
 (potentially more than once)
 for any positions in $\bx$.
 The responses $r_1, r_2, \dots$ come back asynchronously,
 which are incorporated into our current prediction model $p_\theta$.
 \figureref{game-tree}~(left) shows one possible outcome:
-we first query position $q_1 = 2$ (\nl{George}), which later returns $r_1 = \scloc$;
-in the meantime, we have queried $q_2=3$ (\nl{str.}) and gotten back $r_2 = \scloc$.
+We query positions $q_1 = 2$ (\nl{George}) and $q_2=3$ (\nl{str.}).
+The first query returns $r_1 = \scloc$,
+upon which we make another query on the the same position $q_3 = 3$ (\nl{George}),
+and so on.
 When we have sufficient confidence about the entire output,
 we return the most likely prediction $\hat \by$ under the model.
 Each query $q_i$ is issued at time $s_i$ and the response comes back at time $t_i$.
@@ -66,7 +68,7 @@ First, we must make a prediction $\hat \by$ on each input $\bx$ in the stream,
 unlike in active learning, where we are only interested in the pool or stream of examples
 for the purposes of building a good model.
 % PL: though active learning will query hard examples too
-Second, we evaluate on $\accuracy(\by, \byt)$ against the true tag sequence $\by$
+Second, we evaluate on $\accuracy(\by, \byt)$ against the true label sequence $\by$
 (on named-entity recognition, this is the F$_1$ metric),
 but $\by$ is never actually observed---the only feedback is via the responses,
 like in partial monitoring games \citep{cesabianchi06regret}.
@@ -76,7 +78,6 @@ on each example from the beginning.
 Finally, the responses are used to update the prediction model, like in online learning.
 This allows the number of queries needed (and thus cost and latency) to decrease over time
 without compromising accuracy.
-
 
 % VKeenon
 % As a motivating example, imagine an automated trading firm.
