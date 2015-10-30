@@ -142,6 +142,7 @@ When simulating the system's turn, the next state (and hence action) is chosen u
 When simulating the crowd's turn, make a stochastic choice of next state as described above. 
 To handle the unbounded fanout during the crowd's turn, we use progressive widening  
 that maintains a current set of ``active'' or ``explored'' states, which is gradually grown with time. 
+Notationally, we will refer to the number of times a state has been visited as $N(\sigma)$, and the set of all successor (child) states that the algorithm has sampled as $C(\sigma)$.
 %When the game terminates, the weights of the value function, $w$ are updated using a TD-update from TD-learning.
 
 \paragraph{Learning.}
@@ -189,24 +190,29 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
 \caption{Approximating the value with MCTS and Progressive Widening}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
-    \Function{monteCarloValue}{state $s$}
+    \State For all $\sigma$, $N(\sigma) \gets 0$, $V(\sigma) \gets 0$, $C(\sigma) \gets []$
+	\Comment Initialize visits, utility sum, and children
+    \Function{monteCarloValue}{state $\sigma$}
+    \State increment $N(\sigma)$
     \If{\text{system's turn}}
-    \State $s' \gets \argmax_{s'} \left\{V(s') + c \sqrt{\frac{\log N(s)}{N(s')}} \right\}$
+    \State $\sigma' \gets \argmax_{\sigma'} \left\{\frac{V(\sigma')}{N(\sigma')} + c \sqrt{\frac{\log N(\sigma)}{N(\sigma')}} \right\}$
       \Comment Choose child using UCT
-      \State $v \gets $\Call{monteCarloValue}{$s'$}
-      \State increment $N(s)$ and $N(s')$
+	  \State $v \gets $\Call{monteCarloValue}{$\sigma'$}
+      \State $V(\sigma) \gets V(\sigma) + v$
+	  \Comment Record observed utility
       %\State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
       \State \Return $v$
     \ElsIf{crowd's turn}
-	  \If{$\max(1,\sqrt{|s\text{ visits}|}) \leq |s\text{ children}|$}
+	  \If{$\max(1,\sqrt{N(\sigma)}) \leq |C(\sigma)|$}
 	  \Comment Constrict continuos samples using PW
-        \State $s'$ sampled from set of already visited $s$ children based on (\ref{eqn:dynamics})
+        \State $\sigma'$ sampled from set of already visited $C(\sigma)$ based on (\ref{eqn:dynamics})
 	  \Else
-        \State $s'$ drawn based on (\ref{eqn:dynamics}) and added to $s$ children
+        \State $\sigma'$ drawn based on (\ref{eqn:dynamics})
+        \State $C(\sigma) \gets C(\sigma) \cup [\sigma']$
 	  \EndIf
-      \State \Return \Call{monteCarloValue}{$s'$}
+      \State \Return \Call{monteCarloValue}{$\sigma'$}
     \ElsIf{leaf node}
-    \State \Return utility $U$ of $s$ according to (\ref{eqn:utility})
+    \State \Return utility $U$ of $\sigma$ according to (\ref{eqn:utility})
     \EndIf
     \EndFunction{}
     %\Function{$\scvalue^f$}{node $n$}
