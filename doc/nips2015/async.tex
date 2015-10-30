@@ -187,7 +187,7 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
 \begin{algorithm}
 %  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 %  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-\caption{Approximating the value with MCTS and Progressive Widening}
+\caption{Approximating expected utility with MCTS and Progressive Widening}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
     \State For all $\sigma$, $N(\sigma) \gets 0$, $V(\sigma) \gets 0$, $C(\sigma) \gets []$
@@ -204,7 +204,7 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
       \State \Return $v$
     \ElsIf{crowd's turn}
 	  \If{$\max(1,\sqrt{N(\sigma)}) \leq |C(\sigma)|$}
-	  \Comment Constrict continuos samples using PW
+	  \Comment Constrict continuous samples using PW
         \State $\sigma'$ sampled from set of already visited $C(\sigma)$ based on (\ref{eqn:dynamics})
 	  \Else
         \State $\sigma'$ drawn based on (\ref{eqn:dynamics})

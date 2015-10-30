@@ -9,7 +9,7 @@ all: $(OUTPUT).pdf
 $(OUTPUT).pdf: paper.tex $(SECTIONS) $(FIGURES)
 	make -C figures
 	$(LATEX) $<
-	mv $(subst .tex,.pdf,$<) $@
+	cp $(subst .tex,.pdf,$<) $@
 
 final: paper.tex $(SECTIONS)
 	texify < $< > $(subst .tex,.tmp.tex,$<)
@@ -17,14 +17,14 @@ final: paper.tex $(SECTIONS)
 	bibtex $(subst .tex,,$<)
 	$(LATEX)  $(subst .tex,.tmp.tex,$<)
 	$(LATEX)  $(subst .tex,.tmp.tex,$<)
-	mv $(subst .tex,.tmp.pdf,$<) $(OUTPUT).pdf
+	cp $(subst .tex,.tmp.pdf,$<) $(OUTPUT).pdf
 
 bib: paper.tex all.bib $(SECTIONS)
 	$(LATEX) $< 
 	bibtex $(subst .tex,,$<)
 	$(LATEX) $< 
 	$(LATEX) $< 
-	mv $(subst .tex,.pdf,$<) $(OUTPUT).pdf
+	cp $(subst .tex,.pdf,$<) $(OUTPUT).pdf
 
 # Simple thing that just works
 default: all.bib
