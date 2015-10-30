@@ -52,7 +52,7 @@ We evaluated the following four methods on each dataset:
 We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
 The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
 We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query (for NER, since response times were much faster, we paid \$0.005 per query).
-Worker response times were generally in the range of 0.5-6 seconds for NER, 10-15 seconds for Sentiment, and 1-4 seconds for Faces.
+Worker response times were generally in the range of 0.5-2 seconds for NER, 10-15 seconds for Sentiment, and 1-4 seconds for Faces.
 
 When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
 To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{These datasets are available in the code repository for this paper}.
@@ -77,7 +77,7 @@ During simulation we sample the worker responses and delays without replacement 
         2103 ms & 5.0 & 99.8 \\ \hline
     Online & n/a & n/a & 56.9 & 74.6 & 51.4 & 60.9
         % Online 
-        & n/a & n/a & 87.43 \\    %\hline
+        & n/a & n/a & TODO \\    %\hline
     Threshold & 414 ms & 0.61 & 95.2 & \textbf{89.8} & 79.8 & 88.3
         % threshold 
         & 1680 ms & 2.66 & 93.5 \\ %\hline
@@ -120,8 +120,8 @@ During simulation we sample the worker responses and delays without replacement 
 \paragraph{Summary of results.}
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving a slightly inferior result using the human-only 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 2-3.
-For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on.
+On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving comporable quality result using the 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 2-3.
+For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on, and so profit.
 
 \begin{figure}[t]
   \centering

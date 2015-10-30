@@ -186,7 +186,7 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
 \begin{algorithm}
 %  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 %  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-\caption{Approximating the value with Progressive Widening and MCTS}
+\caption{Approximating the value with MCTS and Progressive Widening}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
     \Function{monteCarloValue}{state $s$}
@@ -198,11 +198,11 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
       %\State $n.\scvisits \gets n.\scvisits + 1, n'.\scvisits \gets n'.\scvisits + 1$
       \State \Return $v$
     \ElsIf{crowd's turn}
-	  \If{$\sqrt{|s\text{ visits}|} \geq |s\text{ children}|$}
+	  \If{$\max(1,\sqrt{|s\text{ visits}|}) \leq |s\text{ children}|$}
 	  \Comment Constrict continuos samples using PW
-        \State $s'$ drawn based on (\ref{eqn:dynamics}) and added to $s$ children
-	  \Else
         \State $s'$ sampled from set of already visited $s$ children based on (\ref{eqn:dynamics})
+	  \Else
+        \State $s'$ drawn based on (\ref{eqn:dynamics}) and added to $s$ children
 	  \EndIf
       \State \Return \Call{monteCarloValue}{$s'$}
     \ElsIf{leaf node}
