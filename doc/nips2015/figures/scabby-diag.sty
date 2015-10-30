@@ -108,9 +108,9 @@
 \newcommand{\obj}[1]{\objw{6cm}{#1}}
 
 % Common Shapes
-\newcommand*{\tikzrect}[5]{%
-  \node (#1) at #3 {};
-  \draw[#2] #3 -- ++(-#4,0) -- ++(0,-#5) -- ++(#4,0) -- cycle;
+\newcommand*{\tikzrect}[5]{% name, options, start, width, height
+  \node (#1) at #3 {}; % Point just doesn't work here...
+  \draw[#2] #3 -- ++(#4,0) -- ++(0,#5) -- ++(-#4,0) -- ++(0, -#5) -- cycle;
 }
 \newcommand*{\tikzcube}[6]{%
   \node (#1) at #3 {};
@@ -179,4 +179,5 @@
 \newcommand{\mboxb}[2]{%
   \tikzmarkin[set fill color=blue!10,set border color=blue!70]{#1}#2\tikzmarkend{#1}
 }
+
 

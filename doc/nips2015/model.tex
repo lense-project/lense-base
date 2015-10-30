@@ -4,12 +4,17 @@
 \begin{figure}
   \begin{centering}
     \begin{subfigure}[b]{0.58\textwidth}
-      \includegraphics[width=\textwidth]{figures/piano-roll.pdf}
-      \caption{Structured prediction behavior over time}
+      \includegraphics[width=\textwidth]{figures/behavior.pdf}
+      \caption{
+      Two possible timelines of queries and responses.
+      The bar graphs represent the marginals over the labels for each token (indicated by the first character) at different points in time. 
+      See \sectionref{behavior} for a description of how the agent reasons about these two events.
+      }
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.38\textwidth}
-      \includegraphics[width=\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}\\[1.7ex]
+%      \includegraphics[width=\textwidth,height=0.23\textheight,keepaspectratio]{figures/single-move.pdf}\\[1.7ex]
+      \includegraphics[width=\textwidth,height=0.23\textheight,keepaspectratio]{figures/mcts_simple.pdf}\\[1.7ex]
       \caption{Single-query game tree}
     \end{subfigure}
   \end{centering}
