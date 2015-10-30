@@ -24,28 +24,30 @@ the system can choose to asynchronously query the crowd on \emph{parts} of the i
 uncertain about (e.g. query about the label of a single token in a sentence). After collecting enough evidence the system makes a prediction.
 The goal is to maintain high accuracy by initially using the crowd as a crutch,
 but gradually becoming more self-sufficient as the model improves.
-This differs from online learning \citep{cesabianchi06prediction} and
+Online learning \citep{cesabianchi06prediction} and
 online active learning \citep{helmbold1997some,sculley2007online,chu2011unbiased}
-in that
+are different in that
 they do not actively seek new information \emph{prior} to making a prediction,
 and cannot maintain high accuracy independent of the number of data instances seen so far.
-While active classification \citep{gao2011active}
-also queries a subset of the labels strategically,
-it is based on a static policy, 
+Active classification \citep{gao2011active}, like us,
+strategically seeks information (by querying a subset of labels) prior to prediction,
+%also queries a subset of the labels strategically,
+but it is based on a static policy, 
 whereas we improve the model during test time based on observed data.
 
 % Bayesian decision theory: technical solution
 To determine which queries to make,
 we model on-the-job learning as a stochastic game based on a CRF prediction model.
 We use Bayesian decision theory to tradeoff latency, cost, and accuracy in a principled manner.
-If we desire high accuracy, we must incur the cost of having more redundant labels
-to offset the noisy responses.  If we desire low latency, then we should issue queries
-in parallel, whereas if latency is not a factor, we should issue queries
+Our framework naturally gives rise to intuitive strategies:
+To achieve high accuracy, we should ask for redundant labels
+to offset the noisy responses.  To achieve low latency, we should issue queries
+in parallel, whereas if latency is unimportant, we should issue queries
 sequentially in order to be more adaptive.
 Computing the optimal policy is intractable,
 so we develop an approximation
-based on a combination of progressive widening \citep{coulom2007computing}
-and Monte Carlo tree search \citep{kocsis2006bandit} to approximate it.
+based on Monte Carlo tree search \citep{kocsis2006bandit} and
+progressive widening to reason about continuous time \citep{coulom2007computing}.
 
 % Experiments.
 We implemented and evaluated our system on three different tasks: named-entity
