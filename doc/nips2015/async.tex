@@ -1,10 +1,11 @@
 \section{Game playing}
 \label{sec:game-playing}
 
-In \sectionref{model} we modeled on-the-job learning as a stochastic game played between the system and the crowd, and defined a reasonable model of the environment and utility for the system to maximize.
+In \sectionref{model} we modeled on-the-job learning as a stochastic game played between the system and the crowd.
+%and defined a model of the environment and utility for the system to maximize.
 We now turn to the problem of actually finding a policy that maximizes the expected utility,
 which is, of course, intractable because of the large state space.
-In \algorithmref{mcvts}, we propose an approximate Monte Carlo algorithm to find this policy. 
+%We propose an approximate Monte Carlo algorithm to find this policy (\algorithmref{mcvts}).
 
 %Having defined the simulation dynamics and utility, we can now define the full game tree,
 %which is an extension of our initial example in \figureref{game-tree}~(right).
@@ -135,21 +136,23 @@ Our algorithm (\algorithmref{mcvts}) combines ideas from Monte Carlo tree search
 % No TD really
 % TD-learning~\citep{sutton1988learning} to share statistics across game states.
 %Finally, we incorporate 
-progressive widening~\citep{coulom2007computing} to deal with the challenge of a large state space that includes continuous variables (time).
+progressive widening~\citep{coulom2007computing} to deal with the challenge of continuous variables (time).
 %The value of each state is obtained a linear value function: $V(\sigma) = w\cdot \psi(\sigma)$ where $w$ are learned weights and $\psi$ is a featurization of the state space.
 Some intuition about the algorithm is provided below.
 When simulating the system's turn, the next state (and hence action) is chosen using the upper confidence tree (UCT) decision rule that trades off maximizing the value of the next state (exploitation) with the number of visits (exploration).
-When simulating the crowd's turn, make a stochastic choice of next state as described above. 
+The crowd's turn is simulated based on transitions defined in \sectionref{model}.
 To handle the unbounded fanout during the crowd's turn, we use progressive widening  
 that maintains a current set of ``active'' or ``explored'' states, which is gradually grown with time. 
-Notationally, we will refer to the number of times a state has been visited as $N(\sigma)$, and the set of all successor (child) states that the algorithm has sampled as $C(\sigma)$.
+Let $N(\sigma)$ be the number of times a state has been visited,
+and $C(\sigma)$ be all successor states that the algorithm has sampled.
 %When the game terminates, the weights of the value function, $w$ are updated using a TD-update from TD-learning.
 
-\paragraph{Learning.}
-Having addressed the problem of inferring when to make queries to human beings, we now discuss how that data can be incorporated to learning new parameters for the actual prediction model, $p_\theta(\by \given \bx)$.
-We assume that the final responses given by the system are accurate and use them to create training data for the system.
-Note that in the on-the-job setting, the algorithm can never fully trust its labeled data since it only ever sees noisy responses from the crowd.
-While it is possible for the algorithm to be falsely confident in its faulty predictions due to repeated mistakes from the crowd, we do not actually find this to be a problem in practice.
+% PL: this is terribly confusing and out of place; replaced with small note later
+%\paragraph{Learning.}
+%Having addressed the problem of inferring when to make queries to crowd, we now discuss how that data can be incorporated to learning new parameters for the actual prediction model, $p_\theta(\by \given \bx)$.
+%We assume that the final responses given by the system are accurate and use them to create training data for the system.
+%Note that in the on-the-job setting, the algorithm can never fully trust its labeled data since it only ever sees noisy responses from the crowd.
+%While it is possible for the algorithm to be falsely confident in its faulty predictions due to repeated mistakes from the crowd, we do not actually find this to be a problem in practice.
 
 % Computing the optimal policy is intractable, especially because of continuous time.
 % We propose an approximate algorithm that combines ideas from both TD learning
@@ -187,10 +190,10 @@ While it is possible for the algorithm to be falsely confident in its faulty pre
 \begin{algorithm}
 %  \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 %  \renewcommand{\algorithmicensure}{\textbf{Output:}}
-\caption{Approximating expected utility with MCTS and Progressive Widening}
+\caption{Approximating expected utility with MCTS and progressive widening}
 \label{algo:mcvts}
   \begin{algorithmic}[1]
-    \State For all $\sigma$, $N(\sigma) \gets 0$, $V(\sigma) \gets 0$, $C(\sigma) \gets []$
+    \State For all $\sigma$, $N(\sigma) \gets 0$, $V(\sigma) \gets 0$, $C(\sigma) \gets [\,]$
 	\Comment Initialize visits, utility sum, and children
     \Function{monteCarloValue}{state $\sigma$}
     \State increment $N(\sigma)$
