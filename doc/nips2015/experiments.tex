@@ -14,7 +14,7 @@ We evaluated the following four methods on each dataset:
     Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
     This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
   \item {\bf Threshold baseline}: Uses the following heuristic:
-    For each label, $y_i$, the agent asks for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.88$. % \footnote{We found $0.88$ to give the best results on our datasets.}
+    For each label, $y_i$, the agent asks for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.98$. % \footnote{We found $0.88$ to give the best results on our datasets.}
     Instead of computing the expected marginals over the responses to queries in flight, the agent simply counts the in flight requests for a given variable, and reduces the uncertainty on that variable by a factor of $0.3$. The system continues launching requests until the threshold (adjusted by number of queries in flight) is crossed. Predictions are made using MLE on the model given responses.
     The agent does not reason about time and makes all its queries at the very beginning.
   \item {\bf LENSE:} Our full system as described in \sectionref{model}.
@@ -24,67 +24,66 @@ We evaluated the following four methods on each dataset:
 \begin{table}[t]
   \begin{tabular}{l p{0.35\textwidth} p{0.35\textwidth} r r r}
     {\bf Dataset (Examples)} & {\bf Task and notes} & {\bf Features} \\ \hline
-  {\bf NER (1000)}     & 
-    We evaluate on a simplified version of CoNLL-2003 NER task\tablefootnote{\href{http://www.cnts.ua.ac.be/conll2003/ner/}{http://www.cnts.ua.ac.be/conll2003/ner/}}, a sequence labeling problem over English sentences. 
-    We only consider the three entity tags corresponding to persons, locations or others\tablefootnote{%
-    The original also includes the tags for organizations and miscellaneous, however the distinctions between these tags are technical, making it very difficult for non-expert crowd workers to provide accurate labels.}.
+  {\bf NER (657)}     & 
+    We evaluate on the CoNLL-2003 NER task\tablefootnote{\href{http://www.cnts.ua.ac.be/conll2003/ner/}{http://www.cnts.ua.ac.be/conll2003/ner/}}, a sequence labeling problem over English sentences. 
+    We only consider the four tags corresponding to persons, locations, organizations or none\tablefootnote{
+    The original also includes a fifth tag for miscellaneous, however the definition for miscellaneos is complex, making it very difficult for non-expert crowd workers to provide accurate labels.}.
     &
-    We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes. \\
+    We used standard features~\cite{finkel2005incorporating}: the current word, current lemma, previous and next lemmas, lemmas in a window of size three to the left and right, word shape and word prefix and suffixes, as well as word embeddings. \\
   {\bf Sentiment (1800)} & 
     We evaluate on a subset of the IMDB sentiment dataset \cite{maas2011learning} that consists of 2000 polar movie reviews; the goal is binary classification of documents into classes $\textsc{pos}$ and $\textsc{neg}$. 
     &
-    We used two feature sets, the first (\textsc{bigrams}) containing only word unigrams and bigrams, and the second (\textsc{rnn}) that also contained sentence vector embeddings from~\cite{socher2013recursive}.
+    We used two feature sets, the first (\textsc{unigrams}) containing only word unigrams, and the second (\textsc{rnn}) that also contains sentence vector embeddings from~\cite{socher2013recursive}.
     \\
   {\bf Face (1784)} & 
-  We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson and Miley Cyrus.
+  We evaluate on a celebrity face classification task \cite{attribute_classifiers}. Each image must be labeled as one of the following four choices: Andersen Cooper, Daniel Craig, Scarlet Johansson or Miley Cyrus.
     &
-    We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings.
+    We used the last layer of a 11-layer AlexNet~\cite{krizhevsky2012imagenet} trained on ImageNet as input feature embeddings, though we leave back-propagating into the net to future work.
 \end{tabular}
   \caption{Datasets used in this paper and number of examples we evaluate on.}
 \label{tbl:dataset}
 \end{table}
 
 
-To initialize parameters for the model-based methods, we used a burn-in period of 40 examples during which everything was labeled. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
-We do not update parameters for the delay and response models online.
+% To initialize parameters for the model-based methods, we used a burn-in period of 40 examples during which everything was labeled. We used those responses to train initial parameters for the prediction model $\theta$, response model $\beta$ and delay model $\Gamma$.
+% We do not update parameters for the delay and response models online.
 
 \paragraph{Implementation and crowdsourcing setup.}
 We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
 The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
-We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query.
-Worker response times were generally in the range of 3-6 seconds for NER, 10-15 seconds for Sentiment, and 2-4 seconds for Faces.
+We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query (for NER, since response times were much faster, we paid \$0.005 per query).
+Worker response times were generally in the range of 0.5-2 seconds for NER, 10-15 seconds for Sentiment, and 1-4 seconds for Faces.
 
 When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
-To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{If accepted, we will make our datasets of frozen human responses, delays, and anonymized worker tags publicly available}.
-During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses. 
-Neither LENSE nor the entropic threshold needed more than 3 queries on a single label.
+To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{These datasets are available in the code repository for this paper}.
+During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses.
 
 \begin{table}[t]
 %% NER 
-\begin{tabular}{l r r r r r | r r r r r}
-  \multicolumn{6}{c|}{Named Entity Recognition} & 
+\begin{tabular}{l r r r r r r | r r r r r}
+  \multicolumn{7}{c|}{Named Entity Recognition} & 
       \multicolumn{3}{c}{Face Identification} \\
-      \textbf{System} & \textbf{Latency} & \textbf{Qus./tok} & \textbf{P} & \textbf{R} & \textbf{F$_1$} 
+      \textbf{System} & \textbf{Delay/tok} & \textbf{Qus./tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
           & \textbf{Latency} & \textbf{Qus./ex} & \textbf{Acc.} 
     \\ \hline
-    1-vote & 664 ms & 1.0 & 66.38 & 89.58 & 76.15 
+    1-vote & 467 ms & 1.0 & 90.2 & 78.8 & 71.5 & 80.2
       & %1-vote & 
-      1414 ms & 1.0 & 87.75 \\ %\hline
-    3-vote & 1495 ms & 3.0 & 92.79 & 89.56 & 91.58 
+      1216 ms & 1.0 & 93.6 \\ %\hline
+    3-vote & 750 ms & 3.0 & 93.6 & 85.1 & 74.5 & 85.4
         & %3-vote &
-        1865 ms & 3.0 & 88.44 \\ %\hline
-    5-vote & 3887 ms & 5.0 & 98.25 & 92.33 & 95.20 
+        1782 ms & 3.0 & 99.1 \\ %\hline
+    5-vote & 1350 ms & 5.0 & \textbf{95.5} & 87.7 & 78.7 & 87.3 
         & 
-        -- & -- & -- \\ \hline
-    Online & n/a & n/a & 62.38 & 69.76 & 65.86 
+        2103 ms & 5.0 & 99.8 \\ \hline
+    Online & n/a & n/a & 56.9 & 74.6 & 51.4 & 60.9
         % Online 
-        & n/a & n/a & 87.43 \\    %\hline
-    Threshold & 1523 ms & 0.65 & 91.74 & 90.90 & 91.33 
-        % Entropic 
-        & 1121 ms & 1.12 & \textbf{91.53} \\ %\hline
-    \textbf{LENSE} & 3368 ms & \textbf{0.62} & \textbf{94.32} & \textbf{93.16} & \textbf{93.73} 
+        & n/a & n/a & 79.9 \\    %\hline
+    Threshold & 414 ms & 0.61 & 95.2 & \textbf{89.8} & 79.8 & 88.3
+        % threshold 
+        & 1680 ms & 2.66 & 93.5 \\ %\hline
+    \textbf{LENSE} & \textbf{267 ms} & \textbf{0.45} & 95.2 & 89.7 & \textbf{81.7} & \textbf{88.8} 
     %\textbf{LENSE} 
-    & 961 ms & \textbf{1.06} & 88.45 \\   %\hline
+    & 1590 ms & 2.37 & 99.2 \\   %\hline
 \end{tabular}
 \caption{Results on NER and Face tasks comparing latencies, queries per token and performance metrics (Precision, Recall and \fone{} for NER and accuracy for Face).}
 \label{tbl:results}
@@ -93,7 +92,7 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 \begin{table}[t]
     \begin{minipage}[t]{.49\textwidth}
   \includegraphics[width=\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
-  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{bigram} features, the model does not have the capacity to predict at our desired accuracy and must query the crowd. With more complex \textsc{rnn} features, the model learns and queries the crowd less over time.}
+  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{unigram} features, the model quickly learns it does not have the capacity to satisfy our desired confidence values and must query the crowd. With more complex \textsc{rnn} features, the model learns to be more confident and queries the crowd less over time.}
         \label{fig:sentiment-tradeoff}
     \end{minipage}
     \qquad
@@ -121,9 +120,8 @@ Neither LENSE nor the entropic threshold needed more than 3 queries on a single 
 \paragraph{Summary of results.}
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $93.7\%$ at roughly 1/6th the cost of achieving the same result using the human-only approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 3-4.
-For the latter two tasks, both on-the-job learning methods, entropic threshold baseline and LENSE, perform comparably.
-The simple heuristic adopted by the entropic threshold baseline is sufficient to reason about expected marginals on both these tasks because they are single label prediction tasks which do not involve any interactions between labels.
+On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving comporable quality result using the 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 2-3.
+For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on, and so profit.
 
 \begin{figure}[t]
   \centering
@@ -133,20 +131,20 @@ The simple heuristic adopted by the entropic threshold baseline is sufficient to
   \begin{subfigure}[b]{0.49\textwidth}
   \includegraphics[width=\textwidth]{figures/ner_2_class/cost_plot/cost_vs_time.pdf}
   \end{subfigure}
-  \caption{Comparing \fone{} and queries per token on the NER task. LENSE maintains high \fone{} scores by querying the crowd when it is unsure. As the model learns, it needs to query the crowd less.}
+  \caption{Comparing \fone{} and queries per token on the NER task over time. The left graph compares LENSE to online learning (which cannot query humans at test time). This highlights that LENSE maintains high \fone{} scores even with very small training set sizes, by falling back the crowd when it is unsure. The right graph compares query rate over time to 1-vote. This clearly shows that as the model learns, it needs to query the crowd less.}
 \label{fig:ner-f1}
 \end{figure}
 
 %\paragraph{Does the model respect accuracy preferences?} 
 \figureref{ner-f1} tracks the performance and cost of LENSE over time on the NER task.
 LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
-On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the entropic threshold baseline with fewer queries by waiting for responses before making another query.
+On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the threshold baseline with fewer queries by waiting for responses before making another query.
 
 % == DEV F1
 %We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
 %Compared to the offline baseline, which sees perfect labels on all examples, LENSE observed labels on only \ac{KEENON: fix this number: 600} words. For a comparable number of tokens, the offline baseline has an \fone of \ac{KEENON: fix: 63\%}.
 
-% === Compare with entropic threshold
+% === Compare with threshold
 %\paragraph{Why is the threshold system so much better on sentiment and faces?}
 %LENSE exploits structure in the model when querying, and so outperforms the threshold in the presence of structure (see NER task results).
 %However, when neither structure or time pressure is present, LENSE's only signal is the entropy of the prediction, and so the threshold is able to perform just as well, if not slightly better when the threshold is optimally set.
@@ -156,8 +154,8 @@ On the NER task, we find that LENSE is able to trade off time to produce more ac
 %\paragraph{In the limit, would LENSE still need crowd supervision?}
 While on-the-job learning allows us to deploy quickly and ensure good results, we would like to eventually operate without crowd supervision.
 %In order to do so, we must ensure that our model has the capacity to keep learning from the crowd.
-\figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{bigrams} and \textsc{rnn} (as described in \tableref{dataset}).
-With simpler features (\textsc{bigrams}),
+\figureref{sentiment-tradeoff}, we show the number of queries per example on Sentiment with two different features sets, \textsc{unigrams} and \textsc{rnn} (as described in \tableref{dataset}).
+With simpler features (\textsc{unigrams}),
 the model saturates early and we will continue to need to query to the crowd to achieve our accuracy target (as specified by the loss function).
 On the other hand, using richer features (\textsc{rnn}) the model is able to learn from the crowd and the amount of supervision needed reduces over time.
 %This suggests that given a sufficiently rich model, costs can be brought to zero in the limit.

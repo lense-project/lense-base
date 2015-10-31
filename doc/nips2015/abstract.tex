@@ -1,31 +1,12 @@
 \begin{abstract}
-What if we could deploy a high-accuracy, real-time classification system, without expensive up-front data labelling?
-We describe an ``on-the-job'' classification system, where as queries arrive, we use real-time crowdsourcing to resolve uncertainty where needed and output our prediction when confident.
-As the model improves over time, the reliance on crowdsourcing queries decreases. 
-We cast our setting as a stochastic game based on Bayesian decision theory, which allows us to balance latency, cost, and accuracy objectives in a principled way.
-Computing the optimal policy is intractable, so we develop an approximation based on Monte Carlo Tree Search.
-We tested our approach across three tasks---named-entity recognition, sentiment classification,
-and image classification.
-On the named-entity recognition task, we obtained a 6-7 fold reduction in cost compared to human classification, which requires multiple human votes to achieve the same level of accuracy.
-We also achieve a 17\% F1 improvement over taking a single human vote as the answer to each query, and a 28\% F1 improvement over an online learning classifier that cannot query humans.
-%Learning with little or no data is an important but understudied problem.
-%For most tasks, the current paradigm of first collecting a training dataset and then training a classifier requires a substantial amount of data to be labeled to train a very accurate classifier.
-%We propose a  that redistributes the same human effort to achieve
-%better results faster: 
-%query humans in real time at test time to train a machine learning system {\em
-%on the job}.
-%%\ac{is it clear what we're doing?}
-%%The system only queries humans when it is unsure of its output and learns to 
-%Querying humans introduces cost and latency but can improve accuracy over our
-%model's prediction.
-%We explicitly manage these three key objectives by casting the problem as a
-%Bayesian decision theoretic control problem
-%and draw on techniques from the game-playing literature.
-%The resulting live system provides high quality responses in real-time while
-%starting {\em with no training data\/}: we maintain $> 90\%$ F1 consistently on
-%a stream of test inputs on the three tasks studied at low cost and latency,
-%despite noisy labels from crowd workers.
-% outperform baselines?
+Our goal is to deploy a high-accuracy system starting with zero training examples.
+We consider an “on-the-job” setting, where as inputs arrive, we use real-time crowdsourcing to resolve uncertainty where needed and output our prediction when confident. As the model improves over time, the reliance on crowdsourcing queries
+decreases. We cast our setting as a stochastic game based on Bayesian decision
+theory, which allows us to balance latency, cost, and accuracy objectives in a principled way. Computing the optimal policy is intractable, so we develop an approx-
+imation based on Monte Carlo Tree Search. We tested our approach on three
+datasets---named-entity recognition, sentiment classification, and image classification. On the NER task we obtained more than an order of magnitude reduction in cost compared to full
+human annotation, while boosting performance relative to the expert provided labels. We also achieve a $8\%$ \fone{} improvement over having a single
+human label the whole set, and a $28\%$ \fone{} improvement over online learning.
 \end{abstract}
 
 % V1
@@ -51,3 +32,34 @@ We also achieve a 17\% F1 improvement over taking a single human vote as the ans
 % We explicitly manage these three key objectives by casting the problem as a Bayesian decision theoretic control problem, and drawing on techniques from game-playing literature for real-time solutions.
 % The resulting system provides high quality responses in real-time while starting {\em with no training data\/}: we have achieve $> 90\%$ F1 on the three tasks studied at a low cost, despite noisy crowd worker performance.
 % % outperform baselines?
+
+% V?
+%Learning with little or no data is an important but understudied problem.
+%For most tasks, the current paradigm of first collecting a training dataset and then training a classifier requires a substantial amount of data to be labeled to train a very accurate classifier.
+%We propose a  that redistributes the same human effort to achieve
+%better results faster: 
+%query humans in real time at test time to train a machine learning system {\em
+%on the job}.
+%%\ac{is it clear what we're doing?}
+%%The system only queries humans when it is unsure of its output and learns to 
+%Querying humans introduces cost and latency but can improve accuracy over our
+%model's prediction.
+%We explicitly manage these three key objectives by casting the problem as a
+%Bayesian decision theoretic control problem
+%and draw on techniques from the game-playing literature.
+%The resulting live system provides high quality responses in real-time while
+%starting {\em with no training data\/}: we maintain $> 90\%$ F1 consistently on
+%a stream of test inputs on the three tasks studied at low cost and latency,
+%despite noisy labels from crowd workers.
+% outperform baselines?
+
+% V4
+%Our goal is to deploy a high-accuracy, real-time classification system, without expensive up-front data labelling.
+%We describe an ``on-the-job'' classification system, where as queries arrive, we use real-time crowdsourcing to resolve uncertainty where needed and output our prediction when confident.
+%As the model improves over time, the reliance on crowdsourcing queries decreases. 
+%We cast our setting as a stochastic game based on Bayesian decision theory, which allows us to balance latency, cost, and accuracy objectives in a principled way.
+%Computing the optimal policy is intractable, so we develop an approximation based on Monte Carlo Tree Search.
+%We tested our approach across three tasks---named-entity recognition, sentiment classification,
+%and image classification.
+%On the named-entity recognition task, we obtained a 6-7 fold reduction in cost compared to human classification, which requires multiple human votes to achieve the same level of accuracy.
+%We also achieve a 17\% F1 improvement over taking a single human vote as the answer to each query, and a 28\% F1 improvement over an online learning classifier that cannot query humans.

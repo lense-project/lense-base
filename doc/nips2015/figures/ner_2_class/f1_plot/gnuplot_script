@@ -1,9 +1,7 @@
-set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 8 size 3in,2in
+set terminal pdf enhanced linewidth 3 font "Times New Roman,8" size 3in,2in
 set key right bottom
 set output "f1_vs_time.pdf"
 set xlabel 'Time'
 set ylabel 'F1'
-plot 'human-1.dat' with lines dashtype 7 title '1 vote baseline', \
-'human-3.dat' with lines dashtype 3 title '3 votes baseline', \
-'offline.dat' with lines dashtype 5 title 'online learning', \
-'lense.dat' with lines dashtype 1 title 'LENSE'
+plot 'online.dat' with lines title 'online learning', \
+'lense.dat' with lines title 'LENSE'

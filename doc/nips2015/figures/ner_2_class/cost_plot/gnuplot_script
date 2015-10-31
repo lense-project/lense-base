@@ -1,7 +1,7 @@
-set terminal pdf enhanced linewidth 3 fname "Times New Roman" fsize 8 size 3in,2in
+set terminal pdf enhanced linewidth 3 font "Times New Roman,8" size 3in,2in
 set output "cost_vs_time.pdf"
 set yrange [0:1.5]
 set xlabel 'Time'
 set ylabel 'Queries per token'
 plot '1-human.dat' with lines title '1 vote baseline', \
-'lense.dat' with lines title 'LENSE'
+'AVG.dat' with lines title 'LENSE'
