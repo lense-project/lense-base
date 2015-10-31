@@ -66,7 +66,7 @@ In the rest of this section, we describe the details of the game tree, our choic
 %The key challenge is to determine which actions the system should take to maximize its expected utility at the end of the game.
 
 \paragraph{Game tree.}
-Let us now formalize the game tree in terms of its states, actions, transitions and rewards.
+Let us now formalize the game tree in terms of its states, actions, transitions and rewards; see \figureref{tree} for an example. 
 The \emph{game state} $\sigma = (\now, \bq, \bs, \br, \bt)$
 consists of the current time $\now$, the actions $\bq = (q_1, \ldots, q_{k-1})$ that have been issued at times $\bs = (s_1, \ldots, s_{k-1})$ and
 the responses $\br = (r_1, \ldots, r_{k-1})$ that have been received at times $\bt = (t_1, \ldots, t_{k-1})$.
@@ -193,6 +193,9 @@ In the second timeline, a crowd worker makes an error and labels ``George'' to b
 The system still has uncertainty on ``George'' and issues an additional query which receives a correct response, following which the system turns in the correct sequence of labels.
 While the answer is still correct, the system could have taken less time to respond by making an additional query on ``George'' at the very beginning.
 
+%Secondly, we expect the system to use queries judiciously when the cost per query, $\weightmoney$, is significant compared to the cost per unit time, $\weighttime$.
+%Continuing with the previous example, when $\weightmoney = $ and $\weighttime = $, the system will prefer to wait for a response for the token ``George'' before asking a label for ``str.''.
+%However, it will simultaneously ask for a label for ``Soup'' because the response from ``George'' is unlikely to affect the prediction for ``Soup''.
 
 
 %Firstly, because the system wants to maximize the accuracy while minimizing the number of queries, it will prioritize asking queries that provide the most information.
