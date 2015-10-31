@@ -3,5 +3,5 @@ set output "cost_vs_time.pdf"
 set yrange [0:1.5]
 set xlabel 'Time'
 set ylabel 'Queries per token'
-plot '1-human.dat' with lines title '1 vote baseline', \
-'AVG.dat' with lines title 'LENSE'
+plot 'AVG.dat' with lines title 'LENSE', \
+'1-human.dat' with lines title '1 vote baseline'

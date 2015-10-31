@@ -3,5 +3,5 @@ set key right bottom
 set output "f1_vs_time.pdf"
 set xlabel 'Time'
 set ylabel 'F1'
-plot 'online.dat' with lines title 'online learning', \
-'lense.dat' with lines title 'LENSE'
+plot 'lense.dat' with lines title 'LENSE', \
+'online.dat' with lines title 'online learning'

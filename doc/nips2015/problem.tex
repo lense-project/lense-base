@@ -68,14 +68,14 @@ First, we must make a prediction $\hat \by$ on each input $\bx$ in the stream,
 unlike in active learning, where we are only interested in the pool or stream of examples
 for the purposes of building a good model.
 % PL: though active learning will query hard examples too
-Second, we evaluate on $\accuracy(\by, \byt)$ against the true label sequence $\by$
-(on named-entity recognition, this is the F$_1$ metric),
-but $\by$ is never actually observed---the only feedback is via the responses,
-like in partial monitoring games \citep{cesabianchi06regret}.
-Therefore, we must make enough queries to garner sufficient confidence
-(something we can't do in partial monitoring games)
-on each example from the beginning.
-Finally, the responses are used to update the prediction model, like in online learning.
+%Second, we evaluate on $\accuracy(\by, \byt)$ against the true label sequence $\by$
+%(on named-entity recognition, this is the F$_1$ metric),
+%but $\by$ is never actually observed---the only feedback is via the responses,
+%like in partial monitoring games \citep{cesabianchi06regret}.
+%Therefore, we must make enough queries to garner sufficient confidence
+%(something we can't do in partial monitoring games)
+%on each example from the beginning.
+Second, the responses are used to update the prediction model, like in online learning.
 This allows the number of queries needed (and thus cost and latency) to decrease over time
 without compromising accuracy.
 
