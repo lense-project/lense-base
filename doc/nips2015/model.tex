@@ -101,10 +101,10 @@ The second is the cost of making queries: a (monetary) cost $\weightmoney$ per q
 Formally, we define the utility to be:
 \begin{align}
   \label{eqn:utility}
-  U(\sigma) &\eqdef \text{EA}(p(\by \given \bx, \bq, \bs, \br, \bt)) - (m \weightmoney + \now \weighttime), \\
-  \text{EA}(p) &= \E_{p(\by)}[\accuracy(\arg\max_{\by'} p(\by'))],
+  U(\sigma) &\eqdef \text{ExpAcc}(p(\by \given \bx, \bq, \bs, \br, \bt)) - (n_\text{Q} \weightmoney + \now \weighttime), \\
+  \text{ExpAcc}(p) &= \E_{p(\by)}[\text{Accuracy}(\arg\max_{\by'} p(\by'))],
 \end{align}
-where $m = |\{j \given q_j \in \{1, \ldots, n\}|$ is the number of queries made,
+where $n_\text{Q} = |\{j \given q_j \in \{1, \ldots, n\}|$ is the number of queries made,
 $p(\by \given \bx, \bq, \bs, \br, \bt)$ is a prediction model that incorporates the crowd's responses.
 
 The utility of wait and return actions is computed by taking expectations over subsequent trajectories in the game tree. 
