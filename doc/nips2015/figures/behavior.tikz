@@ -4,27 +4,27 @@
 
 \usepackage{scabby-diag}
 \usepackage{amssymb}
-\pgfplotsset{compat=1.11}
+% \pgfplotsset{compat=1.11}
 
 \begin{document}
 
 % Color definitions
 
-%\definecolor{palette1}{HTML}{00D4A8}
-%\definecolor{palette2}{HTML}{2BE7D2}
-%\definecolor{palette3}{HTML}{9FEDD4}
-%\definecolor{palette4}{HTML}{C7E7A0}
-%\definecolor{palette5}{HTML}{91678D}
+\definecolor{palette1}{HTML}{E27A3F}
+\definecolor{palette2}{HTML}{45B29D}
+\definecolor{palette3}{HTML}{EFC94C}
+\definecolor{palette4}{HTML}{E27A3F}
+\definecolor{palette5}{HTML}{DF5A49}
 
-%\colorlet{per}{palette5}
-%\colorlet{loc}{palette1}
-%\colorlet{res}{palette2}
-%\colorlet{other}{palette3}
+\colorlet{per}{palette5}
+\colorlet{loc}{palette1}
+\colorlet{res}{palette2}
+\colorlet{other}{palette3}
 
-\colorlet{per}{red!80}
-\colorlet{loc}{blue!80}
-\colorlet{res}{green!80}
-\colorlet{other}{cyan!30}
+%\colorlet{per}{red!80}
+%\colorlet{loc}{blue!80}
+%\colorlet{res}{green!80}
+%\colorlet{other}{cyan!30}
 
 \newcommand*{\stackbarw}[7]{% name, start, size1, size2, size3, size4, width}
 \pgfsetlinewidth{0.1pt};
