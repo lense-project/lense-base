@@ -103,7 +103,7 @@ and performance metrics (\fone{} for NER and accuracy for Face).}
 \begin{table}[t]
     \begin{minipage}[t]{.49\textwidth}
   \includegraphics[width=\textwidth]{figures/sentiment_cost_per_token_vs_time/cost_per_token_vs_time.pdf}
-  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{unigram} features, the model quickly learns it does not have the capacity to satisfy our desired confidence values and must query the crowd. With more complex \textsc{rnn} features, the model learns to be more confident and queries the crowd less over time.}
+  \captionof{figure}{Queries per example for LENSE on Sentiment. With simple \textsc{unigram} features, the model quickly learns it does not have the capacity to answer confidently and must query the crowd. With more complex \textsc{rnn} features, the model learns to be more confident and queries the crowd less over time.}
         \label{fig:sentiment-tradeoff}
     \end{minipage}
     \qquad
@@ -151,6 +151,7 @@ of Bayesian decision theory.
   \end{subfigure}
   \caption{Comparing \fone{} and queries per token on the NER task over time. The left graph compares LENSE to online learning (which cannot query humans at test time). This highlights that LENSE maintains high \fone{} scores even with very small training set sizes, by falling back the crowd when it is unsure. The right graph compares query rate over time to 1-vote. This clearly shows that as the model learns, it needs to query the crowd less.}
 \label{fig:ner-f1}
+\vspace{-2em}
 \end{figure}
 
 %\paragraph{Does the model respect accuracy preferences?} 

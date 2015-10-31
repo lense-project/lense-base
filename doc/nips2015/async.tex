@@ -199,7 +199,7 @@ and $C(\sigma)$ be all successor states that the algorithm has sampled.
     \State increment $N(\sigma)$
     \If{\text{system's turn}}
     \State $\sigma' \gets \argmax_{\sigma'} \left\{\frac{V(\sigma')}{N(\sigma')} + c \sqrt{\frac{\log N(\sigma)}{N(\sigma')}} \right\}$
-      \Comment Choose child using UCT
+      \Comment Choose next state $\sigma'$ using UCT
 	  \State $v \gets $\Call{monteCarloValue}{$\sigma'$}
       \State $V(\sigma) \gets V(\sigma) + v$
 	  \Comment Record observed utility
@@ -207,14 +207,14 @@ and $C(\sigma)$ be all successor states that the algorithm has sampled.
       \State \Return $v$
     \ElsIf{crowd's turn}
 	  \If{$\max(1,\sqrt{N(\sigma)}) \leq |C(\sigma)|$}
-	  \Comment Constrict continuous samples using PW
+	  \Comment Restrict continuous samples using PW
         \State $\sigma'$ is sampled from set of already visited $C(\sigma)$ based on (\ref{eqn:dynamics})
 	  \Else
         \State $\sigma'$ is drawn based on (\ref{eqn:dynamics})
         \State $C(\sigma) \gets C(\sigma) \cup \{ [\sigma'] \}$
 	  \EndIf
       \State \Return \Call{monteCarloValue}{$\sigma'$}
-    \ElsIf{leaf node}
+    \ElsIf{game terminated}
     \State \Return utility $U$ of $\sigma$ according to (\ref{eqn:utility})
     \EndIf
     \EndFunction{}
