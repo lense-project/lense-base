@@ -164,6 +164,8 @@ answer is $y_q$;
 and $\ptime(t_i \mid s_i)$ specifies the latency of query $q_i$.
 %\footnote{Of course, $\ptime$ and $\presp$ can easily be extended to depend arbitrarily on the input $\bx$.} 
 %If the crowd workers were infallible we could define $\presp(r \given y_q)$ to
+The CRF model $\p(\by \given \bx)$ is learned based on all actual responses
+(not simulated ones) using AdaGrad.
 To model annotation errors, we set $\presp(r \given y_q)
 = 0.7$ iff $r = y_q$,\footnote{We found the humans we hired were roughly 70\%
 accurate in our experiments} and distribute the remaining probability for $r$

@@ -120,7 +120,7 @@ During simulation we sample the worker responses and delays without replacement 
 \paragraph{Summary of results.}
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving comporable quality result using the 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of 2-3.
+On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving comporable quality result using the 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of around 2.
 For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on, and so profit.
 
 \begin{figure}[t]
@@ -137,7 +137,7 @@ For the latter two tasks, both on-the-job learning methods perform less well tha
 
 %\paragraph{Does the model respect accuracy preferences?} 
 \figureref{ner-f1} tracks the performance and cost of LENSE over time on the NER task.
-LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
+LENSE is not only able to consistently outperform other baselines, but the cost of the system steadily reduces over time.
 On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the threshold baseline with fewer queries by waiting for responses before making another query.
 
 % == DEV F1
