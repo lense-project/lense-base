@@ -16,10 +16,10 @@
 \definecolor{palette4}{HTML}{E27A3F}
 \definecolor{palette5}{HTML}{DF5A49}
 
-\colorlet{per}{palette5}
+\colorlet{per}{palette3}
 \colorlet{loc}{palette1}
-\colorlet{res}{palette2}
-\colorlet{other}{palette3}
+\colorlet{res}{palette5}
+\colorlet{other}{palette2}
 
 %\colorlet{per}{red!80}
 %\colorlet{loc}{blue!80}
