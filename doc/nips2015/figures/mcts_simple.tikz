@@ -10,13 +10,19 @@
 \providecommand{\acwait}{\varnothing_{W}}
 \providecommand{\acret} {\varnothing_{R}}
 
-\definecolor{palette1}{HTML}{00D4A8}
-\definecolor{palette2}{HTML}{2BE7D2}
-\definecolor{palette3}{HTML}{9FEDD4}
-\definecolor{palette4}{HTML}{C7E7A0}
-\definecolor{palette5}{HTML}{91678D}
+%\definecolor{palette1}{HTML}{00D4A8}
+%\definecolor{palette2}{HTML}{2BE7D2}
+%\definecolor{palette3}{HTML}{9FEDD4}
+%\definecolor{palette4}{HTML}{C7E7A0}
+%\definecolor{palette5}{HTML}{91678D}
 
-\colorlet{sys}{palette1}
+\definecolor{palette1}{HTML}{E27A3F}
+\definecolor{palette2}{HTML}{45B29D}
+\definecolor{palette3}{HTML}{EFC94C}
+\definecolor{palette4}{HTML}{E27A3F}
+\definecolor{palette5}{HTML}{DF5A49}
+
+\colorlet{sys}{palette2}
 \colorlet{crowd}{palette4}
 
 \begin{tikzpicture}[
