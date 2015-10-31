@@ -12,6 +12,7 @@
       The system continues to issue queries until it has sufficient confidence on its labels. 
       See the paragraph on behavior in \sectionref{model} for more information.
       }
+\label{fig:behavior}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.38\textwidth}
@@ -20,6 +21,7 @@
       \caption{
       {\bf Game tree.} An example of a partial game tree constructed by the system when deciding which action to take in the state $\sigma = (1, (3), (0), (\emptyset), (\emptyset))$, i.e.\ the query $q_1 = 3$ has already been issued and the system must decide whether to issue another query or wait for a response to $q_1$.
       }
+\label{fig:tree}
     \end{subfigure}
   \end{centering}
 \caption{Example behavior while running structure prediction on the tweet ``Soup on George str.''
@@ -181,20 +183,30 @@ When conditioning on $\br$, we ignore responses that have not yet been received 
 % Behavior!
 \paragraph{Behavior.}
 Let's look at typical behavior that we expect the model and utility to capture.
-Firstly, because the system wants to maximize the accuracy while minimizing the number of queries, it will prioritize asking queries that provide the most information.
-For example,
-in \figureref{game-tree}, getting the crowd to label on the token ``George'' provides information not only to its label, but also to the adjacent token ``str.''. Hence, the system prioritizes asking ``George'' over asking for ``str.''. \todo{Update figure, and have actual numbers here.}
+\figureref{behavior} shows how the marginals over the labels change as the crowd provides responses for our running example, i.e.\ named entity recognition for the sentence ``Soup on George str.''.
+In the both timelines, the system issues queries on ``Soup'' and ``George'' because it is not confident about its predictions for these tokens.
+In the first timeline, the crowd correctly responds that ``Soup'' is a resource and that ``George'' is a location.
+Integrating these responses, the system is also more confident about its prediction on ``str.'', and turns in the correct sequence of labels.
+In the second timeline, a crowd worker makes an error and labels ``George'' to be a person.
+The system still has uncertainty on ``George'' and issues an additional query which receives a correct response, following which the system turns in the correct sequence of labels.
+While the answer is still correct, the system could have taken less time to respond by making an additional query on ``George'' at the very beginning.
+
+
+
+%Firstly, because the system wants to maximize the accuracy while minimizing the number of queries, it will prioritize asking queries that provide the most information.
+%For example,
+%in \figureref{game-tree}, getting the crowd to label on the token ``George'' provides information not only to its label, but also to the adjacent token ``str.''. Hence, the system prioritizes asking ``George'' over asking for ``str.''. %\todo{Update figure, and have actual numbers here.}
 
 %in the model in \figureref{game-tree}, the model, a linear-chain CRF, propagates information between adjacent labels. 
 %Thus, querying one of the middle positions ($q = 2$ or $q = 3$) can be more informative than one of the end positions ($q = 1$ or $q = 4$).
 %Indeed, this is reflected in the expected utilities of each query: with a uniform distribution over the responses, they are $0.7$, $0.8$, $0.8$, and $0.7$ respectively. Thus, both $q = 2$ and $q = 3$ are optimal actions. \todo{This is a really lame example with poor intuition.}
 
-Secondly, we expect the system to use queries judiciously when the cost per query, $\weightmoney$, is significant compared to the cost per unit time, $\weighttime$.
-Continuing with the previous example, when $\weightmoney = $ and $\weighttime = $, the system will prefer to wait for a response for the token ``George'' before asking a label for ``str.''.
-However, it will simultaneously ask for a label for ``Soup'' because the response from ``George'' is unlikely to affect the prediction for ``Soup''.
+%Secondly, we expect the system to use queries judiciously when the cost per query, $\weightmoney$, is significant compared to the cost per unit time, $\weighttime$.
+%Continuing with the previous example, when $\weightmoney = $ and $\weighttime = $, the system will prefer to wait for a response for the token ``George'' before asking a label for ``str.''.
+%However, it will simultaneously ask for a label for ``Soup'' because the response from ``George'' is unlikely to affect the prediction for ``Soup''.
 %\todo{make this happen!}
 
-\todo{Figurewise, we should have a figure that shows the change in probabilities of labels down the tree.}
+%\todo{Figurewise, we should have a figure that shows the change in probabilities of labels down the tree.}
 
 %If we had already made one query $q_1$ and gotten a response $r_1$,
 %we can incorporate the evidence, which will propagate through the CRF
