@@ -208,10 +208,10 @@ and $C(\sigma)$ be all successor states that the algorithm has sampled.
     \ElsIf{crowd's turn}
 	  \If{$\max(1,\sqrt{N(\sigma)}) \leq |C(\sigma)|$}
 	  \Comment Constrict continuous samples using PW
-        \State $\sigma'$ sampled from set of already visited $C(\sigma)$ based on (\ref{eqn:dynamics})
+        \State $\sigma'$ is sampled from set of already visited $C(\sigma)$ based on (\ref{eqn:dynamics})
 	  \Else
-        \State $\sigma'$ drawn based on (\ref{eqn:dynamics})
-        \State $C(\sigma) \gets C(\sigma) \cup [\sigma']$
+        \State $\sigma'$ is drawn based on (\ref{eqn:dynamics})
+        \State $C(\sigma) \gets C(\sigma) \cup \{ [\sigma'] \}$
 	  \EndIf
       \State \Return \Call{monteCarloValue}{$\sigma'$}
     \ElsIf{leaf node}

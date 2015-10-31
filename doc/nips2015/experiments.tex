@@ -4,19 +4,27 @@
 % === Other stuff.
 
 In this section, we empirically evaluate our approach on three tasks. 
-While the on-the-job setting we propose is targeted at scenarios where there is no data to begin with, we use existing labeled datasets (\tableref{dataset}) to empirically evaluate the performance of our system relative to baselines.
+While the on-the-job setting we propose is targeted at scenarios where there is
+no data to begin with, we use existing labeled datasets (\tableref{dataset}) to have a gold standard.
+%empirically evaluate the performance of our system relative to baselines.
 
 \paragraph{Baselines.}
 We evaluated the following four methods on each dataset:
 \begin{enumerate}
   \item {\bf Human n-query}: The majority vote of $n$ human crowd workers was used as a prediction.
   \item {\bf Online learning}:
-    Uses a classifier that trains on the gold output for all examples seen so far and then returns the MLE as a prediction.
+    Uses a classifier that trains on the gold output for all examples seen so
+    far and then returns the MLE as a prediction.
     This is the best possible offline system: it sees perfect information about all the data seen so far, but can not query the crowd while making a prediction.
   \item {\bf Threshold baseline}: Uses the following heuristic:
-    For each label, $y_i$, the agent asks for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.98$. % \footnote{We found $0.88$ to give the best results on our datasets.}
-    Instead of computing the expected marginals over the responses to queries in flight, the agent simply counts the in flight requests for a given variable, and reduces the uncertainty on that variable by a factor of $0.3$. The system continues launching requests until the threshold (adjusted by number of queries in flight) is crossed. Predictions are made using MLE on the model given responses.
-    The agent does not reason about time and makes all its queries at the very beginning.
+    For each label, $y_i$, we ask for $m$ queries such that $(1 - \p(y_i\given \bx))\times 0.3^m \ge 0.98$. % \footnote{We found $0.88$ to give the best results on our datasets.}
+    Instead of computing the expected marginals over the responses to queries in flight,
+    we simply count the in-flight requests for a given variable, and reduces
+    the uncertainty on that variable by a factor of $0.3$. The system continues
+    launching requests until the threshold (adjusted by number of queries in
+    flight) is crossed. Predictions are made using MLE on the model given
+    responses.
+    The baseline does not reason about time and makes all its queries at the very beginning.
   \item {\bf LENSE:} Our full system as described in \sectionref{model}.
 \end{enumerate}
 
@@ -52,19 +60,20 @@ We evaluated the following four methods on each dataset:
 We implemented the retainer model of~\cite{bernstein2011crowds} on Amazon Mechanical Turk to create a ``pool'' of crowd workers that could respond to queries in real-time.
 The workers were given a short tutorial on each task before joining the pool to minimize systematic errors caused by misunderstanding the task.
 We paid workers \$1.00 to join the retainer pool and an additional \$0.01 per query (for NER, since response times were much faster, we paid \$0.005 per query).
-Worker response times were generally in the range of 0.5-2 seconds for NER, 10-15 seconds for Sentiment, and 1-4 seconds for Faces.
+Worker response times were generally in the range of 0.5--2 seconds for NER, 10--15 seconds for Sentiment, and 1--4 seconds for Faces.
 
 When running experiments, we found that the results varied based on the current worker quality. %, fluctuating on the NER task between 87 and 96 F1, depending on workers.
 To control for variance in worker quality across our evaluations of the different methods, we collected 5 worker responses and their delays on each label ahead of time\footnote{These datasets are available in the code repository for this paper}.
 During simulation we sample the worker responses and delays without replacement from this frozen pool of worker responses.
 
 \begin{table}[t]
+  {\small
 %% NER 
 \begin{tabular}{l r r r r r r | r r r r r}
   \multicolumn{7}{c|}{Named Entity Recognition} & 
       \multicolumn{3}{c}{Face Identification} \\
-      \textbf{System} & \textbf{Delay/tok} & \textbf{Qus./tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
-          & \textbf{Latency} & \textbf{Qus./ex} & \textbf{Acc.} 
+      \textbf{System} & \textbf{Delay/tok} & \textbf{Qs/tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
+          & \textbf{Latency} & \textbf{Qs/ex} & \textbf{Acc.} 
     \\ \hline
     1-vote & 467 ms & 1.0 & 90.2 & 78.8 & 71.5 & 80.2
       & %1-vote & 
@@ -85,7 +94,9 @@ During simulation we sample the worker responses and delays without replacement 
     %\textbf{LENSE} 
     & 1590 ms & 2.37 & 99.2 \\   %\hline
 \end{tabular}
-\caption{Results on NER and Face tasks comparing latencies, queries per token and performance metrics (Precision, Recall and \fone{} for NER and accuracy for Face).}
+}
+\caption{Results on NER and Face tasks comparing latencies, queries per token (Qs/tok)
+and performance metrics (\fone{} for NER and accuracy for Face).}
 \label{tbl:results}
 \end{table}
 
@@ -120,8 +131,15 @@ During simulation we sample the worker responses and delays without replacement 
 \paragraph{Summary of results.}
 \tableref{results} and \tableref{sentiment-results} summarize the performance of the methods on the three tasks.
 On all three datasets, we found that on-the-job learning outperforms machine and human-only comparisons on both quality and cost. 
-On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude reduction on the cost of achieving comporable quality result using the 5-vote approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by a factor of around 2.
-For the latter two tasks, both on-the-job learning methods perform less well than in NER. We suspect this is due to the presence of a dominant class (``none'') in NER that the model can very quickly learn to expend almost no effort on, and so profit.
+On NER, we achieve an \fone{} of $88.4\%$ at more than an order of magnitude
+reduction on the cost of achieving comporable quality result using the 5-vote
+approach. On Sentiment and Faces, we reduce costs for a comparable accuracy by
+a factor of around 2.
+For the latter two tasks, both on-the-job learning methods perform less well
+than in NER. We suspect this is due to the presence of a dominant class
+(``none'') in NER that the model can very quickly learn to expend almost no
+effort on.  LENSE outperforms the threshold baseline, supporting the importance
+of Bayesian decision theory.
 
 \begin{figure}[t]
   \centering
@@ -137,8 +155,15 @@ For the latter two tasks, both on-the-job learning methods perform less well tha
 
 %\paragraph{Does the model respect accuracy preferences?} 
 \figureref{ner-f1} tracks the performance and cost of LENSE over time on the NER task.
+<<<<<<< Updated upstream
 LENSE is not only able to consistently outperform other baselines, but the cost of the system steadily reduces over time.
 On the NER task, we find that LENSE is able to trade off time to produce more accurate results than the threshold baseline with fewer queries by waiting for responses before making another query.
+=======
+LENSE is not only able  to consistently outperform other baselines, but the cost of the system steadily reduces over time.
+On the NER task, we find that LENSE is able to trade off time to produce more
+accurate results than the 1-vote baseline with fewer queries by waiting for
+responses before making another query.
+>>>>>>> Stashed changes
 
 % == DEV F1
 %We also plot \fone{} on a held-out set: while we receive noisy and sparse supervision LENSE is able to train a classifier that generalizes well over time. 
