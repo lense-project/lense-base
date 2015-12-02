@@ -1,0 +1,114 @@
+% LaTeX Poster vim:ts=2 sw=2
+% 
+\documentclass[final,xcolor={svgnames}]{beamer}
+
+\newcommand{\leftlogo}{\includegraphics[height=1.5in]{figures/stanford.pdf}}
+%\newcommand{\rightlogo}{{\Huge$\mathbb{P}\lambda$}}
+\newcommand{\rightlogo}{\includegraphics[height=1.5in]{figures/nlp-logo.pdf}}
+\newcommand{\leftfooter}{NLP at Stanford University}
+%\newcommand{\leftfooter}{$\mathbb{P}\lambda$ at Stanford University}
+\newcommand{\centerfooter}{\texttt{http://bit.ly/codalab-lense}}
+\newcommand{\rightfooter}{\texttt{\{keenon,chaganty,pliang,manning\}@cs.stanford.edu}}
+\mode<presentation>{\usetheme{I6pd2}}
+
+\usepackage{grffile}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{subfigure}
+
+\boldmath{}
+\usepackage{graphicx}
+\usepackage[orientation=landscape,size=a1,scale=1.4]{beamerposter}
+% change list indention level
+% \setdefaultleftmargin{3em}{}{}{}{}{}
+%\usepackage{snapshot} % will write a .dep file with all dependencies, allows for easy bundling
+
+\usepackage{array,booktabs,tabularx}
+\newcolumntype{Z}{>{\centering\arraybackslash}X} % centered tabularx columns
+
+
+%\listfiles
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{{../figures/}}
+\usepackage[nodefinetheorems]{scabby}
+\usepackage{scabby-diag}
+
+\input{macros}
+ 
+\title{On-the-Job Learning with Bayesian Decision Theory}
+\author{Keenon Werling \and Arun Tejasvi Chaganty \and Percy Liang \and Christopher D. Manning} 
+\institute[Stanford University]{Department of Computer Science\\ Stanford University}
+%\date[Sep. 8th, 2009]{Sep. 8th, 2009}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% You wlll have to manually set the height of the page
+% 105cm is good for A0. 52 for A2, 22 for A3
+\newlength{\columnheight}
+\setlength{\columnheight}{52cm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Everything is contained in this frame
+\begin{frame}
+  % Standard two column layout
+  \begin{columns}
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Column 1
+    \begin{column}{.32\textwidth}
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+        \begin{minipage}[T]{.95\textwidth}  % tweaks the width, makes a new \textwidth
+          \parbox[t][\columnheight]{\textwidth}{% must be some better way to set the the height, width and textwidth simultaneously
+            % Since all columns are the same length, it is all nice and tidy.  You have to get the height empirically
+            % ---------------------------------------------------------%
+            % fill each column with content            
+            \input{column1}
+          }
+        \end{minipage}
+      \end{beamercolorbox}
+    \end{column}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Column 2
+    \begin{column}{.32\textwidth}
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+        \begin{minipage}[T]{.95\textwidth} % tweaks the width, makes a new \textwidth
+          \parbox[t][\columnheight]{\textwidth}{% must be some better way to set the the height, width and textwidth simultaneously
+            % Since all columns are the same length, it is all nice and tidy.  You have to get the height empirically
+            % ---------------------------------------------------------%
+            % fill each column with content
+            \input{column2}
+          }
+          % ---------------------------------------------------------%
+          % end the column
+        \end{minipage}
+      \end{beamercolorbox}
+    \end{column}
+    % ---------------------------------------------------------%
+    % end the column
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Column 3
+    \begin{column}{.32\textwidth}
+      \begin{beamercolorbox}[center,wd=\textwidth]{postercolumn}
+        \begin{minipage}[T]{.95\textwidth} % tweaks the width, makes a new \textwidth
+          \parbox[t][\columnheight]{\textwidth}{% must be some better way to set the the height, width and textwidth simultaneously
+            % Since all columns are the same length, it is all nice and tidy.  You have to get the height empirically
+            % ---------------------------------------------------------%
+            % fill each column with content
+            \input{column3}
+          }
+          % ---------------------------------------------------------%
+          % end the column
+        \end{minipage}
+      \end{beamercolorbox}
+    \end{column}
+    % ---------------------------------------------------------%
+    % end the column
+
+  \end{columns}
+  \vskip2ex
+\end{frame}
+
+\end{document}
+
