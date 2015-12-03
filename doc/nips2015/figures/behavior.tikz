@@ -111,14 +111,14 @@
 
     \sentenceblock{t2x}{($(t2) + (-1.0cm, 0)$)}
      %  p     l     r     o
-     {{0.01}{0.01}{0.9}{0.08}}    % Split b/w other and res.
+     {{0.01}{0.01}{0.9}{0.08}}    % Now we're sure it's resource.
      {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
-     {{0.06}{0.90}{0.01}{0.03}}   % now clearly loc
-     {{0.01}{0.95}{0.01}{0.03}};  % now clearly loc
+     {{0.5}{0.40}{0.01}{0.09} }   % Split b/w person and loc
+     {{0.04}{0.75}{0.01}{0.20}};    % Split b/w/ loc and none
 
     \sentenceblock{t3x}{($(t3) + (-0.25cm, 0)$)}
      %  p     l     r     o
-     {{0.1}{0.05}{0.4}{0.45}}     % Split b/w other and res.
+     {{0.01}{0.01}{0.9}{0.08}}     % Still sure it's resource.
      {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
      {{0.06}{0.90}{0.01}{0.03}}   % now clearly loc
      {{0.01}{0.95}{0.01}{0.03}};  % now clearly loc
@@ -169,7 +169,7 @@
   \draw[-|] (start-2) -- ++(0,-1.1);
   \querypath{($(start-2) + (0,-0.5)$)}{($(start-2) + (3,-0.5)$)}{\small $q_1 = 1$}{\small $r_1 = \textsc{res}$};
   \querypath{($(start-2) + (0,-1.0)$)}{($(start-2) + (4,-1.0)$)}{\small $q_2 = 3$}{\small $r_2 = \textsc{per}$};
-  \querypath{($(start-2) + (4,-1.5)$)}{($(start-2) + (6,-1.5)$)}{\small $q_4 = 3$}{\small $r_4 = \textsc{loc}$};
+  \querypath{($(start-2) + (4,-1.5)$)}{($(start-2) + (6,-1.5)$)}{\small $q_3 = 3$}{\small $r_3 = \textsc{loc}$};
 
 % Legend 
 
