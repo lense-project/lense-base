@@ -1,7 +1,7 @@
 LATEX = pdflatex
 #LATEX = pdflatex -interaction=nonstopmode
 OUTPUT=$(shell basename `pwd`)
-SECTIONS = macros.tex column1.tex column2.tex
+SECTIONS = macros.tex column1.tex column2.tex column3.tex
 FIGURES = 
 
 all: $(OUTPUT).pdf

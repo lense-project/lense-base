@@ -1,31 +1,62 @@
-\begin{block}{On the job learning}
+\vfill
+\begin{block}{Big picture}
   \begin{center}
-  {\large How do you deploy a high accuracy classifier starting with zero training examples?}
-  \end{center}
-
-  \begin{center}
+  {\large How do you deploy a high accuracy classifier starting with zero training examples?}\\
   \includegraphics[width=0.8\columnwidth]{graph}
   \end{center}
 
-  \begin{itemize}
-    \item In {\bf on the job learning} when a new input arrives, the system can choose to query the crowd on \emph{parts} of the input it is uncertain about {\bf before} making a prediction. 
-
-  \begin{center}
-    \includegraphics[width=0.8\columnwidth]{intro-banner}
-  \end{center}
-
-    \item The framework allows systems to maintain accuracy on difficult examples by asking the crowd for assistance, \emph{while} reducing costs by learning a better prediction model on-the-job.
-    \item {\bf The key challenge} is how to trade off latency, cost and
-      accuracy, which is modeled using {\em a game tree and Bayesian decision theory}. 
-  \end{itemize}
-
 \end{block}
+\vfill
+
+\begin{block}{What is on-the-job learning?}
+  \begin{itemize}
+    \item 
+  \textbf{On-the-job learning} allows a system to query the crowd for labels on the uncertain parts of an input as it arrives \textbf{before} making a prediction.
+
+%  \begin{center}
+%    \includegraphics[width=0.8\columnwidth]{intro-banner}
+%  \end{center}
+
+    \item Can \textbf{maintain accuracy on difficult examples} by asking the crowd for assistance.
+    \item \textbf{Reduces costs} on simpler examples by learning a better prediction model online (on-the-job).
+    \item User specifies a base prediction model and how to trade off accuracy, cost and latency. 
+    \item System optimizes for utility using ideas from game playing and Bayesian decision theory.
+  \end{itemize}
+\end{block}
+\vfill
 
 \begin{block}{Related work}
-  \begin{itemize}
-    \item \textbf{Active learning}:
-    \item \textbf{Online learning}:
-  \end{itemize}
+  \begin{tabular}{p{0.5\columnwidth} p{0.2\columnwidth}  p{0.2\columnwidth}}
+    \textbf{Area} & \textbf{Adaptive} & \textbf{Query then predict} \\ \midrule
+    \textbf{Online active learning}
+      chooses the most informative examples to label \emph{after} classification. 
+      Impossible to maintain high accuracy initially.
+      & \begin{center}{\Huge\checkmark}\end{center} &   \\
+    \textbf{Active classification} 
+    learns a static policy from a labelled dataset to choose features to query at test time.
+    &  & \begin{center}{\Huge\checkmark}\end{center} \\
+    \textbf{On-the-job learning}
+    combines advantages of both the above methods. Note,
+Legion:AR \citep{lasecki2013real} studied the user interface
+      aspects of on-the-job learning, while we study the machine learning
+      aspects of it.
+    & \begin{center}{\Huge\checkmark}\end{center} & \begin{center}{\Huge\checkmark}\end{center}
+  \end{tabular}
+
+
+  %\begin{itemize}
+  %  \item Legion:AR \citep{lasecki2013real} study the user interface
+  %    aspects of on-the-job learning, while we study the machine learning
+  %    aspects of it.
+
+
+
+  %  \item \textbf{Online active learning}: The key distinction from
+  %    online active learning is that in on-the-job learning, (noisy
+  %    partial) labels are obtained \emph{before} a prediction is made.
+  %    \todo{figure}.
+  %  \item \textbf{Active classification}: Active classification algorithms learns a static policy from a labelled dataset for when certain features should be queried which does not change at test time, whereas on-the-job learning continuously updates itself, 
+  %\end{itemize}
 \end{block}
-%\vfill
+\vfill
 
