@@ -1,13 +1,13 @@
 \begin{block}{Example: named entity recognition on tweets}
   \begin{center}
-    \includegraphics[width=0.89\columnwidth]{soup-example.png}
+    \includegraphics[width=0.79\columnwidth]{soup-example.png}
   \end{center}
 \end{block}
 \vfill
 
 \begin{block}{How marginals evolve after incorporating responses}
   \begin{center}
-    \includegraphics[width=0.89\columnwidth]{behavior}
+    \includegraphics[width=0.79\columnwidth]{behavior}
   \end{center}
 \end{block}
 \vfill
@@ -18,8 +18,23 @@
       \includegraphics[width=0.89\columnwidth]{mcts_poster}
     \end{center}
   }{
-  Something.
+  \begin{itemize}
+    \item \textbf{Stochastic game} between system and crowd.
+    \item \textbf{States} capture time, queries in flight and received responses.
+    \item \textbf{Actions} are querying for a label, waiting or returning current best guess.
+  \end{itemize}
   }
+  \begin{itemize}
+    \item The system chooses actions that \textbf{maximize utility}.
+    \item Approximated by Markov Chain Tree Search (MCTS) with progressive widening, using an environment model.
+  \begin{align*}
+    \label{eqn:dynamics}
+  %p(\by, \br, \bt \mid \bx, \bq) \eqdef \p(\by \given \bx) \prod_{i=1}^k \presp(r_i \mid \bx, \by, q_i) \ptime(t_i \mid \bx, \by, q_i, s_i).
+  \underbrace{p(\by, \br, \bt \given \bx, \bq, \bs)}_{\textrm{environment model}} \eqdef \underbrace{\p(\by \given \bx)}_{\textrm{prediction}} \prod_{i=1}^k \underbrace{\presp(r_i \mid y_{q_i})}_{\textrm{annotator noise}} \underbrace{\ptime(t_i \mid s_i)}_{\textrm{latency}}.
+  \end{align*}
+    \item Use human-labelled examples as training data to learn the model.
+  \end{itemize}
+
 \end{block}
 \vfill
 
