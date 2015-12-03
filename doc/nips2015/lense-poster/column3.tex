@@ -1,11 +1,11 @@
 
-\begin{block}{Named Entity Recognition}
+\begin{block}{Named Entity Recognition (CoNLL 2003)}
 \begin{table}[t]
   {\small
 %% NER 
 \begin{tabular}{l r r r r r r }
 %  \multicolumn{7}{c}{Named Entity Recognition}  \\
-      \textbf{System} & \textbf{Delay/tok} & \textbf{Qs/tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
+      \textbf{System} & \textbf{Latency/tok} & \textbf{Qs/tok} & \textbf{PER F$_1$} & \textbf{LOC F$_1$} & \textbf{ORG F$_1$} & \textbf{F$_1$}
     \\ \hline
     1-vote & 467 ms & 1.0 & 90.2 & 78.8 & 71.5 & 80.2
       \\ %\hline
@@ -20,8 +20,7 @@
     \textbf{LENSE} & \textbf{267 ms} & \textbf{0.45} & 95.2 & 89.7 & \textbf{81.7} & \textbf{88.8} 
 \end{tabular}
 }
-\caption{Results on NER (CoNLL 2003) comparing latencies, queries per token (Qs/tok)
-and per-class \fone{} scores.}
+%\caption{Results on NER (CoNLL 2003) comparing latencies, queries per token (Qs/tok) and per-class \fone{} scores.}
 \label{tbl:results}
 \end{table}
 
@@ -71,7 +70,11 @@ and per-class \fone{} scores.}
 
 \begin{block}{Conclusions and Future Work}
   \begin{itemize}
-    \item xtuff.
+    \item Consider on-the-job learning to get accurate labels on your
+      next project for cheap. 
+    \item Easy to use open-source implementation, LENSE, available!
+    \item Future directions include improving confidence estimation, 
+      learning from measurements and more applications.
   \end{itemize}
 \end{block}
 \vfill

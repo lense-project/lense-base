@@ -26,21 +26,49 @@
 \vfill
 
 \begin{block}{Related work}
-  \begin{tabular}{p{0.5\columnwidth} p{0.2\columnwidth}  p{0.2\columnwidth}}
-    \textbf{Area} & \textbf{Adaptive} & \textbf{Query then predict} \\ \midrule
+  \begin{tabular}{p{0.49\columnwidth} p{0.49\columnwidth}}
+    \textbf{Area} & \textbf{Paradigm} \\ \midrule
     \textbf{Online active learning}
       chooses the most informative examples to label \emph{after} classification. 
       Impossible to maintain high accuracy initially.
-      & \begin{center}{\Huge\checkmark}\end{center} &   \\
+      & 
+      \begin{center}
+      \tikz{
+      \node[draw, fill=palette2, rectangle, scale=0.7] (inp) {\textsc{Input}};
+      \node[draw, fill=palette3, rectangle, right, scale=0.7] (pred) at ($(inp.east)$) {\textsc{Predict}};
+      \node[draw, fill=palette5, rectangle, right, scale=0.7] (label) at ($(pred.east)$) {\textsc{Label}};
+      \node[draw, fill=palette1, rectangle, right, scale=0.7] (learn) at ($(label.east)$) {\textsc{Learn}};
+      }
+      \end{center}
+      \\
+      %Input, Predict, Label, Learn \\
     \textbf{Active classification} 
     learns a static policy from a labelled dataset to choose features to query at test time.
-    &  & \begin{center}{\Huge\checkmark}\end{center} \\
+      & 
+      \begin{center}
+      \tikz{
+      \node[draw, fill=palette2, rectangle, scale=0.7] (inp) {\textsc{Input}};
+      \node[draw, fill=palette5, rectangle, right, scale=0.7] (label) at ($(inp.east)$) {\textsc{Label}$^*$};
+      \node[draw, fill=palette3, rectangle, right, scale=0.7] (pred) at ($(label.east)$) {\textsc{Predict}};
+%      \node[draw, fill=palette1, rectangle, right, scale=0.7] (learn) at ($(pred.east)$) {\phantom{Learn}};
+      }
+      \end{center}
+      \\
     \textbf{On-the-job learning}
     combines advantages of both the above methods. Note,
 Legion:AR \citep{lasecki2013real} studied the user interface
       aspects of on-the-job learning, while we study the machine learning
       aspects of it.
-    & \begin{center}{\Huge\checkmark}\end{center} & \begin{center}{\Huge\checkmark}\end{center}
+      & 
+      \begin{center}
+      \tikz{
+      \node[draw, fill=palette2, rectangle, scale=0.7] (inp) {\textsc{Input}};
+      \node[draw, fill=palette5, rectangle, right, scale=0.7] (label) at ($(inp.east)$) {\textsc{Label}};
+      \node[draw, fill=palette3, rectangle, right, scale=0.7] (pred) at ($(label.east)$) {\textsc{Predict}};
+      \node[draw, fill=palette1, rectangle, right, scale=0.7] (learn) at ($(pred.east)$) {\textsc{Learn}};
+      }
+      \end{center}
+      \\
   \end{tabular}
 
 
