@@ -1,0 +1,93 @@
+% vim:ft=tex
+\documentclass[tikz,convert={outfile=mcts_poster.pdf}]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+\usepackage{scabby}
+\usepackage{scabby-diag}
+\usepackage{amssymb}
+
+\begin{document}
+
+\providecommand{\acwait}{\textrm{wait}}
+\providecommand{\acret} {\textrm{return}}
+
+%\definecolor{palette1}{HTML}{00D4A8}
+%\definecolor{palette2}{HTML}{2BE7D2}
+%\definecolor{palette3}{HTML}{9FEDD4}
+%\definecolor{palette4}{HTML}{C7E7A0}
+%\definecolor{palette5}{HTML}{91678D}
+
+\definecolor{palette1}{HTML}{E27A3F}
+\definecolor{palette2}{HTML}{45B29D}
+\definecolor{palette3}{HTML}{EFC94C}
+\definecolor{palette4}{HTML}{E27A3F}
+\definecolor{palette5}{HTML}{DF5A49}
+
+\colorlet{sys}{palette2}
+\colorlet{crowd}{palette4}
+
+\begin{tikzpicture}[
+    sys/.style = {draw, regular polygon, regular polygon sides=3, fill=sys},
+    hsys/.style = {regular polygon, regular polygon sides=3},
+    crowd/.style = {draw, circle, fill=crowd},
+    term/.style = {draw, rectangle, fill},
+    ]
+  % Root node
+
+  \point{start}{(0,0)};
+  \point{lvl01}{(0,1cm)}; \point{lvl01x}{(1,1cm)};
+1 \point{lvl02}{(0,0.7cm)}; \point{lvl02x}{(1,0.7cm)};
+  \point{lvl0}{(0,0cm)}; \point{lvl0x}{(1,0cm)};
+  \point{lvl1}{(0,-1cm)}; \point{lvl1x}{(1,-1cm)};
+  \point{lvl2}{(0,-2cm)}; \point{lvl2x}{(1,-2cm)};
+  \point{lvl3}{(0,-3cm)}; \point{lvl3x}{(1,-3cm)};
+  \point{lvl4}{(0,-4cm)}; \point{lvl4x}{(1,-4cm)};
+
+  \point{hist0}{(0.5cm,0)}; \point{hist0x}{(0.5cm,-1cm)};
+  \point{hist1}{(0,0)}; \point{hist1x}{(0,-1cm)};
+  \point{hist15}{(-0.75cm,0)}; \point{hist15x}{(-0.75cm,-1cm)};
+  \point{hist2}{(-1.5cm,0)}; \point{hist2x}{(-1.5cm,-1cm)};
+  \point{hist25}{(-2cm,0)}; \point{hist25x}{(-2cm,-1cm)};
+
+  \node[sys] (rt) at (start) {};
+  % First history, wait, get crowd;
+  \node[crowd] (h1-crowd1) at ($(lvl1)!(hist1)!(lvl1x)$) {};
+  \draw[-latex] (rt.south) -- node[right]{$\acwait$} (h1-crowd1);
+
+  \node[sys] (h1-resp1) at ($(lvl2)!(hist1)!(lvl2x)$) {};
+  \draw[-latex] (h1-crowd1) -- node[right]{\small $r_1 = \textsc{loc}$} (h1-resp1.north);
+
+  \node[hsys] (h1-resp2) at ($(lvl2)!(hist15)!(lvl2x)$) {};
+  \draw[-latex] (h1-crowd1) -- (h1-resp2.north);
+
+  \node[term] (h1-term) at ($(lvl3)!(hist1)!(lvl3x)$) {};
+  \node[right=0.1cm of h1-term] {0.47};
+  \draw[-latex] (h1-resp1) -- node[right]{$\acret$} (h1-term);
+
+  \node[sys] (h2-q1) at ($(lvl1)!(hist2)!(lvl1x)$) {};
+  \draw[-latex] (rt.south) -- node[above left]{\small query $q_2 = 4$ ``st.''} (h2-q1.north);
+
+  \node[crowd] (h2-crowd1) at ($(lvl2)!(hist2)!(lvl2x)$) {};
+  \draw[-latex] (h2-q1) -- node[right]{$\acwait$} (h2-crowd1);
+
+  \node[sys] (h2-resp1) at ($(lvl3)!(hist2)!(lvl3x)$) {};
+  \draw[-latex] (h2-crowd1) -- node[right]{\small $r_1 = \textsc{loc}$} (h2-resp1.north);
+
+  \node[hsys] (h2-resp2) at ($(lvl3)!(hist25)!(lvl3x)$) {};
+  \draw[-latex] (h2-crowd1) -- node[left]{} (h2-resp2.north);
+
+  \node[term] (h2-term) at ($(lvl4)!(hist2)!(lvl4x)$) {};
+  \node[right=0.1cm of h2-term] {0.27};
+  \draw[-latex] (h2-resp1) -- node[right]{$\acret$} (h2-term);
+
+  \node[sys, scale=0.5, left] (lg0) at ($(lvl01)!(hist2)!(lvl01x)$) {};
+  \node[right] at (lg0) {\ $=$ system};
+  \node[crowd, scale=0.5, left] (lg1) at ($(lvl02)!(hist2)!(lvl02x)$) {};
+  \node[right] at (lg1) {\ $=$ crowd};
+
+  \node[right] (st1) at ($(lvl0)!(hist0)!(lvl0x)$) {queried $q_1 = 3$ ``George''.};
+  %\node[right] (st2) at ($(lvl2)!(hist0)!(lvl2x)$) {\small $(1.7, (3), (0), (1.7), (\textsc{loc}))$};
+
+
+\end{tikzpicture}
+
+\end{document}

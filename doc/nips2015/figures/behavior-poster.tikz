@@ -1,0 +1,191 @@
+% vim:ft=tex
+\documentclass[tikz,convert={outfile=behavior-poster.pdf}]{standalone}
+%\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
+
+\usepackage{scabby-diag}
+\usepackage{amssymb}
+% \pgfplotsset{compat=1.11}
+
+\begin{document}
+
+% Color definitions
+
+\definecolor{palette1}{HTML}{E27A3F}
+\definecolor{palette2}{HTML}{45B29D}
+\definecolor{palette3}{HTML}{EFC94C}
+\definecolor{palette4}{HTML}{E27A3F}
+\definecolor{palette5}{HTML}{DF5A49}
+
+\colorlet{per}{palette3}
+\colorlet{loc}{palette1}
+\colorlet{res}{palette5}
+\colorlet{other}{palette2}
+
+%\colorlet{per}{red!80}
+%\colorlet{loc}{blue!80}
+%\colorlet{res}{green!80}
+%\colorlet{other}{cyan!30}
+
+\newcommand*{\stackbarw}[7]{% name, start, size1, size2, size3, size4, width}
+\pgfsetlinewidth{0.1pt};
+  \tikzrect{#1-per}{per,fill=per}{($#2 + (0.5*\pgflinewidth, 0.5*\pgflinewidth)$)}{#7}{#3};
+  \node[above right] at (#1-per) {\textsc{per}};
+  \tikzrect{#1-loc}{loc,fill=loc}{($(#1-per) + (0,#3)$)}{#7}{#4};
+  \node[above right] at (#1-loc) {\textsc{loc}};
+  \tikzrect{#1-res}{res,fill=res}{($(#1-loc) + (0,#4)$)}{#7}{#5};
+  \node[above right] at (#1-res) {\textsc{res}};
+  \tikzrect{#1-other}{other,fill=other}{($(#1-res) + (0,#5)$)}{#7}{#6};
+  \node[above right] at (#1-other) {\textsc{none}};
+\node[draw, rectangle, minimum height=2cm, minimum width=#7, above right] (#1) at #2 {};
+\pgfsetlinewidth{0.4pt};
+}
+
+\newcommand*{\stackbar}[6]{% name, start, size1, size2, size3, size4}
+\pgfsetlinewidth{0.1pt};
+  \tikzrect{#1-per}{per,fill=per}{($#2 + (0.5*\pgflinewidth, 0.5*\pgflinewidth)$)}{0.3cm}{#3};
+  \tikzrect{#1-loc}{loc,fill=loc}{($(#1-per) + (0,#3)$)}{0.3cm}{#4};
+  \tikzrect{#1-res}{res,fill=res}{($(#1-loc) + (0,#4)$)}{0.3cm}{#5};
+  \tikzrect{#1-other}{other,fill=other}{($(#1-res) + (0,#5)$)}{0.3cm}{#6};
+\node[draw, rectangle, minimum height=1cm, minimum width=0.3cm, above right] (#1) at #2 {};
+\pgfsetlinewidth{0.4pt};
+}
+
+% \newcommand*{\sentenceblock}[5]{% id, start, (scores for tok1), ..., (scores for tok4)
+% \point{#1}{#2};
+% \stackbar{#1-S}{(#1)}                              {#3}{#4}{#5}{#6};
+% \stackbar{#1-o}{($(#1-S.south west) + (0.3cm, 0)$)}{#7}{#8}{#9}{#10};
+% \stackbar{#1-G}{($(#1-o.south west) + (0.3cm, 0)$)}{#11}{#12}{#13}{#14};
+% \stackbar{#1-s}{($(#1-G.south west) + (0.3cm, 0)$)}{#15}{#16}{#17}{#18};
+% }
+
+\newcommand*{\sentenceblock}[6]{% id, start, (scores for tok1), ..., (scores for tok4)
+\point{#1}{#2};
+\stackbar{#1-S}{(#1)}#3;
+\stackbar{#1-o}{($(#1-S.south west) + (0.3cm, 0)$)}#4;
+\stackbar{#1-G}{($(#1-o.south west) + (0.3cm, 0)$)}#5;
+\stackbar{#1-s}{($(#1-G.south west) + (0.3cm, 0)$)}#6;
+\node[above] at (#1-S.north) {\small S};
+\node[above] at (#1-o.north) {\small o};
+\node[above] at (#1-G.north) {\small G};
+\node[above] at (#1-s.north) {\small s};
+}
+
+%\newcommand{\querypath}[3]{% start, end, label}
+%  \draw[->|, fill] #1 circle (1pt) edge node[above] {#3} #2;
+%}
+\newcommand{\querypath}[4]{% start, end, start label, end label}
+\draw[->|, fill] #1 circle (1pt) node[left]{#3} edge #2 -- #2 node[right] {#4};
+}
+
+\newcommand{\acwait}{\varnothing_{W}}
+\newcommand{\acret}{\varnothing_{R}}
+
+\begin{tikzpicture}[
+    triangle/.style = {regular polygon, regular polygon sides=3},
+    timepoint/.style = {circle, radius=1cm},
+    square/.style = {regular polygon, regular polygon sides=4},
+    elem/.style = {rectangle, minimum width=0.3cm}, 
+    node rotated/.style = {rotate=180},
+    border rotated/.style = {shape border rotate=180}
+    ]
+  % Draw a barchart with probabilities.
+  \point{start-1}{(0,0)};
+
+    %\sentenceblock{t1}{(start)}
+    % %  p     l     r     o
+    % {{0.1}{0.05}{0.4}{0.45}}     % Split b/w other and res.
+    % {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+    % {{0.5}{0.45}{0.01}{0.04} }   % Split b/w person and loc
+    % {{0.04}{0.45}{0.01}{0.40}};    % Split b/w/ loc and none
+
+    % Define a time line
+  \node[draw,rectangle] at ($(start-1) + (-1cm,0.5cm)$) {\small 1};
+    \draw[fill, -|] (start-1) circle (2pt) node[above] (t1) {} -- ++(3,0) circle (2pt) node[above] (t2) {} -- ++(1,0) circle (2pt) node[above] (t3) {} -- ++(0,0) edge ++(1,0);
+
+    \sentenceblock{t1x}{($(t1) + (-0.5cm, 0)$)}
+     %  p     l     r     o
+     {{0.1}{0.05}{0.4}{0.45}}     % Split b/w other and res.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.5}{0.40}{0.01}{0.09} }   % Split b/w person and loc
+     {{0.04}{0.75}{0.01}{0.20}};    % Split b/w/ loc and none
+
+    \sentenceblock{t2x}{($(t2) + (-1.0cm, 0)$)}
+     %  p     l     r     o
+     {{0.01}{0.01}{0.9}{0.08}}    % Now we're sure it's resource.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.5}{0.40}{0.01}{0.09} }   % Split b/w person and loc
+     {{0.04}{0.75}{0.01}{0.20}};    % Split b/w/ loc and none
+
+    \sentenceblock{t3x}{($(t3) + (-0.25cm, 0)$)}
+     %  p     l     r     o
+     {{0.01}{0.01}{0.9}{0.08}}     % Still sure it's resource.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.06}{0.90}{0.01}{0.03}}   % now clearly loc
+     {{0.01}{0.95}{0.01}{0.03}};  % now clearly loc
+
+     % Query lines
+  \draw[-|] (0,0) -- (0,-1.1);
+  \querypath{(0,-0.5)}{(3,-0.5)}{\small $q_1 = 1$}{\small $r_1 = \textsc{res}$};
+  \querypath{(0,-1.0)}{(4,-1.0)}{\small $q_2 = 3$}{\small $r_2 = \textsc{loc}$};
+
+  \node[black!70, scale=0.5] at ($(start-1) + (0,-0.5) + (-0.6, 0.23)$) {``Soup''?};
+  \node[black!70, scale=0.5] at ($(start-1) + (0,-1.0) + (-0.6, 0.23)$) {``George''?};
+
+  \draw[dashed, gray!70] (-0.5,-1.35) -- (7.,-1.35);
+
+  \point{start-2}{(0,-3.0)};
+
+  % Story 2: the we got a different response and have to query again.!
+  \node[draw,rectangle] at ($(start-2) + (-1cm,0.5cm)$) {\small 2};
+
+    \draw[fill, -|] (start-2) circle (2pt) node[above] (s2-t1) {} -- ++(3,0) circle (2pt) node[above] (s2-t2) {} -- ++(1,0) circle (2pt) node[above] (s2-t3) {} -- ++(2,0) circle (2pt) node[above] (s2-t4) {} -- ++(0,0) edge ++(1,0) -- ++(1,0);
+
+    \sentenceblock{s2-t1x}{($(s2-t1) + (-0.5cm, 0)$)}
+     %  p     l     r     o
+     {{0.1}{0.05}{0.4}{0.45}}     % Split b/w other and res.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.5}{0.40}{0.01}{0.09} }   % Split b/w person and loc
+     {{0.04}{0.75}{0.01}{0.20}};    % Split b/w/ loc and none
+
+    \sentenceblock{s2-t2x}{($(s2-t2) + (-1.0cm, 0)$)}
+     %  p     l     r     o
+     {{0.01}{0.01}{0.9}{0.08}}    % Split b/w other and res.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.5}{0.40}{0.01}{0.09} }   % Split b/w person and loc
+     {{0.04}{0.75}{0.01}{0.20}};    % Split b/w/ loc and none
+
+    \sentenceblock{s2-t3x}{($(s2-t3) + (-0.25cm, 0)$)}
+     %  p     l     r     o
+     {{0.01}{0.01}{0.9}{0.08}}    % Split b/w other and res.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.70}{0.20}{0.01}{0.09}}   % uh oh, annotation error
+     {{0.01}{0.75}{0.01}{0.23}};  % now, more uncertainty
+
+    \sentenceblock{s2-t4x}{($(s2-t4) + (-0.25cm, 0)$)}
+     %  p     l     r     o
+     {{0.01}{0.01}{0.9}{0.08}}    % Split b/w other and res.
+     {{0.01}{0.01}{0.01}{0.97}}   % just clearly other
+     {{0.16}{0.80}{0.01}{0.03}}   % now mostly loc
+     {{0.01}{0.95}{0.01}{0.03}};  % now clearly loc
+
+     % Query lines
+  \draw[-|] (start-2) -- ++(0,-1.1);
+  \querypath{($(start-2) + (0,-0.5)$)}{($(start-2) + (3,-0.5)$)}{\small $q_1 = 1$}{\small $r_1 = \textsc{res}$};
+  \querypath{($(start-2) + (0,-1.0)$)}{($(start-2) + (4,-1.0)$)}{\small $q_2 = 3$}{\small $r_2 = \textsc{per}$};
+  \querypath{($(start-2) + (4,-1.5)$)}{($(start-2) + (6,-1.5)$)}{\small $q_3 = 3$}{\small $r_3 = \textsc{loc}$};
+
+  \node[black!70, scale=0.5] at ($(start-2) + (0,-0.5) + (-0.6, 0.23)$) {``Soup''?};
+  \node[black!70, scale=0.5] at ($(start-2) + (0,-1.0) + (-0.6, 0.23)$) {``George''?};
+  \node[black!70, scale=0.5] at ($(start-2) + (4,-1.5) + (-0.6, 0.23)$) {``George''?};
+
+
+% Legend 
+
+\point{legend}{(6.0, -1)};
+\stackbarw{legend-var}{(legend)}{0.5}{0.5}{0.5}{0.5}{1.0cm};
+\node[above] at (legend-var.north) {\small Legend};
+
+\end{tikzpicture}
+
+\end{document}
+
